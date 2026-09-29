@@ -20,7 +20,11 @@
 // the naive approach that made skymap's old drag "blow up near the
 // zenith" — see the note).
 
-import { Observer, Horizon } from "../lib/astronomy-engine.js";
+import {
+  Observer, Spherical, VectorFromSphere, RotateVector,
+  HorizonFromVector, VectorFromHorizon, EquatorFromVector,
+  Rotation_EQJ_HOR, Rotation_HOR_EQJ,
+} from "../lib/astronomy-engine.js";
 
 /** Builds an astronomy-engine Observer from a site (degrees, degrees, metres). */
 export function makeObserver(latDeg, lonDeg, elevM) {
@@ -28,13 +32,25 @@ export function makeObserver(latDeg, lonDeg, elevM) {
 }
 
 /**
- * RA (degrees, J2000-ish "of date" per Horizon()'s own contract)/Dec
- * (degrees) -> {azimuth, altitude} (degrees), for one observer at one
- * instant. Horizon() itself wants RA in sidereal hours, hence the /15.
+ * RA/Dec (degrees, J2000 — the epoch every star/DSO catalog here uses) ->
+ * {azimuth, altitude} (degrees, of date), for one observer at one instant.
+ * Built entirely from astronomy-engine's own official rotation-matrix
+ * primitives (Rotation_EQJ_HOR et al.) rather than a hand-derived formula,
+ * specifically so the J2000->of-date precession/nutation step is handled
+ * correctly and automatically — Gilles, 2026-09-29, having watched a GOTO
+ * land in a "weird position": "tu dois avoir des problemes de conversion
+ * degres/heures et/ou de jnow/j2000". An earlier version of this function
+ * (Horizon()-based) skipped that step entirely, off by ~0.2-0.4deg in 2026
+ * — small, but real, and worth fixing now that the right tool is known,
+ * even though the actual "weird position" turned out to be the separate,
+ * much larger targetra-in-degrees-not-hours bug (see templates/
+ * navigator.js).
  */
 export function equatorialToHorizontal(raDeg, decDeg, observer, date) {
-  const h = Horizon(date, observer, raDeg / 15, decDeg, "normal");
-  return { azimuth: h.azimuth, altitude: h.altitude };
+  const eqjVec = VectorFromSphere(new Spherical(decDeg, raDeg, 1), date);
+  const horVec = RotateVector(Rotation_EQJ_HOR(date, observer), eqjVec);
+  const sphere = HorizonFromVector(horVec, "normal"); // {lat: altitude, lon: azimuth}
+  return { azimuth: sphere.lon, altitude: sphere.lat };
 }
 
 /**
@@ -97,4 +113,26 @@ export function horizontalToScreen(azimuthDeg, altitudeDeg, radiusPx) {
 export function magnitudeToRadius(mag) {
   const r = 3.2 - mag * 0.34;
   return Math.max(0.4, Math.min(3.2, r));
+}
+
+/** Inverse of horizontalToVector. */
+export function vectorToHorizontal(v) {
+  return { azimuth: Math.atan2(v.x, v.y) * 180 / Math.PI, altitude: Math.asin(Math.max(-1, Math.min(1, v.z))) * 180 / Math.PI };
+}
+
+/**
+ * Horizontal (of date) coordinates -> RA/Dec (degrees, J2000) — the exact
+ * inverse of equatorialToHorizontal(), same rotation-matrix primitives.
+ * Used for "what RA/Dec did the user click on" (sky-engine.js's
+ * selection), including setting a GOTO target (navigator.cpp's own
+ * OnSucessSolve()/actions.gototarget both treat target.targetra/targetde
+ * as J2000, converting to of-date internally via INDI::J2000toObserved) —
+ * so returning J2000 here, not of-date, is required for that value to be
+ * usable as-is.
+ */
+export function horizontalToEquatorial(azimuthDeg, altitudeDeg, observer, date) {
+  const horVec = VectorFromHorizon(new Spherical(altitudeDeg, azimuthDeg, 1), date, "normal");
+  const eqjVec = RotateVector(Rotation_HOR_EQJ(date, observer), horVec);
+  const equ = EquatorFromVector(eqjVec); // {ra: hours, dec: degrees}
+  return { ra: equ.ra * 15, dec: equ.dec };
 }

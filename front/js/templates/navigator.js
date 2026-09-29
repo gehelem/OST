@@ -10,28 +10,89 @@
 //     sky-engine.js's own header for why);
 //   - full-screen background placement, panels float over it.
 //
-// v1 deliberately does NOT wire: search/results, GOTO, target selection,
-// the visibility bar / time-scrub control (engine already accepts an
-// arbitrary getTime(), just nothing drives it yet), the horizon/terrestrial
-// and camera-field views. Those are the next steps, not attempted in one
-// shot - see the note's own "pas encore tranche" section.
+// Selection (Gilles, 2026-09-29: "point epineux : la selection d'un objet,
+// on fait comment ?"): a tap/click on the dome (sky-engine.js's own
+// onSelect, not a right-click/long-press — see that file's header for the
+// mobile-compatibility reasoning) opens/updates a regular "Selection"
+// panel with the picked object's info + GOTO/Add-to-planner buttons - same
+// interaction language as the rest of this app, no context menu anywhere.
+//
+// Still not wired in this pass: search/results (text search still only
+// reachable via the generic "Other" catch-all panel), the visibility bar /
+// time-scrub control (engine already accepts an arbitrary getTime(), just
+// nothing drives it yet), the horizon/terrestrial and camera-field views.
 //
 // Real property names confirmed against src/modules/navigator/navigator.json
 // / libs/indimodule.cpp's defineMeAsNavigator()/giveMeALocation(): search,
-// results, selectnow, target, mountposition, gpslocation, gpstime,
-// location, actions (abortnavigator/gototarget/addtoplanner),
-// centeringparams, slaves - plus image/optic/parms, generic to any imager.
+// results, selectnow, target (targetname/targetra/targetde), mountposition,
+// gpslocation, gpstime, location, actions (abortnavigator/gototarget/
+// addtoplanner), centeringparams, slaves - plus image/optic/parms, generic
+// to any imager.
 
 import { renderProperty, updateQuickNav } from "../render.js";
 import { el } from "../dom.js";
 import * as Panels from "../panels.js";
 import { SkyEngine } from "../sky-engine.js";
 
+function fmtDeg(v) { return v.toFixed(3) + "°"; }
+function fmtHours(raDeg) {
+  const h = ((raDeg / 15) % 24 + 24) % 24;
+  const hh = Math.floor(h);
+  const mm = Math.floor((h - hh) * 60);
+  const ss = Math.round(((h - hh) * 60 - mm) * 60);
+  return `${hh}h${String(mm).padStart(2, "0")}m${String(ss).padStart(2, "0")}s`;
+}
+
+/** The "Selection" panel's body: updated in place from sky-engine.js's
+ * onSelect callback (client-only transient state, not server-sourced - no
+ * client.subscribe() here), plus two buttons that actually talk to the
+ * server: setting target.targetname/targetra/targetde (SV, immediately on
+ * selection, so the module's own idea of "the current pick" stays in sync
+ * with what's shown here) and firing actions.gototarget/addtoplanner.
+ *
+ * targetra is sent in HOURS (0-24), not degrees — INDI::IEquatorialCoordinates
+ * ("Right Ascension in Hours (0 to 24)", libastro.h) is what navigator.cpp's
+ * own gototarget handler feeds straight into INDI::J2000toObserved(). Every
+ * RA elsewhere in this file (sky-projection.js, sky-catalog.js, sky-engine.js)
+ * stays in degrees for internal consistency with Dec — this /15 is the one
+ * and only place it matters, right at the wire boundary. Sending degrees
+ * here was the actual cause of a GOTO landing in a "weird position" (Gilles,
+ * 2026-09-30) — a 15x error, not the smaller J2000/of-date precession gap
+ * fixed alongside it in sky-projection.js. */
+function buildSelectionPanel(client, moduleName) {
+  const wrap = el("div");
+  const info = el("div", { class: "muted small", text: "Tap a star or object on the sky to select it." });
+  const gotoBtn = el("button", { class: "btn btn-primary btn-sm", disabled: true }, [el("span", { class: "material-icons", style: "font-size:15px;vertical-align:middle" }, "gps_fixed"), " GOTO"]);
+  const plannerBtn = el("button", { class: "btn btn-sm", disabled: true }, "Add to planner");
+  const actionsRow = el("div", { class: "form-row" }, [gotoBtn, plannerBtn]);
+  wrap.appendChild(info);
+  wrap.appendChild(actionsRow);
+
+  gotoBtn.addEventListener("click", () => client.setValue(moduleName, "actions", "gototarget", true));
+  plannerBtn.addEventListener("click", () => client.setValue(moduleName, "actions", "addtoplanner", true));
+
+  function onSelect(obj) {
+    const name = obj.name || (obj.kind === "star" ? "Star" : obj.kind === "messier" ? obj.desig || "DSO" : "Point");
+    info.innerHTML = "";
+    info.appendChild(el("div", { text: name }));
+    info.appendChild(el("div", { class: "muted small mono", text: `RA ${fmtHours(obj.ra)}  Dec ${fmtDeg(obj.dec)}` }));
+    if (obj.mag !== undefined) info.appendChild(el("div", { class: "muted small", text: `mag ${obj.mag}` }));
+    gotoBtn.disabled = false;
+    plannerBtn.disabled = false;
+    client.setValue(moduleName, "target", "targetname", name);
+    client.setValue(moduleName, "target", "targetra", obj.ra / 15); // degrees -> hours, see this function's own doc comment
+    client.setValue(moduleName, "target", "targetde", obj.dec);
+  }
+
+  wrap._dispose = () => {};
+  return { node: wrap, onSelect };
+}
+
 // Same shared #bg-layer element imagelayer.js targets for guider/focus/
 // sequencer's own image background - looked up directly here (unlike
 // imagelayer.js's setBgLayer() indirection) since this is the only
 // consumer and there's no boot-time ordering to get right either way.
-function buildSkyDome(client, moduleName) {
+function buildSkyDome(client, moduleName, onSelect) {
   const bgLayer = document.getElementById("bg-layer");
   if (!bgLayer) return { dispose: () => {} };
   bgLayer.classList.add("sky-active");
@@ -41,6 +102,7 @@ function buildSkyDome(client, moduleName) {
 
   const engine = new SkyEngine(canvas, {
     onNeedsRender: () => engine.render(),
+    onSelect,
   });
   engine.loadCatalog("light").then(() => engine.render()).catch((e) => console.error("[navigator] catalog load", e));
 
@@ -96,10 +158,15 @@ export function mount(client, moduleName) {
     const has = (name) => name in mod.properties;
     const quickNavEntries = [];
 
-    disposers.push(buildSkyDome(client, moduleName).dispose);
+    const selection = buildSelectionPanel(client, moduleName);
+    disposers.push(buildSkyDome(client, moduleName, selection.onSelect).dispose);
 
     const header = Panels.make({ id: "header", title: mod.infos.modulelabel || mod.infos.label || moduleName, x: 20, y: 92, w: 320 });
     header.appendChild(el("div", { class: "muted small", text: mod.infos.description || "" }));
+
+    const selectionPanel = Panels.make({ id: "selection", title: "Selection", x: 340, y: 92, w: 300 });
+    selectionPanel.appendChild(track(selection.node));
+    quickNavEntries.push({ id: "selection", label: "Selection" });
 
     if (has("actions")) {
       const b = Panels.make({ id: "actions", title: mod.properties.actions.label || "Commands", x: 20, y: 210, w: 300 });

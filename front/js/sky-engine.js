@@ -17,11 +17,31 @@
 // (dragged point lands exactly under the new cursor, for a range of
 // drags including ones crossing the zenith) with a standalone script
 // before this file used it at all.
+//
+// Selection: a tap/click (not a drag — distinguished by total pointer
+// movement, see CLICK_THRESHOLD_PX) hit-tests the catalog in screen space
+// and calls onSelect(). Deliberately not a right-click/long-press context
+// menu (Gilles, 2026-09-29: "point epineux : la selection d'un objet, on
+// fait comment ? ... attention = future app android pour qui ca va poser
+// probleme") — works identically for mouse and (single-)touch, no
+// platform-specific gesture at all; the caller (templates/navigator.js)
+// shows the selection as a regular panel with action buttons, same as
+// everything else in this app, not a menu at the tap position.
 
 import { Body, Horizon, Equator } from "../lib/astronomy-engine.js";
-import { makeObserver, equatorialToHorizontal, horizontalToVector, vectorToScreen, screenToVector, magnitudeToRadius } from "./sky-projection.js";
+import { makeObserver, equatorialToHorizontal, horizontalToEquatorial, horizontalToVector, vectorToHorizontal, vectorToScreen, screenToVector, magnitudeToRadius } from "./sky-projection.js";
 import { identity, multiply, conjugate, rotateVector, fromTwoVectors } from "./quaternion.js";
 import { loadCatalog } from "./sky-catalog.js";
+
+// Below this many CSS px of total movement between pointerdown and
+// pointerup, a gesture counts as a tap/click (selection) rather than a
+// drag (pan) — Gilles, 2026-09-29: "clic droit... attention = future app
+// android pour qui ca va poser probleme". Works identically for mouse and
+// touch, no platform-specific gesture (no right-click, no long-press).
+const CLICK_THRESHOLD_PX = 6;
+// How close (CSS px) a tap needs to land to a catalog object to select it,
+// rather than just recording the raw RA/Dec of the tap itself.
+const HIT_RADIUS_PX = 12;
 
 const PLANETS = [
   { body: Body.Sun, color: "#ffd54f", radius: 5, label: "Sun" },
@@ -49,18 +69,30 @@ export class SkyEngine {
     this.zoom = 1;
     this.rotation = identity(); // view pan state - see this file's own header
     this.onNeedsRender = opts.onNeedsRender || null; // called after wheel-zoom/drag changes, so the caller can re-render immediately instead of waiting for its own timer
+    this.onSelect = opts.onSelect || null; // called on a tap/click that isn't a drag - see _handlePointerUp()
     this.catalog = { stars: [], constellationLines: [], messier: [] };
-    this._domeRadius = 1; // recomputed every render(), read by the drag handlers to convert screen<->vector
-    this._drag = null; // { grabVector (fixed-frame), rotationAtDragStart } while a drag is in progress
+    this._domeRadius = 1; // recomputed every render(), read by the drag/tap handlers to convert screen<->vector
+    this._drag = null; // { grabVector (fixed-frame), rotationAtDragStart, startOffset, moved } while a gesture is in progress (mouse or touch)
 
+    this._onMouseDown = this._onMouseDown.bind(this);
+    this._onMouseMove = this._onMouseMove.bind(this);
+    this._onMouseUp = this._onMouseUp.bind(this);
+    this._onTouchStart = this._onTouchStart.bind(this);
+    this._onTouchMove = this._onTouchMove.bind(this);
+    this._onTouchEnd = this._onTouchEnd.bind(this);
     this._onWheel = this._onWheel.bind(this);
-    this._onPointerDown = this._onPointerDown.bind(this);
-    this._onPointerMove = this._onPointerMove.bind(this);
-    this._onPointerUp = this._onPointerUp.bind(this);
     canvas.addEventListener("wheel", this._onWheel, { passive: false });
-    canvas.addEventListener("mousedown", this._onPointerDown);
-    window.addEventListener("mousemove", this._onPointerMove);
-    window.addEventListener("mouseup", this._onPointerUp);
+    canvas.addEventListener("mousedown", this._onMouseDown);
+    window.addEventListener("mousemove", this._onMouseMove);
+    window.addEventListener("mouseup", this._onMouseUp);
+    // Single-touch only for v1: touch-drag pans, a tap (like a click)
+    // selects. No pinch-zoom yet (wheel-zoom is desktop-only so far) —
+    // { passive: false } since we preventDefault to stop the page itself
+    // from scrolling/zooming while panning the dome.
+    canvas.addEventListener("touchstart", this._onTouchStart, { passive: false });
+    canvas.addEventListener("touchmove", this._onTouchMove, { passive: false });
+    canvas.addEventListener("touchend", this._onTouchEnd);
+    canvas.addEventListener("touchcancel", this._onTouchEnd);
   }
 
   setSite(lat, lon, elev) {
@@ -83,30 +115,33 @@ export class SkyEngine {
     return { cx: r.width / 2, cy: r.height / 2, rect: r };
   }
 
-  /** CSS-pixel offset from the canvas's own center, for a mouse event —
-   * screenToVector/vectorToScreen both work in that same offset space
-   * (see sky-projection.js), not raw client/page coordinates. */
-  _eventOffset(ev) {
+  /** CSS-pixel offset from the canvas's own center, for a {clientX,clientY}
+   * point (a MouseEvent or one Touch both have these) — screenToVector/
+   * vectorToScreen both work in that same offset space (see
+   * sky-projection.js), not raw client/page coordinates. */
+  _pointOffset(clientX, clientY) {
     const { cx, cy, rect } = this._screenCenter();
-    return { x: ev.clientX - rect.left - cx, y: ev.clientY - rect.top - cy };
+    return { x: clientX - rect.left - cx, y: clientY - rect.top - cy };
   }
 
-  _onPointerDown(ev) {
-    if (ev.button !== 0) return;
-    const off = this._eventOffset(ev);
+  _handlePointerDown(clientX, clientY) {
+    const off = this._pointOffset(clientX, clientY);
     const grabView = screenToVector(off.x, off.y, this._domeRadius);
     // The point currently under the cursor, expressed in the FIXED
     // (unrotated) frame: view = rotation * fixed, so fixed = rotation^-1 *
     // view = conjugate(rotation) * view (unit quaternions: inverse = conjugate).
     const grabVector = rotateVector(conjugate(this.rotation), grabView);
-    this._drag = { grabVector, rotationAtDragStart: this.rotation };
+    this._drag = { grabVector, rotationAtDragStart: this.rotation, startOffset: off, moved: false };
     this.canvas.classList.add("dragging");
-    ev.preventDefault();
   }
 
-  _onPointerMove(ev) {
+  _handlePointerMove(clientX, clientY) {
     if (!this._drag) return;
-    const off = this._eventOffset(ev);
+    const off = this._pointOffset(clientX, clientY);
+    if (!this._drag.moved) {
+      const d = Math.hypot(off.x - this._drag.startOffset.x, off.y - this._drag.startOffset.y);
+      if (d > CLICK_THRESHOLD_PX) this._drag.moved = true;
+    }
     const cView = screenToVector(off.x, off.y, this._domeRadius);
     // The single minimal rotation taking the originally-grabbed view-space
     // point to the current cursor, composed onto the rotation that was
@@ -119,10 +154,65 @@ export class SkyEngine {
     if (this.onNeedsRender) this.onNeedsRender();
   }
 
-  _onPointerUp() {
+  _handlePointerUp() {
     if (!this._drag) return;
+    const { startOffset, moved } = this._drag;
     this._drag = null;
     this.canvas.classList.remove("dragging");
+    if (!moved && this.onSelect) this._select(startOffset.x, startOffset.y);
+  }
+
+  _onMouseDown(ev) { if (ev.button === 0) { this._handlePointerDown(ev.clientX, ev.clientY); ev.preventDefault(); } }
+  _onMouseMove(ev) { this._handlePointerMove(ev.clientX, ev.clientY); }
+  _onMouseUp() { this._handlePointerUp(); }
+
+  _onTouchStart(ev) {
+    if (ev.touches.length !== 1) return;
+    this._handlePointerDown(ev.touches[0].clientX, ev.touches[0].clientY);
+    ev.preventDefault();
+  }
+  _onTouchMove(ev) {
+    if (!this._drag || ev.touches.length !== 1) return;
+    this._handlePointerMove(ev.touches[0].clientX, ev.touches[0].clientY);
+    ev.preventDefault();
+  }
+  _onTouchEnd() { this._handlePointerUp(); }
+
+  /** Finds the catalog object nearest a tap/click, within HIT_RADIUS_PX —
+   * re-projects the catalog fresh (cheap: only runs once per tap, not per
+   * frame) rather than caching render()'s own per-frame positions, so it
+   * can never drift out of sync with what's actually on screen. Falls back
+   * to the raw RA/Dec under the tap when nothing catalogued is close
+   * enough (e.g. centering an arbitrary point, not tied to any object).
+   * Calls onSelect({kind, name, ra, dec, mag}) — kind is "star"/"messier"/
+   * null (null = the raw-point fallback, no name/mag). */
+  _select(offX, offY) {
+    const date = this.getTime();
+    const domeRadius = this._domeRadius;
+    const toOffset = (v) => {
+      const rv = rotateVector(this.rotation, v);
+      return vectorToScreen(rv, domeRadius);
+    };
+    let best = null, bestDist = HIT_RADIUS_PX;
+    const consider = (kind, obj) => {
+      const { azimuth, altitude } = equatorialToHorizontal(obj.ra, obj.dec, this.observer, date);
+      const p = toOffset(horizontalToVector(azimuth, altitude));
+      if (!p.visible) return;
+      const d = Math.hypot(p.x - offX, p.y - offY);
+      if (d < bestDist) { bestDist = d; best = { kind, ...obj }; }
+    };
+    for (const s of this.catalog.stars) consider("star", s);
+    for (const m of this.catalog.messier) consider("messier", m);
+
+    if (best) { this.onSelect(best); return; }
+
+    // Nothing catalogued close enough - report the raw point instead.
+    const view = screenToVector(offX, offY, domeRadius);
+    const fixed = rotateVector(conjugate(this.rotation), view);
+    const { azimuth, altitude } = vectorToHorizontal(fixed);
+    if (altitude < 0) return; // tapped past the dome edge - not a real sky point
+    const { ra, dec } = horizontalToEquatorial(azimuth, altitude, this.observer, date);
+    this.onSelect({ kind: null, ra, dec });
   }
 
   /** Matches the canvas's drawing-buffer size to its CSS size (device-pixel
@@ -136,9 +226,13 @@ export class SkyEngine {
 
   destroy() {
     this.canvas.removeEventListener("wheel", this._onWheel);
-    this.canvas.removeEventListener("mousedown", this._onPointerDown);
-    window.removeEventListener("mousemove", this._onPointerMove);
-    window.removeEventListener("mouseup", this._onPointerUp);
+    this.canvas.removeEventListener("mousedown", this._onMouseDown);
+    window.removeEventListener("mousemove", this._onMouseMove);
+    window.removeEventListener("mouseup", this._onMouseUp);
+    this.canvas.removeEventListener("touchstart", this._onTouchStart);
+    this.canvas.removeEventListener("touchmove", this._onTouchMove);
+    this.canvas.removeEventListener("touchend", this._onTouchEnd);
+    this.canvas.removeEventListener("touchcancel", this._onTouchEnd);
   }
 
   render() {

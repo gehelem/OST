@@ -2,8 +2,11 @@
 // constellation lines, Messier objects), independent of the server's own
 // search/results catalog — see notes/NOTES-frontend-ostcore-planetarium.md
 // ("la carte a son propre catalogue client"). Data files are GeoJSON
-// (RA/Dec in degrees), reused as-is from noctua's skymap package — that's
-// DATA, not the projection/drag code that was actually rapiece there.
+// (RA/Dec in degrees) — see celestial-data/README.md for exactly where
+// each one comes from (most reused as data-only from noctua's skymap
+// package; star-proper-names.json fetched independently instead, per
+// Gilles, 2026-09-29: "cherche plutot comment faire proprement avec les
+// nouveaux catalogues").
 //
 // Two star depths ship today (celestial-data/): "light" (stars.6.json,
 // mag <= 6.5, ~8.9k stars, naked-eye-ish, the default) and "deep"
@@ -27,12 +30,17 @@ async function fetchJson(name) {
   return res.json();
 }
 
-function starsFromGeoJson(geo) {
+function starsFromGeoJson(geo, properNames) {
   return geo.features.map((f) => ({
     ra: f.geometry.coordinates[0],
     dec: f.geometry.coordinates[1],
     mag: f.properties.mag,
     bv: f.properties.bv !== undefined ? Number(f.properties.bv) : undefined,
+    // f.id is the star's Hipparcos catalog number (HIP) - see
+    // celestial-data/README.md - matched against star-proper-names.json's
+    // own HIP-keyed lookup. Most stars have no common name (name stays
+    // undefined); sky-engine.js's selection falls back to "Star" for those.
+    name: properNames[f.id],
   }));
 }
 
@@ -75,8 +83,9 @@ function messierFromGeoJson(geo) {
  */
 export async function loadCatalog(depth) {
   const starFile = (STAR_DEPTHS[depth] || STAR_DEPTHS.light).file;
+  const properNames = await fetchJson("star-proper-names.json").catch((e) => { console.error(e); return {}; });
   const [stars, constellationLines, messier] = await Promise.all([
-    fetchJson(starFile).then(starsFromGeoJson).catch((e) => { console.error(e); return []; }),
+    fetchJson(starFile).then((geo) => starsFromGeoJson(geo, properNames)).catch((e) => { console.error(e); return []; }),
     fetchJson("constellations.lines.json").then(constellationLinesFromGeoJson).catch((e) => { console.error(e); return []; }),
     fetchJson("messier.json").then(messierFromGeoJson).catch((e) => { console.error(e); return []; }),
   ]);
