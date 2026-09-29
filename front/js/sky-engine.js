@@ -49,6 +49,39 @@ export const ZOOM_MIN = 0.5, ZOOM_MAX = 6;
 // the dome edge once panned.
 const HORIZON_SAMPLES = 72;
 
+// Equator/meridian graduations (Gilles, 2026-09-30: "regles graduees
+// dynamiquement en fonction du niveau de zoom") — pickGradStepDeg() picks
+// the finest of these "usual" intervals that keeps the tick count under a
+// zoom-scaled budget, so the ruler gets more detailed as you zoom in
+// instead of a fixed spacing that's either sparse zoomed out or an
+// unreadable smear zoomed in. GRAD_TICK_PX is a fixed screen length (not
+// degrees) so ticks stay a constant, legible size regardless of zoom.
+const GRAD_STEPS_DEG = [60, 30, 15, 10, 5, 2, 1, 0.5];
+const GRAD_TICK_PX = 6;
+function pickGradStepDeg(rangeDeg, zoom) {
+  const maxTicks = 12 * Math.max(1, zoom);
+  let step = GRAD_STEPS_DEG[0];
+  for (const s of GRAD_STEPS_DEG) {
+    if (rangeDeg / s <= maxTicks) step = s; else break;
+  }
+  return step;
+}
+// Draws one short tick at p0, oriented along the (p0 -> p1) screen-space
+// direction — p1 is any nearby point along the "other" coordinate (e.g.
+// dec+3° for an equator tick, az+3° for a meridian tick), so the tick
+// automatically follows the curve's local perpendicular under whatever
+// rotation/projection is currently active, without needing real calculus.
+function drawTick(ctx, p0, p1, pixelLen) {
+  let dx = p1.x - p0.x, dy = p1.y - p0.y;
+  const len = Math.hypot(dx, dy) || 1;
+  dx = (dx / len) * pixelLen;
+  dy = (dy / len) * pixelLen;
+  ctx.beginPath();
+  ctx.moveTo(p0.x - dx / 2, p0.y - dy / 2);
+  ctx.lineTo(p0.x + dx / 2, p0.y + dy / 2);
+  ctx.stroke();
+}
+
 const PLANETS = [
   { body: Body.Sun, color: "#ffd54f", radius: 5, label: "Sun" },
   { body: Body.Moon, color: "#e0e0e0", radius: 4.5, label: "Moon" },
@@ -83,6 +116,8 @@ export class SkyEngine {
     this.showCardinals = true;
     this.showMessier = true;
     this.showTrueHorizon = false;
+    this.showEquator = false;
+    this.showMeridian = false;
     this.dayMode = false;
     // Whether the *app's own* light/dark theme is currently light — set
     // and kept in sync by the caller (templates/navigator.js watches
@@ -283,8 +318,8 @@ export class SkyEngine {
     ctx.fillStyle = this.dayMode ? "#8ec8e8" : (this.lightUI ? "#e4e9ee" : "#05070c");
     ctx.fillRect(0, 0, w, h);
     const fg = isLightBg
-      ? { dome: "rgba(0,0,0,0.28)", cardinal: "rgba(0,0,0,0.6)", constellation: "rgba(40,80,140,0.45)", star: "#15181c", messier: "rgba(27,94,32,0.85)", horizon: "rgba(180,110,0,0.65)" }
-      : { dome: "rgba(255,255,255,0.25)", cardinal: "rgba(255,255,255,0.55)", constellation: "rgba(100,160,220,0.35)", star: "#fff", messier: "rgba(129,199,132,0.85)", horizon: "rgba(255,193,7,0.55)" };
+      ? { dome: "rgba(0,0,0,0.28)", cardinal: "rgba(0,0,0,0.6)", constellation: "rgba(40,80,140,0.45)", star: "#15181c", messier: "rgba(27,94,32,0.85)", horizon: "rgba(180,110,0,0.65)", equator: "rgba(0,121,107,0.6)", meridian: "rgba(123,31,162,0.6)" }
+      : { dome: "rgba(255,255,255,0.25)", cardinal: "rgba(255,255,255,0.55)", constellation: "rgba(100,160,220,0.35)", star: "#fff", messier: "rgba(129,199,132,0.85)", horizon: "rgba(255,193,7,0.55)", equator: "rgba(77,208,225,0.6)", meridian: "rgba(206,147,216,0.6)" };
 
     const cx = w / 2, cy = h / 2;
     const domeRadius = Math.min(w, h) / 2 * 0.96 * this.zoom;
@@ -301,6 +336,10 @@ export class SkyEngine {
       const rv = rotateVector(this.rotation, v);
       const p = vectorToScreen(rv, domeRadius);
       return { x: cx + p.x, y: cy + p.y, visible: p.visible };
+    };
+    const project = (raDeg, decDeg) => {
+      const { azimuth, altitude } = equatorialToHorizontal(raDeg, decDeg, this.observer, date);
+      return toScreen(horizontalToVector(azimuth, altitude));
     };
 
     // Dome edge. Once panned, this is just the current view's own field-of-
@@ -334,6 +373,81 @@ export class SkyEngine {
       ctx.setLineDash([]);
     }
 
+    // Celestial equator (dec=0), graduated like a ruler - Gilles,
+    // 2026-09-30: "afficher les reperes habituels ... equateur, meridien".
+    // Sampled/projected in equatorial coordinates (unlike the true
+    // horizon/meridian below, which are native to the observer's own
+    // horizontal frame) since dec=0 is a fixed circle on the sky regardless
+    // of where the observer is or what time it is - project() (RA/Dec ->
+    // screen) already does the equatorial->horizontal->screen chain for
+    // every other catalog object.
+    if (this.showEquator) {
+      ctx.strokeStyle = fg.equator;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      let started = false;
+      const EQUATOR_SAMPLES = 144;
+      for (let i = 0; i <= EQUATOR_SAMPLES; i++) {
+        const p = project((360 * i) / EQUATOR_SAMPLES, 0);
+        if (!p.visible) { started = false; continue; }
+        if (!started) { ctx.moveTo(p.x, p.y); started = true; } else { ctx.lineTo(p.x, p.y); }
+      }
+      ctx.stroke();
+
+      const step = pickGradStepDeg(360, this.zoom);
+      for (let ra = 0; ra < 360; ra += step) {
+        const p0 = project(ra, 0);
+        const p1 = project(ra, 3); // a few degrees off in dec - just used for tick direction, see drawTick()
+        if (p0.visible && p1.visible) drawTick(ctx, p0, p1, GRAD_TICK_PX);
+      }
+    }
+
+    // Local meridian: the great circle through the North point, zenith and
+    // South point - always passes through the celestial pole (at azimuth 0,
+    // altitude = observer latitude, any hemisphere - see
+    // equatorialToHorizontal's own precession-correct math, used here
+    // instead of the textbook alt=latitude shortcut). Split in two styles
+    // at that pole (Gilles, 2026-09-30: "pointille du nord a la polaire, et
+    // continu de la polaire au sud") - dashed below the pole, solid from
+    // the pole through the zenith to the South point; degrades gracefully
+    // to "solid all the way" if the pole itself is below the horizon
+    // (southern-hemisphere sites - not this app's primary use case, but
+    // shouldn't draw a nonsensical dash either).
+    if (this.showMeridian) {
+      const ncpAlt = equatorialToHorizontal(0, 90, this.observer, date).altitude;
+      const splitAlt = Math.max(0, Math.min(90, ncpAlt));
+      ctx.strokeStyle = fg.meridian;
+      ctx.lineWidth = 1;
+
+      const drawMeridianArc = (az, altFrom, altTo, dashed) => {
+        if (altFrom === altTo) return;
+        ctx.setLineDash(dashed ? [4, 4] : []);
+        ctx.beginPath();
+        let started = false;
+        const ARC_SAMPLES = 48;
+        for (let i = 0; i <= ARC_SAMPLES; i++) {
+          const alt = altFrom + (altTo - altFrom) * (i / ARC_SAMPLES);
+          const p = toScreen(horizontalToVector(az, alt));
+          if (!p.visible) { started = false; continue; }
+          if (!started) { ctx.moveTo(p.x, p.y); started = true; } else { ctx.lineTo(p.x, p.y); }
+        }
+        ctx.stroke();
+      };
+      drawMeridianArc(0, 0, splitAlt, true);    // North point -> pole, dashed
+      drawMeridianArc(0, splitAlt, 90, false);  // pole -> zenith, solid
+      drawMeridianArc(180, 90, 0, false);       // zenith -> South point, solid
+      ctx.setLineDash([]);
+
+      const step = pickGradStepDeg(90, this.zoom);
+      for (const az of [0, 180]) {
+        for (let alt = step; alt < 90; alt += step) {
+          const p0 = toScreen(horizontalToVector(az, alt));
+          const p1 = toScreen(horizontalToVector(az + 3, alt)); // a few degrees off in azimuth - tick direction only
+          if (p0.visible && p1.visible) drawTick(ctx, p0, p1, GRAD_TICK_PX);
+        }
+      }
+    }
+
     // Cardinal points. Projected through the same rotation as everything
     // else, so they move/disappear with the pan like any other sky feature.
     if (this.showCardinals) {
@@ -346,11 +460,6 @@ export class SkyEngine {
         if (p.visible) ctx.fillText(label, p.x, p.y);
       }
     }
-
-    const project = (raDeg, decDeg) => {
-      const { azimuth, altitude } = equatorialToHorizontal(raDeg, decDeg, this.observer, date);
-      return toScreen(horizontalToVector(azimuth, altitude));
-    };
 
     // Constellation lines.
     if (this.showConstellations) {

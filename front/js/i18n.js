@@ -144,6 +144,8 @@ const STRINGS = {
   "navigator.cardinalPoints": { en: "Cardinal points", fr: "Points cardinaux", de: "Himmelsrichtungen", it: "Punti cardinali", es: "Puntos cardinales" },
   "navigator.messierObjects": { en: "Messier objects", fr: "Objets Messier", de: "Messier-Objekte", it: "Oggetti Messier", es: "Objetos Messier" },
   "navigator.trueHorizon": { en: "True horizon", fr: "Horizon réel", de: "Wahrer Horizont", it: "Orizzonte reale", es: "Horizonte real" },
+  "navigator.equator": { en: "Equator", fr: "Équateur", de: "Äquator", it: "Equatore", es: "Ecuador" },
+  "navigator.meridian": { en: "Meridian", fr: "Méridien", de: "Meridian", it: "Meridiano", es: "Meridiano" },
   "navigator.dayMode": { en: "Day mode", fr: "Mode jour", de: "Tagmodus", it: "Modalità giorno", es: "Modo día" },
   "navigator.zoom": { en: "Zoom", fr: "Zoom", de: "Zoom", it: "Zoom", es: "Zoom" },
   "navigator.selection": { en: "Selection", fr: "Sélection", de: "Auswahl", it: "Selezione", es: "Selección" },
