@@ -84,13 +84,14 @@
    same scoping convention as #modbar's own .mod-btn. */
 #quicknav-actions .icon-chip { background: var(--accent-faint); border: 1px solid var(--border-subtle); border-radius: var(--radius); }
 .quicknav-btn {
-  display: inline-flex; align-items: center; justify-content: center;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   height: 36px; padding: 0 12px; flex-shrink: 0;
   background: var(--accent-faint); color: var(--text-secondary);
   border: 1px solid var(--border-subtle); border-radius: var(--radius);
   cursor: pointer; font: inherit; font-size: 12px; white-space: nowrap;
   transition: border-color 0.15s ease, color 0.15s ease;
 }
+.quicknav-btn .material-icons { font-size: 16px; }
 .quicknav-btn:hover { color: var(--accent); border-color: var(--accent-dim); }
 .quicknav-btn.active {
   background: var(--accent-subtle); color: var(--accent); border-color: var(--accent);

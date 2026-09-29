@@ -32,7 +32,7 @@
 import { renderProperty, updateQuickNav } from "../render.js";
 import { el } from "../dom.js";
 import * as Panels from "../panels.js";
-import { SkyEngine } from "../sky-engine.js";
+import { SkyEngine, ZOOM_MIN, ZOOM_MAX } from "../sky-engine.js";
 
 function fmtDeg(v) { return v.toFixed(3) + "°"; }
 function fmtHours(raDeg) {
@@ -88,13 +88,84 @@ function buildSelectionPanel(client, moduleName) {
   return { node: wrap, onSelect };
 }
 
+// Persisted like the theme/UI-zoom widgets elsewhere in this app (one
+// global key, not per module instance — matches how those work too).
+// saveDisplaySettings() takes the engine itself (reads its current fields)
+// so *every* path that changes a setting — the panel's own checkboxes/
+// slider, but also the canvas's own wheel-zoom (Gilles, 2026-09-30: "le
+// niveau de zoom ne persiste pas" — wheel-zoom went through sky-engine.js's
+// own _onWheel(), which never called back into this file's save logic at
+// all) — can call the exact same function instead of two copies drifting
+// apart.
+const DISPLAY_SETTINGS_KEY = "ostcore-ui3.navigator.display";
+function loadDisplaySettings() {
+  try { return JSON.parse(localStorage.getItem(DISPLAY_SETTINGS_KEY)) || {}; } catch (e) { return {}; }
+}
+function saveDisplaySettings(engine) {
+  try {
+    localStorage.setItem(DISPLAY_SETTINGS_KEY, JSON.stringify({
+      showConstellations: engine.showConstellations,
+      showCardinals: engine.showCardinals,
+      showMessier: engine.showMessier,
+      showTrueHorizon: engine.showTrueHorizon,
+      dayMode: engine.dayMode,
+      zoom: engine.zoom,
+    }));
+  } catch (e) { /* ignore */ }
+}
+
+/** The "Settings" panel's body — Gilles, 2026-09-30: "ajoute un bouton
+ * 'reglages' ... qui ouvre une fenetre pour personnaliser l'affichage
+ * (reperes, horizon, niveau de zoom, jour/nuit)". Plain checkboxes/slider
+ * directly flipping js/sky-engine.js's own public display-setting fields
+ * and calling render() again — no server round-trip, this is purely
+ * client-side presentation, so it's persisted to localStorage instead
+ * (same pattern as the theme/UI-zoom widgets). Saved settings are already
+ * applied to `engine` by buildSkyDome() before this is even called (so the
+ * very first render is correct, not a flash-then-jump) — this only needs
+ * to reflect that starting state in the controls themselves. */
+function buildSettingsPanel(engine) {
+  const wrap = el("div");
+
+  function persistAndRender() {
+    saveDisplaySettings(engine);
+    engine.render();
+  }
+
+  function checkboxRow(label, key) {
+    const cb = el("input", { type: "checkbox" });
+    cb.checked = engine[key];
+    cb.addEventListener("change", () => { engine[key] = cb.checked; persistAndRender(); });
+    return el("label", { class: "form-row", style: "cursor:pointer" }, [cb, el("span", { text: label })]);
+  }
+
+  wrap.appendChild(checkboxRow("Constellations", "showConstellations"));
+  wrap.appendChild(checkboxRow("Cardinal points", "showCardinals"));
+  wrap.appendChild(checkboxRow("Messier objects", "showMessier"));
+  wrap.appendChild(checkboxRow("True horizon", "showTrueHorizon"));
+  wrap.appendChild(checkboxRow("Day mode", "dayMode"));
+
+  const zoomRow = el("div", { class: "form-row" }, [el("span", { class: "muted small", text: "Zoom" })]);
+  const zoomSlider = el("input", { type: "range", min: String(ZOOM_MIN), max: String(ZOOM_MAX), step: "0.1", value: String(engine.zoom), style: "flex:1" });
+  zoomSlider.addEventListener("input", () => { engine.zoom = parseFloat(zoomSlider.value); persistAndRender(); });
+  zoomRow.appendChild(zoomSlider);
+  wrap.appendChild(zoomRow);
+  // Kept in sync when zoom changes some other way (wheel, or a future
+  // pinch-zoom) — same "one listener reflects every path" idea as
+  // app.js's own panelvisibility listener for the quicknav buttons.
+  engine.onZoomChange = () => { zoomSlider.value = String(engine.zoom); saveDisplaySettings(engine); };
+
+  wrap._dispose = () => { engine.onZoomChange = null; };
+  return wrap;
+}
+
 // Same shared #bg-layer element imagelayer.js targets for guider/focus/
 // sequencer's own image background - looked up directly here (unlike
 // imagelayer.js's setBgLayer() indirection) since this is the only
 // consumer and there's no boot-time ordering to get right either way.
 function buildSkyDome(client, moduleName, onSelect) {
   const bgLayer = document.getElementById("bg-layer");
-  if (!bgLayer) return { dispose: () => {} };
+  if (!bgLayer) return { dispose: () => {}, engine: null };
   bgLayer.classList.add("sky-active");
   bgLayer.innerHTML = "";
   const canvas = el("canvas", { id: "sky-canvas" });
@@ -104,6 +175,12 @@ function buildSkyDome(client, moduleName, onSelect) {
     onNeedsRender: () => engine.render(),
     onSelect,
   });
+  // Applied before the catalog/first render below, not in the settings
+  // panel (built later, after this function returns) — so the very first
+  // frame already reflects saved settings instead of a brief flash at the
+  // defaults. buildSettingsPanel() takes it from here for the ongoing
+  // wheel-zoom -> persist wiring (engine.onZoomChange).
+  Object.assign(engine, loadDisplaySettings());
   engine.loadCatalog("light").then(() => engine.render()).catch((e) => console.error("[navigator] catalog load", e));
 
   const ro = new ResizeObserver(() => {
@@ -133,6 +210,7 @@ function buildSkyDome(client, moduleName, onSelect) {
   const timer = setInterval(() => engine.render(), 30000);
 
   return {
+    engine,
     dispose: () => {
       unsub();
       ro.disconnect();
@@ -159,7 +237,8 @@ export function mount(client, moduleName) {
     const quickNavEntries = [];
 
     const selection = buildSelectionPanel(client, moduleName);
-    disposers.push(buildSkyDome(client, moduleName, selection.onSelect).dispose);
+    const sky = buildSkyDome(client, moduleName, selection.onSelect);
+    disposers.push(sky.dispose);
 
     const header = Panels.make({ id: "header", title: mod.infos.modulelabel || mod.infos.label || moduleName, x: 20, y: 92, w: 320 });
     header.appendChild(el("div", { class: "muted small", text: mod.infos.description || "" }));
@@ -167,6 +246,12 @@ export function mount(client, moduleName) {
     const selectionPanel = Panels.make({ id: "selection", title: "Selection", x: 340, y: 92, w: 300 });
     selectionPanel.appendChild(track(selection.node));
     quickNavEntries.push({ id: "selection", label: "Selection" });
+
+    if (sky.engine) {
+      const settingsPanel = Panels.make({ id: "settings", title: "Display settings", x: 660, y: 92, w: 260, collapsed: true });
+      settingsPanel.appendChild(track(buildSettingsPanel(sky.engine)));
+      quickNavEntries.push({ id: "settings", label: "Settings", icon: "tune" });
+    }
 
     if (has("actions")) {
       const b = Panels.make({ id: "actions", title: mod.properties.actions.label || "Commands", x: 20, y: 210, w: 300 });

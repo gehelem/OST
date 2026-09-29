@@ -43,6 +43,12 @@ const CLICK_THRESHOLD_PX = 6;
 // rather than just recording the raw RA/Dec of the tap itself.
 const HIT_RADIUS_PX = 12;
 
+export const ZOOM_MIN = 0.5, ZOOM_MAX = 6;
+// How many points to sample around the true horizon circle when
+// showTrueHorizon is on — see render()'s own comment on why it's not just
+// the dome edge once panned.
+const HORIZON_SAMPLES = 72;
+
 const PLANETS = [
   { body: Body.Sun, color: "#ffd54f", radius: 5, label: "Sun" },
   { body: Body.Moon, color: "#e0e0e0", radius: 4.5, label: "Moon" },
@@ -68,8 +74,19 @@ export class SkyEngine {
     this.getTime = opts.getTime || (() => new Date());
     this.zoom = 1;
     this.rotation = identity(); // view pan state - see this file's own header
+
+    // Display settings (templates/navigator.js's "Settings" panel, Gilles,
+    // 2026-09-30: "personnaliser l'affichage (reperes, horizon, niveau de
+    // zoom, jour/nuit)") - plain public fields, the caller just sets them
+    // and calls render() again, same as `zoom`/`rotation` already work.
+    this.showConstellations = true;
+    this.showCardinals = true;
+    this.showMessier = true;
+    this.showTrueHorizon = false;
+    this.dayMode = false;
     this.onNeedsRender = opts.onNeedsRender || null; // called after wheel-zoom/drag changes, so the caller can re-render immediately instead of waiting for its own timer
     this.onSelect = opts.onSelect || null; // called on a tap/click that isn't a drag - see _handlePointerUp()
+    this.onZoomChange = opts.onZoomChange || null; // called after wheel-zoom specifically (not pan/drag) - e.g. to persist it, see templates/navigator.js
     this.catalog = { stars: [], constellationLines: [], messier: [] };
     this._domeRadius = 1; // recomputed every render(), read by the drag/tap handlers to convert screen<->vector
     this._drag = null; // { grabVector (fixed-frame), rotationAtDragStart, startOffset, moved } while a gesture is in progress (mouse or touch)
@@ -106,8 +123,9 @@ export class SkyEngine {
   _onWheel(ev) {
     ev.preventDefault();
     const f = ev.deltaY < 0 ? 1.1 : 1 / 1.1;
-    this.zoom = Math.max(0.5, Math.min(6, this.zoom * f));
+    this.zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, this.zoom * f));
     if (this.onNeedsRender) this.onNeedsRender();
+    if (this.onZoomChange) this.onZoomChange();
   }
 
   _screenCenter() {
@@ -239,6 +257,16 @@ export class SkyEngine {
     const { ctx, canvas } = this;
     const w = canvas.width, h = canvas.height;
     ctx.clearRect(0, 0, w, h);
+    // Day mode: a plain sky-blue fill instead of the transparent canvas
+    // (which lets #bg-layer's own near-black CSS background show through -
+    // see panels.css). No real atmospheric simulation (extinction, twilight
+    // gradient...) - that's real future work (astro2001-style, see the
+    // note), this is deliberately just a flat on/off "is it meant to look
+    // like daytime" toggle, cheap and unambiguous.
+    if (this.dayMode) {
+      ctx.fillStyle = "#8ec8e8";
+      ctx.fillRect(0, 0, w, h);
+    }
     const cx = w / 2, cy = h / 2;
     const domeRadius = Math.min(w, h) / 2 * 0.96 * this.zoom;
     // Drag math (_onPointerDown/_onPointerMove) reads this via CSS pixels
@@ -256,24 +284,48 @@ export class SkyEngine {
       return { x: cx + p.x, y: cy + p.y, visible: p.visible };
     };
 
-    // Dome edge + cardinal points. Once panned, "the dome edge" is just the
-    // current view's own field-of-view boundary, not the true horizon
-    // (which would generally no longer be a circle on screen at all) - see
-    // sky-projection.js's horizontalToScreen doc. Cardinal labels are
-    // projected through the same rotation as everything else, so they
-    // move/disappear with the pan like any other sky feature.
+    // Dome edge. Once panned, this is just the current view's own field-of-
+    // view boundary, not the true horizon (which would generally no longer
+    // be a circle on screen at all) - see sky-projection.js's
+    // horizontalToScreen doc, and showTrueHorizon below for the actual
+    // horizon reference.
     ctx.strokeStyle = "rgba(255,255,255,0.25)";
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(cx, cy, domeRadius, 0, 2 * Math.PI);
     ctx.stroke();
-    ctx.fillStyle = "rgba(255,255,255,0.55)";
-    ctx.font = "11px sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    for (const [az, label] of [[0, "N"], [90, "E"], [180, "S"], [270, "O"]]) {
-      const p = toScreen(horizontalToVector(az, 0));
-      if (p.visible) ctx.fillText(label, p.x, p.y);
+
+    // True horizon (alt=0 in the FIXED frame, sampled and projected through
+    // the current rotation like everything else) - distinct from the dome
+    // edge above once panned. Off by default: mostly redundant with the
+    // dome edge at the default (unpanned, zenith-centered) view, only
+    // earns its own line once you've actually looked away from straight up.
+    if (this.showTrueHorizon) {
+      ctx.strokeStyle = "rgba(255,193,7,0.55)";
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      let started = false;
+      for (let i = 0; i <= HORIZON_SAMPLES; i++) {
+        const az = (360 * i) / HORIZON_SAMPLES;
+        const p = toScreen(horizontalToVector(az, 0));
+        if (!p.visible) { started = false; continue; }
+        if (!started) { ctx.moveTo(p.x, p.y); started = true; } else { ctx.lineTo(p.x, p.y); }
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // Cardinal points. Projected through the same rotation as everything
+    // else, so they move/disappear with the pan like any other sky feature.
+    if (this.showCardinals) {
+      ctx.fillStyle = "rgba(255,255,255,0.55)";
+      ctx.font = "11px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      for (const [az, label] of [[0, "N"], [90, "E"], [180, "S"], [270, "O"]]) {
+        const p = toScreen(horizontalToVector(az, 0));
+        if (p.visible) ctx.fillText(label, p.x, p.y);
+      }
     }
 
     const project = (raDeg, decDeg) => {
@@ -282,20 +334,25 @@ export class SkyEngine {
     };
 
     // Constellation lines.
-    ctx.strokeStyle = "rgba(100,160,220,0.35)";
-    ctx.lineWidth = 1;
-    for (const [a, b] of this.catalog.constellationLines) {
-      const pa = project(a.ra, a.dec), pb = project(b.ra, b.dec);
-      if (!pa.visible && !pb.visible) continue;
-      ctx.beginPath();
-      ctx.moveTo(pa.x, pa.y);
-      ctx.lineTo(pb.x, pb.y);
-      ctx.stroke();
+    if (this.showConstellations) {
+      ctx.strokeStyle = "rgba(100,160,220,0.35)";
+      ctx.lineWidth = 1;
+      for (const [a, b] of this.catalog.constellationLines) {
+        const pa = project(a.ra, a.dec), pb = project(b.ra, b.dec);
+        if (!pa.visible && !pb.visible) continue;
+        ctx.beginPath();
+        ctx.moveTo(pa.x, pa.y);
+        ctx.lineTo(pb.x, pb.y);
+        ctx.stroke();
+      }
     }
 
-    // Stars.
+    // Stars. Day mode: only the handful bright enough to plausibly still
+    // show up against a lit sky (rough, not a real extinction model - see
+    // the dayMode comment above render()'s own fillRect).
     ctx.fillStyle = "#fff";
     for (const s of this.catalog.stars) {
+      if (this.dayMode && s.mag > 0) continue;
       const p = project(s.ra, s.dec);
       if (!p.visible) continue;
       const r = magnitudeToRadius(s.mag) * Math.sqrt(this.zoom);
@@ -305,14 +362,16 @@ export class SkyEngine {
     }
 
     // Messier objects: small open circles, distinct from stars.
-    ctx.strokeStyle = "rgba(129,199,132,0.85)";
-    ctx.lineWidth = 1;
-    for (const m of this.catalog.messier) {
-      const p = project(m.ra, m.dec);
-      if (!p.visible) continue;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 3.5, 0, 2 * Math.PI);
-      ctx.stroke();
+    if (this.showMessier) {
+      ctx.strokeStyle = "rgba(129,199,132,0.85)";
+      ctx.lineWidth = 1;
+      for (const m of this.catalog.messier) {
+        const p = project(m.ra, m.dec);
+        if (!p.visible) continue;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3.5, 0, 2 * Math.PI);
+        ctx.stroke();
+      }
     }
 
     // Sun/Moon/planets - live position for `date`, not from any static file

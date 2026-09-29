@@ -65,25 +65,29 @@ export function renderModbar(client, activeKey, onSelect) {
 
 /**
  * The per-module "quick nav" bar (#quicknav, bottom-center): one button per
- * {id, label} entry, showing/hiding that panel and reflecting whether it's
- * currently visible (Gilles, 2026-09-27: "l'action du bouton doit masquer/
- * demasquer la fenetre et l'etat du bouton doit montrer si la fenetre est
- * visible ou pas") — Panels.togglePanel()/isPanelVisible() are the *only*
- * shared piece (render.js/templates own the entry list; see render.js's
- * setQuickNavRoot()). `data-panel-id` lets app.js's single "panelvisibility"
- * listener find and update this same button when the panel's own minimize
- * button (or reorganizeStacked()) changes it instead. Same DocumentFragment
- * pattern as renderModbar, for the same reason (no unstyled wrapper
- * element).
+ * {id, label, icon?} entry, showing/hiding that panel and reflecting
+ * whether it's currently visible (Gilles, 2026-09-27: "l'action du bouton
+ * doit masquer/demasquer la fenetre et l'etat du bouton doit montrer si la
+ * fenetre est visible ou pas") — Panels.togglePanel()/isPanelVisible() are
+ * the *only* shared piece (render.js/templates own the entry list; see
+ * render.js's setQuickNavRoot()). `data-panel-id` lets app.js's single
+ * "panelvisibility" listener find and update this same button when the
+ * panel's own minimize button (or reorganizeStacked()) changes it instead.
+ * Same DocumentFragment pattern as renderModbar, for the same reason (no
+ * unstyled wrapper element). `icon` (a material-icons name) is optional —
+ * most entries are text-only; a template can ask for an icon instead when
+ * the button represents an action rather than "jump to this panel" (e.g.
+ * navigator's "Settings" button, Gilles, 2026-09-30: "l'icone avec 3
+ * sliders").
  */
 export function renderQuickNav(entries) {
   const bar = document.createDocumentFragment();
-  for (const { id, label } of entries) {
+  for (const { id, label, icon: iconName } of entries) {
     const btn = el("button", {
       class: "quicknav-btn" + (isPanelVisible(id) ? " active" : ""),
       title: label, "data-panel-id": id,
       onclick: () => btn.classList.toggle("active", togglePanel(id)),
-    }, label);
+    }, iconName ? [icon(iconName), el("span", { text: label })] : label);
     bar.appendChild(btn);
   }
   return bar;
