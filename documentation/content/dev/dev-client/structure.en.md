@@ -298,7 +298,10 @@ The `value` field is an object with image metadata:
 | `stars` | int | Number of detected stars |
 | `issolved` | bool | Whether plate solving succeeded |
 | `solverra` / `solverde` | float | Solved RA/Dec coordinates |
-| `solverorientation` | float | Solved field rotation angle |
+| `solverorientation` | float | Solved field rotation angle: from North to image up (degrees), only meaningful when `issolved` |
+| `solverpixscale` | float | Solved pixel scale (arcsec/pixel), only meaningful when `issolved` |
+| `solverfieldwidth` / `solverfieldheight` | float | Solved field size (arcminutes), only meaningful when `issolved` |
+| `sampling` | float | Nominal pixel scale (arcsec/pixel), from the module's own optic focal length/reducer and the camera's pixel size — always available once a camera and optic are configured, independent of any solve (unlike the `solver*` fields above) |
 | `min` / `max` / `mean` / `median` / `stddev` | float[] | Per-channel statistics (see below) |
 | `histogram` | array | Per-channel histogram data (see below) |
 | `alternates` | string[] | Optional: alternative versions of the image |

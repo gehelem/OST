@@ -301,7 +301,10 @@ Le champ `value` est un objet contenant les métadonnées de l'image :
 | `stars` | int | Nombre d'étoiles détectées |
 | `issolved` | bool | Indique si la résolution de champ a réussi |
 | `solverra` / `solverde` | float | Coordonnées AR/Déc résolues |
-| `solverorientation` | float | Angle de rotation du champ résolu |
+| `solverorientation` | float | Angle de rotation du champ résolu : du Nord vers le haut de l'image (degrés), pertinent uniquement si `issolved` |
+| `solverpixscale` | float | Échelle de pixel résolue (arcsec/pixel), pertinent uniquement si `issolved` |
+| `solverfieldwidth` / `solverfieldheight` | float | Taille de champ résolue (minutes d'arc), pertinent uniquement si `issolved` |
+| `sampling` | float | Échelle de pixel nominale (arcsec/pixel), calculée à partir de la focale/réducteur de l'optique et de la taille de pixel de la caméra du module — toujours disponible dès qu'une caméra et une optique sont configurées, indépendamment de toute résolution (contrairement aux champs `solver*` ci-dessus) |
 | `min` / `max` / `mean` / `median` / `stddev` | float[] | Statistiques par canal (voir détail ci-dessous) |
 | `histogram` | array | Données d'histogramme par canal (voir détail ci-dessous) |
 | `alternates` | string[] | Optionnel : versions alternatives de l'image |

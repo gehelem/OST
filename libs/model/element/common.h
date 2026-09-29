@@ -588,6 +588,12 @@ typedef struct ImgData
     double solverRA{ 0 };               /*!< Solved Right Ascension (degrees) */
     double solverDE{ 0 };               /*!< Solved Declination (degrees) */
     double solverOrientation{ 0 };      /*!< Solver image orientation: angle from North to image up (degrees) */
+    double solverPixscale{ 0 };         /*!< Solver-measured pixel scale (arcsec/pixel) - only meaningful when isSolved */
+    double solverFieldWidth{ 0 };       /*!< Solver-measured field width (arcminutes) - only meaningful when isSolved */
+    double solverFieldHeight{ 0 };      /*!< Solver-measured field height (arcminutes) - only meaningful when isSolved */
+    double sampling{ 0 };               /*!< Nominal pixel scale (arcsec/pixel), from optic focal length/reducer and the
+                                              camera's pixel size - see IndiModule::getSampling(). Always available once
+                                              a camera+optic are configured, independent of any solve. */
     QVector<double> histogram[3];       /*!< Histogram data for R,G,B channels */
 } ImgData;
 

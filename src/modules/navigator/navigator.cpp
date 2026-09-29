@@ -392,14 +392,28 @@ void Navigator::OnSucessSolve()
         return;
     }
     // Get solved coordinates
-    double solvedRA = stellarSolver.getSolution().ra * 24 / 360;
-    double solvedDEC = stellarSolver.getSolution().dec;
+    auto solution = stellarSolver.getSolution();
+    double solvedRA = solution.ra * 24 / 360;
+    double solvedDEC = solution.dec;
     // Update image with solve data
     OST::ImgData dta = pImage->ImgStats();
     dta.mUrlJpeg = getModuleName() + ".jpeg";
     dta.solverRA = solvedRA;
     dta.solverDE = solvedDEC;
     dta.isSolved = true;
+    // Orientation/pixel scale/field size straight from the actual solve -
+    // needed by any client-side sky-rendering (e.g. a planetarium view's
+    // camera field-of-view overlay), previously computed here but never
+    // propagated onto the wire (see notes/NOTES-frontend-ostcore-planetarium.md).
+    dta.solverOrientation = solution.orientation;
+    dta.solverPixscale = solution.pixscale;
+    dta.solverFieldWidth = solution.fieldWidth;
+    dta.solverFieldHeight = solution.fieldHeight;
+    // Nominal sampling (optic + camera pixel size, see getSampling()) is
+    // independent of the solve outcome - refreshed here too since this is
+    // already the "new image data" update point, same as every other
+    // per-image stat.
+    dta.sampling = getSampling();
     getEltImg("image", "image")->setValue(dta, true);
 
     mCurrentIteration++;

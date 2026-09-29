@@ -51,6 +51,10 @@ void ValueJsonDumper::visit(ValueImg *  pValue)
     imgdata["solverra"] = pValue->value.solverRA;
     imgdata["solverde"] = pValue->value.solverDE;
     imgdata["solverorientation"] = pValue->value.solverOrientation;
+    imgdata["solverpixscale"] = pValue->value.solverPixscale;
+    imgdata["solverfieldwidth"] = pValue->value.solverFieldWidth;
+    imgdata["solverfieldheight"] = pValue->value.solverFieldHeight;
+    imgdata["sampling"] = pValue->value.sampling;
 
 
     QJsonArray arr;

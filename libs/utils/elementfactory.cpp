@@ -165,6 +165,10 @@ ElementBase *ElementFactory::createElement(const QString &key, const QVariantMap
             if (pData.contains("solverra")) dta.solverRA = pData["solverra"].toDouble();
             if (pData.contains("solverde")) dta.solverDE = pData["solverde"].toDouble();
             if (pData.contains("solverorientation")) dta.solverOrientation = pData["solverorientation"].toDouble();
+            if (pData.contains("solverpixscale")) dta.solverPixscale = pData["solverpixscale"].toDouble();
+            if (pData.contains("solverfieldwidth")) dta.solverFieldWidth = pData["solverfieldwidth"].toDouble();
+            if (pData.contains("solverfieldheight")) dta.solverFieldHeight = pData["solverfieldheight"].toDouble();
+            if (pData.contains("sampling")) dta.sampling = pData["sampling"].toDouble();
 
             pElement->setValue(dta, false);
             if (pData.contains("showstats")) pElement->setShowStats( pData["showstats"].toBool());

@@ -298,7 +298,10 @@ Il campo `value` è un oggetto contenente i metadati dell'immagine:
 | `stars` | int | Numero di stelle rilevate |
 | `issolved` | bool | Indica se la risoluzione di campo è riuscita |
 | `solverra` / `solverde` | float | Coordinate RA/DEC risolte |
-| `solverorientation` | float | Angolo di rotazione del campo risolto |
+| `solverorientation` | float | Angolo di rotazione del campo risolto: dal Nord verso l'alto dell'immagine (gradi), rilevante solo se `issolved` |
+| `solverpixscale` | float | Scala del pixel risolta (arcsec/pixel), rilevante solo se `issolved` |
+| `solverfieldwidth` / `solverfieldheight` | float | Dimensione del campo risolta (minuti d'arco), rilevante solo se `issolved` |
+| `sampling` | float | Scala del pixel nominale (arcsec/pixel), calcolata dalla focale/riduttore dell'ottica e dalla dimensione del pixel della fotocamera del modulo — sempre disponibile una volta configurate fotocamera e ottica, indipendentemente da qualsiasi risoluzione (a differenza dei campi `solver*` sopra) |
 | `min` / `max` / `mean` / `median` / `stddev` | float[] | Statistiche per canale (vedi sotto) |
 | `histogram` | array | Dati dell'istogramma per canale (vedi sotto) |
 | `alternates` | string[] | Opzionale: versioni alternative dell'immagine |

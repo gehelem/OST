@@ -298,7 +298,10 @@ Das Feld `value` ist ein Objekt mit den Bild-Metadaten:
 | `stars` | int | Anzahl der erkannten Sterne |
 | `issolved` | bool | Zeigt an, ob die Plate-Solving-Auflösung erfolgreich war |
 | `solverra` / `solverde` | float | Aufgelöste RA/Dec-Koordinaten |
-| `solverorientation` | float | Rotationswinkel des aufgelösten Feldes |
+| `solverorientation` | float | Rotationswinkel des aufgelösten Feldes: von Norden zur Bildoberkante (Grad), nur relevant wenn `issolved` |
+| `solverpixscale` | float | Aufgelöste Pixelskala (Bogensekunden/Pixel), nur relevant wenn `issolved` |
+| `solverfieldwidth` / `solverfieldheight` | float | Aufgelöste Feldgröße (Bogenminuten), nur relevant wenn `issolved` |
+| `sampling` | float | Nominale Pixelskala (Bogensekunden/Pixel), berechnet aus der Brennweite/dem Reducer der Optik und der Pixelgröße der Kamera des Moduls — immer verfügbar, sobald Kamera und Optik konfiguriert sind, unabhängig von einer Auflösung (im Gegensatz zu den obigen `solver*`-Feldern) |
 | `min` / `max` / `mean` / `median` / `stddev` | float[] | Statistiken pro Kanal (siehe unten) |
 | `histogram` | array | Histogrammdaten pro Kanal (siehe unten) |
 | `alternates` | string[] | Optional: alternative Versionen des Bildes |

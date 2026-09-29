@@ -202,6 +202,10 @@ void ElementJsonDumper::visit(ElementImg *pElement, QVariantMap &data, bool &emi
     imgdata["solverra"] = pElement->value().solverRA;
     imgdata["solverde"] = pElement->value().solverDE;
     imgdata["solverorientation"] = pElement->value().solverOrientation;
+    imgdata["solverpixscale"] = pElement->value().solverPixscale;
+    imgdata["solverfieldwidth"] = pElement->value().solverFieldWidth;
+    imgdata["solverfieldheight"] = pElement->value().solverFieldHeight;
+    imgdata["sampling"] = pElement->value().sampling;
 
 
     QJsonArray arr;
