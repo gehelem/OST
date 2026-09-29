@@ -57,12 +57,8 @@ const HORIZON_SAMPLES = 72;
 // l'echelle)") — pickGradStepDeg() picks the finest of these "usual"
 // intervals that keeps the line count under a zoom-scaled budget, so the
 // grid gets denser as you zoom in instead of a fixed spacing that's either
-// sparse zoomed out or an unreadable smear zoomed in. Major lines (thicker,
-// full opacity) sit at 5x the minor spacing (Gilles's own "5°/1°" example,
-// applied as a ratio rather than literal degrees so it still makes sense
-// once the minor step itself is something other than 1°).
+// sparse zoomed out or an unreadable smear zoomed in.
 const GRAD_STEPS_DEG = [60, 30, 15, 10, 5, 2, 1, 0.5];
-const GRAD_MAJOR_RATIO = 5;
 function pickGradStepDeg(rangeDeg, zoom) {
   const maxLines = 12 * Math.max(1, zoom);
   let step = GRAD_STEPS_DEG[0];
@@ -71,37 +67,95 @@ function pickGradStepDeg(rangeDeg, zoom) {
   }
   return step;
 }
+// Major lines (thicker, full opacity - every line gets its own coordinate
+// label regardless, see drawCornerLabel()) sit at 5x the minor spacing
+// (Gilles's own "5°/1°" example) - but capped at 10°, never coarser
+// (Gilles, 2026-10-02: "la determination du 'pas majeur' est curieuse
+// lorsqu'on est completement dezoome, on va se limiter a 10° max, pas
+// plus" - fully zoomed out, minorStep can be 60° and 5x that (300°) is
+// nonsensical against a 360° range, leaving only 1-2 major lines total).
+// If the minor step alone already exceeds 10° there's no room for a
+// distinct major tier below the cap, so every drawn line just becomes
+// major instead (nothing coarser to fall back to, and there are few
+// enough lines at that zoom for that to look reasonable anyway).
+const GRAD_MAJOR_RATIO = 5;
+const GRAD_MAJOR_CAP_DEG = 10;
+function pickMajorStepDeg(minorStep) {
+  const ratioStep = minorStep * GRAD_MAJOR_RATIO;
+  if (ratioStep <= GRAD_MAJOR_CAP_DEG) return ratioStep;
+  const capped = Math.floor(GRAD_MAJOR_CAP_DEG / minorStep) * minorStep;
+  return capped > 0 ? capped : minorStep;
+}
 function isMajorLine(value, majorStep) {
   const m = ((value % majorStep) + majorStep) % majorStep;
   return m < 1e-6 || majorStep - m < 1e-6;
 }
+// Picks a grid line's label anchor among its (already-projected)
+// {x,y,visible} sample points: prefers the bottom-most one that's
+// actually within the canvas rectangle, INSET by `margin` on every side
+// (Gilles, 2026-10-02: "le tour de l'ecran, idealement en bas") -
+// hemisphere-"visible" alone isn't enough, an anchor picked from
+// hemisphere-visible-but-off-canvas points (e.g. once zoomed in past
+// domeRadius > canvas size - see this file's own header) left labels
+// nowhere on screen at any real zoom ("toujours KO"). `margin` needs to
+// cover both drawCornerLabel()'s own offset (the text is drawn a bit
+// *above* the anchor) and roughly half a label's own width/height, or a
+// clamped anchor right at the canvas edge would still place the actual
+// text outside it (caught the same way: re-verifying by actually checking
+// the drawn fillText() coordinates, not just "is there an anchor at all").
+// If none of the (necessarily finite) sample points land exactly inside
+// the inset rectangle - common once zoomed in, where the on-canvas slice
+// of a line can be a sliver much narrower than the sampling step - falls
+// back to whichever sample is closest to it, clamped just inside. Only
+// needs a modest, fixed sample count either way: "closest point" doesn't
+// require actually hitting a narrow window the way "did we sample a point
+// strictly inside it" would.
+function pickLabelAnchor(points, w, h, margin) {
+  let onCanvas = null;
+  let near = null, nearDistSq = Infinity;
+  const lo = margin, hiX = w - margin, hiY = h - margin;
+  for (const p of points) {
+    if (!p.visible) continue;
+    if (p.x >= lo && p.x <= hiX && p.y >= lo && p.y <= hiY) {
+      if (!onCanvas || p.y > onCanvas.y) onCanvas = p;
+    } else {
+      const dx = p.x < lo ? lo - p.x : (p.x > hiX ? p.x - hiX : 0);
+      const dy = p.y < lo ? lo - p.y : (p.y > hiY ? p.y - hiY : 0);
+      const d = dx * dx + dy * dy;
+      if (d < nearDistSq) { nearDistSq = d; near = p; }
+    }
+  }
+  if (onCanvas) return onCanvas;
+  if (!near) return null;
+  return { x: Math.min(Math.max(near.x, lo), hiX), y: Math.min(Math.max(near.y, lo), hiY) };
+}
 // Strokes a polyline given as an array of already-projected {x,y,visible}
 // points, breaking across any gap where the line leaves the currently
 // visible (front) hemisphere and picking back up wherever it re-enters -
-// same "moveTo on the first visible point after a gap" pattern the true
-// horizon/meridian lines already used before this became a generic grid.
-// Returns the first visible point, for a caller that wants to label the
-// line (or null if none of it was visible at all).
-function strokePolyline(ctx, points) {
-  let started = false, first = null;
+// and returns its label anchor (see pickLabelAnchor() above).
+function strokePolyline(ctx, points, w, h, margin) {
+  let started = false;
   ctx.beginPath();
   for (const p of points) {
     if (!p.visible) { started = false; continue; }
-    if (!first) first = p;
     if (!started) { ctx.moveTo(p.x, p.y); started = true; } else { ctx.lineTo(p.x, p.y); }
   }
   ctx.stroke();
-  return first;
+  return pickLabelAnchor(points, w, h, margin);
 }
-// A grid line's coordinate value, drawn once near wherever it happens to
-// first become visible - Gilles, 2026-10-01: "tu n'as pas ajoute les
-// graduations, coordonnees equatoriales et azimutales comme je te l'avais
-// demande": the lines alone aren't the "graduations", the coordinate
-// numbers are. Only called for major lines (see render()) - a full grid at
-// minor-line density would make every single line's own label unreadable
-// clutter.
-function drawCornerLabel(ctx, p, text) {
-  ctx.fillText(text, p.x + 6, p.y - 6);
+// A grid line's coordinate value, anchored at strokePolyline()'s own
+// bottom-most-on-canvas point - Gilles, 2026-10-01: "tu n'as pas ajoute
+// les graduations, coordonnees equatoriales et azimutales comme je te
+// l'avais demande": the lines alone aren't the "graduations", the
+// coordinate numbers are. Called for EVERY visible-on-canvas line, major
+// or minor (Gilles, 2026-10-02, after an earlier major-only pass:
+// "chaque graduation doit porter un libelle de valeur"). `offsetPx` is in
+// device pixels (render() scales it by the current devicePixelRatio, same
+// as the font size itself - see render()'s own `uiFont`/`dpr` - a fixed
+// CSS-pixel-sized offset would otherwise shrink to almost nothing on a
+// high-DPI screen).
+function drawCornerLabel(ctx, p, text, offsetPx) {
+  ctx.fillText(text, p.x, p.y - offsetPx);
 }
 // RA graduation label, in hours - the "usual" unit for equatorial
 // coordinates (as opposed to plain degrees) in every telescope-control
@@ -447,6 +501,24 @@ export class SkyEngine {
     const dpr = window.devicePixelRatio || 1;
     this._domeRadius = domeRadius / dpr;
     const date = this.getTime();
+    // All drawing below happens in DEVICE pixels (canvas.width/height are
+    // already dpr-scaled - see resize()). A literal "10px" font would then
+    // render at 10 *device* pixels, i.e. as little as 3-5 CSS pixels tall
+    // on a common 2x/3x-DPI screen - technically drawn, but small enough
+    // to be effectively invisible (Gilles, 2026-10-02, after the previous
+    // fix still left him seeing "strictement rien, absolument nulle part":
+    // turned out to be exactly this - not a missing-label bug but an
+    // illegible-label one). uiFont() keeps every label's actual on-screen
+    // (CSS-pixel) size constant regardless of DPI, the same way
+    // `_domeRadius` above already does for geometry.
+    const uiFont = (px) => `${px * dpr}px sans-serif`;
+    const labelOffsetPx = 6 * dpr;
+    // Keeps a clamped label anchor (pickLabelAnchor()'s fallback path) far
+    // enough from the canvas edge that the actual text - drawn offset
+    // *above* the anchor, and centred, so it extends further still to
+    // either side - never gets clipped off despite the anchor itself being
+    // technically inside the rectangle.
+    const labelMargin = labelOffsetPx + 24 * dpr;
 
     const toScreen = (v) => {
       const rv = rotateVector(this.rotation, v);
@@ -543,14 +615,13 @@ export class SkyEngine {
     // the observer's own horizontal frame) since RA/Dec are fixed on the
     // sky regardless of where the observer is or what time it is -
     // project() (RA/Dec -> screen) already does the equatorial ->
-    // horizontal -> screen chain for every other catalog object. Major
-    // lines only get a coordinate label (RA in hours, Dec in degrees) -
-    // labelling every minor line too would be unreadable clutter.
+    // horizontal -> screen chain for every other catalog object. Every
+    // line carries its own coordinate label (RA in hours, Dec in degrees).
     if (this.showEquatorialGrid) {
-      const raMinor = pickGradStepDeg(360, this.zoom), raMajor = raMinor * GRAD_MAJOR_RATIO;
-      const decMinor = pickGradStepDeg(180, this.zoom), decMajor = decMinor * GRAD_MAJOR_RATIO;
+      const raMinor = pickGradStepDeg(360, this.zoom), raMajor = pickMajorStepDeg(raMinor);
+      const decMinor = pickGradStepDeg(180, this.zoom), decMajor = pickMajorStepDeg(decMinor);
       ctx.fillStyle = fg.grad;
-      ctx.font = "10px sans-serif";
+      ctx.font = uiFont(11);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       const LINE_SAMPLES = 64;
@@ -562,8 +633,8 @@ export class SkyEngine {
         ctx.globalAlpha = major ? 1 : 0.55;
         const pts = [];
         for (let i = 0; i <= LINE_SAMPLES; i++) pts.push(project(ra, -90 + (180 * i) / LINE_SAMPLES));
-        const first = strokePolyline(ctx, pts);
-        if (major && first) drawCornerLabel(ctx, first, fmtRaHoursLabel(ra));
+        const anchor = strokePolyline(ctx, pts, w, h, labelMargin);
+        if (anchor) drawCornerLabel(ctx, anchor, fmtRaHoursLabel(ra), labelOffsetPx);
       }
       for (const dec of rangeSteps(-90, 90, decMinor)) {
         const major = isMajorLine(dec, decMajor);
@@ -572,8 +643,8 @@ export class SkyEngine {
         ctx.globalAlpha = major ? 1 : 0.55;
         const pts = [];
         for (let i = 0; i <= LINE_SAMPLES; i++) pts.push(project((360 * i) / LINE_SAMPLES, dec));
-        const first = strokePolyline(ctx, pts);
-        if (major && first) drawCornerLabel(ctx, first, fmtDegLabel(dec));
+        const anchor = strokePolyline(ctx, pts, w, h, labelMargin);
+        if (anchor) drawCornerLabel(ctx, anchor, fmtDegLabel(dec), labelOffsetPx);
       }
       ctx.globalAlpha = 1;
     }
@@ -598,10 +669,10 @@ export class SkyEngine {
     // neither system draws below the horizon (alt<0) - a "look at the sky"
     // grid, not a full free-floating sphere one.
     if (this.showAzimuthalGrid) {
-      const azMinor = pickGradStepDeg(360, this.zoom), azMajor = azMinor * GRAD_MAJOR_RATIO;
-      const altMinor = pickGradStepDeg(90, this.zoom), altMajor = altMinor * GRAD_MAJOR_RATIO;
+      const azMinor = pickGradStepDeg(360, this.zoom), azMajor = pickMajorStepDeg(azMinor);
+      const altMinor = pickGradStepDeg(90, this.zoom), altMajor = pickMajorStepDeg(altMinor);
       ctx.fillStyle = fg.grad;
-      ctx.font = "10px sans-serif";
+      ctx.font = uiFont(11);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       const ARC_SAMPLES = 48;
@@ -619,18 +690,27 @@ export class SkyEngine {
             ctx.setLineDash(dashed ? [4, 4] : []);
             const pts = [];
             for (let i = 0; i <= ARC_SAMPLES; i++) pts.push(toScreen(horizontalToVector(azz, altFrom + (altTo - altFrom) * (i / ARC_SAMPLES))));
-            strokePolyline(ctx, pts);
+            strokePolyline(ctx, pts, w, h, labelMargin);
           };
           drawMeridianArc(0, 0, splitAlt, true);    // North point -> pole, dashed
           drawMeridianArc(0, splitAlt, 90, false);  // pole -> zenith, solid
           drawMeridianArc(180, 90, 0, false);       // zenith -> South point, solid
           ctx.setLineDash([]);
+          // Every graduation gets its own value label (Gilles, 2026-10-02:
+          // "chaque graduation doit porter un libellé de valeur"), the
+          // meridian included - re-walk just its North-point-to-zenith
+          // half (cheap, ARC_SAMPLES points) purely to find its own anchor
+          // via the same rule as every other line (pickLabelAnchor()).
+          const northPts = [];
+          for (let i = 0; i <= ARC_SAMPLES; i++) northPts.push(toScreen(horizontalToVector(0, (90 * i) / ARC_SAMPLES)));
+          const northAnchor = pickLabelAnchor(northPts, w, h, labelMargin);
+          if (northAnchor) drawCornerLabel(ctx, northAnchor, fmtDegLabel(0), labelOffsetPx);
         } else {
           for (const azz of [az, az + 180]) {
             const pts = [];
             for (let i = 0; i <= ARC_SAMPLES; i++) pts.push(toScreen(horizontalToVector(azz, (90 * i) / ARC_SAMPLES)));
-            const first = strokePolyline(ctx, pts);
-            if (major && first) drawCornerLabel(ctx, first, fmtDegLabel(azz));
+            const anchor = strokePolyline(ctx, pts, w, h, labelMargin);
+            if (anchor) drawCornerLabel(ctx, anchor, fmtDegLabel(azz), labelOffsetPx);
           }
         }
       }
@@ -642,8 +722,8 @@ export class SkyEngine {
         const pts = [];
         const CIRCLE_SAMPLES = 96;
         for (let i = 0; i <= CIRCLE_SAMPLES; i++) pts.push(toScreen(horizontalToVector((360 * i) / CIRCLE_SAMPLES, alt)));
-        const first = strokePolyline(ctx, pts);
-        if (major && first) drawCornerLabel(ctx, first, fmtDegLabel(alt));
+        const anchor = strokePolyline(ctx, pts, w, h, labelMargin);
+        if (anchor) drawCornerLabel(ctx, anchor, fmtDegLabel(alt), labelOffsetPx);
       }
       ctx.globalAlpha = 1;
     }
@@ -652,7 +732,7 @@ export class SkyEngine {
     // else, so they move/disappear with the pan like any other sky feature.
     if (this.showCardinals) {
       ctx.fillStyle = fg.cardinal;
-      ctx.font = "11px sans-serif";
+      ctx.font = uiFont(12);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       for (const [az, label] of [[0, "N"], [90, "E"], [180, "S"], [270, "O"]]) {
