@@ -84,6 +84,16 @@ export class SkyEngine {
     this.showMessier = true;
     this.showTrueHorizon = false;
     this.dayMode = false;
+    // Whether the *app's own* light/dark theme is currently light — set
+    // and kept in sync by the caller (templates/navigator.js watches
+    // <html data-theme>). Independent of dayMode (that's the astronomical
+    // simulation, this is just "does the light/dark palette below need to
+    // flip so it's still visible against whatever background ends up on
+    // screen") but both end up driving the exact same palette choice below
+    // (Gilles, 2026-09-30, having switched the app to light theme: "en
+    // mode clair le fond reste noir ... il faut aussi inverser les
+    // couleurs (etoiles noires par exemple)").
+    this.lightUI = !!opts.lightUI;
     this.onNeedsRender = opts.onNeedsRender || null; // called after wheel-zoom/drag changes, so the caller can re-render immediately instead of waiting for its own timer
     this.onSelect = opts.onSelect || null; // called on a tap/click that isn't a drag - see _handlePointerUp()
     this.onZoomChange = opts.onZoomChange || null; // called after wheel-zoom specifically (not pan/drag) - e.g. to persist it, see templates/navigator.js
@@ -257,16 +267,25 @@ export class SkyEngine {
     const { ctx, canvas } = this;
     const w = canvas.width, h = canvas.height;
     ctx.clearRect(0, 0, w, h);
-    // Day mode: a plain sky-blue fill instead of the transparent canvas
-    // (which lets #bg-layer's own near-black CSS background show through -
-    // see panels.css). No real atmospheric simulation (extinction, twilight
-    // gradient...) - that's real future work (astro2001-style, see the
-    // note), this is deliberately just a flat on/off "is it meant to look
-    // like daytime" toggle, cheap and unambiguous.
-    if (this.dayMode) {
-      ctx.fillStyle = "#8ec8e8";
-      ctx.fillRect(0, 0, w, h);
-    }
+
+    // Background + foreground palette. Two independent things can make the
+    // background light — dayMode (simulating an actual daytime sky) and
+    // lightUI (the app's own theme happens to be light) — either one needs
+    // every foreground colour (stars first and foremost) to invert too, or
+    // they're invisible against it (Gilles, 2026-09-30, having switched the
+    // app to light theme: "en mode clair le fond reste noir ... il faut
+    // aussi inverser les couleurs (etoiles noires par exemple)"). Drawn
+    // explicitly here (ctx.fillRect) rather than left to #bg-layer's own
+    // CSS background showing through the transparent canvas, so this stays
+    // the one, authoritative place that decides the sky's own colours,
+    // independent of any CSS/canvas timing.
+    const isLightBg = this.dayMode || this.lightUI;
+    ctx.fillStyle = this.dayMode ? "#8ec8e8" : (this.lightUI ? "#e4e9ee" : "#05070c");
+    ctx.fillRect(0, 0, w, h);
+    const fg = isLightBg
+      ? { dome: "rgba(0,0,0,0.28)", cardinal: "rgba(0,0,0,0.6)", constellation: "rgba(40,80,140,0.45)", star: "#15181c", messier: "rgba(27,94,32,0.85)", horizon: "rgba(180,110,0,0.65)" }
+      : { dome: "rgba(255,255,255,0.25)", cardinal: "rgba(255,255,255,0.55)", constellation: "rgba(100,160,220,0.35)", star: "#fff", messier: "rgba(129,199,132,0.85)", horizon: "rgba(255,193,7,0.55)" };
+
     const cx = w / 2, cy = h / 2;
     const domeRadius = Math.min(w, h) / 2 * 0.96 * this.zoom;
     // Drag math (_onPointerDown/_onPointerMove) reads this via CSS pixels
@@ -289,7 +308,7 @@ export class SkyEngine {
     // be a circle on screen at all) - see sky-projection.js's
     // horizontalToScreen doc, and showTrueHorizon below for the actual
     // horizon reference.
-    ctx.strokeStyle = "rgba(255,255,255,0.25)";
+    ctx.strokeStyle = fg.dome;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(cx, cy, domeRadius, 0, 2 * Math.PI);
@@ -301,7 +320,7 @@ export class SkyEngine {
     // dome edge at the default (unpanned, zenith-centered) view, only
     // earns its own line once you've actually looked away from straight up.
     if (this.showTrueHorizon) {
-      ctx.strokeStyle = "rgba(255,193,7,0.55)";
+      ctx.strokeStyle = fg.horizon;
       ctx.setLineDash([4, 4]);
       ctx.beginPath();
       let started = false;
@@ -318,7 +337,7 @@ export class SkyEngine {
     // Cardinal points. Projected through the same rotation as everything
     // else, so they move/disappear with the pan like any other sky feature.
     if (this.showCardinals) {
-      ctx.fillStyle = "rgba(255,255,255,0.55)";
+      ctx.fillStyle = fg.cardinal;
       ctx.font = "11px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -335,7 +354,7 @@ export class SkyEngine {
 
     // Constellation lines.
     if (this.showConstellations) {
-      ctx.strokeStyle = "rgba(100,160,220,0.35)";
+      ctx.strokeStyle = fg.constellation;
       ctx.lineWidth = 1;
       for (const [a, b] of this.catalog.constellationLines) {
         const pa = project(a.ra, a.dec), pb = project(b.ra, b.dec);
@@ -350,7 +369,7 @@ export class SkyEngine {
     // Stars. Day mode: only the handful bright enough to plausibly still
     // show up against a lit sky (rough, not a real extinction model - see
     // the dayMode comment above render()'s own fillRect).
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = fg.star;
     for (const s of this.catalog.stars) {
       if (this.dayMode && s.mag > 0) continue;
       const p = project(s.ra, s.dec);
@@ -363,7 +382,7 @@ export class SkyEngine {
 
     // Messier objects: small open circles, distinct from stars.
     if (this.showMessier) {
-      ctx.strokeStyle = "rgba(129,199,132,0.85)";
+      ctx.strokeStyle = fg.messier;
       ctx.lineWidth = 1;
       for (const m of this.catalog.messier) {
         const p = project(m.ra, m.dec);

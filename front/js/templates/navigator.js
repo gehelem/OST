@@ -174,6 +174,7 @@ function buildSkyDome(client, moduleName, onSelect) {
   const engine = new SkyEngine(canvas, {
     onNeedsRender: () => engine.render(),
     onSelect,
+    lightUI: document.documentElement.getAttribute("data-theme") === "light",
   });
   // Applied before the catalog/first render below, not in the settings
   // panel (built later, after this function returns) — so the very first
@@ -182,6 +183,18 @@ function buildSkyDome(client, moduleName, onSelect) {
   // wheel-zoom -> persist wiring (engine.onZoomChange).
   Object.assign(engine, loadDisplaySettings());
   engine.loadCatalog("light").then(() => engine.render()).catch((e) => console.error("[navigator] catalog load", e));
+
+  // lightUI tracks the app's own live theme toggle, not a saved preference
+  // of its own (unlike the fields loadDisplaySettings() restores above) —
+  // it would just drift out of sync with the real theme if it were. Gilles,
+  // 2026-09-30, having switched the app to light theme: "en mode clair le
+  // fond reste noir ... il faut aussi inverser les couleurs". The app sets
+  // <html data-theme> on toggle (see app.js) - watch it directly.
+  const themeObserver = new MutationObserver(() => {
+    engine.lightUI = document.documentElement.getAttribute("data-theme") === "light";
+    engine.render();
+  });
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
   const ro = new ResizeObserver(() => {
     const r = bgLayer.getBoundingClientRect();
@@ -214,6 +227,7 @@ function buildSkyDome(client, moduleName, onSelect) {
     dispose: () => {
       unsub();
       ro.disconnect();
+      themeObserver.disconnect();
       clearInterval(timer);
       engine.destroy();
       bgLayer.innerHTML = "";
