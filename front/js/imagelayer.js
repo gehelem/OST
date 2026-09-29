@@ -26,6 +26,7 @@
 import { el, icon } from "./dom.js";
 import { getMediaBaseUrl, imageStatsLine } from "./render.js";
 import { mediaUrl as buildMediaUrl } from "../core/index.js";
+import { t } from "./i18n.js";
 
 if (window.Chart && window.Chart.registerables) {
   try { window.Chart.register(...window.Chart.registerables); } catch (e) { /* already done */ }
@@ -86,7 +87,7 @@ function buildViewer() {
   const stage = el("div", { class: "img-viewer-stage" });
   const img = el("img", { class: "img-viewer-img" });
   stage.appendChild(img);
-  const close = el("button", { class: "img-viewer-close", type: "button", title: "Close" }, [icon("close")]);
+  const close = el("button", { class: "img-viewer-close", type: "button", title: t("common.close") }, [icon("close")]);
   root.appendChild(stage);
   root.appendChild(close);
   document.body.appendChild(root);
@@ -185,20 +186,20 @@ function renderImageStatsTable(v) {
   const wrap = el("div", { class: "img-stats-full" });
   const ch = v.channels || 1;
 
-  wrap.appendChild(el("div", { class: "stat-sec", text: "Dimensions" }));
+  wrap.appendChild(el("div", { class: "stat-sec", text: t("imagelayer.dimensions") }));
   wrap.appendChild(statRow("Width", (v.width || "N/A") + " px"));
   wrap.appendChild(statRow("Height", (v.height || "N/A") + " px"));
   wrap.appendChild(statRow("Type", ch === 3 ? "RGB" : "Grayscale"));
 
   if (v.hfravg != null || v.stars != null || v.snr != null) {
-    wrap.appendChild(el("div", { class: "stat-sec", text: "Focus & stars" }));
+    wrap.appendChild(el("div", { class: "stat-sec", text: t("imagelayer.focusAndStars") }));
     if (v.hfravg != null) wrap.appendChild(statRow("HFR avg", fmtNum(v.hfravg)));
     if (v.hfravgdev != null) wrap.appendChild(statRow("HFR avg dev", fmtNum(v.hfravgdev)));
     if (v.stars != null) wrap.appendChild(statRow("Stars", String(v.stars)));
     if (v.snr != null) wrap.appendChild(statRow("SNR", fmtNum(v.snr)));
   }
 
-  wrap.appendChild(el("div", { class: "stat-sec", text: "Statistics" }));
+  wrap.appendChild(el("div", { class: "stat-sec", text: t("imagelayer.statistics") }));
   const table = el("table", { class: "img-stats-table" });
   const head = el("tr", null, [el("th", null, "")]);
   (ch === 3 ? ["R", "G", "B"] : ["Value"]).forEach((h) => head.appendChild(el("th", null, h)));
@@ -214,7 +215,7 @@ function renderImageStatsTable(v) {
   wrap.appendChild(table);
 
   if (v.issolved) {
-    wrap.appendChild(el("div", { class: "stat-sec", text: "Astrometry" }));
+    wrap.appendChild(el("div", { class: "stat-sec", text: t("imagelayer.astrometry") }));
     wrap.appendChild(statRow("RA", fmtNum(v.solverra, 3) + "°"));
     wrap.appendChild(statRow("DEC", fmtNum(v.solverde, 3) + "°"));
   }
@@ -236,11 +237,11 @@ function updateImageHistogram(v, canvas, chartRef) {
   const ch = v.channels || 1;
   const ds = ch === 3
     ? [
-      { label: "R", data: flat(h[0]), borderColor: "#ef5350", backgroundColor: "rgba(239,83,80,0.3)", borderWidth: 1, fill: true },
-      { label: "G", data: flat(h[1]), borderColor: "#66bb6a", backgroundColor: "rgba(102,187,106,0.3)", borderWidth: 1, fill: true },
-      { label: "B", data: flat(h[2]), borderColor: "#42a5f5", backgroundColor: "rgba(66,165,245,0.3)", borderWidth: 1, fill: true },
+      { label: t("imagelayer.channelR"), data: flat(h[0]), borderColor: "#ef5350", backgroundColor: "rgba(239,83,80,0.3)", borderWidth: 1, fill: true },
+      { label: t("imagelayer.channelG"), data: flat(h[1]), borderColor: "#66bb6a", backgroundColor: "rgba(102,187,106,0.3)", borderWidth: 1, fill: true },
+      { label: t("imagelayer.channelB"), data: flat(h[2]), borderColor: "#42a5f5", backgroundColor: "rgba(66,165,245,0.3)", borderWidth: 1, fill: true },
     ]
-    : [{ label: "Value", data: flat(h[0]), borderColor: "rgba(200,200,200,0.9)", backgroundColor: "rgba(200,200,200,0.35)", borderWidth: 1, fill: true }];
+    : [{ label: t("imagelayer.channelValue"), data: flat(h[0]), borderColor: "rgba(200,200,200,0.9)", backgroundColor: "rgba(200,200,200,0.35)", borderWidth: 1, fill: true }];
 
   if (chartRef.chart) {
     chartRef.chart.data.labels = labels;
@@ -307,7 +308,7 @@ export function addImageBlock(client, moduleName, mod, propName, elName, panelsA
   b.appendChild(track(buildImageQuickStats(client, moduleName, propName, elName)));
   quickNavEntries.push({ id: propName, label: mod.properties[propName].label || "Image" });
 
-  const sb = panelsApi.make({ id: propName + "-stats", title: "Image stats", x: p.x, y: p.y + 100, w: p.w + 100, collapsed: true });
+  const sb = panelsApi.make({ id: propName + "-stats", title: t("imagelayer.imageStats"), x: p.x, y: p.y + 100, w: p.w + 100, collapsed: true });
   sb.appendChild(track(buildImageStatsHistogramPanel(client, moduleName, propName, elName)));
-  quickNavEntries.push({ id: propName + "-stats", label: "Stats" });
+  quickNavEntries.push({ id: propName + "-stats", label: t("imagelayer.stats") });
 }

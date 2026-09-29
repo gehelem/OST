@@ -39,6 +39,7 @@ import { renderProperty, updateQuickNav } from "../render.js";
 import { addImageBlock } from "../imagelayer.js";
 import { el } from "../dom.js";
 import * as Panels from "../panels.js";
+import { t } from "../i18n.js";
 
 if (window.Chart && window.Chart.registerables) {
   try { window.Chart.register(...window.Chart.registerables); } catch (e) { /* already done */ }
@@ -146,17 +147,17 @@ function buildGuidingChartPanel(client, moduleName) {
             x: { ticks: { color: grey, maxRotation: 0, autoSkip: true, maxTicksLimit: 10, font: { size: 9 } }, grid },
             yDrive: {
               type: "linear", position: "left", min: lim && lim.drive.min, max: lim && lim.drive.max,
-              title: { display: true, text: "Drift", color: grey, font: { size: 10 } },
+              title: { display: true, text: t("guider.drift"), color: grey, font: { size: 10 } },
               ticks: { color: grey, font: { size: 9 }, maxTicksLimit: 8 }, grid,
             },
             yPulse: {
               type: "linear", position: "right", min: lim && lim.pulse.min, max: lim && lim.pulse.max,
-              title: { display: true, text: "Pulse", color: grey, font: { size: 10 } },
+              title: { display: true, text: t("guider.pulse"), color: grey, font: { size: 10 } },
               ticks: { color: grey, font: { size: 9 }, maxTicksLimit: 6 }, grid: { drawOnChartArea: false },
             },
             ySNR: {
               type: "linear", position: "right", offset: true, min: 0,
-              title: { display: true, text: "SNR", color: "#F44336", font: { size: 10 } },
+              title: { display: true, text: t("guider.snr"), color: "#F44336", font: { size: 10 } },
               ticks: { color: "#F44336", font: { size: 9 }, maxTicksLimit: 5 }, grid: { drawOnChartArea: false },
             },
           },

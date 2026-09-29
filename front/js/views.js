@@ -8,6 +8,7 @@
 
 import { el, icon, iconButton, moduleIcon, statusDot, updateStatusDot } from "./dom.js";
 import { togglePanel, isPanelVisible } from "./panels.js";
+import { t } from "./i18n.js";
 
 // Horizontal module bar (ostnoctua's .on-modbar/.on-mod, see panels.css) —
 // only the actually-loaded OST modules. Controller/Files/Logs live in the
@@ -99,9 +100,9 @@ export function renderQuickNav(entries) {
 // with the other app-level settings reads better than mixing them into the
 // live module list.
 const SYSTEM_VIEWS = [
-  { key: "__controller", label: "Controller", icon: "tune" },
-  { key: "__files", label: "Files", icon: "folder" },
-  { key: "__logs", label: "Logs", icon: "list" },
+  { key: "__controller", get label() { return t("views.controller"); }, icon: "tune" },
+  { key: "__files", get label() { return t("views.files"); }, icon: "folder" },
+  { key: "__logs", get label() { return t("views.logs"); }, icon: "list" },
 ];
 export function renderSystemViews(activeKey, onSelect) {
   const nav = el("div", { class: "settings-nav" });
@@ -117,17 +118,17 @@ export function renderSystemViews(activeKey, onSelect) {
 
 export function renderLogin(client, onDone) {
   const overlay = el("div", { class: "dialog-overlay" });
-  const user = el("input", { type: "text", class: "field-input", placeholder: "user", style: "width:100%" });
-  const pw = el("input", { type: "password", class: "field-input", placeholder: "password", style: "width:100%" });
+  const user = el("input", { type: "text", class: "field-input", placeholder: t("views.userPlaceholder"), style: "width:100%" });
+  const pw = el("input", { type: "password", class: "field-input", placeholder: t("views.passwordPlaceholder"), style: "width:100%" });
   const submit = () => { client.login(user.value, pw.value); overlay.remove(); if (onDone) onDone(); };
   pw.addEventListener("keydown", (ev) => { if (ev.key === "Enter") submit(); });
   const dialog = el("div", { class: "dialog" }, [
-    el("h3", { text: "Login required" }),
-    el("div", { class: "muted small", text: "This server requires authentication (grant-client = -1)." }),
-    el("div", { class: "form-row" }, [el("label", { text: "User" }), user]),
-    el("div", { class: "form-row" }, [el("label", { text: "Password" }), pw]),
+    el("h3", { text: t("views.loginRequired") }),
+    el("div", { class: "muted small", text: t("views.loginRequiresAuth") }),
+    el("div", { class: "form-row" }, [el("label", { text: t("views.user") }), user]),
+    el("div", { class: "form-row" }, [el("label", { text: t("views.password") }), pw]),
     el("div", { class: "dialog-actions" }, [
-      el("button", { class: "btn btn-primary", onclick: submit }, "Login"),
+      el("button", { class: "btn btn-primary", onclick: submit }, t("views.login")),
     ]),
   ]);
   overlay.appendChild(dialog);
@@ -151,7 +152,7 @@ export function renderController(client) {
   function render() {
     const cd = client.get(client.topics.controllerData()) || {};
     root.innerHTML = "";
-    root.appendChild(el("h2", null, [icon("tune"), el("span", { text: " Controller" })]));
+    root.appendChild(el("h2", null, [icon("tune"), el("span", { text: " " + t("views.controller") })]));
     if (cd.banner) root.appendChild(el("div", { class: "banner", text: cd.banner }));
     if (cd.git) root.appendChild(el("div", { class: "muted small mono", text: `${cd.git.Gittag || ""} ${cd.git.Githash || ""} — ${cd.git.Gitdate || ""}` }));
 
@@ -159,67 +160,67 @@ export function renderController(client) {
 
     const sw = cd.systemwatcher;
     if (sw) {
-      const sec = el("section", { class: "panel" }, [el("h3", { text: "Server load" })]);
-      if (sw.cpu) sec.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: "CPU (1/5/15m)" }), el("span", { class: "value", text: `${sw.cpu.load_1m} / ${sw.cpu.load_5m} / ${sw.cpu.load_15m}` })]));
-      if (sw.ram) sec.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: "RAM" }), el("span", { class: "value", text: `${fmtBytes(sw.ram.used_mb)} / ${fmtBytes(sw.ram.total_mb)}` })]));
+      const sec = el("section", { class: "panel" }, [el("h3", { text: t("views.serverLoad") })]);
+      if (sw.cpu) sec.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: t("views.cpuLabel") }), el("span", { class: "value", text: `${sw.cpu.load_1m} / ${sw.cpu.load_5m} / ${sw.cpu.load_15m}` })]));
+      if (sw.ram) sec.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: t("views.ramLabel") }), el("span", { class: "value", text: `${fmtBytes(sw.ram.used_mb)} / ${fmtBytes(sw.ram.total_mb)}` })]));
       for (const d of sw.disks || []) sec.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: `${d.mountpoint} (${d.device})` }), el("span", { class: "value", text: `${d.used_gb.toFixed(1)} / ${d.total_gb.toFixed(1)} GB` })]));
       for (const n of sw.network || []) sec.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: n.iface }), el("span", { class: "value", text: `↓${n.rx_kbps.toFixed(1)} ↑${n.tx_kbps.toFixed(1)} kbps` })]));
       for (const t of sw.temperatures || []) sec.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: t.type }), el("span", { class: "value", text: `${t.temp_c.toFixed(1)} °C` })]));
       grid.appendChild(sec);
     }
 
-    const confSec = el("section", { class: "panel" }, [el("h3", { text: "Configurations" })]);
+    const confSec = el("section", { class: "panel" }, [el("h3", { text: t("views.configurations") })]);
     const confs = cd.availableconfs || {};
     const confList = el("ul");
     for (const [name, modlist] of Object.entries(confs)) {
       const li = el("li");
-      li.appendChild(el("span", { class: "spacer", text: `${name}${cd.currentconf === name ? " (current)" : ""} — ${(modlist || []).length} module(s)` }));
-      li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.loadConfiguration(name) }, "Load"));
+      li.appendChild(el("span", { class: "spacer", text: `${name}${cd.currentconf === name ? t("views.current") : ""} — ${(modlist || []).length} ${t("views.moduleCountSuffix")}` }));
+      li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.loadConfiguration(name) }, t("views.load")));
       confList.appendChild(li);
     }
     confSec.appendChild(confList);
-    const nameInput = el("input", { type: "text", class: "field-input", placeholder: "configuration name" });
-    confSec.appendChild(el("div", { class: "form-row" }, [nameInput, el("button", { class: "btn btn-primary btn-sm", onclick: () => { if (nameInput.value) client.saveConfiguration(nameInput.value); } }, "Save current as…")]));
+    const nameInput = el("input", { type: "text", class: "field-input", placeholder: t("views.configNamePlaceholder") });
+    confSec.appendChild(el("div", { class: "form-row" }, [nameInput, el("button", { class: "btn btn-primary btn-sm", onclick: () => { if (nameInput.value) client.saveConfiguration(nameInput.value); } }, t("views.saveCurrentAs"))]));
     grid.appendChild(confSec);
 
-    const modSec = el("section", { class: "panel" }, [el("h3", { text: "Loaded modules" })]);
+    const modSec = el("section", { class: "panel" }, [el("h3", { text: t("views.loadedModules") })]);
     const modList = el("ul");
     for (const name of client.get(client.topics.modules())) {
       const li = el("li");
       li.appendChild(el("span", { class: "spacer mono small", text: name }));
-      if (name !== "GlobalDatastore") li.appendChild(el("button", { class: "btn btn-sm btn-danger", onclick: () => { if (confirm(`Unload ${name}?`)) client.killModule(name); } }, "Kill"));
+      if (name !== "GlobalDatastore") li.appendChild(el("button", { class: "btn btn-sm btn-danger", onclick: () => { if (confirm(t("views.unloadConfirm", { name }))) client.killModule(name); } }, t("views.kill")));
       modList.appendChild(li);
     }
     modSec.appendChild(modList);
     grid.appendChild(modSec);
 
-    const libSec = el("section", { class: "panel" }, [el("h3", { text: "Load a module" })]);
+    const libSec = el("section", { class: "panel" }, [el("h3", { text: t("views.loadAModule") })]);
     const libs = cd.libraries || {};
     const libSelect = el("select", { class: "field-input" });
     for (const key of Object.keys(libs)) {
       const stripped = key.startsWith("libost") ? key.slice(6) : key;
       libSelect.appendChild(el("option", { value: stripped, text: key }));
     }
-    const labelInput = el("input", { type: "text", class: "field-input", placeholder: "instance label" });
-    const profileInput = el("input", { type: "text", class: "field-input", placeholder: "profile (optional)" });
+    const labelInput = el("input", { type: "text", class: "field-input", placeholder: t("views.instanceLabelPlaceholder") });
+    const profileInput = el("input", { type: "text", class: "field-input", placeholder: t("views.profileOptionalPlaceholder") });
     libSec.appendChild(el("div", { class: "form-row" }, [libSelect, labelInput, profileInput,
-      el("button", { class: "btn btn-primary btn-sm", onclick: () => { if (labelInput.value) client.loadModule(libSelect.value, labelInput.value, profileInput.value || undefined); } }, "Load"),
+      el("button", { class: "btn btn-primary btn-sm", onclick: () => { if (labelInput.value) client.loadModule(libSelect.value, labelInput.value, profileInput.value || undefined); } }, t("views.load")),
     ]));
     grid.appendChild(libSec);
 
-    const indiSec = el("section", { class: "panel" }, [el("h3", { text: `INDI server — ${cd.indiserver === "Y" ? "enabled" : "disabled"}` })]);
+    const indiSec = el("section", { class: "panel" }, [el("h3", { text: t("views.indiServerPrefix") + (cd.indiserver === "Y" ? t("views.enabled") : t("views.disabled")) })]);
     indiSec.appendChild(el("div", { class: "form-row" }, [
-      el("button", { class: "btn btn-sm", onclick: () => client.indiStart() }, "Start server"),
-      el("button", { class: "btn btn-sm", onclick: () => client.indiStop() }, "Stop server"),
+      el("button", { class: "btn btn-sm", onclick: () => client.indiStart() }, t("views.startServer")),
+      el("button", { class: "btn btn-sm", onclick: () => client.indiStop() }, t("views.stopServer")),
     ]));
     const active = new Set((cd.indiactivedrivers || []).map((d) => d.binary));
     const driversList = el("ul");
     for (const d of cd.indidrivers || []) {
       const li = el("li");
-      li.appendChild(el("span", { class: "spacer small", text: `${d.label} (${d.family})${active.has(d.binary) ? " ● running" : ""}` }));
-      li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.indiLoadDriver(d.binary) }, "Load"));
-      li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.indiReloadDriver(d.binary) }, "Reload"));
-      li.appendChild(el("button", { class: "btn btn-sm btn-danger", onclick: () => client.indiStopDriver(d.binary) }, "Stop"));
+      li.appendChild(el("span", { class: "spacer small", text: `${d.label} (${d.family})${active.has(d.binary) ? t("views.runningSuffix") : ""}` }));
+      li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.indiLoadDriver(d.binary) }, t("views.load")));
+      li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.indiReloadDriver(d.binary) }, t("views.reload")));
+      li.appendChild(el("button", { class: "btn btn-sm btn-danger", onclick: () => client.indiStopDriver(d.binary) }, t("views.stop")));
       driversList.appendChild(li);
     }
     indiSec.appendChild(driversList);
@@ -252,7 +253,7 @@ function buildFolderTree(folders) {
 
 function renderFolderNode(node, client, depth) {
   const wrap = el("div", { class: "folder-node", style: `padding-left:${depth * 14}px` });
-  const btn = el("button", { class: "folder-btn" }, [icon("folder", { small: true }), el("span", { text: node.name || "(root)" })]);
+  const btn = el("button", { class: "folder-btn" }, [icon("folder", { small: true }), el("span", { text: node.name || t("views.rootFolder") })]);
   btn.addEventListener("click", () => client.selectFolder(node.path));
   wrap.appendChild(btn);
   const children = Array.from(node.children.values()).sort((a, b) => a.name.localeCompare(b.name));
@@ -267,7 +268,7 @@ export function renderFiles(client, mediaBaseUrl) {
   scope.subscribe(client.topics.files(), (files) => {
     files = files || { folders: [], files: [], selectedfolder: "" };
     root.innerHTML = "";
-    root.appendChild(el("h2", null, [icon("folder"), el("span", { text: " Files" })]));
+    root.appendChild(el("h2", null, [icon("folder"), el("span", { text: " " + t("views.files") })]));
     const layout = el("div", { class: "files-layout" });
     const tree = buildFolderTree(files.folders || []);
     const treeWrap = el("div", { class: "folder-tree" });
@@ -279,7 +280,7 @@ export function renderFiles(client, mediaBaseUrl) {
     layout.appendChild(treeWrap);
 
     const listWrap = el("div", { class: "file-list-wrap" });
-    listWrap.appendChild(el("div", { class: "muted small mono", text: `Selected: ${files.selectedfolder || "(none)"}` }));
+    listWrap.appendChild(el("div", { class: "muted small mono", text: t("views.selectedPrefix") + (files.selectedfolder || t("views.none")) }));
     const fgrid = el("div", { class: "file-grid" });
     for (const f of files.files || []) {
       const url = mediaBaseUrl + (f.startsWith("/") ? f.slice(1) : f);
@@ -291,7 +292,7 @@ export function renderFiles(client, mediaBaseUrl) {
       card.appendChild(el("div", { class: "file-name", text: f.split("/").pop() }));
       fgrid.appendChild(card);
     }
-    if (!(files.files || []).length) fgrid.appendChild(el("div", { class: "muted small", text: "No files in this folder." }));
+    if (!(files.files || []).length) fgrid.appendChild(el("div", { class: "muted small", text: t("views.noFilesInFolder") }));
     listWrap.appendChild(fgrid);
     layout.appendChild(listWrap);
     root.appendChild(layout);
@@ -307,8 +308,8 @@ export function renderLogs(client) {
 
   scope.subscribe(client.topics.logs(), (logs) => {
     root.innerHTML = "";
-    root.appendChild(el("h2", null, [icon("list"), el("span", { text: " Logs" })]));
-    root.appendChild(el("div", { class: "log-toolbar muted small", text: `${(logs || []).length} entries (capped at 1000)` }));
+    root.appendChild(el("h2", null, [icon("list"), el("span", { text: " " + t("views.logs") })]));
+    root.appendChild(el("div", { class: "log-toolbar muted small", text: `${(logs || []).length} ${t("views.entriesCappedSuffix")}` }));
     const table = el("table", { class: "log-table" });
     for (const entry of (logs || []).slice().reverse()) {
       const lvl = LEVELS[entry.l] || "info";

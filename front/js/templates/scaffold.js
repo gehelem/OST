@@ -25,6 +25,7 @@ import { renderProperty, updateQuickNav } from "../render.js";
 import { addImageBlock } from "../imagelayer.js";
 import { el } from "../dom.js";
 import * as Panels from "../panels.js";
+import { t } from "../i18n.js";
 
 /**
  * `panelSpecs`: array of `{ id, title?, x, y, w, extra? }` — `id` is both
@@ -74,12 +75,21 @@ export function buildScaffoldTemplate(panelSpecs, imagePos) {
         known.add(spec.id);
         for (const extra of spec.extra || []) known.add(extra);
         if (!has(spec.id)) continue;
-        const b = Panels.make({ id: spec.id, title: spec.title || mod.properties[spec.id].label || spec.id, x: spec.x, y: spec.y, w: spec.w });
+        // spec.title, when a template gives one (e.g. focus.js's "Focus
+        // curve"), is an i18n.js *key*, not literal text - panelSpecs
+        // arrays are built once at module-import time (see focus.js/
+        // sequencer.js), long before a language is even selected, so
+        // resolving it here (inside build(), which re-runs on every module
+        // event, including the one a language change triggers) is what
+        // keeps it reactive instead of frozen at whatever language was
+        // current on import.
+        const title = (spec.title && t(spec.title)) || mod.properties[spec.id].label || spec.id;
+        const b = Panels.make({ id: spec.id, title, x: spec.x, y: spec.y, w: spec.w });
         b.appendChild(track(renderProperty(client, moduleName, spec.id)));
         for (const extra of spec.extra || []) {
           if (has(extra)) b.appendChild(track(renderProperty(client, moduleName, extra)));
         }
-        quickNavEntries.push({ id: spec.id, label: spec.title || mod.properties[spec.id].label || spec.id });
+        quickNavEntries.push({ id: spec.id, label: title });
       }
 
       addImageBlock(client, moduleName, mod, "image", "image", Panels, track, disposers, quickNavEntries, ip);
@@ -91,9 +101,9 @@ export function buildScaffoldTemplate(panelSpecs, imagePos) {
       for (const n of hasprofileNames) known.add(n);
       const rest = Object.keys(mod.properties).filter((n) => !known.has(n));
       if (rest.length) {
-        const b = Panels.make({ id: "other", title: "Other", x: 20, y: 620, w: 300 });
+        const b = Panels.make({ id: "other", title: t("common.other"), x: 20, y: 620, w: 300 });
         for (const name of rest) b.appendChild(track(renderProperty(client, moduleName, name)));
-        quickNavEntries.push({ id: "other", label: "Other" });
+        quickNavEntries.push({ id: "other", label: t("common.other") });
       }
       updateQuickNav(quickNavEntries);
     }
@@ -104,7 +114,7 @@ export function buildScaffoldTemplate(panelSpecs, imagePos) {
         Panels.clear();
         updateQuickNav([]);
         const b = Panels.make({ id: "missing", title: moduleName, x: 20, y: 92, w: 320 });
-        b.appendChild(el("div", { class: "muted", text: "Module not found (unloaded?)" }));
+        b.appendChild(el("div", { class: "muted", text: t("common.moduleNotFound") }));
         return;
       }
       build(mod);

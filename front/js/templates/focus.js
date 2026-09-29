@@ -15,6 +15,9 @@ import { buildScaffoldTemplate } from "./scaffold.js";
 export const mount = buildScaffoldTemplate([
   { id: "results", x: 20, y: 330, w: 300 },
   { id: "progress", x: 20, y: 450, w: 300 },
-  { id: "values", title: "Focus curve", x: 350, y: 92, w: 300 },
+  // title is an js/i18n.js key, not literal text - see scaffold.js's own
+  // comment on why (this array is built once at import time, well before
+  // any language is selected).
+  { id: "values", title: "focus.focusCurve", x: 350, y: 92, w: 300 },
   { id: "zones", x: 350, y: 330, w: 300 },
 ]);

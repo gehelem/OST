@@ -13,6 +13,7 @@ import { el, icon, iconButton } from "./dom.js";
 import * as Panels from "./panels.js";
 import { setBgLayer } from "./imagelayer.js";
 import { templates } from "./templates/index.js";
+import { setLanguage, t } from "./i18n.js";
 
 const client = createClient();
 
@@ -59,6 +60,26 @@ const themeToggle = document.getElementById("theme-toggle");
 const paramsToggleEl = document.getElementById("params-toggle");
 const reorganizeToggleEl = document.getElementById("reorganize-toggle");
 const dialogRootEl = document.getElementById("dialog-root");
+const connectBtnLabelEl = document.getElementById("connect-btn-label");
+const disconnectBtnLabelEl = document.getElementById("disconnect-btn-label");
+
+// Static chrome (this file's own top-right icon chips + the connect bar) is
+// never rebuilt from a server dump the way a module's panels are, so a
+// language change needs to touch it explicitly — called once at boot and
+// again every time the language actually changes (connect, or the
+// lang-select's own change handler below). Everything else UI3-local
+// (module panels, system views, login...) is rebuilt from client-driven
+// events that already run after setLanguage() has updated i18n.js's
+// current language, so those pick it up for free.
+function applyStaticLabels() {
+  reorganizeToggleEl.title = t("chrome.tidyUpPanels");
+  paramsToggleEl.title = t("chrome.parameters");
+  zoomToggleEl.title = t("chrome.uiSize");
+  themeToggle.title = t("chrome.toggleTheme");
+  connectBtnLabelEl.textContent = t("chrome.connect");
+  disconnectBtnLabelEl.textContent = t("chrome.disconnect");
+  connSummaryEl.textContent = t("status." + client.connection.status);
+}
 
 // ---- connection widget: collapsed status pill, click (or connecting/
 // disconnected) to fold out the full settings — Gilles, 2026-09-25: "settings
@@ -245,8 +266,8 @@ function openParamsDialog() {
   const dialog = el("div", { class: "dialog params-dialog" });
   const close = () => { while (disposers.length) disposers.pop()(); overlay.remove(); };
   dialog.appendChild(el("div", { class: "dialog-header" }, [
-    el("h3", { text: "Parameters — " + (mod.infos.modulelabel || mod.infos.label || moduleName) }),
-    iconButton("close", "Close", close),
+    el("h3", { text: t("chrome.parametersPrefix") + (mod.infos.modulelabel || mod.infos.label || moduleName) }),
+    iconButton("close", t("common.close"), close),
   ]));
   const body = el("div");
   dialog.appendChild(body);
@@ -266,22 +287,37 @@ document.getElementById("connect-btn").addEventListener("click", () => {
   saveHistory({ wsUrl: wsUrlInput.value, mediaUrl: mediaUrlInput.value });
   loginShown = false;
   activeView = null;
-  client.connect(wsUrlInput.value, { language: document.getElementById("lang-select").value });
+  const lang = document.getElementById("lang-select").value;
+  setLanguage(lang);
+  applyStaticLabels();
+  client.connect(wsUrlInput.value, { language: lang });
 });
 document.getElementById("disconnect-btn").addEventListener("click", () => client.disconnect());
 document.getElementById("lang-select").addEventListener("change", (e) => {
+  setLanguage(e.target.value);
+  applyStaticLabels();
+  // Everything server-sourced (property/element labels) follows this same
+  // language once the server's own reply comes back, re-triggering each
+  // module's own client.subscribe() callback and rebuilding its panels —
+  // that rebuild is also what picks up this file's own local i18n.t()
+  // calls for free. Views NOT driven by a module subscription (system
+  // views, login, the disconnected screen) don't get that free ride, so
+  // force them explicitly here too.
   if (client.connection.status === "connected") client.setLanguage(e.target.value);
+  renderModbarNow();
+  renderContentNow();
 });
 
 client.onStatus((s) => {
   connDotEl.className = "conn-dot " + s;
-  connSummaryEl.textContent = s.charAt(0).toUpperCase() + s.slice(1);
+  connSummaryEl.textContent = t("status." + s);
   if (s !== "connected") grantPill.textContent = "";
   // Minimal pill once connected; folded open again the moment there's
   // something the user needs to look at or act on.
   setConnPanelOpen(s !== "connected");
   if (s === "connecting" || s === "disconnected") { activeView = null; renderModbarNow(); renderContentNow(); }
 });
+applyStaticLabels();
 
 // ---- rendering -------------------------------------------------------
 
@@ -345,8 +381,8 @@ function renderConnectScreen() {
   div.appendChild(icon("stars", { small: false }));
   div.querySelector(".material-icons").classList.add("icon-lg");
   div.appendChild(el("h2", { text: "OST — UI3" }));
-  div.appendChild(el("p", { class: "lede", text: "Not connected. Set the WebSocket URL above and press Connect." }));
-  const panel = el("div", { class: "panel" }, [el("h3", { text: "Recent servers" })]);
+  div.appendChild(el("p", { class: "lede", text: t("chrome.notConnectedLede") }));
+  const panel = el("div", { class: "panel" }, [el("h3", { text: t("chrome.recentServers") })]);
   const ul = el("ul");
   for (const h of loadHistory()) {
     const li = el("li");
@@ -355,7 +391,7 @@ function renderConnectScreen() {
     li.appendChild(btn);
     ul.appendChild(li);
   }
-  if (!loadHistory().length) ul.appendChild(el("li", { class: "muted small", text: "No history yet." }));
+  if (!loadHistory().length) ul.appendChild(el("li", { class: "muted small", text: t("chrome.noHistoryYet") }));
   panel.appendChild(ul);
   div.appendChild(panel);
   return div;

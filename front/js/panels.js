@@ -36,6 +36,8 @@ const live = [];
 // per-template default y values again, which is what led to this being a
 // recurring bug across several rounds (60, then 70, both still not quite
 // enough) - Gilles, 2026-09-27: "probleme qu'on a depuis le debut".
+import { t } from "./i18n.js";
+
 const SAFE_TOP = 92;
 
 const keyFor = (sc, id) => "ostcore-ui3:layout:" + sc + ":" + id;
@@ -161,7 +163,7 @@ export function make(opts) {
   min.className = "panel-float-min";
   min.type = "button";
   min.textContent = "–";
-  min.title = "Minimize";
+  min.title = t("chrome.minimize");
   bar.appendChild(grip);
   bar.appendChild(title);
   bar.appendChild(min);
@@ -173,7 +175,7 @@ export function make(opts) {
 
   const rz = document.createElement("div");
   rz.className = "panel-float-resize";
-  rz.title = "Resize";
+  rz.title = t("chrome.resize");
   rz.addEventListener("mousedown", (e) => startResize(panel, id, e, sc));
   panel.appendChild(rz);
 

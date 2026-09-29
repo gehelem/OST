@@ -2,6 +2,8 @@
 // Pulled into its own module (UI2 duplicated this in both files) so both
 // call sites stay in sync and the icon/status vocabulary lives in one place.
 
+import { t } from "./i18n.js";
+
 export function el(tag, attrs, children) {
   const node = document.createElement(tag);
   if (attrs) for (const [k, v] of Object.entries(attrs)) {
@@ -24,7 +26,7 @@ export function icon(name, opts) {
 }
 
 const STATUS_CLASS = ["standby", "ok", "busy", "error"];
-const STATUS_LABEL = ["Standby", "OK", "Busy", "Error"];
+const STATUS_KEY = ["status.standby", "status.ok", "status.busy", "status.error"];
 
 /** Sets/refreshes an existing dot's status class + tooltip in place, without
  * touching its other classes — split out of statusDot() so a live-updated
@@ -34,7 +36,7 @@ export function updateStatusDot(dotEl, status) {
   const s = typeof status === "number" ? status : 0;
   for (const c of STATUS_CLASS) dotEl.classList.remove("status-" + c);
   dotEl.classList.add("status-" + STATUS_CLASS[s]);
-  dotEl.title = STATUS_LABEL[s];
+  dotEl.title = t(STATUS_KEY[s]);
 }
 
 export function statusDot(status) {

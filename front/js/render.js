@@ -20,6 +20,7 @@ import { mediaUrl as buildMediaUrl } from "../core/index.js";
 import { el, icon, statusDot, iconButton } from "./dom.js";
 import * as Panels from "./panels.js";
 import { renderQuickNav } from "./views.js";
+import { t } from "./i18n.js";
 
 const DISPLAY_ONLY_TYPES = new Set(["img", "video", "light", "prg", "message"]);
 
@@ -211,7 +212,7 @@ function renderDisplayOnly(elName, el_) {
       ]);
       wrap.appendChild(a);
     } else {
-      wrap.appendChild(el("div", { class: "muted", text: "No image" }));
+      wrap.appendChild(el("div", { class: "muted", text: t("common.noImage") }));
     }
     const stats = imageStatsLine(v);
     if (stats.length) wrap.appendChild(el("div", { class: "img-stats muted mono", text: stats.join(" · ") }));
@@ -220,7 +221,7 @@ function renderDisplayOnly(elName, el_) {
   if (type === "video") {
     const v = value || {};
     const url = v.url;
-    if (!url) return el("div", { class: "muted", text: "No video" });
+    if (!url) return el("div", { class: "muted", text: t("common.noVideo") });
     return el("video", { src: buildMediaUrl(mediaBaseUrl, url), controls: "true", class: "preview-video" });
   }
   if (type === "light") return statusDot(value);
@@ -310,10 +311,10 @@ function renderGridSection(client, moduleName, propName, prop) {
         tr.appendChild(el("td", { text: formatScalar(def.type, row[h]) }));
       }
       const actions = el("td", { class: "grid-actions" });
-      actions.appendChild(iconButton("edit", "Edit row", () => openGridDialog(client, moduleName, propName, prop, idx, row)));
-      actions.appendChild(iconButton("arrow_upward", "Move up", () => client.gridMoveUp(moduleName, propName, idx)));
-      actions.appendChild(iconButton("arrow_downward", "Move down", () => client.gridMoveDown(moduleName, propName, idx)));
-      actions.appendChild(iconButton("delete", "Delete row", () => { if (confirm("Delete this row?")) client.gridDelete(moduleName, propName, idx); }, { danger: true }));
+      actions.appendChild(iconButton("edit", t("common.editRow"), () => openGridDialog(client, moduleName, propName, prop, idx, row)));
+      actions.appendChild(iconButton("arrow_upward", t("common.moveUp"), () => client.gridMoveUp(moduleName, propName, idx)));
+      actions.appendChild(iconButton("arrow_downward", t("common.moveDown"), () => client.gridMoveDown(moduleName, propName, idx)));
+      actions.appendChild(iconButton("delete", t("common.deleteRow"), () => { if (confirm(t("common.deleteRowConfirm"))) client.gridDelete(moduleName, propName, idx); }, { danger: true }));
       tr.appendChild(actions);
       tr.addEventListener("click", (ev) => { if (ev.target.closest(".grid-actions")) return; client.gridFetch(moduleName, propName, idx); });
       tbody.appendChild(tr);
@@ -435,7 +436,7 @@ function renderPropertyBody(client, moduleName, propName, prop) {
     } else if (permOk) {
       const ctrl = buildEditControl(client, moduleName, e, name, buffer, {});
       valueCell.appendChild(ctrl);
-      if (e.directedit) valueCell.appendChild(iconButton("send", "Send now (SV)", () => client.setValue(moduleName, propName, name, buffer[name])));
+      if (e.directedit) valueCell.appendChild(iconButton("send", t("common.sendNow"), () => client.setValue(moduleName, propName, name, buffer[name])));
     } else {
       valueCell.appendChild(el("span", { class: "readonly-val", text: formatScalar(e.type, e.value) }));
     }
@@ -689,9 +690,9 @@ export function renderModuleView(client, moduleName) {
     const quickNavEntries = [];
     if (noLevel1.length) {
       const pos = autoPos(i++);
-      const gbody = Panels.make({ id: "general", title: "General", x: pos.x, y: pos.y, w: pos.w });
+      const gbody = Panels.make({ id: "general", title: t("common.general"), x: pos.x, y: pos.y, w: pos.w });
       for (const { name } of noLevel1) gbody.appendChild(track(renderProperty(client, moduleName, name)));
-      quickNavEntries.push({ id: "general", label: "General" });
+      quickNavEntries.push({ id: "general", label: t("common.general") });
     }
     for (const tab of tabs) {
       const pos = autoPos(i++);
@@ -710,7 +711,7 @@ export function renderModuleView(client, moduleName) {
       Panels.clear();
       updateQuickNav([]);
       const body = Panels.make({ id: "missing", title: moduleName, x: 20, y: 92, w: 320 });
-      body.appendChild(el("div", { class: "muted", text: "Module not found (unloaded?)" }));
+      body.appendChild(el("div", { class: "muted", text: t("common.moduleNotFound") }));
       return;
     }
     build(mod);
@@ -733,12 +734,12 @@ export function renderModuleView(client, moduleName) {
  */
 export function renderProfileBar(client, moduleName, mod) {
   const bar = el("div", { class: "profile-bar" });
-  bar.appendChild(el("span", { class: "muted", text: "Profile" }));
+  bar.appendChild(el("span", { class: "muted", text: t("common.profile") }));
   const nameSpan = el("span", { class: "profile-name" + (mod.profile.changed ? " changed" : ""), text: mod.profile.name || "(none)" });
   bar.appendChild(nameSpan);
 
   const select = el("select", { class: "field-input small" });
-  const nameInput = el("input", { type: "text", class: "field-input small", placeholder: "profile name" });
+  const nameInput = el("input", { type: "text", class: "field-input small", placeholder: t("common.profileNamePlaceholder") });
   select.addEventListener("change", () => { if (select.value) nameInput.value = select.value; });
   bar.appendChild(select);
   bar.appendChild(nameInput);

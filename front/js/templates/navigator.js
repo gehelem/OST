@@ -33,6 +33,7 @@ import { renderProperty, updateQuickNav } from "../render.js";
 import { el } from "../dom.js";
 import * as Panels from "../panels.js";
 import { SkyEngine, ZOOM_MIN, ZOOM_MAX } from "../sky-engine.js";
+import { t } from "../i18n.js";
 
 function fmtDeg(v) { return v.toFixed(3) + "°"; }
 function fmtHours(raDeg) {
@@ -61,9 +62,9 @@ function fmtHours(raDeg) {
  * fixed alongside it in sky-projection.js. */
 function buildSelectionPanel(client, moduleName) {
   const wrap = el("div");
-  const info = el("div", { class: "muted small", text: "Tap a star or object on the sky to select it." });
-  const gotoBtn = el("button", { class: "btn btn-primary btn-sm", disabled: true }, [el("span", { class: "material-icons", style: "font-size:15px;vertical-align:middle" }, "gps_fixed"), " GOTO"]);
-  const plannerBtn = el("button", { class: "btn btn-sm", disabled: true }, "Add to planner");
+  const info = el("div", { class: "muted small", text: t("navigator.tapToSelect") });
+  const gotoBtn = el("button", { class: "btn btn-primary btn-sm", disabled: true }, [el("span", { class: "material-icons", style: "font-size:15px;vertical-align:middle" }, "gps_fixed"), " " + t("navigator.goto")]);
+  const plannerBtn = el("button", { class: "btn btn-sm", disabled: true }, t("navigator.addToPlanner"));
   const actionsRow = el("div", { class: "form-row" }, [gotoBtn, plannerBtn]);
   wrap.appendChild(info);
   wrap.appendChild(actionsRow);
@@ -72,11 +73,11 @@ function buildSelectionPanel(client, moduleName) {
   plannerBtn.addEventListener("click", () => client.setValue(moduleName, "actions", "addtoplanner", true));
 
   function onSelect(obj) {
-    const name = obj.name || (obj.kind === "star" ? "Star" : obj.kind === "messier" ? obj.desig || "DSO" : "Point");
+    const name = obj.name || (obj.kind === "star" ? t("navigator.star") : obj.kind === "messier" ? obj.desig || t("navigator.dso") : t("navigator.point"));
     info.innerHTML = "";
     info.appendChild(el("div", { text: name }));
     info.appendChild(el("div", { class: "muted small mono", text: `RA ${fmtHours(obj.ra)}  Dec ${fmtDeg(obj.dec)}` }));
-    if (obj.mag !== undefined) info.appendChild(el("div", { class: "muted small", text: `mag ${obj.mag}` }));
+    if (obj.mag !== undefined) info.appendChild(el("div", { class: "muted small", text: t("navigator.magPrefix") + obj.mag }));
     gotoBtn.disabled = false;
     plannerBtn.disabled = false;
     client.setValue(moduleName, "target", "targetname", name);
@@ -139,13 +140,13 @@ function buildSettingsPanel(engine) {
     return el("label", { class: "form-row", style: "cursor:pointer" }, [cb, el("span", { text: label })]);
   }
 
-  wrap.appendChild(checkboxRow("Constellations", "showConstellations"));
-  wrap.appendChild(checkboxRow("Cardinal points", "showCardinals"));
-  wrap.appendChild(checkboxRow("Messier objects", "showMessier"));
-  wrap.appendChild(checkboxRow("True horizon", "showTrueHorizon"));
-  wrap.appendChild(checkboxRow("Day mode", "dayMode"));
+  wrap.appendChild(checkboxRow(t("navigator.constellations"), "showConstellations"));
+  wrap.appendChild(checkboxRow(t("navigator.cardinalPoints"), "showCardinals"));
+  wrap.appendChild(checkboxRow(t("navigator.messierObjects"), "showMessier"));
+  wrap.appendChild(checkboxRow(t("navigator.trueHorizon"), "showTrueHorizon"));
+  wrap.appendChild(checkboxRow(t("navigator.dayMode"), "dayMode"));
 
-  const zoomRow = el("div", { class: "form-row" }, [el("span", { class: "muted small", text: "Zoom" })]);
+  const zoomRow = el("div", { class: "form-row" }, [el("span", { class: "muted small", text: t("navigator.zoom") })]);
   const zoomSlider = el("input", { type: "range", min: String(ZOOM_MIN), max: String(ZOOM_MAX), step: "0.1", value: String(engine.zoom), style: "flex:1" });
   zoomSlider.addEventListener("input", () => { engine.zoom = parseFloat(zoomSlider.value); persistAndRender(); });
   zoomRow.appendChild(zoomSlider);
@@ -257,14 +258,14 @@ export function mount(client, moduleName) {
     const header = Panels.make({ id: "header", title: mod.infos.modulelabel || mod.infos.label || moduleName, x: 20, y: 92, w: 320 });
     header.appendChild(el("div", { class: "muted small", text: mod.infos.description || "" }));
 
-    const selectionPanel = Panels.make({ id: "selection", title: "Selection", x: 340, y: 92, w: 300 });
+    const selectionPanel = Panels.make({ id: "selection", title: t("navigator.selection"), x: 340, y: 92, w: 300 });
     selectionPanel.appendChild(track(selection.node));
-    quickNavEntries.push({ id: "selection", label: "Selection" });
+    quickNavEntries.push({ id: "selection", label: t("navigator.selection") });
 
     if (sky.engine) {
-      const settingsPanel = Panels.make({ id: "settings", title: "Display settings", x: 660, y: 92, w: 260, collapsed: true });
+      const settingsPanel = Panels.make({ id: "settings", title: t("navigator.displaySettings"), x: 660, y: 92, w: 260, collapsed: true });
       settingsPanel.appendChild(track(buildSettingsPanel(sky.engine)));
-      quickNavEntries.push({ id: "settings", label: "Settings", icon: "tune" });
+      quickNavEntries.push({ id: "settings", label: t("navigator.settingsQuicknav"), icon: "tune" });
     }
 
     if (has("actions")) {
@@ -294,9 +295,9 @@ export function mount(client, moduleName) {
     const known = new Set(["actions", "location", "mountposition", ...hasprofileNames]);
     const rest = Object.keys(mod.properties).filter((n) => !known.has(n));
     if (rest.length) {
-      const b = Panels.make({ id: "other", title: "Other", x: 340, y: 500, w: 340 });
+      const b = Panels.make({ id: "other", title: t("common.other"), x: 340, y: 500, w: 340 });
       for (const name of rest) b.appendChild(track(renderProperty(client, moduleName, name)));
-      quickNavEntries.push({ id: "other", label: "Other" });
+      quickNavEntries.push({ id: "other", label: t("common.other") });
     }
     updateQuickNav(quickNavEntries);
   }
@@ -307,7 +308,7 @@ export function mount(client, moduleName) {
       Panels.clear();
       updateQuickNav([]);
       const b = Panels.make({ id: "missing", title: moduleName, x: 20, y: 92, w: 320 });
-      b.appendChild(el("div", { class: "muted", text: "Module not found (unloaded?)" }));
+      b.appendChild(el("div", { class: "muted", text: t("common.moduleNotFound") }));
       return;
     }
     build(mod);
