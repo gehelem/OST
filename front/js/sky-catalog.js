@@ -8,17 +8,22 @@
 // Gilles, 2026-09-29: "cherche plutot comment faire proprement avec les
 // nouveaux catalogues").
 //
-// Two star depths ship today (celestial-data/): "light" (stars.6.json,
-// mag <= 6.5, ~8.9k stars, naked-eye-ish, the default) and "deep"
-// (stars.8.json, mag <= 8, ~41k stars) — per Gilles, 2026-09-29:
-// "leger par defaut, mais parametrable ... prevoir tous les catalogues
-// possibles des le depart". More depths can be added the same way later
+// Three star depths ship today (celestial-data/): "light" (stars.6.json,
+// mag <= 6.5, ~8.9k stars, naked-eye-ish, the default), "deep"
+// (stars.8.json, mag <= 8, ~41k stars), and "full" (stars.hip.json, every
+// HYG entry with a Hipparcos number, ~118k stars) — per Gilles,
+// 2026-09-29: "leger par defaut, mais parametrable ... prevoir tous les
+// catalogues possibles des le depart", and 2026-10-03, pointing at
+// astro2001's own ~871k-star full catalog as the scale to aim toward:
+// "le grand saut : on augmente la densite, on passe la taille au dessus
+// sur les catalogues". More depths can be added the same way later
 // (another file + another entry in STAR_DEPTHS) without touching the
 // loader itself.
 
 export const STAR_DEPTHS = {
   light: { file: "stars.6.json", label: "Light (mag <= 6.5, ~8.9k stars)" },
   deep: { file: "stars.8.json", label: "Deep (mag <= 8, ~41k stars)" },
+  full: { file: "stars.hip.json", label: "Full (Hipparcos, ~118k stars)" },
 };
 
 let dataBaseUrl = "celestial-data/";

@@ -33,6 +33,7 @@ import { renderProperty, updateQuickNav } from "../render.js";
 import { el } from "../dom.js";
 import * as Panels from "../panels.js";
 import { SkyEngine, ZOOM_MIN, ZOOM_MAX } from "../sky-engine.js";
+import { STAR_DEPTHS } from "../sky-catalog.js";
 import { t } from "../i18n.js";
 
 function fmtDeg(v) { return v.toFixed(3) + "°"; }
@@ -115,6 +116,7 @@ function saveDisplaySettings(engine) {
       dayMode: engine.dayMode,
       zoom: engine.zoom,
       projection: engine.projection,
+      catalogDepth: engine.catalogDepth,
     }));
   } catch (e) { /* ignore */ }
 }
@@ -167,6 +169,27 @@ function buildSettingsPanel(engine) {
   });
   wrap.appendChild(el("label", { class: "form-row", style: "cursor:pointer" }, [projCb, el("span", { text: t("navigator.stereographic") })]));
 
+  // Star catalog depth - Gilles, 2026-09-29: "leger par defaut, mais
+  // parametrable par l'utilisateur - donc prevoir tous les catalogues
+  // possibles des le depart" (the actual selector was deferred until now:
+  // 2026-10-03, "le grand saut : on augmente la densite, on passe la
+  // taille au dessus sur les catalogues", after which sky-catalog.js
+  // gained the "full" depth this exposes). Re-fetches on change (not just
+  // a display-setting flip like everything else in this panel), so it
+  // gets its own persistAndRender()-alike rather than reusing
+  // checkboxRow()'s synchronous one.
+  const depthRow = el("div", { class: "form-row" }, [el("span", { class: "muted small", text: t("navigator.catalogDepth") })]);
+  const depthSelect = el("select", { class: "field-input" });
+  for (const key of Object.keys(STAR_DEPTHS)) {
+    depthSelect.appendChild(el("option", { value: key, text: t("navigator.catalogDepth." + key) }));
+  }
+  depthSelect.value = engine.catalogDepth || "light";
+  depthSelect.addEventListener("change", () => {
+    engine.loadCatalog(depthSelect.value).then(() => persistAndRender()).catch((e) => console.error("[navigator] catalog load", e));
+  });
+  depthRow.appendChild(depthSelect);
+  wrap.appendChild(depthRow);
+
   const zoomRow = el("div", { class: "form-row" }, [el("span", { class: "muted small", text: t("navigator.zoom") })]);
   const zoomSlider = el("input", { type: "range", min: String(ZOOM_MIN), max: String(ZOOM_MAX), step: "0.1", value: String(engine.zoom), style: "flex:1" });
   zoomSlider.addEventListener("input", () => { engine.zoom = parseFloat(zoomSlider.value); persistAndRender(); });
@@ -217,8 +240,21 @@ function buildSkyDome(client, moduleName, onSelect) {
   // frame already reflects saved settings instead of a brief flash at the
   // defaults. buildSettingsPanel() takes it from here for the ongoing
   // wheel-zoom -> persist wiring (engine.onZoomChange).
-  Object.assign(engine, loadDisplaySettings());
-  engine.loadCatalog("light").then(() => engine.render()).catch((e) => console.error("[navigator] catalog load", e));
+  const savedSettings = loadDisplaySettings();
+  Object.assign(engine, savedSettings);
+  // "leger par defaut, mais parametrable" (Gilles, 2026-09-29) - defaults
+  // to "light" same as before, but now actually reads back whichever
+  // depth was last chosen (buildSettingsPanel()'s own selector, added
+  // 2026-10-03: "le grand saut ... on passe la taille au dessus sur les
+  // catalogues") instead of hardcoding "light" regardless. Set
+  // synchronously here (loadCatalog() itself only sets it once the fetch
+  // actually resolves) so buildSettingsPanel() - built right after this
+  // function returns, well before that fetch is likely to have finished -
+  // shows the right depth selected immediately instead of always
+  // flashing "light" first.
+  const initialDepth = savedSettings.catalogDepth || "light";
+  engine.catalogDepth = initialDepth;
+  engine.loadCatalog(initialDepth).then(() => engine.render()).catch((e) => console.error("[navigator] catalog load", e));
 
   // lightUI/uiZoom track the app's own live theme/UI-size, not saved
   // preferences of their own (unlike the fields loadDisplaySettings()

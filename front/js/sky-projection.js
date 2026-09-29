@@ -32,6 +32,23 @@ export function makeObserver(latDeg, lonDeg, elevM) {
 }
 
 /**
+ * Rotation_EQJ_HOR(date, observer) on its own - depends only on the
+ * current instant + site, not on any individual star, but
+ * equatorialToHorizontal() below used to recompute it from scratch on
+ * every single call. Fine at a few hundred catalog objects; at the
+ * ~118k-star "full" depth (Gilles, 2026-10-03: "le grand saut ... on
+ * passe la taille au dessus sur les catalogues") that repeated,
+ * per-star sidereal-time/precession/nutation computation is real
+ * measured cost - ~96ms/frame, unusable for interactive dragging.
+ * Callers with many points to project in the same frame (sky-engine.js's
+ * own project()) compute this ONCE and pass it into
+ * equatorialToHorizontal()'s own optional 5th argument instead.
+ */
+export function equatorialHorizontalRotation(date, observer) {
+  return Rotation_EQJ_HOR(date, observer);
+}
+
+/**
  * RA/Dec (degrees, J2000 — the epoch every star/DSO catalog here uses) ->
  * {azimuth, altitude} (degrees, of date), for one observer at one instant.
  * Built entirely from astronomy-engine's own official rotation-matrix
@@ -44,11 +61,14 @@ export function makeObserver(latDeg, lonDeg, elevM) {
  * — small, but real, and worth fixing now that the right tool is known,
  * even though the actual "weird position" turned out to be the separate,
  * much larger targetra-in-degrees-not-hours bug (see templates/
- * navigator.js).
+ * navigator.js). `rotation`, if given (equatorialHorizontalRotation()'s
+ * own return value), replaces the internal Rotation_EQJ_HOR(date,
+ * observer) call - see that function's own doc comment for why a caller
+ * projecting many points in the same frame would want to pass this in.
  */
-export function equatorialToHorizontal(raDeg, decDeg, observer, date) {
+export function equatorialToHorizontal(raDeg, decDeg, observer, date, rotation) {
   const eqjVec = VectorFromSphere(new Spherical(decDeg, raDeg, 1), date);
-  const horVec = RotateVector(Rotation_EQJ_HOR(date, observer), eqjVec);
+  const horVec = RotateVector(rotation || Rotation_EQJ_HOR(date, observer), eqjVec);
   const sphere = HorizonFromVector(horVec, "normal"); // {lat: altitude, lon: azimuth}
   return { azimuth: sphere.lon, altitude: sphere.lat };
 }

@@ -29,7 +29,7 @@
 // everything else in this app, not a menu at the tap position.
 
 import { Body, Horizon, Equator } from "../lib/astronomy-engine.js";
-import { makeObserver, equatorialToHorizontal, horizontalToEquatorial, horizontalToVector, vectorToHorizontal, vectorToScreen, screenToVector, magnitudeToRadius } from "./sky-projection.js";
+import { makeObserver, equatorialToHorizontal, equatorialHorizontalRotation, horizontalToEquatorial, horizontalToVector, vectorToHorizontal, vectorToScreen, screenToVector, magnitudeToRadius } from "./sky-projection.js";
 import { identity, multiply, conjugate, rotateVector, fromTwoVectors } from "./quaternion.js";
 import { loadCatalog } from "./sky-catalog.js";
 
@@ -431,6 +431,12 @@ export class SkyEngine {
 
   async loadCatalog(depth) {
     this.catalog = await loadCatalog(depth);
+    // Bookkeeping only (sky-catalog.js's own loadCatalog() already
+    // defaults an unrecognised depth to "light" internally) - lets a
+    // caller (templates/navigator.js's settings panel) read back which
+    // depth is actually loaded, e.g. to persist it, without keeping its
+    // own separate copy of the same state.
+    this.catalogDepth = depth;
   }
 
   _onWheel(ev) {
@@ -630,8 +636,14 @@ export class SkyEngine {
       const p = vectorToScreen(rv, domeRadius, this.projection);
       return { x: cx + p.x, y: cy + p.y, visible: p.visible };
     };
+    // Computed once per frame, not per catalog object - see
+    // equatorialHorizontalRotation()'s own doc comment on why that matters
+    // once the star count gets into the tens of thousands (Gilles,
+    // 2026-10-03: "le grand saut ... on passe la taille au dessus sur les
+    // catalogues" - the ~118k-star "full" depth this made possible).
+    const eqjHorRotation = equatorialHorizontalRotation(date, this.observer);
     const project = (raDeg, decDeg) => {
-      const { azimuth, altitude } = equatorialToHorizontal(raDeg, decDeg, this.observer, date);
+      const { azimuth, altitude } = equatorialToHorizontal(raDeg, decDeg, this.observer, date, eqjHorRotation);
       return toScreen(horizontalToVector(azimuth, altitude));
     };
 
@@ -797,7 +809,7 @@ export class SkyEngine {
       ctx.font = uiFont(11);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      const ncpAlt = equatorialToHorizontal(0, 90, this.observer, date).altitude;
+      const ncpAlt = equatorialToHorizontal(0, 90, this.observer, date, eqjHorRotation).altitude;
       const splitAlt = Math.max(0, Math.min(90, ncpAlt));
       const drawMeridianArc = (azz, altFrom, altTo, dashed) => {
         if (altFrom === altTo) return;
