@@ -81,6 +81,102 @@ function drawTick(ctx, p0, p1, pixelLen) {
   ctx.lineTo(p0.x + dx / 2, p0.y + dy / 2);
   ctx.stroke();
 }
+// Draws a tick's coordinate value just past its outer end (p0 + the same
+// perpendicular direction used for the tick itself, pushed a bit further
+// out) - Gilles, 2026-10-01: "tu n'as pas ajoute les graduations,
+// coordonnees equatoriales et azimutales comme je te l'avais demande":
+// the ticks alone weren't the "graduations", the coordinate numbers next
+// to them are.
+function drawTickLabel(ctx, p0, p1, text) {
+  let dx = p1.x - p0.x, dy = p1.y - p0.y;
+  const len = Math.hypot(dx, dy) || 1;
+  dx = (dx / len) * (GRAD_TICK_PX + 8);
+  dy = (dy / len) * (GRAD_TICK_PX + 8);
+  ctx.fillText(text, p0.x + dx, p0.y + dy);
+}
+// RA graduation label, in hours - the "usual" unit for equatorial
+// coordinates (as opposed to plain degrees) in every telescope-control
+// context this app already uses (see templates/navigator.js's own
+// fmtHours() for target RA). Compact ("2h"/"2h30", not "2h00m00s") since
+// this is a quick on-sky reference, not a precision readout.
+function fmtRaHoursLabel(raDeg) {
+  const h = ((raDeg / 15) % 24 + 24) % 24;
+  const hh = Math.floor(h + 1e-9);
+  const mm = Math.round((h - hh) * 60);
+  return mm === 0 ? `${hh}h` : `${hh}h${String(mm).padStart(2, "0")}`;
+}
+function fmtDegLabel(deg) {
+  return `${Math.round(deg)}°`;
+}
+
+// Ground mask (Gilles, 2026-10-01: "si horizon : la partie inferieure doit
+// etre masquee ! (on ne voit quasiment pas le trait)"): when showTrueHorizon
+// is on and the view has been panned enough to look toward/below the real
+// horizon, the below-horizon portion of the current view gets filled with a
+// distinct "ground" colour and everything normally drawn there (stars,
+// lines...) gets clipped away, instead of relying on the thin horizon line
+// alone to convey it.
+//
+// The real (fixed-frame) altitude at a given screen offset from the dome's
+// centre - screenToVector() already clamps to the visible (front) hemisphere,
+// so this is only meaningful for offsets within the dome disk.
+function altitudeAtOffset(offX, offY, domeRadius, rotation) {
+  const viewVec = screenToVector(offX, offY, domeRadius);
+  const fixedVec = rotateVector(conjugate(rotation), viewVec);
+  return vectorToHorizontal(fixedVec).altitude;
+}
+
+const GROUND_MASK_RAYS = 120;
+const GROUND_MASK_BISECT_STEPS = 10;
+
+/**
+ * Returns the boundary of the *sky* portion of the currently visible dome,
+ * as an array of {x,y} points (offsets from the dome centre) - or `null`
+ * if the whole visible dome is real sky (nothing to mask, the common case
+ * at the default zenith-centred view), or the string "none" if the whole
+ * visible dome is below the real horizon (fully masked).
+ *
+ * The true horizon is a great circle (alt=0 is always 90° from the
+ * zenith), so under an arbitrary rotation + orthographic projection it
+ * divides the visible hemisphere into two regions separated by a single
+ * curve. Rather than tracing that curve analytically (messy once it also
+ * has to be closed off along the dome's own edge), this walks a ray from
+ * the dome's centre to its edge at each of GROUND_MASK_RAYS angles and
+ * binary-searches each ray for the altitude=0 crossing - naturally
+ * produces a simple polygon (every point already expressed in its own
+ * polar form) that handles every case uniformly: a ray with no crossing
+ * just collapses to the centre (fully ground) or extends fully to the
+ * edge (fully sky).
+ */
+function computeSkyPolygon(domeRadius, rotation) {
+  const centerAlt = altitudeAtOffset(0, 0, domeRadius, rotation);
+  const centerIsSky = centerAlt >= 0;
+  let anyGround = !centerIsSky, anySky = centerIsSky;
+  const points = [];
+  for (let i = 0; i < GROUND_MASK_RAYS; i++) {
+    const phi = (2 * Math.PI * i) / GROUND_MASK_RAYS;
+    const dx = Math.cos(phi), dy = Math.sin(phi);
+    const edgeAlt = altitudeAtOffset(dx * domeRadius, dy * domeRadius, domeRadius, rotation);
+    const edgeIsSky = edgeAlt >= 0;
+    if (!edgeIsSky) anyGround = true; else anySky = true;
+    let r;
+    if (edgeIsSky === centerIsSky) {
+      r = centerIsSky ? domeRadius : 0; // whole ray agrees - no crossing to find
+    } else {
+      let lo = 0, hi = domeRadius;
+      for (let k = 0; k < GROUND_MASK_BISECT_STEPS; k++) {
+        const mid = (lo + hi) / 2;
+        const midIsSky = altitudeAtOffset(dx * mid, dy * mid, domeRadius, rotation) >= 0;
+        if (midIsSky === centerIsSky) lo = mid; else hi = mid;
+      }
+      r = (lo + hi) / 2;
+    }
+    points.push({ x: dx * r, y: dy * r });
+  }
+  if (!anyGround) return null;
+  if (!anySky) return "none";
+  return points;
+}
 
 const PLANETS = [
   { body: Body.Sun, color: "#ffd54f", radius: 5, label: "Sun" },
@@ -315,11 +411,12 @@ export class SkyEngine {
     // the one, authoritative place that decides the sky's own colours,
     // independent of any CSS/canvas timing.
     const isLightBg = this.dayMode || this.lightUI;
-    ctx.fillStyle = this.dayMode ? "#8ec8e8" : (this.lightUI ? "#e4e9ee" : "#05070c");
+    const bgColor = this.dayMode ? "#8ec8e8" : (this.lightUI ? "#e4e9ee" : "#05070c");
+    ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, w, h);
     const fg = isLightBg
-      ? { dome: "rgba(0,0,0,0.28)", cardinal: "rgba(0,0,0,0.6)", constellation: "rgba(40,80,140,0.45)", star: "#15181c", messier: "rgba(27,94,32,0.85)", horizon: "rgba(180,110,0,0.65)", equator: "rgba(0,121,107,0.6)", meridian: "rgba(123,31,162,0.6)" }
-      : { dome: "rgba(255,255,255,0.25)", cardinal: "rgba(255,255,255,0.55)", constellation: "rgba(100,160,220,0.35)", star: "#fff", messier: "rgba(129,199,132,0.85)", horizon: "rgba(255,193,7,0.55)", equator: "rgba(77,208,225,0.6)", meridian: "rgba(206,147,216,0.6)" };
+      ? { dome: "rgba(0,0,0,0.28)", cardinal: "rgba(0,0,0,0.6)", constellation: "rgba(40,80,140,0.45)", star: "#15181c", messier: "rgba(27,94,32,0.85)", horizon: "rgba(180,110,0,0.65)", equator: "rgba(0,121,107,0.6)", meridian: "rgba(123,31,162,0.6)", grad: "rgba(0,0,0,0.55)", ground: "#cdbb95" }
+      : { dome: "rgba(255,255,255,0.25)", cardinal: "rgba(255,255,255,0.55)", constellation: "rgba(100,160,220,0.35)", star: "#fff", messier: "rgba(129,199,132,0.85)", horizon: "rgba(255,193,7,0.55)", equator: "rgba(77,208,225,0.6)", meridian: "rgba(206,147,216,0.6)", grad: "rgba(255,255,255,0.75)", ground: "#241b12" };
 
     const cx = w / 2, cy = h / 2;
     const domeRadius = Math.min(w, h) / 2 * 0.96 * this.zoom;
@@ -373,6 +470,49 @@ export class SkyEngine {
       ctx.setLineDash([]);
     }
 
+    // Ground mask: fills the below-horizon portion of the current view
+    // with a distinct colour and clips everything drawn from here on
+    // (equator/meridian/cardinals/constellations/stars/messier/planets) to
+    // the real-sky region only - Gilles, 2026-10-01: "si horizon : la
+    // partie inferieure doit etre masquee ! (on ne voit quasiment pas le
+    // trait)": the thin dashed line above was easy to miss against a
+    // starfield with nothing distinguishing "above" from "below" it.
+    // groundClipActive tracks whether render() needs its own matching
+    // ctx.restore() at the very end.
+    let groundClipActive = false;
+    if (this.showTrueHorizon) {
+      const skyPoly = computeSkyPolygon(domeRadius, this.rotation);
+      if (skyPoly === "none") {
+        ctx.fillStyle = fg.ground;
+        ctx.beginPath();
+        ctx.arc(cx, cy, domeRadius, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.save();
+        ctx.beginPath(); // empty path -> clip to nothing, hides everything after
+        ctx.clip();
+        groundClipActive = true;
+      } else if (skyPoly) {
+        ctx.fillStyle = fg.ground;
+        ctx.beginPath();
+        ctx.arc(cx, cy, domeRadius, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.save();
+        ctx.beginPath();
+        skyPoly.forEach((p, i) => {
+          if (i === 0) ctx.moveTo(cx + p.x, cy + p.y); else ctx.lineTo(cx + p.x, cy + p.y);
+        });
+        ctx.closePath();
+        ctx.clip();
+        // Restore the normal sky background within the clipped (sky-only)
+        // region - the ground fill above covered the whole disk, this
+        // repaints just the sky portion back over it.
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, w, h);
+        groundClipActive = true;
+      }
+      // skyPoly === null: whole visible dome is real sky, nothing to mask.
+    }
+
     // Celestial equator (dec=0), graduated like a ruler - Gilles,
     // 2026-09-30: "afficher les reperes habituels ... equateur, meridien".
     // Sampled/projected in equatorial coordinates (unlike the true
@@ -395,10 +535,16 @@ export class SkyEngine {
       ctx.stroke();
 
       const step = pickGradStepDeg(360, this.zoom);
+      ctx.fillStyle = fg.grad;
+      ctx.font = "10px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
       for (let ra = 0; ra < 360; ra += step) {
         const p0 = project(ra, 0);
         const p1 = project(ra, 3); // a few degrees off in dec - just used for tick direction, see drawTick()
-        if (p0.visible && p1.visible) drawTick(ctx, p0, p1, GRAD_TICK_PX);
+        if (!p0.visible || !p1.visible) continue;
+        drawTick(ctx, p0, p1, GRAD_TICK_PX);
+        drawTickLabel(ctx, p0, p1, fmtRaHoursLabel(ra)); // equatorial coordinates - RA in hours
       }
     }
 
@@ -439,11 +585,17 @@ export class SkyEngine {
       ctx.setLineDash([]);
 
       const step = pickGradStepDeg(90, this.zoom);
+      ctx.fillStyle = fg.grad;
+      ctx.font = "10px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
       for (const az of [0, 180]) {
         for (let alt = step; alt < 90; alt += step) {
           const p0 = toScreen(horizontalToVector(az, alt));
           const p1 = toScreen(horizontalToVector(az + 3, alt)); // a few degrees off in azimuth - tick direction only
-          if (p0.visible && p1.visible) drawTick(ctx, p0, p1, GRAD_TICK_PX);
+          if (!p0.visible || !p1.visible) continue;
+          drawTick(ctx, p0, p1, GRAD_TICK_PX);
+          drawTickLabel(ctx, p0, p1, fmtDegLabel(alt)); // azimuthal/horizontal coordinates - altitude in degrees
         }
       }
     }
@@ -516,5 +668,7 @@ export class SkyEngine {
       ctx.fill();
       ctx.fillText(p.label, scr.x + p.radius + 3, scr.y);
     }
+
+    if (groundClipActive) ctx.restore(); // matches the ctx.save() in the ground-mask block above
   }
 }
