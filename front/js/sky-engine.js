@@ -151,6 +151,41 @@ function pickOrderedLabelAnchor(points, w, h, margin) {
   }
   return pickLabelAnchor(points, w, h, margin);
 }
+// Grid lines converge toward a pole/zenith, so once panned/zoomed near one
+// (Gilles, 2026-10-02: "lorsque je m'approche du pole les graduations se
+// resserrent autour du pole - normal / les libelles font pareil, et du
+// coup ... tous les libelles se retrouvent presque au meme endroit") each
+// individual line's own anchor is still correctly ON that line, but
+// several different lines' anchors can end up only a few pixels apart -
+// not the earlier "several lines picked the exact same shared point" bug
+// (pickOrderedLabelAnchor() above), a distinct one where every anchor is
+// genuinely distinct but too close together to read once the actual text
+// is drawn. Labels are queued as {anchor, text, major} candidates instead
+// of drawn immediately, major ones placed first (skipping fewer of them
+// under crowding matters more - there are always far fewer to begin
+// with), each checked with a real measureText()-based bounding box against
+// every box already placed (any two grid labels can be different lengths,
+// e.g. "0h" vs "12h40", so a fixed pixel radius would either false-negative
+// on long labels or over-cull short ones) - overlapping candidates are
+// simply skipped rather than drawn on top of each other. `placedBoxes` is
+// shared across every label family in a single render() (RA/Dec/Az/Alt/
+// meridian all queue into the same array) so none of them overlap each
+// other either, not just within their own family.
+function placeDeclutteredLabels(ctx, candidates, placedBoxes, fontPx, offsetPx) {
+  const sorted = candidates.slice().sort((a, b) => (b.major ? 1 : 0) - (a.major ? 1 : 0));
+  const padX = 3, padY = 2;
+  for (const c of sorted) {
+    const textWidth = ctx.measureText(c.text).width;
+    const cx = c.anchor.x, cy = c.anchor.y - offsetPx;
+    const box = { left: cx - textWidth / 2 - padX, right: cx + textWidth / 2 + padX, top: cy - fontPx / 2 - padY, bottom: cy + fontPx / 2 + padY };
+    const overlaps = placedBoxes.some((b) => box.left < b.right && box.right > b.left && box.top < b.bottom && box.bottom > b.top);
+    if (overlaps) continue;
+    placedBoxes.push(box);
+    ctx.globalAlpha = c.major ? 1 : 0.55;
+    drawCornerLabel(ctx, c.anchor, c.text, offsetPx);
+  }
+  ctx.globalAlpha = 1;
+}
 // Strokes a polyline given as an array of already-projected {x,y,visible}
 // points, breaking across any gap where the line leaves the currently
 // visible (front) hemisphere and picking back up wherever it re-enters -
@@ -658,6 +693,13 @@ export class SkyEngine {
       // skyPoly === null: whole visible dome is real sky, nothing to mask.
     }
 
+    // Collects {anchor, text, major} across BOTH grids below instead of
+    // drawing each label immediately - see placeDeclutteredLabels()'s own
+    // doc comment for why (labels from lines that converge near a pole/
+    // zenith need to be checked against each other, and against every
+    // other label already on screen, not just drawn independently).
+    const labelCandidates = [];
+
     // Equatorial grid: lines of constant RA (pole to pole, like meridians
     // of longitude) and constant Dec (parallels, dec=0 being the celestial
     // equator itself) - Gilles, 2026-10-01, correcting an earlier
@@ -696,9 +738,12 @@ export class SkyEngine {
         // extremal one, bunching their labels together there instead of
         // along each line's own path (Gilles, 2026-10-02: "regroupent en
         // haut" - the analogous azimuth/zenith case below, but the same
-        // failure mode applies here too).
+        // failure mode applies here too). Queued, not drawn immediately -
+        // see placeDeclutteredLabels()'s own doc comment for why (lines
+        // converging near a pole/zenith still each get their own correct,
+        // but nearly-coincident, anchor).
         const anchor = pickLabelAnchor(pts.slice(1, -1), w, h, labelMargin);
-        if (anchor) drawCornerLabel(ctx, anchor, fmtRaHoursLabel(ra), labelOffsetPx);
+        if (anchor) labelCandidates.push({ anchor, text: fmtRaHoursLabel(ra), major });
       }
       for (const dec of rangeSteps(-90, 90, decMinor)) {
         const major = isMajorLine(dec, decMajor);
@@ -708,7 +753,7 @@ export class SkyEngine {
         const pts = [];
         for (let i = 0; i <= LINE_SAMPLES; i++) pts.push(project((360 * i) / LINE_SAMPLES, dec));
         const anchor = strokePolyline(ctx, pts, w, h, labelMargin);
-        if (anchor) drawCornerLabel(ctx, anchor, fmtSignedDegLabel(dec), labelOffsetPx);
+        if (anchor) labelCandidates.push({ anchor, text: fmtSignedDegLabel(dec), major });
       }
       ctx.globalAlpha = 1;
     }
@@ -769,7 +814,7 @@ export class SkyEngine {
           const northPts = [];
           for (let i = 0; i <= ARC_SAMPLES; i++) northPts.push(toScreen(horizontalToVector(0, (90 * i) / ARC_SAMPLES)));
           const northAnchor = pickOrderedLabelAnchor(northPts.slice(0, -1), w, h, labelMargin);
-          if (northAnchor) drawCornerLabel(ctx, northAnchor, fmtDegLabel(0), labelOffsetPx);
+          if (northAnchor) labelCandidates.push({ anchor: northAnchor, text: fmtDegLabel(0), major: true });
         } else {
           for (const azz of [az, az + 180]) {
             const pts = [];
@@ -787,7 +832,7 @@ export class SkyEngine {
             // different azimuths' labels landing on the exact same point
             // (Gilles, 2026-10-02: "regroupent en haut, horizontal").
             const anchor = pickOrderedLabelAnchor(pts.slice(0, -1), w, h, labelMargin);
-            if (anchor) drawCornerLabel(ctx, anchor, fmtDegLabel(azz), labelOffsetPx);
+            if (anchor) labelCandidates.push({ anchor, text: fmtDegLabel(azz), major });
           }
         }
       }
@@ -800,9 +845,17 @@ export class SkyEngine {
         const CIRCLE_SAMPLES = 96;
         for (let i = 0; i <= CIRCLE_SAMPLES; i++) pts.push(toScreen(horizontalToVector((360 * i) / CIRCLE_SAMPLES, alt)));
         const anchor = strokePolyline(ctx, pts, w, h, labelMargin);
-        if (anchor) drawCornerLabel(ctx, anchor, fmtSignedDegLabel(alt), labelOffsetPx);
+        if (anchor) labelCandidates.push({ anchor, text: fmtSignedDegLabel(alt), major });
       }
       ctx.globalAlpha = 1;
+    }
+
+    if (labelCandidates.length) {
+      ctx.fillStyle = fg.grad;
+      ctx.font = uiFont(11);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      placeDeclutteredLabels(ctx, labelCandidates, [], 11 * labelScale, labelOffsetPx);
     }
 
     // Cardinal points. Projected through the same rotation as everything
