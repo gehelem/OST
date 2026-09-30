@@ -43,6 +43,12 @@ const CLICK_THRESHOLD_PX = 6;
 // rather than just recording the raw RA/Dec of the tap itself.
 const HIT_RADIUS_PX = 12;
 
+// Distance (CSS px) between two Touch points - the only thing pinch-to-zoom
+// (_onTouchStart/_onTouchMove) needs from a TouchList's own two entries.
+function touchDistance(touches) {
+  return Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
+}
+
 // ZOOM_MAX raised from 6 (Gilles, 2026-10-03: "le zoom max n'est pas
 // assez fin, augmente la limite") - purely a magnification ceiling by
 // this point (starMagnitudeLimit() below already reaches every star any
@@ -409,6 +415,7 @@ export class SkyEngine {
     this.catalog = { stars: [], constellationLines: [], messier: [] };
     this._domeRadius = 1; // recomputed every render(), read by the drag/tap handlers to convert screen<->vector
     this._drag = null; // { grabVector (fixed-frame), rotationAtDragStart, startOffset, moved } while a gesture is in progress (mouse or touch)
+    this._pinch = null; // { startDist (px), startZoom } while a two-finger pinch-to-zoom is in progress - see _onTouchStart()
 
     this._onMouseDown = this._onMouseDown.bind(this);
     this._onMouseMove = this._onMouseMove.bind(this);
@@ -421,10 +428,11 @@ export class SkyEngine {
     canvas.addEventListener("mousedown", this._onMouseDown);
     window.addEventListener("mousemove", this._onMouseMove);
     window.addEventListener("mouseup", this._onMouseUp);
-    // Single-touch only for v1: touch-drag pans, a tap (like a click)
-    // selects. No pinch-zoom yet (wheel-zoom is desktop-only so far) —
+    // Single-touch drags/pans, a tap (like a click) selects, two fingers
+    // pinch-zoom (Gilles, 2026-10-03: "le zoom ... ne marche pas sur
+    // tablette/smartphone (zoom/pinch)" - wheel-zoom was desktop-only) -
     // { passive: false } since we preventDefault to stop the page itself
-    // from scrolling/zooming while panning the dome.
+    // from scrolling/zooming while panning/pinching the dome.
     canvas.addEventListener("touchstart", this._onTouchStart, { passive: false });
     canvas.addEventListener("touchmove", this._onTouchMove, { passive: false });
     canvas.addEventListener("touchend", this._onTouchEnd);
@@ -510,16 +518,48 @@ export class SkyEngine {
   _onMouseUp() { this._handlePointerUp(); }
 
   _onTouchStart(ev) {
-    if (ev.touches.length !== 1) return;
-    this._handlePointerDown(ev.touches[0].clientX, ev.touches[0].clientY);
-    ev.preventDefault();
+    if (ev.touches.length === 1) {
+      this._pinch = null;
+      this._handlePointerDown(ev.touches[0].clientX, ev.touches[0].clientY);
+      ev.preventDefault();
+    } else if (ev.touches.length === 2) {
+      // Pinch-to-zoom (Gilles, 2026-10-03: "le zoom (molette souris) ne
+      // marche pas sur tablette/smartphone (zoom/pinch)") - mirrors
+      // _onWheel()'s own zoom clamp + onNeedsRender/onZoomChange calls,
+      // just driven by the ratio of the current two-finger distance to
+      // the distance when the pinch started instead of a discrete wheel
+      // tick. A second finger landing mid-drag cancels that drag first -
+      // the gesture just became a pinch, not a pan.
+      this._drag = null;
+      this.canvas.classList.remove("dragging");
+      this._pinch = { startDist: touchDistance(ev.touches), startZoom: this.zoom };
+      ev.preventDefault();
+    }
   }
   _onTouchMove(ev) {
+    if (this._pinch) {
+      if (ev.touches.length !== 2) return; // a third finger, or one lifted without a touchend yet - ignore until back to exactly two
+      const scale = touchDistance(ev.touches) / this._pinch.startDist;
+      this.zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, this._pinch.startZoom * scale));
+      if (this.onNeedsRender) this.onNeedsRender();
+      if (this.onZoomChange) this.onZoomChange();
+      ev.preventDefault();
+      return;
+    }
     if (!this._drag || ev.touches.length !== 1) return;
     this._handlePointerMove(ev.touches[0].clientX, ev.touches[0].clientY);
     ev.preventDefault();
   }
-  _onTouchEnd() { this._handlePointerUp(); }
+  _onTouchEnd(ev) {
+    if (this._pinch) {
+      // ev.touches lists whatever's still down after this touch ended -
+      // below two fingers, the pinch is over; don't fall through to
+      // _handlePointerUp()'s own tap-to-select, a pinch is never a tap.
+      if (ev.touches.length < 2) this._pinch = null;
+      return;
+    }
+    this._handlePointerUp();
+  }
 
   /** Finds the catalog object nearest a tap/click, within HIT_RADIUS_PX —
    * re-projects the catalog fresh (cheap: only runs once per tap, not per
