@@ -284,6 +284,11 @@ function altitudeAtOffset(offX, offY, domeRadius, rotation, projection) {
 const GROUND_MASK_RAYS = 120;
 const GROUND_MASK_BISECT_STEPS = 10;
 
+// Small enough to give a clean, near-orthogonal local North/East screen
+// direction regardless of a Messier object's own (possibly much larger)
+// angular size - see the position-angle rendering block's own doc comment.
+const MESSIER_DIR_EPS_DEG = 0.01;
+
 /**
  * Returns the boundary of the *sky* portion of the currently visible dome,
  * as an array of {x,y} points (offsets from the dome centre) - or `null`
@@ -1175,18 +1180,21 @@ export class SkyEngine {
     // 2026-10-01: "est-ce que tu as une taille et une orientation ? si oui
     // essaie d'en tenir compte, la on a que des petits cercles tous de la
     // meme taille") - sizeWDeg/sizeHDeg from sky-catalog.js's own
-    // parseMessierDim() (its doc comment covers why there's no real
-    // orientation to use: the catalog simply doesn't have one). Radii
-    // measured directly on screen - project() a small RA/Dec offset the
-    // same way as the object itself, rather than a fixed px-per-degree
-    // constant - so they stay correct at any zoom/projection, and the
-    // offset points' own screen-space direction (not just their distance)
-    // doubles as the ellipse's rotation, so it stays RA/Dec-axis-aligned
-    // (not screen-axis-aligned) even once the dome has been panned. Fine
-    // as a simple RA-offset/cos(dec) approximation (not full gnomonic) for
-    // objects this small - the largest, M31, is still only ~3 degrees.
-    // Falls back to the old fixed-size circle for the couple of entries
-    // with no `dim` data at all.
+    // parseMessierDim(), real position angle (paDeg, the 40/110 objects
+    // that have one - mostly galaxies, see celestial-data/README.md) from
+    // celestial-data/messier-orientation.json, fetched separately after
+    // Gilles, seeing M31 rendered axis-aligned: "elle n'a pas du tout
+    // cette orientation" (messier.json itself has no orientation field at
+    // all - see sky-catalog.js's own messierFromGeoJson() doc comment).
+    // Both size AND rotation are measured/derived directly on screen -
+    // project() a small RA/Dec offset the same way as the object itself,
+    // rather than a fixed px-per-degree constant - so they stay correct at
+    // any zoom/projection/pan. Fine as a simple RA-offset/cos(dec)
+    // approximation (not full gnomonic) for objects this small - the
+    // largest, M31, is still only ~3 degrees. Falls back to a plain circle
+    // for the couple of entries with no `dim` data, and to the previous
+    // RA/Dec-axis-aligned ellipse for the (majority of) objects with a
+    // size but no known paDeg.
     if (this.showMessier) {
       ctx.strokeStyle = fg.messier;
       ctx.lineWidth = 1;
@@ -1198,9 +1206,61 @@ export class SkyEngine {
           const cosDec = Math.cos((m.dec * Math.PI) / 180) || 1;
           const east = project(m.ra + (m.sizeWDeg / 2) / cosDec, m.dec);
           const north = project(m.ra, m.dec + m.sizeHDeg / 2);
-          if (east.visible && north.visible) {
-            rx = Math.max(3, Math.hypot(east.x - p.x, east.y - p.y));
-            ry = Math.max(3, Math.hypot(north.x - p.x, north.y - p.y));
+          const eastLen = Math.hypot(east.x - p.x, east.y - p.y);
+          const northLen = Math.hypot(north.x - p.x, north.y - p.y);
+          if (east.visible && north.visible && m.paDeg != null && eastLen > 0 && northLen > 0) {
+            // Real major-axis position angle (OpenNGC's own "Major axis
+            // position angle, North Eastwards" - the standard IAU
+            // convention): the major axis (sizeWDeg) points paDeg degrees
+            // from this object's own on-screen North, turning toward its
+            // own on-screen East - not assumed to be any particular screen
+            // direction, so this comes out correct regardless of pan or
+            // which way this dome view happens to mirror East. The North/
+            // East DIRECTIONS themselves come from a separate, small fixed
+            // offset (MESSIER_DIR_EPS_DEG), not east/north above - using
+            // the real (possibly large, e.g. M31 is over 3 degrees across)
+            // sizing offsets directly as a direction basis would add their
+            // own extra error on top of the one below for no benefit; a
+            // small, fixed offset keeps that part clean regardless of the
+            // object's own size (same reasoning as sensorFovCorners()'s own
+            // numerically-derived tangent vectors).
+            //
+            // Known remaining limitation, inherent to this 2D screen-space
+            // approach (not something MESSIER_DIR_EPS_DEG fixes): this
+            // dome's default orthographic projection is only locally
+            // angle-preserving AT the zenith, increasingly less so toward
+            // the horizon - checked directly, the effective North/East
+            // basis is measurably non-orthogonal there (~20 degrees off at
+            // 9 degrees altitude, ~3 degrees off at 69 degrees). Negligible
+            // for objects reasonably high in the sky (where anyone would
+            // actually be observing them - extinction alone rules out real
+            // work near 9 degrees altitude), same "good enough at realistic
+            // conditions" tradeoff as sensorFovCorners()'s own wide-FOV
+            // distortion note. A fully correct fix would build the ellipse
+            // boundary in a real 3D tangent-plane basis and project each
+            // point individually (sensorFovCorners()'s own approach) rather
+            // than one 2D rotation - not done here for what is, unlike the
+            // sensor FOV frame, a decorative catalog overlay.
+            const eastDir = project(m.ra + MESSIER_DIR_EPS_DEG / cosDec, m.dec);
+            const northDir = project(m.ra, m.dec + MESSIER_DIR_EPS_DEG);
+            const eastDirLen = Math.hypot(eastDir.x - p.x, eastDir.y - p.y) || 1;
+            const northDirLen = Math.hypot(northDir.x - p.x, northDir.y - p.y) || 1;
+            const nUnit = { x: (northDir.x - p.x) / northDirLen, y: (northDir.y - p.y) / northDirLen };
+            const eUnit = { x: (eastDir.x - p.x) / eastDirLen, y: (eastDir.y - p.y) / eastDirLen };
+            const theta = (m.paDeg * Math.PI) / 180;
+            const majorDirX = Math.cos(theta) * nUnit.x + Math.sin(theta) * eUnit.x;
+            const majorDirY = Math.cos(theta) * nUnit.y + Math.sin(theta) * eUnit.y;
+            rotation = Math.atan2(majorDirY, majorDirX);
+            // Local px-per-degree scale, averaged from the (large, real-
+            // size) east/north offsets - separate concern from direction
+            // above, and much less sensitive to the same curvature effect
+            // (a magnitude, not an angle-between-two-vectors).
+            const scale = (eastLen / (m.sizeWDeg / 2) + northLen / (m.sizeHDeg / 2)) / 2;
+            rx = Math.max(3, (m.sizeWDeg / 2) * scale);
+            ry = Math.max(3, (m.sizeHDeg / 2) * scale);
+          } else if (east.visible && north.visible) {
+            rx = Math.max(3, eastLen);
+            ry = Math.max(3, northLen);
             rotation = Math.atan2(east.y - p.y, east.x - p.x);
           }
         }

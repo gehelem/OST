@@ -87,16 +87,11 @@ function milkyWayFromGeoJson(geo) {
   return polygons;
 }
 
-// `dim` (arcmin) is either "WxH" (elongated objects) or a single value
-// (round ones, W=H) - checked directly against the actual file: only 2 of
-// 110 entries have no dim at all (empty string), and there is NO
-// orientation/position-angle field anywhere in this catalog (its only
-// properties are name/desig/alt/type/mag/dim/cl) - Gilles, 2026-10-01:
-// "est-ce que tu as une taille et une orientation ? si oui essaie d'en
-// tenir compte" - taille oui, orientation non. sky-engine.js draws the
-// resulting ellipse RA/Dec-axis-aligned for lack of a real PA (same
-// "unrotated until real data says otherwise" fallback as
-// sensorOrientationDeg elsewhere in this chantier).
+// `dim` (arcmin) is either "WxH" (elongated objects, W = major axis, H =
+// minor - matches celestial-data/messier-orientation.json's own PosAng
+// being specifically the MAJOR axis's angle) or a single value (round
+// ones, W=H) - checked directly against the file: only 2 of 110 entries
+// have no dim at all (empty string).
 function parseMessierDim(dim) {
   if (!dim) return { sizeWDeg: null, sizeHDeg: null };
   const [wArcmin, hArcmin] = String(dim).split(/x/i).map(Number);
@@ -104,7 +99,18 @@ function parseMessierDim(dim) {
   return { sizeWDeg: wArcmin / 60, sizeHDeg: (hArcmin > 0 ? hArcmin : wArcmin) / 60 };
 }
 
-function messierFromGeoJson(geo) {
+// messier.json itself has NO orientation/position-angle field at all
+// (checked directly: its only properties are name/desig/alt/type/mag/dim/
+// cl) - Gilles, 2026-10-01: "est-ce que tu as une taille et une
+// orientation ? si oui essaie d'en tenir compte" - taille oui (dim,
+// above), orientation non, in THIS file. Confirmed, then asked to fetch it
+// separately after seeing M31 rendered axis-aligned: "elle n'a pas du tout
+// cette orientation" - `orientations` (Messier id -> degrees, North
+// Eastwards) comes from celestial-data/messier-orientation.json instead
+// (its own doc comment / celestial-data/README.md for where that's from).
+// Objects with no known PA there keep paDeg null - sky-engine.js falls
+// back to the same RA/Dec-axis-aligned rendering as before for those.
+function messierFromGeoJson(geo, orientations) {
   return geo.features.map((f) => ({
     ra: f.geometry.coordinates[0],
     dec: f.geometry.coordinates[1],
@@ -114,6 +120,7 @@ function messierFromGeoJson(geo) {
     type: f.properties.type || "",
     mag: f.properties.mag,
     ...parseMessierDim(f.properties.dim),
+    paDeg: (orientations && orientations[f.properties.name]) ?? null,
   }));
 }
 
@@ -127,10 +134,11 @@ function messierFromGeoJson(geo) {
 export async function loadCatalog(depth) {
   const starFile = (STAR_DEPTHS[depth] || STAR_DEPTHS.light).file;
   const properNames = await fetchJson("star-proper-names.json").catch((e) => { console.error(e); return {}; });
+  const orientations = await fetchJson("messier-orientation.json").catch((e) => { console.error(e); return {}; });
   const [stars, constellationLines, messier, milkyWay] = await Promise.all([
     fetchJson(starFile).then((geo) => starsFromGeoJson(geo, properNames)).catch((e) => { console.error(e); return []; }),
     fetchJson("constellations.lines.json").then(constellationLinesFromGeoJson).catch((e) => { console.error(e); return []; }),
-    fetchJson("messier.json").then(messierFromGeoJson).catch((e) => { console.error(e); return []; }),
+    fetchJson("messier.json").then((geo) => messierFromGeoJson(geo, orientations)).catch((e) => { console.error(e); return []; }),
     fetchJson("mw.json").then(milkyWayFromGeoJson).catch((e) => { console.error(e); return []; }),
   ]);
   return { stars, constellationLines, messier, milkyWay };
