@@ -9,6 +9,22 @@ static void atomicSaveJpeg(const QImage &img, const QString &finalPath)
         ::rename(tmp.toLocal8Bit().constData(), finalPath.toLocal8Bit().constData());
 }
 
+// RA is circular (0-24h) - a naive subtraction of two RA values lands near
+// +/-24h whenever they straddle the 0h/24h boundary, even though the true
+// angular separation between them is tiny. Wraps into (-12h, +12h] so "how
+// far, and which way" is always the shortest path around the circle -
+// Gilles, 2026-10-01: caught via a centering log showing "dRA 24.006794arcs"
+// at a 60arcsec tolerance (still triggering a correction loop) - the "24"
+// shape of that number, not "arcs" at all despite the label (see
+// checkCentering()/correctOffset() below), was the giveaway of an unwrapped
+// full-turn artifact hiding a real ~24 arcsec separation.
+static double wrapRaHoursDelta(double deltaHours)
+{
+    while (deltaHours > 12.0) deltaHours -= 24.0;
+    while (deltaHours <= -12.0) deltaHours += 24.0;
+    return deltaHours;
+}
+
 Navigator *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
     Navigator *basemodule = new Navigator(name, label, profile, availableModuleLibs);
@@ -541,9 +557,13 @@ void Navigator::convertSelection(void)
 
 bool Navigator::checkCentering(double solvedRA, double solvedDEC, double targetRA, double targetDEC)
 {
-    // Calculate angular distance in arcseconds
-    //double deltaRA = (solvedRA * 360 / 24 - targetRA * 360 / 24) * cos(solvedDEC * M_PI / 180.0) * 3600;
-    double deltaRA = (solvedRA * 360 / 24 - targetRA * 360 / 24) * 3600;
+    // Calculate angular distance in arcseconds. RA delta wrapped to its
+    // shortest-path form first (wrapRaHoursDelta()'s own doc comment) -
+    // without it, a target near the 0h/24h RA boundary would compute as
+    // ~24h/~360deg away from a solve a few arcsec off, permanently failing
+    // this check no matter how well centered the mount actually is.
+    //double deltaRA = wrapRaHoursDelta(solvedRA - targetRA) * 15 * cos(solvedDEC * M_PI / 180.0) * 3600;
+    double deltaRA = wrapRaHoursDelta(solvedRA - targetRA) * 15 * 3600;
     double deltaDEC = (solvedDEC - targetDEC) * 3600 ;
 
     // Total angular distance in arcseconds
@@ -556,11 +576,22 @@ bool Navigator::checkCentering(double solvedRA, double solvedDEC, double targetR
 
 void Navigator::correctOffset(double solvedRA, double solvedDEC)
 {
-    // Calculate correction offset
-    //double deltaRA = (solvedRA  - mTargetRA) * cos(solvedDEC * M_PI / 180.0);
-    double deltaRA = solvedRA  - mTargetRA;
+    // Calculate correction offset (RA in hours, DEC in degrees - the same
+    // units EQUATORIAL_EOD_COORD's own widgets use below, so the correction
+    // applies directly with no further conversion). RA wrapped to its
+    // shortest-path form (wrapRaHoursDelta()'s own doc comment) - without
+    // it, straddling the 0h/24h boundary would both log a nonsensical
+    // ~24h-shaped "correction" and, worse, actually apply it, slewing the
+    // mount nearly a full turn away instead of nudging it by the real,
+    // tiny amount.
+    //double deltaRA = wrapRaHoursDelta(solvedRA - mTargetRA) * cos(solvedDEC * M_PI / 180.0);
+    double deltaRA = wrapRaHoursDelta(solvedRA - mTargetRA);
     double deltaDEC = solvedDEC - mTargetDEC;
-    logInfo("Offset correction : dRA %1arcs dDEC %2arcs", {deltaRA, deltaDEC});
+    // Logged in actual arcsec (matching checkCentering()'s own units) -
+    // previously logged as the raw hours/degrees deltas above while still
+    // labelled "arcs", which is what made an unwrapped ~24h RA artifact
+    // read as an innocuous-looking "~24 arcsec" in the log.
+    logInfo("Offset correction : dRA %1arcs dDEC %2arcs", {deltaRA * 15 * 3600, deltaDEC * 3600});
 
     // Get current mount position
     QString mount = getString("devices", "mount");
@@ -582,8 +613,15 @@ void Navigator::correctOffset(double solvedRA, double solvedDEC)
         return;
     }
 
-    // Send corrected position to mount (RA in hours, DEC in degrees)
-    prop.findWidgetByName("RA")->value  = prop.findWidgetByName("RA")->value - deltaRA;
+    // Send corrected position to mount (RA in hours, DEC in degrees). RA
+    // re-wrapped into [0,24) after the subtraction - deltaRA is now at most
+    // 12h in magnitude (wrapRaHoursDelta() above), but the mount's own
+    // current RA minus/plus that can still land just outside [0,24) right
+    // at the boundary.
+    double newRA = prop.findWidgetByName("RA")->value - deltaRA;
+    if (newRA < 0.0) newRA += 24.0;
+    if (newRA >= 24.0) newRA -= 24.0;
+    prop.findWidgetByName("RA")->value  = newRA;
     prop.findWidgetByName("DEC")->value = prop.findWidgetByName("DEC")->value - deltaDEC;
     mWaitingSlew = true;
     sendNewNumber(prop);
