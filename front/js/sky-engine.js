@@ -743,8 +743,8 @@ export class SkyEngine {
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, w, h);
     const fg = isLightBg
-      ? { dome: "rgba(0,0,0,0.28)", cardinal: "rgba(0,0,0,0.6)", constellation: "rgba(40,80,140,0.45)", star: "#15181c", messier: "rgba(27,94,32,0.85)", horizon: "rgba(180,110,0,0.65)", equator: "rgba(0,121,107,0.6)", azimuthal: "rgba(123,31,162,0.6)", meridian: "rgba(13,71,161,0.95)", milkyway: "rgba(60,80,110,0.35)", milkywayFill: "rgba(70,75,85,0.10)", ecliptic: "rgba(230,140,20,0.75)", grad: "rgba(0,0,0,0.55)", ground: "#cdbb95" }
-      : { dome: "rgba(255,255,255,0.25)", cardinal: "rgba(255,255,255,0.55)", constellation: "rgba(100,160,220,0.35)", star: "#fff", messier: "rgba(129,199,132,0.85)", horizon: "rgba(255,193,7,0.55)", equator: "rgba(77,208,225,0.6)", azimuthal: "rgba(206,147,216,0.6)", meridian: "rgba(41,121,255,0.95)", milkyway: "rgba(200,215,235,0.18)", milkywayFill: "rgba(200,205,215,0.08)", ecliptic: "rgba(255,183,77,0.85)", grad: "rgba(255,255,255,0.75)", ground: "#241b12" };
+      ? { dome: "rgba(0,0,0,0.28)", cardinal: "rgba(0,0,0,0.6)", constellation: "rgba(40,80,140,0.45)", star: "#15181c", messier: "rgba(27,94,32,0.85)", horizon: "rgba(180,110,0,0.65)", equator: "rgba(0,121,107,0.6)", azimuthal: "rgba(123,31,162,0.6)", meridian: "rgba(13,71,161,0.95)", milkyway: "rgba(60,80,110,0.35)", ecliptic: "rgba(230,140,20,0.75)", grad: "rgba(0,0,0,0.55)", ground: "#cdbb95" }
+      : { dome: "rgba(255,255,255,0.25)", cardinal: "rgba(255,255,255,0.55)", constellation: "rgba(100,160,220,0.35)", star: "#fff", messier: "rgba(129,199,132,0.85)", horizon: "rgba(255,193,7,0.55)", equator: "rgba(77,208,225,0.6)", azimuthal: "rgba(206,147,216,0.6)", meridian: "rgba(41,121,255,0.95)", milkyway: "rgba(200,215,235,0.18)", ecliptic: "rgba(255,183,77,0.85)", grad: "rgba(255,255,255,0.75)", ground: "#241b12" };
 
     const cx = w / 2, cy = h / 2;
     const domeRadius = Math.min(w, h) / 2 * 0.96 * this.zoom;
@@ -1091,43 +1091,36 @@ export class SkyEngine {
     }
 
     // Milky Way outline (Gilles, 2026-10-01: "ajoute son affichage en
-    // optionnel dans les settings du module", then "tu peux griser
-    // legerement l'interieur de ces contours") - contour stroked plus a
-    // light fill, one path per polygon covering every one of its rings
-    // (sky-catalog.js's own milkyWayFromGeoJson doc comment - ring[0] is
-    // the outer boundary, the rest are holes e.g. the Coalsack) filled
-    // with the "evenodd" rule so holes actually read as holes regardless
-    // of the source data's own ring winding direction. Drawn before
-    // constellations/stars, as the diffuse background band it represents.
-    // Each contiguous run of visible points gets its own moveTo/closePath
-    // (not one lineTo'd straight across a gap), same reasoning as the
-    // ground mask - otherwise a ring dipping behind the viewer would draw
-    // a stray line/wedge clear across the dome instead of just clipping;
-    // closePath() per run also matters here (unlike a plain stroke-only
-    // contour) since fill() only implicitly closes the LAST subpath, not
-    // every one drawn before it.
+    // optionnel dans les settings du module") - a plain contour, no fill.
+    // A fill was attempted (Gilles: "tu peux griser legerement l'interieur
+    // de ces contours") but every attempt at correctly clipping a filled
+    // shape against the dome edge/visible hemisphere boundary produced a
+    // real, visible bug (straight "bars" across the sky; then no fill at
+    // all, since a band circling the whole sky is essentially never 100%
+    // on-screen; then, on a third attempt, the fill covering the entire
+    // dome and flickering with panning) - reverted back to this simple,
+    // reliable contour-only version rather than keep shipping a broken
+    // fill (Gilles: "revenir au contour seul" when asked how to proceed).
+    // Drawn before constellations/stars, as the diffuse background band it
+    // represents. Each contiguous run of visible points gets its own
+    // moveTo/lineTo (not one straight lineTo across a gap, and never
+    // closed) - same reasoning as the true horizon/constellation lines:
+    // a ring dipping behind the viewer should just clip, not draw a stray
+    // line/chord clear across the dome.
     if (this.showMilkyWay) {
       ctx.strokeStyle = fg.milkyway;
-      ctx.fillStyle = fg.milkywayFill;
       ctx.lineWidth = 1;
       for (const polygon of this.catalog.milkyWay) {
-        ctx.beginPath();
         for (const ring of polygon) {
+          ctx.beginPath();
           let started = false;
           for (const pt of ring) {
             const p = project(pt.ra, pt.dec);
-            if (!p.visible) {
-              if (started) ctx.closePath();
-              started = false;
-              continue;
-            }
-            if (started) ctx.lineTo(p.x, p.y);
-            else { ctx.moveTo(p.x, p.y); started = true; }
+            if (!p.visible) { started = false; continue; }
+            if (!started) { ctx.moveTo(p.x, p.y); started = true; } else { ctx.lineTo(p.x, p.y); }
           }
-          if (started) ctx.closePath();
+          ctx.stroke();
         }
-        ctx.fill("evenodd");
-        ctx.stroke();
       }
     }
 
