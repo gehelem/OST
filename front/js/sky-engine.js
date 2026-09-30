@@ -414,6 +414,16 @@ export class SkyEngine {
     // sensorFovCorners()'s own doc comment for the rotation convention
     // and its one unverified assumption (the sign).
     this.sensorOrientationDeg = 0;
+    // Gilles, 2026-10-01: "dans le cadre du capteur de la camera essaie de
+    // m'afficher l'image prise ... toujours en optionnel" - unlike
+    // showMountPosition/showSensorFov above (core telescope-control info,
+    // default on), this is a heavier, speculative extra: default OFF, same
+    // as the reference-overlay toggles (grids/horizon/Milky Way). Backing
+    // state (_sensorImageUrl/_sensorImageEl) lives behind setSensorImage()
+    // below, not plain fields - loading a JPEG is asynchronous.
+    this.showSensorImage = false;
+    this._sensorImageUrl = null;
+    this._sensorImageEl = null;
     this.dayMode = false;
     // "orthographic" (default) or "stereographic" - see sky-projection.js's
     // own vectorToScreen()/screenToVector() doc comment for the actual
@@ -492,6 +502,30 @@ export class SkyEngine {
     // depth is actually loaded, e.g. to persist it, without keeping its
     // own separate copy of the same state.
     this.catalogDepth = depth;
+  }
+
+  /**
+   * The last successfully solved image, to draw inside the sensor FOV
+   * frame (Gilles, 2026-10-01: "essaie de m'afficher l'image prise",
+   * "toujours en optionnel" - see showSensorImage's own doc comment).
+   * A method (not a plain field like mountRaDeg etc.) because loading is
+   * asynchronous - templates/navigator.js can call this on every "image"
+   * property tick without care; a no-op if the URL hasn't actually
+   * changed (avoids re-decoding the same JPEG every tick), and the
+   * onload guard drops a stale load that resolves after a newer one was
+   * already requested.
+   */
+  setSensorImage(url) {
+    if (this._sensorImageUrl === url) return;
+    this._sensorImageUrl = url;
+    if (!url) { this._sensorImageEl = null; return; }
+    const img = new Image();
+    img.onload = () => {
+      if (this._sensorImageUrl !== url) return; // superseded while loading
+      this._sensorImageEl = img;
+      if (this.onNeedsRender) this.onNeedsRender();
+    };
+    img.src = url;
   }
 
   _onWheel(ev) {
@@ -1139,6 +1173,44 @@ export class SkyEngine {
             this.sensorOrientationDeg, this.observer, date,
           ).map((h) => toScreen(horizontalToVector(h.azimuth, h.altitude)));
           if (corners.every((c) => c.visible)) {
+            // The actual captured image, warped into the frame (Gilles,
+            // 2026-10-01: "dans le cadre du capteur de la camera essaie
+            // de m'afficher l'image prise", "toujours en optionnel") -
+            // drawn first, so the frame outline/up-marker below stay
+            // legible on top of it. A single affine transform (3-point
+            // correspondence: image top-left/top-right/bottom-left ->
+            // corners[3]/[2]/[0], sensorFovCorners()'s own sy=+1 "up"
+            // side is corners[2]/[3] - see its up-marker triangle just
+            // below) rather than a true 4-point perspective warp - exact
+            // for a parallelogram, and this quad is one to within the
+            // same negligible wide-FOV gnomonic distortion already
+            // established as irrelevant at realistic deep-sky FOV sizes
+            // (sensorFovCorners()'s own doc comment). Which raster edge
+            // is "left" vs "right" (i.e. whether the image is mirrored)
+            // is, like the orientation sign itself, unverified against a
+            // real solved frame - flip the corners[0]/[2] <-> mapping
+            // below if a real capture comes out mirrored. Clipped to the
+            // TRUE 4 corners (not just the parallelogram implied by 3 of
+            // them) so any tiny divergence at the unused 4th corner never
+            // bleeds outside the frame.
+            if (this.showSensorImage && this._sensorImageEl) {
+              const img = this._sensorImageEl;
+              const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+              if (iw > 0 && ih > 0) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(corners[0].x, corners[0].y);
+                for (let i = 1; i < corners.length; i++) ctx.lineTo(corners[i].x, corners[i].y);
+                ctx.closePath();
+                ctx.clip();
+                const a = (corners[2].x - corners[3].x) / iw, b = (corners[2].y - corners[3].y) / iw;
+                const c = (corners[0].x - corners[3].x) / ih, d = (corners[0].y - corners[3].y) / ih;
+                ctx.transform(a, b, c, d, corners[3].x, corners[3].y);
+                ctx.drawImage(img, 0, 0, iw, ih);
+                ctx.restore();
+              }
+            }
+
             ctx.strokeStyle = "#e53935";
             ctx.lineWidth = 1.5;
             ctx.beginPath();

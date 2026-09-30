@@ -29,12 +29,13 @@
 // addtoplanner), centeringparams, slaves - plus image/optic/parms, generic
 // to any imager.
 
-import { renderProperty, updateQuickNav } from "../render.js";
+import { renderProperty, updateQuickNav, getMediaBaseUrl } from "../render.js";
 import { el } from "../dom.js";
 import * as Panels from "../panels.js";
 import { SkyEngine, ZOOM_MIN, ZOOM_MAX } from "../sky-engine.js";
 import { STAR_DEPTHS } from "../sky-catalog.js";
 import { t } from "../i18n.js";
+import { mediaUrl } from "../../core/index.js";
 
 function fmtDeg(v) { return v.toFixed(3) + "°"; }
 function fmtHours(raDeg) {
@@ -116,6 +117,7 @@ function saveDisplaySettings(engine) {
       showMilkyWay: engine.showMilkyWay,
       showMountPosition: engine.showMountPosition,
       showSensorFov: engine.showSensorFov,
+      showSensorImage: engine.showSensorImage,
       dayMode: engine.dayMode,
       zoom: engine.zoom,
       rotation: engine.rotation, // pan/trackball state - a plain {w,x,y,z} quaternion, see js/quaternion.js
@@ -160,6 +162,7 @@ function buildSettingsPanel(engine) {
   wrap.appendChild(checkboxRow(t("navigator.milkyWay"), "showMilkyWay"));
   wrap.appendChild(checkboxRow(t("navigator.mountPosition"), "showMountPosition"));
   wrap.appendChild(checkboxRow(t("navigator.sensorFov"), "showSensorFov"));
+  wrap.appendChild(checkboxRow(t("navigator.sensorImage"), "showSensorImage"));
   wrap.appendChild(checkboxRow(t("navigator.dayMode"), "dayMode"));
 
   // Not a plain boolean engine field (it's the string "orthographic"/
@@ -342,6 +345,20 @@ function buildSkyDome(client, moduleName, onSelect) {
       // OnSucessSolve() has populated this since the earlier backend
       // work in this chantier, it just wasn't read here yet.
       if (img.issolved) engine.sensorOrientationDeg = img.solverorientation || 0;
+      // The captured JPEG itself, warped into the FOV frame (Gilles,
+      // 2026-10-01: "dans le cadre du capteur de la camera essaie de
+      // m'afficher l'image prise ... toujours en optionnel") - same
+      // urljpeg/urlthumbnail + cache-busting-query-param convention as
+      // js/imagelayer.js's own jpegSrc(), not reused directly since that
+      // one takes a property-element wrapper rather than the already-
+      // unwrapped `img` this handler already has. Gated on issolved, same
+      // as sensorOrientationDeg just above - the frame's own placement
+      // (and therefore where the image would land inside it) is only
+      // trustworthy once solved.
+      if (img.issolved) {
+        const path = img.urljpeg || img.urlthumbnail;
+        if (path) engine.setSensorImage(mediaUrl(getMediaBaseUrl(), path) + "?t=" + Date.now());
+      }
       engine.render();
     }
   });
