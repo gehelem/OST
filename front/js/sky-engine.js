@@ -1028,7 +1028,15 @@ export class SkyEngine {
       if (s.mag > starMagLimit) continue;
       const p = project(s.ra, s.dec);
       if (!p.visible) continue;
-      const r = magnitudeToRadius(s.mag) * Math.sqrt(this.zoom);
+      // Fixed screen-space size, magnitude only - no zoom scaling. Stars
+      // are unresolved point sources: zooming in spreads them apart, it
+      // doesn't make a real star's disk bigger. The old `* Math.sqrt(zoom)`
+      // factor was tuned back when ZOOM_MAX was 6 (sqrt(6)=~2.4, radius up
+      // to ~7.8px) and never revisited through the later 6->20->100->200
+      // bumps, so it quietly grew to ~45px at max zoom - Gilles, 2026-10-0X:
+      // "a fort zoom les ronds des etoiles sont beaucoup trop gros ...
+      // (ou) leur laisser une taille fixe, relative a leur magnitude".
+      const r = magnitudeToRadius(s.mag);
       ctx.beginPath();
       ctx.arc(p.x, p.y, r, 0, 2 * Math.PI);
       ctx.fill();
