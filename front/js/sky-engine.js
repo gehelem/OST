@@ -1085,6 +1085,29 @@ export class SkyEngine {
             for (let i = 1; i < corners.length; i++) ctx.lineTo(corners[i].x, corners[i].y);
             ctx.closePath();
             ctx.stroke();
+
+            // Small filled triangle at the middle of the top edge (corners[2]
+            // and [3] are sensorFovCorners()'s sy=+1/"imageUp" corners),
+            // tip pointing outward - a visible "this way up" marker for the
+            // solved image orientation, so its effect (and sign convention,
+            // still unverified - see sensorFovCorners()'s own doc comment)
+            // is readable at a glance instead of only inferable from the
+            // rectangle's own rotation.
+            const topMidX = (corners[2].x + corners[3].x) / 2;
+            const topMidY = (corners[2].y + corners[3].y) / 2;
+            let dx = topMidX - center.x, dy = topMidY - center.y;
+            const dlen = Math.hypot(dx, dy) || 1;
+            dx /= dlen; dy /= dlen;
+            const perpX = -dy, perpY = dx;
+            const TIP_LEN = 12, BASE_HALF = 6;
+            const tipX = topMidX + dx * TIP_LEN, tipY = topMidY + dy * TIP_LEN;
+            ctx.fillStyle = "#e53935";
+            ctx.beginPath();
+            ctx.moveTo(tipX, tipY);
+            ctx.lineTo(topMidX + perpX * BASE_HALF, topMidY + perpY * BASE_HALF);
+            ctx.lineTo(topMidX - perpX * BASE_HALF, topMidY - perpY * BASE_HALF);
+            ctx.closePath();
+            ctx.fill();
           }
         }
         if (this.showMountPosition) {
