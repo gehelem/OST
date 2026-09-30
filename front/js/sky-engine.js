@@ -29,7 +29,7 @@
 // everything else in this app, not a menu at the tap position.
 
 import { Body, Horizon, Equator } from "../lib/astronomy-engine.js";
-import { makeObserver, equatorialToHorizontal, equatorialHorizontalRotation, horizontalToEquatorial, horizontalToVector, vectorToHorizontal, vectorToScreen, screenToVector, magnitudeToRadius } from "./sky-projection.js";
+import { makeObserver, equatorialToHorizontal, equatorialHorizontalRotation, horizontalToEquatorial, horizontalToVector, vectorToHorizontal, vectorToScreen, screenToVector, magnitudeToRadius, starMagnitudeLimit } from "./sky-projection.js";
 import { identity, multiply, conjugate, rotateVector, fromTwoVectors } from "./quaternion.js";
 import { loadCatalog } from "./sky-catalog.js";
 
@@ -43,7 +43,13 @@ const CLICK_THRESHOLD_PX = 6;
 // rather than just recording the raw RA/Dec of the tap itself.
 const HIT_RADIUS_PX = 12;
 
-export const ZOOM_MIN = 0.5, ZOOM_MAX = 6;
+// ZOOM_MAX raised from 6 (Gilles, 2026-10-03: "le zoom max n'est pas
+// assez fin, augmente la limite") - purely a magnification ceiling by
+// this point (starMagnitudeLimit() below already reaches every star any
+// catalog here contains well before ZOOM_MIN*5=2.5), useful for precisely
+// judging position against nearby grid lines/objects (e.g. polar
+// alignment against the meridian) rather than revealing more stars.
+export const ZOOM_MIN = 0.5, ZOOM_MAX = 20;
 // How many points to sample around the true horizon circle when
 // showTrueHorizon is on — see render()'s own comment on why it's not just
 // the dome edge once panned.
@@ -930,12 +936,21 @@ export class SkyEngine {
       }
     }
 
-    // Stars. Day mode: only the handful bright enough to plausibly still
-    // show up against a lit sky (rough, not a real extinction model - see
-    // the dayMode comment above render()'s own fillRect).
+    // Stars. Day mode keeps its own fixed, stricter cutoff (only the
+    // handful bright enough to plausibly still show up against a lit sky -
+    // rough, not a real extinction model, see the dayMode comment above
+    // render()'s own fillRect); otherwise the limit tracks zoom (Gilles,
+    // 2026-10-03: "a niveau de zoom faible c'est tout a fait inutile
+    // d'afficher toutes les etoiles, ca fait un gros nuage de points
+    // illisible et ca ralentit l'affichage" - see starMagnitudeLimit()'s
+    // own doc comment). Checked BEFORE project() (the expensive part, one
+    // equatorial->horizontal rotation per star), not just before drawing -
+    // the whole point is to also skip the work, not only the pixels, once
+    // the "full" ~118k-star depth is loaded at a wide-open, dezoomed view.
+    const starMagLimit = this.dayMode ? 0 : starMagnitudeLimit(this.zoom, ZOOM_MIN);
     ctx.fillStyle = fg.star;
     for (const s of this.catalog.stars) {
-      if (this.dayMode && s.mag > 0) continue;
+      if (s.mag > starMagLimit) continue;
       const p = project(s.ra, s.dec);
       if (!p.visible) continue;
       const r = magnitudeToRadius(s.mag) * Math.sqrt(this.zoom);

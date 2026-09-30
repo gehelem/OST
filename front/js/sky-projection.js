@@ -178,6 +178,28 @@ export function magnitudeToRadius(mag) {
   return Math.max(0.4, Math.min(3.2, r));
 }
 
+/**
+ * The dimmest star magnitude worth drawing at a given zoom level - Gilles,
+ * 2026-10-03: "a niveau de zoom faible c'est tout a fait inutile
+ * d'afficher toutes les etoiles, ca fait un gros nuage de points
+ * illisible et ca ralentit l'affichage" (right after the "full" ~118k-star
+ * depth made that failure mode obvious for the first time - the two
+ * lighter depths were always small enough that it didn't matter). Matches
+ * astro2001's own dynamic-limit approach rather than a fixed cutoff
+ * independent of zoom (see notes/ASTRO2001_ANALYSE_COMPLETE.md: "Dezoom:
+ * magnitude limite ~3-4 / zoom normal: ~7-9 / zoom serre: +11") -
+ * logarithmic in zoom (each doubling reveals ~3 more magnitudes), clamped
+ * to a sane range: by about 5x `zoomMin` the limit already reaches every
+ * star any of this app's own catalogs contain (mag ~14), so zooming in
+ * further past that point is pure magnification, not "revealing more
+ * stars" - which is also the actual reason a deeper max zoom needed its
+ * own separate fix (ZOOM_MAX, sky-engine.js) rather than this alone.
+ */
+export function starMagnitudeLimit(zoom, zoomMin) {
+  const limit = 4 + 3 * Math.log2(zoom / zoomMin);
+  return Math.max(2, Math.min(14, limit));
+}
+
 /** Inverse of horizontalToVector. */
 export function vectorToHorizontal(v) {
   return { azimuth: Math.atan2(v.x, v.y) * 180 / Math.PI, altitude: Math.asin(Math.max(-1, Math.min(1, v.z))) * 180 / Math.PI };
