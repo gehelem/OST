@@ -1129,15 +1129,41 @@ export class SkyEngine {
       ctx.fill();
     }
 
-    // Messier objects: small open circles, distinct from stars.
+    // Messier objects: real angular size when the catalog has it (Gilles,
+    // 2026-10-01: "est-ce que tu as une taille et une orientation ? si oui
+    // essaie d'en tenir compte, la on a que des petits cercles tous de la
+    // meme taille") - sizeWDeg/sizeHDeg from sky-catalog.js's own
+    // parseMessierDim() (its doc comment covers why there's no real
+    // orientation to use: the catalog simply doesn't have one). Radii
+    // measured directly on screen - project() a small RA/Dec offset the
+    // same way as the object itself, rather than a fixed px-per-degree
+    // constant - so they stay correct at any zoom/projection, and the
+    // offset points' own screen-space direction (not just their distance)
+    // doubles as the ellipse's rotation, so it stays RA/Dec-axis-aligned
+    // (not screen-axis-aligned) even once the dome has been panned. Fine
+    // as a simple RA-offset/cos(dec) approximation (not full gnomonic) for
+    // objects this small - the largest, M31, is still only ~3 degrees.
+    // Falls back to the old fixed-size circle for the couple of entries
+    // with no `dim` data at all.
     if (this.showMessier) {
       ctx.strokeStyle = fg.messier;
       ctx.lineWidth = 1;
       for (const m of this.catalog.messier) {
         const p = project(m.ra, m.dec);
         if (!p.visible) continue;
+        let rx = 3.5, ry = 3.5, rotation = 0;
+        if (m.sizeWDeg > 0 && m.sizeHDeg > 0) {
+          const cosDec = Math.cos((m.dec * Math.PI) / 180) || 1;
+          const east = project(m.ra + (m.sizeWDeg / 2) / cosDec, m.dec);
+          const north = project(m.ra, m.dec + m.sizeHDeg / 2);
+          if (east.visible && north.visible) {
+            rx = Math.max(3, Math.hypot(east.x - p.x, east.y - p.y));
+            ry = Math.max(3, Math.hypot(north.x - p.x, north.y - p.y));
+            rotation = Math.atan2(east.y - p.y, east.x - p.x);
+          }
+        }
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 3.5, 0, 2 * Math.PI);
+        ctx.ellipse(p.x, p.y, rx, ry, rotation, 0, 2 * Math.PI);
         ctx.stroke();
       }
     }

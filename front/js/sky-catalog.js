@@ -87,6 +87,23 @@ function milkyWayFromGeoJson(geo) {
   return polygons;
 }
 
+// `dim` (arcmin) is either "WxH" (elongated objects) or a single value
+// (round ones, W=H) - checked directly against the actual file: only 2 of
+// 110 entries have no dim at all (empty string), and there is NO
+// orientation/position-angle field anywhere in this catalog (its only
+// properties are name/desig/alt/type/mag/dim/cl) - Gilles, 2026-10-01:
+// "est-ce que tu as une taille et une orientation ? si oui essaie d'en
+// tenir compte" - taille oui, orientation non. sky-engine.js draws the
+// resulting ellipse RA/Dec-axis-aligned for lack of a real PA (same
+// "unrotated until real data says otherwise" fallback as
+// sensorOrientationDeg elsewhere in this chantier).
+function parseMessierDim(dim) {
+  if (!dim) return { sizeWDeg: null, sizeHDeg: null };
+  const [wArcmin, hArcmin] = String(dim).split(/x/i).map(Number);
+  if (!(wArcmin > 0)) return { sizeWDeg: null, sizeHDeg: null };
+  return { sizeWDeg: wArcmin / 60, sizeHDeg: (hArcmin > 0 ? hArcmin : wArcmin) / 60 };
+}
+
 function messierFromGeoJson(geo) {
   return geo.features.map((f) => ({
     ra: f.geometry.coordinates[0],
@@ -96,6 +113,7 @@ function messierFromGeoJson(geo) {
     desig: f.properties.desig || "",
     type: f.properties.type || "",
     mag: f.properties.mag,
+    ...parseMessierDim(f.properties.dim),
   }));
 }
 
