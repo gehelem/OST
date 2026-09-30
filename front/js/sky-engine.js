@@ -49,13 +49,14 @@ function touchDistance(touches) {
   return Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
 }
 
-// ZOOM_MAX raised from 6 (Gilles, 2026-10-03: "le zoom max n'est pas
-// assez fin, augmente la limite") - purely a magnification ceiling by
-// this point (starMagnitudeLimit() below already reaches every star any
-// catalog here contains well before ZOOM_MIN*5=2.5), useful for precisely
-// judging position against nearby grid lines/objects (e.g. polar
-// alignment against the meridian) rather than revealing more stars.
-export const ZOOM_MIN = 0.5, ZOOM_MAX = 20;
+// ZOOM_MAX raised twice now (6 -> 20 -> 100, Gilles, 2026-10-03: "le zoom
+// max n'est pas assez fin, augmente la limite", then again the same day)
+// - purely a magnification ceiling by this point (starMagnitudeLimit()
+// below already reaches every star any catalog here contains well before
+// ZOOM_MIN*5=2.5), useful for precisely judging position against nearby
+// grid lines/objects (e.g. polar alignment against the meridian) rather
+// than revealing more stars.
+export const ZOOM_MIN = 0.5, ZOOM_MAX = 100;
 // How many points to sample around the true horizon circle when
 // showTrueHorizon is on — see render()'s own comment on why it's not just
 // the dome edge once panned.
