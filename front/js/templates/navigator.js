@@ -117,6 +117,7 @@ function saveDisplaySettings(engine) {
       showSensorFov: engine.showSensorFov,
       dayMode: engine.dayMode,
       zoom: engine.zoom,
+      rotation: engine.rotation, // pan/trackball state - a plain {w,x,y,z} quaternion, see js/quaternion.js
       projection: engine.projection,
       catalogDepth: engine.catalogDepth,
     }));
@@ -203,8 +204,11 @@ function buildSettingsPanel(engine) {
   // pinch-zoom) — same "one listener reflects every path" idea as
   // app.js's own panelvisibility listener for the quicknav buttons.
   engine.onZoomChange = () => { zoomSlider.value = String(engine.zoom); saveDisplaySettings(engine); };
+  // Gilles, 2026-10-01: "quand je fais F5 la position du planetarium n'est
+  // pas preservee" - see sky-engine.js's own onRotationChange doc comment.
+  engine.onRotationChange = () => saveDisplaySettings(engine);
 
-  wrap._dispose = () => { engine.onZoomChange = null; };
+  wrap._dispose = () => { engine.onZoomChange = null; engine.onRotationChange = null; };
   return wrap;
 }
 

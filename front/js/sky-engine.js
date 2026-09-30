@@ -447,6 +447,7 @@ export class SkyEngine {
     this.onNeedsRender = opts.onNeedsRender || null; // called after wheel-zoom/drag changes, so the caller can re-render immediately instead of waiting for its own timer
     this.onSelect = opts.onSelect || null; // called on a tap/click that isn't a drag - see _handlePointerUp()
     this.onZoomChange = opts.onZoomChange || null; // called after wheel-zoom specifically (not pan/drag) - e.g. to persist it, see templates/navigator.js
+    this.onRotationChange = opts.onRotationChange || null; // called once a pan/drag gesture ends and actually moved something - e.g. to persist it, see templates/navigator.js
     this.catalog = { stars: [], constellationLines: [], messier: [] };
     this._domeRadius = 1; // recomputed every render(), read by the drag/tap handlers to convert screen<->vector
     this._drag = null; // { grabVector (fixed-frame), rotationAtDragStart, startOffset, moved } while a gesture is in progress (mouse or touch)
@@ -546,6 +547,12 @@ export class SkyEngine {
     this._drag = null;
     this.canvas.classList.remove("dragging");
     if (!moved && this.onSelect) this._select(startOffset.x, startOffset.y);
+    // Once per gesture (not per mousemove, unlike onZoomChange which fires
+    // per wheel tick - a drag can fire hundreds of move events) - Gilles,
+    // 2026-10-01: "quand je fais F5 la position du planetarium n'est pas
+    // preservee" (this.rotation, the pan/trackball state - zoom itself was
+    // already fixed separately, see onZoomChange's own doc comment).
+    if (moved && this.onRotationChange) this.onRotationChange();
   }
 
   _onMouseDown(ev) { if (ev.button === 0) { this._handlePointerDown(ev.clientX, ev.clientY); ev.preventDefault(); } }
