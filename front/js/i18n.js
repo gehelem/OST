@@ -149,6 +149,7 @@ const STRINGS = {
   "navigator.meridian": { en: "Meridian", fr: "Méridien", de: "Meridian", it: "Meridiano", es: "Meridiano" },
   "navigator.mountPosition": { en: "Telescope position", fr: "Position du télescope", de: "Teleskopposition", it: "Posizione del telescopio", es: "Posición del telescopio" },
   "navigator.sensorFov": { en: "Sensor field of view", fr: "Champ du capteur", de: "Sensor-Gesichtsfeld", it: "Campo del sensore", es: "Campo del sensor" },
+  "navigator.milkyWay": { en: "Milky Way", fr: "Voie lactée", de: "Milchstraße", it: "Via Lattea", es: "Vía Láctea" },
   "navigator.dayMode": { en: "Day mode", fr: "Mode jour", de: "Tagmodus", it: "Modalità giorno", es: "Modo día" },
   "navigator.stereographic": { en: "Stereographic projection", fr: "Projection stéréographique", de: "Stereografische Projektion", it: "Proiezione stereografica", es: "Proyección estereográfica" },
   "navigator.catalogDepth": { en: "Star catalog", fr: "Catalogue d'étoiles", de: "Sternkatalog", it: "Catalogo stellare", es: "Catálogo de estrellas" },

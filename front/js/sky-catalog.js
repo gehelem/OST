@@ -1,5 +1,6 @@
 // sky-catalog.js — loads the sky-dome's own client-side catalog (stars,
-// constellation lines, Messier objects), independent of the server's own
+// constellation lines, Messier objects, Milky Way outline), independent
+// of the server's own
 // search/results catalog — see notes/NOTES-frontend-ostcore-planetarium.md
 // ("la carte a son propre catalogue client"). Data files are GeoJSON
 // (RA/Dec in degrees) — see celestial-data/README.md for exactly where
@@ -67,6 +68,25 @@ function constellationLinesFromGeoJson(geo) {
   return segments;
 }
 
+// MultiPolygon per feature (5 features) -> flat list of polygons, each a
+// list of rings (ring[0] = its outer boundary, ring[1..] = holes, e.g. the
+// Coalsack), each ring a list of {ra,dec} points. Kept grouped by polygon
+// (not flattened further, unlike constellationLinesFromGeoJson()'s plain
+// segment list) - Gilles, 2026-10-01: "tu peux griser legerement
+// l'interieur de ces contours" needs the outer/hole grouping intact so
+// sky-engine.js can fill each polygon with its own holes correctly
+// (evenodd fill rule over every ring in the SAME path), rather than
+// filling every ring independently and papering over the holes.
+function milkyWayFromGeoJson(geo) {
+  const polygons = [];
+  for (const f of geo.features) {
+    for (const polygon of f.geometry.coordinates) {
+      polygons.push(polygon.map((ring) => ring.map(([ra, dec]) => ({ ra, dec }))));
+    }
+  }
+  return polygons;
+}
+
 function messierFromGeoJson(geo) {
   return geo.features.map((f) => ({
     ra: f.geometry.coordinates[0],
@@ -81,18 +101,19 @@ function messierFromGeoJson(geo) {
 
 /**
  * Loads the catalog: stars (depth: "light"|"deep"), constellation lines,
- * Messier objects. Returns {stars, constellationLines, messier}. Any one
- * catalog failing to load doesn't block the others (each caught
- * independently) - a partial sky (e.g. stars but no constellation lines)
- * is still useful, not a hard failure.
+ * Messier objects, Milky Way outline. Returns {stars, constellationLines,
+ * messier, milkyWay}. Any one catalog failing to load doesn't block the
+ * others (each caught independently) - a partial sky (e.g. stars but no
+ * constellation lines) is still useful, not a hard failure.
  */
 export async function loadCatalog(depth) {
   const starFile = (STAR_DEPTHS[depth] || STAR_DEPTHS.light).file;
   const properNames = await fetchJson("star-proper-names.json").catch((e) => { console.error(e); return {}; });
-  const [stars, constellationLines, messier] = await Promise.all([
+  const [stars, constellationLines, messier, milkyWay] = await Promise.all([
     fetchJson(starFile).then((geo) => starsFromGeoJson(geo, properNames)).catch((e) => { console.error(e); return []; }),
     fetchJson("constellations.lines.json").then(constellationLinesFromGeoJson).catch((e) => { console.error(e); return []; }),
     fetchJson("messier.json").then(messierFromGeoJson).catch((e) => { console.error(e); return []; }),
+    fetchJson("mw.json").then(milkyWayFromGeoJson).catch((e) => { console.error(e); return []; }),
   ]);
-  return { stars, constellationLines, messier };
+  return { stars, constellationLines, messier, milkyWay };
 }

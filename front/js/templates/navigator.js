@@ -113,6 +113,7 @@ function saveDisplaySettings(engine) {
       showEquatorialGrid: engine.showEquatorialGrid,
       showAzimuthalGrid: engine.showAzimuthalGrid,
       showMeridian: engine.showMeridian,
+      showMilkyWay: engine.showMilkyWay,
       showMountPosition: engine.showMountPosition,
       showSensorFov: engine.showSensorFov,
       dayMode: engine.dayMode,
@@ -156,6 +157,7 @@ function buildSettingsPanel(engine) {
   wrap.appendChild(checkboxRow(t("navigator.equatorialGrid"), "showEquatorialGrid"));
   wrap.appendChild(checkboxRow(t("navigator.azimuthalGrid"), "showAzimuthalGrid"));
   wrap.appendChild(checkboxRow(t("navigator.meridian"), "showMeridian"));
+  wrap.appendChild(checkboxRow(t("navigator.milkyWay"), "showMilkyWay"));
   wrap.appendChild(checkboxRow(t("navigator.mountPosition"), "showMountPosition"));
   wrap.appendChild(checkboxRow(t("navigator.sensorFov"), "showSensorFov"));
   wrap.appendChild(checkboxRow(t("navigator.dayMode"), "dayMode"));

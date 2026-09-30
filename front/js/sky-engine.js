@@ -375,6 +375,11 @@ export class SkyEngine {
     // draw as part of the full azimuthal grid's own az=0 special case,
     // with no way to show just it on its own.
     this.showMeridian = false;
+    // Gilles, 2026-10-01: "ajoute son affichage en optionnel dans les
+    // settings du module" - a reference/decorative overlay like the grids
+    // above, not core telescope-control info, so it defaults off like them
+    // rather than on like showConstellations/showCardinals/showMessier.
+    this.showMilkyWay = false;
     // Gilles, 2026-10-03: "affiche la position du telescope (repere
     // orange) et le champ du capteur (cadre rouge)". Both default to
     // shown, unlike the reference overlays above (grids/horizon) - this
@@ -448,7 +453,7 @@ export class SkyEngine {
     this.onSelect = opts.onSelect || null; // called on a tap/click that isn't a drag - see _handlePointerUp()
     this.onZoomChange = opts.onZoomChange || null; // called after wheel-zoom specifically (not pan/drag) - e.g. to persist it, see templates/navigator.js
     this.onRotationChange = opts.onRotationChange || null; // called once a pan/drag gesture ends and actually moved something - e.g. to persist it, see templates/navigator.js
-    this.catalog = { stars: [], constellationLines: [], messier: [] };
+    this.catalog = { stars: [], constellationLines: [], messier: [], milkyWay: [] };
     this._domeRadius = 1; // recomputed every render(), read by the drag/tap handlers to convert screen<->vector
     this._drag = null; // { grabVector (fixed-frame), rotationAtDragStart, startOffset, moved } while a gesture is in progress (mouse or touch)
     this._pinch = null; // { startDist (px), startZoom } while a two-finger pinch-to-zoom is in progress - see _onTouchStart()
@@ -681,8 +686,8 @@ export class SkyEngine {
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, w, h);
     const fg = isLightBg
-      ? { dome: "rgba(0,0,0,0.28)", cardinal: "rgba(0,0,0,0.6)", constellation: "rgba(40,80,140,0.45)", star: "#15181c", messier: "rgba(27,94,32,0.85)", horizon: "rgba(180,110,0,0.65)", equator: "rgba(0,121,107,0.6)", azimuthal: "rgba(123,31,162,0.6)", meridian: "rgba(13,71,161,0.95)", grad: "rgba(0,0,0,0.55)", ground: "#cdbb95" }
-      : { dome: "rgba(255,255,255,0.25)", cardinal: "rgba(255,255,255,0.55)", constellation: "rgba(100,160,220,0.35)", star: "#fff", messier: "rgba(129,199,132,0.85)", horizon: "rgba(255,193,7,0.55)", equator: "rgba(77,208,225,0.6)", azimuthal: "rgba(206,147,216,0.6)", meridian: "rgba(41,121,255,0.95)", grad: "rgba(255,255,255,0.75)", ground: "#241b12" };
+      ? { dome: "rgba(0,0,0,0.28)", cardinal: "rgba(0,0,0,0.6)", constellation: "rgba(40,80,140,0.45)", star: "#15181c", messier: "rgba(27,94,32,0.85)", horizon: "rgba(180,110,0,0.65)", equator: "rgba(0,121,107,0.6)", azimuthal: "rgba(123,31,162,0.6)", meridian: "rgba(13,71,161,0.95)", milkyway: "rgba(60,80,110,0.35)", milkywayFill: "rgba(70,75,85,0.10)", grad: "rgba(0,0,0,0.55)", ground: "#cdbb95" }
+      : { dome: "rgba(255,255,255,0.25)", cardinal: "rgba(255,255,255,0.55)", constellation: "rgba(100,160,220,0.35)", star: "#fff", messier: "rgba(129,199,132,0.85)", horizon: "rgba(255,193,7,0.55)", equator: "rgba(77,208,225,0.6)", azimuthal: "rgba(206,147,216,0.6)", meridian: "rgba(41,121,255,0.95)", milkyway: "rgba(200,215,235,0.18)", milkywayFill: "rgba(200,205,215,0.08)", grad: "rgba(255,255,255,0.75)", ground: "#241b12" };
 
     const cx = w / 2, cy = h / 2;
     const domeRadius = Math.min(w, h) / 2 * 0.96 * this.zoom;
@@ -1001,6 +1006,47 @@ export class SkyEngine {
       for (const [az, label] of [[0, "N"], [90, "E"], [180, "S"], [270, "O"]]) {
         const p = toScreen(horizontalToVector(az, 0));
         if (p.visible) ctx.fillText(label, p.x, p.y);
+      }
+    }
+
+    // Milky Way outline (Gilles, 2026-10-01: "ajoute son affichage en
+    // optionnel dans les settings du module", then "tu peux griser
+    // legerement l'interieur de ces contours") - contour stroked plus a
+    // light fill, one path per polygon covering every one of its rings
+    // (sky-catalog.js's own milkyWayFromGeoJson doc comment - ring[0] is
+    // the outer boundary, the rest are holes e.g. the Coalsack) filled
+    // with the "evenodd" rule so holes actually read as holes regardless
+    // of the source data's own ring winding direction. Drawn before
+    // constellations/stars, as the diffuse background band it represents.
+    // Each contiguous run of visible points gets its own moveTo/closePath
+    // (not one lineTo'd straight across a gap), same reasoning as the
+    // ground mask - otherwise a ring dipping behind the viewer would draw
+    // a stray line/wedge clear across the dome instead of just clipping;
+    // closePath() per run also matters here (unlike a plain stroke-only
+    // contour) since fill() only implicitly closes the LAST subpath, not
+    // every one drawn before it.
+    if (this.showMilkyWay) {
+      ctx.strokeStyle = fg.milkyway;
+      ctx.fillStyle = fg.milkywayFill;
+      ctx.lineWidth = 1;
+      for (const polygon of this.catalog.milkyWay) {
+        ctx.beginPath();
+        for (const ring of polygon) {
+          let started = false;
+          for (const pt of ring) {
+            const p = project(pt.ra, pt.dec);
+            if (!p.visible) {
+              if (started) ctx.closePath();
+              started = false;
+              continue;
+            }
+            if (started) ctx.lineTo(p.x, p.y);
+            else { ctx.moveTo(p.x, p.y); started = true; }
+          }
+          if (started) ctx.closePath();
+        }
+        ctx.fill("evenodd");
+        ctx.stroke();
       }
     }
 
