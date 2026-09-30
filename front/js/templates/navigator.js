@@ -329,6 +329,13 @@ function buildSkyDome(client, moduleName, onSelect) {
     if (sampling > 0 && img.width > 0 && img.height > 0) {
       engine.sensorFovWidthDeg = (img.width * sampling) / 3600;
       engine.sensorFovHeightDeg = (img.height * sampling) / 3600;
+      // Only meaningful once a plate solve has actually succeeded (see
+      // ImgData::solverOrientation's own doc comment in common.h) -
+      // Gilles, 2026-10-0X: "on ne tient pas compte de l'orientation
+      // (pourtant je te l'ai demande)" - navigator.cpp's own
+      // OnSucessSolve() has populated this since the earlier backend
+      // work in this chantier, it just wasn't read here yet.
+      if (img.issolved) engine.sensorOrientationDeg = img.solverorientation || 0;
       engine.render();
     }
   });

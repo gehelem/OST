@@ -95,6 +95,85 @@ export function equatorialOfDateToHorizontal(raDeg, decDeg, observer, date) {
   return { azimuth: sphere.lon, altitude: sphere.lat };
 }
 
+// Tiny local vec3 helpers for sensorFovCorners() below - not exported,
+// this file already has plenty of its own vector conventions (unit
+// vectors from horizontalToVector, quaternions in js/quaternion.js) and
+// doesn't need a fourth.
+function v3sub(a, b) { return { x: a.x - b.x, y: a.y - b.y, z: a.z - b.z }; }
+function v3add(a, b) { return { x: a.x + b.x, y: a.y + b.y, z: a.z + b.z }; }
+function v3scale(a, s) { return { x: a.x * s, y: a.y * s, z: a.z * s }; }
+function v3dot(a, b) { return a.x * b.x + a.y * b.y + a.z * b.z; }
+function v3cross(a, b) { return { x: a.y * b.z - a.z * b.y, y: a.z * b.x - a.x * b.z, z: a.x * b.y - a.y * b.x }; }
+function v3norm(a) { const m = Math.hypot(a.x, a.y, a.z) || 1; return { x: a.x / m, y: a.y / m, z: a.z / m }; }
+const FOV_TANGENT_EPS_DEG = 1e-4;
+
+/**
+ * The 4 corners of a camera sensor's field of view, as {azimuth, altitude}
+ * (degrees, ready for horizontalToVector()+toScreen()) - a genuine
+ * gnomonic (tangent-plane/rectilinear) rectangle around the pointing
+ * direction (raDeg/decDeg, OF DATE - see equatorialOfDateToHorizontal()'s
+ * own doc comment), rotated by `orientationDeg` (StellarSolver's own
+ * Solution::orientation, "the orientation angle of the image from North
+ * in degrees" - applied here as the standard astrometric convention,
+ * rotating from North through East; not independently verified against a
+ * real solved frame in this environment, check against one once
+ * available and flip the sign below if a real frame comes out mirrored).
+ *
+ * Deliberately NOT built from RA/Dec coordinate offsets (a "RA ±
+ * dRA/cos(dec), Dec ± dDec" box, this function's own earlier version) -
+ * Gilles, 2026-10-0X: "proche des poles elle suit les axes et se
+ * transforme peu a peu en parallelogramme a mesure qu'on s'approche : ca
+ * devrait rester un rectangle de dimensions fixes". A coordinate-offset
+ * box is only a flat-sky approximation of what a real sensor images
+ * (valid far from the pole, where RA/Dec locally looks flat, increasingly
+ * wrong as RA lines converge toward a pole); a real sensor images a
+ * genuine gnomonic projection of the sky. This instead builds an
+ * orthonormal tangent-plane basis (toward celestial North, and
+ * perpendicular to it/East) at the pointing direction itself, derived
+ * NUMERICALLY from VectorFromSphere (rather than a hand-derived formula
+ * for what "North"/"East" mean in whatever x/y/z convention it happens to
+ * use internally) so it stays correct and self-consistent everywhere
+ * except the exact pole itself - an inherent singularity, position angle
+ * is itself undefined there, exactly like azimuth is undefined at the
+ * zenith (and just as irrelevant in practice: no telescope points at the
+ * pole to the arcsecond).
+ */
+export function sensorFovCorners(raDeg, decDeg, fovWidthDeg, fovHeightDeg, orientationDeg, observer, date) {
+  const center = VectorFromSphere(new Spherical(decDeg, raDeg, 1), date);
+  // Centered difference (samples on both sides of center, not just one) -
+  // halves the truncation error of the tangent-direction estimate versus
+  // a forward difference, for the same epsilon and no extra cost.
+  const eastPlus = VectorFromSphere(new Spherical(decDeg, raDeg + FOV_TANGENT_EPS_DEG, 1), date);
+  const eastMinus = VectorFromSphere(new Spherical(decDeg, raDeg - FOV_TANGENT_EPS_DEG, 1), date);
+  const northPlus = VectorFromSphere(new Spherical(Math.min(89.999, decDeg + FOV_TANGENT_EPS_DEG), raDeg, 1), date);
+  const northMinus = VectorFromSphere(new Spherical(Math.max(-89.999, decDeg - FOV_TANGENT_EPS_DEG), raDeg, 1), date);
+  const eastDiff = v3sub(eastPlus, eastMinus);
+  const northDiff = v3sub(northPlus, northMinus);
+  const east = v3norm(v3sub(eastDiff, v3scale(center, v3dot(eastDiff, center))));
+  const north = v3norm(v3sub(northDiff, v3scale(center, v3dot(northDiff, center))));
+
+  const theta = ((orientationDeg || 0) * Math.PI) / 180;
+  const cosT = Math.cos(theta), sinT = Math.sin(theta);
+  // Rodrigues' rotation formula around `center` (already a unit vector).
+  function rotateAroundCenter(v) {
+    const kCrossV = v3cross(center, v);
+    const kDotV = v3dot(center, v);
+    return v3add(v3add(v3scale(v, cosT), v3scale(kCrossV, sinT)), v3scale(center, kDotV * (1 - cosT)));
+  }
+  const imageUp = rotateAroundCenter(north);
+  const imageRight = rotateAroundCenter(east);
+
+  const tanW = Math.tan(((fovWidthDeg / 2) * Math.PI) / 180);
+  const tanH = Math.tan(((fovHeightDeg / 2) * Math.PI) / 180);
+  return [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([sx, sy]) => {
+    const offset = v3add(v3scale(imageRight, tanW * sx), v3scale(imageUp, tanH * sy));
+    const cornerVec = v3norm(v3add(center, offset));
+    const horVec = RotateVector(Rotation_EQD_HOR(date, observer), cornerVec);
+    const sphere = HorizonFromVector(horVec, "normal");
+    return { azimuth: sphere.lon, altitude: sphere.lat };
+  });
+}
+
 /**
  * Horizontal coordinates -> unit vector {x,y,z}, in the SAME frame the
  * screen-space formulas below assume (z=up/zenith, and vectorToScreen's

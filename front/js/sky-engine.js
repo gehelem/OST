@@ -29,7 +29,7 @@
 // everything else in this app, not a menu at the tap position.
 
 import { Body, Horizon, Equator } from "../lib/astronomy-engine.js";
-import { makeObserver, equatorialToHorizontal, equatorialOfDateToHorizontal, equatorialHorizontalRotation, horizontalToEquatorial, horizontalToVector, vectorToHorizontal, vectorToScreen, screenToVector, magnitudeToRadius, starMagnitudeLimit } from "./sky-projection.js";
+import { makeObserver, equatorialToHorizontal, equatorialOfDateToHorizontal, equatorialHorizontalRotation, horizontalToEquatorial, horizontalToVector, vectorToHorizontal, vectorToScreen, screenToVector, magnitudeToRadius, starMagnitudeLimit, sensorFovCorners } from "./sky-projection.js";
 import { identity, multiply, conjugate, rotateVector, fromTwoVectors } from "./quaternion.js";
 import { loadCatalog } from "./sky-catalog.js";
 
@@ -399,6 +399,16 @@ export class SkyEngine {
     this.mountDecDeg = null;
     this.sensorFovWidthDeg = null;
     this.sensorFovHeightDeg = null;
+    // StellarSolver's own Solution::orientation ("angle of the image from
+    // North", degrees) from the last successful plate solve
+    // (image.solverorientation, only meaningful when image.issolved) -
+    // Gilles, 2026-10-0X: "on ne tient pas compte de l'orientation
+    // (pourtant je te l'ai demande)" - the backend work exposing it was
+    // already done earlier in this chantier, just never actually read
+    // here. 0 (unrotated, North-up) until a solve has happened - see
+    // sensorFovCorners()'s own doc comment for the rotation convention
+    // and its one unverified assumption (the sign).
+    this.sensorOrientationDeg = 0;
     this.dayMode = false;
     // "orthographic" (default) or "stereographic" - see sky-projection.js's
     // own vectorToScreen()/screenToVector() doc comment for the actual
@@ -1054,23 +1064,19 @@ export class SkyEngine {
       const center = mountProject(this.mountRaDeg, this.mountDecDeg);
       if (center.visible) {
         if (this.showSensorFov && this.sensorFovWidthDeg > 0 && this.sensorFovHeightDeg > 0) {
-          // Flat tangent-plane approximation (a simple RA/Dec offset box,
-          // RA corrected by cos(dec) so it reads as a rectangle rather
-          // than visibly narrower at the top) - camera rotator angle
-          // isn't available live yet (see this chantier's own note on
-          // "l'orientation de la camera, pas encore implementee"), so
-          // North-up/East-left is the only sensible default orientation;
-          // negligible error at any FOV small enough that this
-          // approximation matters for (a few degrees at most - true for
-          // every amateur imaging setup this app targets).
-          const halfW = this.sensorFovWidthDeg / 2 / Math.cos((this.mountDecDeg * Math.PI) / 180);
-          const halfH = this.sensorFovHeightDeg / 2;
-          const corners = [
-            mountProject(this.mountRaDeg - halfW, this.mountDecDeg - halfH),
-            mountProject(this.mountRaDeg + halfW, this.mountDecDeg - halfH),
-            mountProject(this.mountRaDeg + halfW, this.mountDecDeg + halfH),
-            mountProject(this.mountRaDeg - halfW, this.mountDecDeg + halfH),
-          ];
+          // Genuine gnomonic (tangent-plane/rectilinear) rectangle, plus
+          // the last plate solve's own orientation - see
+          // sensorFovCorners()'s own doc comment for why (Gilles,
+          // 2026-10-0X, after an earlier RA/Dec-coordinate-offset version
+          // both ignored orientation and visibly turned into a
+          // parallelogram near a pole: "1- on ne tient pas compte de
+          // l'orientation ... 2- proche des poles elle suit les axes et
+          // se transforme peu a peu en parallelogramme").
+          const corners = sensorFovCorners(
+            this.mountRaDeg, this.mountDecDeg,
+            this.sensorFovWidthDeg, this.sensorFovHeightDeg,
+            this.sensorOrientationDeg, this.observer, date,
+          ).map((h) => toScreen(horizontalToVector(h.azimuth, h.altitude)));
           if (corners.every((c) => c.visible)) {
             ctx.strokeStyle = "#e53935";
             ctx.lineWidth = 1.5;
