@@ -28,8 +28,8 @@
 // shows the selection as a regular panel with action buttons, same as
 // everything else in this app, not a menu at the tap position.
 
-import { Body, Horizon, Equator } from "../lib/astronomy-engine.js";
-import { makeObserver, equatorialToHorizontal, equatorialOfDateToHorizontal, equatorialHorizontalRotation, horizontalToEquatorial, horizontalToVector, vectorToHorizontal, vectorToScreen, screenToVector, magnitudeToRadius, starMagnitudeLimit, sensorFovCorners } from "./sky-projection.js";
+import { Body, Horizon, Equator, Illumination } from "../lib/astronomy-engine.js";
+import { makeObserver, equatorialToHorizontal, equatorialOfDateToHorizontal, equatorialHorizontalRotation, horizontalToEquatorial, horizontalToVector, vectorToHorizontal, vectorToScreen, screenToVector, magnitudeToRadius, starMagnitudeLimit, sensorFovCorners, eclipticToEquatorial } from "./sky-projection.js";
 import { identity, multiply, conjugate, rotateVector, fromTwoVectors } from "./quaternion.js";
 import { loadCatalog } from "./sky-catalog.js";
 
@@ -333,15 +333,30 @@ function computeSkyPolygon(domeRadius, rotation, projection) {
   return points;
 }
 
+// No more per-body fixed `radius` (Gilles, 2026-10-01: "adapte la taille
+// des planetes") - see the render() loop below for how each one is now
+// sized live instead: Sun/Moon by their own real angular diameter (they
+// have an actual visible disk), the five naked-eye planets by their
+// current real apparent magnitude (Illumination(), same magnitudeToRadius()
+// scale as stars) - a small, faint Mercury and a blazing Venus no longer
+// draw as the same fixed dot regardless of how bright either actually is
+// right now.
 const PLANETS = [
-  { body: Body.Sun, color: "#ffd54f", radius: 5, label: "Sun" },
-  { body: Body.Moon, color: "#e0e0e0", radius: 4.5, label: "Moon" },
-  { body: Body.Mercury, color: "#b0bec5", radius: 2, label: "Mercury" },
-  { body: Body.Venus, color: "#fff59d", radius: 2.5, label: "Venus" },
-  { body: Body.Mars, color: "#ef5350", radius: 2, label: "Mars" },
-  { body: Body.Jupiter, color: "#ffcc80", radius: 3, label: "Jupiter" },
-  { body: Body.Saturn, color: "#fff9c4", radius: 2.5, label: "Saturn" },
+  { body: Body.Sun, color: "#ffd54f", label: "Sun" },
+  { body: Body.Moon, color: "#e0e0e0", label: "Moon" },
+  { body: Body.Mercury, color: "#b0bec5", label: "Mercury" },
+  { body: Body.Venus, color: "#fff59d", label: "Venus" },
+  { body: Body.Mars, color: "#ef5350", label: "Mars" },
+  { body: Body.Jupiter, color: "#ffcc80", label: "Jupiter" },
+  { body: Body.Saturn, color: "#fff9c4", label: "Saturn" },
 ];
+// Physical radii (km) for the two bodies large enough to have a real
+// visible disk at this app's scale - every other body here is small
+// enough (even Venus, at most ~1 arcminute) that only its brightness
+// (magnitude), not its disk, is worth drawing.
+const SUN_RADIUS_KM = 696000;
+const MOON_RADIUS_KM = 1737.4;
+const AU_KM = 149597870.7;
 
 export class SkyEngine {
   /**
@@ -380,6 +395,9 @@ export class SkyEngine {
     // above, not core telescope-control info, so it defaults off like them
     // rather than on like showConstellations/showCardinals/showMessier.
     this.showMilkyWay = false;
+    // Gilles, 2026-10-01: "ajoute le trait de l'ecliptique en option" -
+    // same default-off reference-overlay treatment.
+    this.showEcliptic = false;
     // Gilles, 2026-10-03: "affiche la position du telescope (repere
     // orange) et le champ du capteur (cadre rouge)". Both default to
     // shown, unlike the reference overlays above (grids/horizon) - this
@@ -720,8 +738,8 @@ export class SkyEngine {
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, w, h);
     const fg = isLightBg
-      ? { dome: "rgba(0,0,0,0.28)", cardinal: "rgba(0,0,0,0.6)", constellation: "rgba(40,80,140,0.45)", star: "#15181c", messier: "rgba(27,94,32,0.85)", horizon: "rgba(180,110,0,0.65)", equator: "rgba(0,121,107,0.6)", azimuthal: "rgba(123,31,162,0.6)", meridian: "rgba(13,71,161,0.95)", milkyway: "rgba(60,80,110,0.35)", milkywayFill: "rgba(70,75,85,0.10)", grad: "rgba(0,0,0,0.55)", ground: "#cdbb95" }
-      : { dome: "rgba(255,255,255,0.25)", cardinal: "rgba(255,255,255,0.55)", constellation: "rgba(100,160,220,0.35)", star: "#fff", messier: "rgba(129,199,132,0.85)", horizon: "rgba(255,193,7,0.55)", equator: "rgba(77,208,225,0.6)", azimuthal: "rgba(206,147,216,0.6)", meridian: "rgba(41,121,255,0.95)", milkyway: "rgba(200,215,235,0.18)", milkywayFill: "rgba(200,205,215,0.08)", grad: "rgba(255,255,255,0.75)", ground: "#241b12" };
+      ? { dome: "rgba(0,0,0,0.28)", cardinal: "rgba(0,0,0,0.6)", constellation: "rgba(40,80,140,0.45)", star: "#15181c", messier: "rgba(27,94,32,0.85)", horizon: "rgba(180,110,0,0.65)", equator: "rgba(0,121,107,0.6)", azimuthal: "rgba(123,31,162,0.6)", meridian: "rgba(13,71,161,0.95)", milkyway: "rgba(60,80,110,0.35)", milkywayFill: "rgba(70,75,85,0.10)", ecliptic: "rgba(230,140,20,0.75)", grad: "rgba(0,0,0,0.55)", ground: "#cdbb95" }
+      : { dome: "rgba(255,255,255,0.25)", cardinal: "rgba(255,255,255,0.55)", constellation: "rgba(100,160,220,0.35)", star: "#fff", messier: "rgba(129,199,132,0.85)", horizon: "rgba(255,193,7,0.55)", equator: "rgba(77,208,225,0.6)", azimuthal: "rgba(206,147,216,0.6)", meridian: "rgba(41,121,255,0.95)", milkyway: "rgba(200,215,235,0.18)", milkywayFill: "rgba(200,205,215,0.08)", ecliptic: "rgba(255,183,77,0.85)", grad: "rgba(255,255,255,0.75)", ground: "#241b12" };
 
     const cx = w / 2, cy = h / 2;
     const domeRadius = Math.min(w, h) / 2 * 0.96 * this.zoom;
@@ -959,6 +977,30 @@ export class SkyEngine {
       for (let i = 0; i <= ARC_SAMPLES; i++) northPts.push(toScreen(horizontalToVector(0, (90 * i) / ARC_SAMPLES)));
       const northAnchor = pickOrderedLabelAnchor(northPts.slice(0, -1), w, h, labelMargin);
       if (northAnchor) labelCandidates.push({ anchor: northAnchor, text: fmtDegLabel(0), major: true });
+    }
+
+    // Ecliptic: the Sun's own apparent yearly path, a single fixed great
+    // circle (eclipticToEquatorial()'s own doc comment - date-independent,
+    // fed through the regular J2000 project() pipeline like any other
+    // static reference line) - Gilles, 2026-10-01: "ajoute le trait de
+    // l'ecliptique en option". Dashed, same visual weight as
+    // showTrueHorizon's own line above, not the grids' major/minor
+    // thickness convention (this is one single reference circle, not a
+    // graduated grid - no per-line labels either, for the same reason).
+    if (this.showEcliptic) {
+      ctx.strokeStyle = fg.ecliptic;
+      ctx.lineWidth = 1.3;
+      ctx.setLineDash([6, 4]);
+      ctx.beginPath();
+      let started = false;
+      for (let i = 0; i <= ARC_SAMPLES; i++) {
+        const { ra, dec } = eclipticToEquatorial((360 * i) / ARC_SAMPLES);
+        const p = project(ra, dec);
+        if (!p.visible) { started = false; continue; }
+        if (!started) { ctx.moveTo(p.x, p.y); started = true; } else { ctx.lineTo(p.x, p.y); }
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
     }
 
     // Azimuthal grid: vertical circles through the zenith (constant
@@ -1296,11 +1338,40 @@ export class SkyEngine {
       const h = Horizon(date, this.observer, equ.ra, equ.dec, "normal");
       const scr = toScreen(horizontalToVector(h.azimuth, h.altitude));
       if (!scr.visible) continue;
+      const illum = Illumination(p.body, date);
+      let radiusPx;
+      if (p.body === Body.Sun || p.body === Body.Moon) {
+        // Real angular diameter (varies with actual Earth-Sun/Earth-Moon
+        // distance - a genuine "supermoon" is visibly bigger here too, not
+        // just brighter) - measured directly on screen (offset the
+        // altitude by half the angular diameter and project it, same
+        // "offset + project()" technique as the Messier ellipses' own
+        // radii) rather than a fixed px-per-degree constant, so it stays
+        // correct at any zoom/projection. Floored at 5px (bigger than
+        // magnitudeToRadius()'s own 3.2px ceiling for stars/planets, so
+        // the Sun/Moon read as clearly bigger than anything else even
+        // dezoomed) - the REAL angular size only exceeds that floor once
+        // zoomed in a fair amount (whole-dome view: ~0.5deg is only ~1-2px
+        // no matter how the Earth-Moon distance varies), which is also
+        // exactly the regime where seeing it actually vary starts to
+        // matter (e.g. examining the Moon up close).
+        const radiusKm = p.body === Body.Sun ? SUN_RADIUS_KM : MOON_RADIUS_KM;
+        const angularDiameterDeg = (2 * Math.atan(radiusKm / (illum.geo_dist * AU_KM)) * 180) / Math.PI;
+        const edge = toScreen(horizontalToVector(h.azimuth, h.altitude + angularDiameterDeg / 2));
+        radiusPx = edge.visible ? Math.max(5, Math.hypot(edge.x - scr.x, edge.y - scr.y)) : magnitudeToRadius(illum.mag);
+      } else {
+        // The five naked-eye planets: real angular size (at most ~1
+        // arcminute for Venus) is too small to matter at this scale - only
+        // brightness does, and it genuinely varies a lot (e.g. Venus
+        // ranges roughly mag -4.9 to -3.8). Same star scale (magnitudeToRadius)
+        // so a dim Mars/Mercury doesn't outsize a bright Venus/Jupiter.
+        radiusPx = magnitudeToRadius(illum.mag);
+      }
       ctx.fillStyle = p.color;
       ctx.beginPath();
-      ctx.arc(scr.x, scr.y, p.radius, 0, 2 * Math.PI);
+      ctx.arc(scr.x, scr.y, radiusPx, 0, 2 * Math.PI);
       ctx.fill();
-      ctx.fillText(p.label, scr.x + p.radius + 3 * labelScale, scr.y);
+      ctx.fillText(p.label, scr.x + radiusPx + 3 * labelScale, scr.y);
     }
 
     if (groundClipActive) ctx.restore(); // matches the ctx.save() in the ground-mask block above

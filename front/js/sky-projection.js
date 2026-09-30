@@ -23,7 +23,7 @@
 import {
   Observer, Spherical, VectorFromSphere, RotateVector,
   HorizonFromVector, VectorFromHorizon, EquatorFromVector,
-  Rotation_EQJ_HOR, Rotation_HOR_EQJ, Rotation_EQD_HOR,
+  Rotation_EQJ_HOR, Rotation_HOR_EQJ, Rotation_EQD_HOR, Rotation_ECL_EQJ,
 } from "../lib/astronomy-engine.js";
 
 /** Builds an astronomy-engine Observer from a site (degrees, degrees, metres). */
@@ -93,6 +93,34 @@ export function equatorialOfDateToHorizontal(raDeg, decDeg, observer, date) {
   const horVec = RotateVector(Rotation_EQD_HOR(date, observer), eqdVec);
   const sphere = HorizonFromVector(horVec, "normal");
   return { azimuth: sphere.lon, altitude: sphere.lat };
+}
+
+// A fixed, arbitrary instant - VectorFromSphere() takes a `time` argument
+// but never actually uses it in the numeric conversion (plain spherical ->
+// Cartesian), it's only there to timestamp the resulting Vector object for
+// whatever rotation gets applied to it next. eclipticToEquatorial() below
+// applies Rotation_ECL_EQJ(), itself also date-independent (J2000 mean
+// ecliptic obliquity, a fixed constant) - so nothing here actually depends
+// on which instant this is, unlike every other date-taking function in
+// this file.
+const ECLIPTIC_TIME_PLACEHOLDER = new Date("2000-01-01T00:00:00Z");
+
+/**
+ * Ecliptic longitude (degrees, latitude always 0 - the ecliptic PLANE
+ * itself, not any specific body's actual position on a given date) ->
+ * {ra, dec} (degrees, J2000 equatorial) - Gilles, 2026-10-01: "ajoute le
+ * trait de l'ecliptique en option". A fixed, date-independent shape (the
+ * J2000 mean ecliptic doesn't move on any timescale this app cares about)
+ * via Rotation_ECL_EQJ() - feeds straight into the same J2000-equatorial
+ * project() pipeline every other static reference line here already uses
+ * (grids, constellation lines), rather than a separate ecliptic-of-
+ * date/observer path.
+ */
+export function eclipticToEquatorial(lonDeg) {
+  const eclVec = VectorFromSphere(new Spherical(0, lonDeg, 1), ECLIPTIC_TIME_PLACEHOLDER);
+  const eqjVec = RotateVector(Rotation_ECL_EQJ(), eclVec);
+  const eq = EquatorFromVector(eqjVec); // {ra: hours, dec: degrees}
+  return { ra: eq.ra * 15, dec: eq.dec };
 }
 
 // Tiny local vec3 helpers for sensorFovCorners() below - not exported,
