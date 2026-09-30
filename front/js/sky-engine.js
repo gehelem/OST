@@ -29,7 +29,7 @@
 // everything else in this app, not a menu at the tap position.
 
 import { Body, Horizon, Equator } from "../lib/astronomy-engine.js";
-import { makeObserver, equatorialToHorizontal, equatorialHorizontalRotation, horizontalToEquatorial, horizontalToVector, vectorToHorizontal, vectorToScreen, screenToVector, magnitudeToRadius, starMagnitudeLimit } from "./sky-projection.js";
+import { makeObserver, equatorialToHorizontal, equatorialOfDateToHorizontal, equatorialHorizontalRotation, horizontalToEquatorial, horizontalToVector, vectorToHorizontal, vectorToScreen, screenToVector, magnitudeToRadius, starMagnitudeLimit } from "./sky-projection.js";
 import { identity, multiply, conjugate, rotateVector, fromTwoVectors } from "./quaternion.js";
 import { loadCatalog } from "./sky-catalog.js";
 
@@ -375,6 +375,30 @@ export class SkyEngine {
     // draw as part of the full azimuthal grid's own az=0 special case,
     // with no way to show just it on its own.
     this.showMeridian = false;
+    // Gilles, 2026-10-03: "affiche la position du telescope (repere
+    // orange) et le champ du capteur (cadre rouge)". Both default to
+    // shown, unlike the reference overlays above (grids/horizon) - this
+    // is the module's own core telescope-control info, not an optional
+    // extra. mountRaDeg/mountDecDeg are OF DATE (navigator.cpp's own
+    // mountposition, fed straight from the mount's INDI
+    // EQUATORIAL_EOD_COORD - see equatorialOfDateToHorizontal()'s own
+    // doc comment for why that's a different conversion than every
+    // catalog object here uses), RA already converted from the wire's
+    // own hours to degrees by the caller (templates/navigator.js) -
+    // this file otherwise treats every RA as degrees throughout, this is
+    // no exception. sensorFovWidthDeg/HeightDeg come from the "image"
+    // element's own sampling (arcsec/px) x width/height (px) - the
+    // camera-FOV-not-eyepiece decision from this chantier's own
+    // requirements (Gilles, 2026-09-29: "on peut determiner le champ
+    // avec ces donnees") - null until the caller has enough data to
+    // compute them (camera+optic not configured yet, or no mountposition
+    // update received at all).
+    this.showMountPosition = true;
+    this.showSensorFov = true;
+    this.mountRaDeg = null;
+    this.mountDecDeg = null;
+    this.sensorFovWidthDeg = null;
+    this.sensorFovHeightDeg = null;
     this.dayMode = false;
     // "orthographic" (default) or "stereographic" - see sky-projection.js's
     // own vectorToScreen()/screenToVector() doc comment for the actual
@@ -1010,6 +1034,68 @@ export class SkyEngine {
         ctx.beginPath();
         ctx.arc(p.x, p.y, 3.5, 0, 2 * Math.PI);
         ctx.stroke();
+      }
+    }
+
+    // Telescope position (orange) + sensor field of view (red frame) -
+    // Gilles, 2026-10-03: "affiche la position du telescope (repere
+    // orange) et le champ du capteur (cadre rouge)". Own of-date
+    // conversion (mountRaDeg/mountDecDeg aren't J2000 - see
+    // equatorialOfDateToHorizontal()'s own doc comment), not project()
+    // (which is exactly the catalog's own equatorialToHorizontal
+    // pipeline, J2000-only). Colours are fixed regardless of dayMode/
+    // lightUI, same reasoning as the PLANETS palette above: both already
+    // saturated/high-contrast enough to read on either background.
+    if ((this.showMountPosition || this.showSensorFov) && this.mountRaDeg !== null && this.mountDecDeg !== null) {
+      const mountProject = (raDeg, decDeg) => {
+        const { azimuth, altitude } = equatorialOfDateToHorizontal(raDeg, decDeg, this.observer, date);
+        return toScreen(horizontalToVector(azimuth, altitude));
+      };
+      const center = mountProject(this.mountRaDeg, this.mountDecDeg);
+      if (center.visible) {
+        if (this.showSensorFov && this.sensorFovWidthDeg > 0 && this.sensorFovHeightDeg > 0) {
+          // Flat tangent-plane approximation (a simple RA/Dec offset box,
+          // RA corrected by cos(dec) so it reads as a rectangle rather
+          // than visibly narrower at the top) - camera rotator angle
+          // isn't available live yet (see this chantier's own note on
+          // "l'orientation de la camera, pas encore implementee"), so
+          // North-up/East-left is the only sensible default orientation;
+          // negligible error at any FOV small enough that this
+          // approximation matters for (a few degrees at most - true for
+          // every amateur imaging setup this app targets).
+          const halfW = this.sensorFovWidthDeg / 2 / Math.cos((this.mountDecDeg * Math.PI) / 180);
+          const halfH = this.sensorFovHeightDeg / 2;
+          const corners = [
+            mountProject(this.mountRaDeg - halfW, this.mountDecDeg - halfH),
+            mountProject(this.mountRaDeg + halfW, this.mountDecDeg - halfH),
+            mountProject(this.mountRaDeg + halfW, this.mountDecDeg + halfH),
+            mountProject(this.mountRaDeg - halfW, this.mountDecDeg + halfH),
+          ];
+          if (corners.every((c) => c.visible)) {
+            ctx.strokeStyle = "#e53935";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(corners[0].x, corners[0].y);
+            for (let i = 1; i < corners.length; i++) ctx.lineTo(corners[i].x, corners[i].y);
+            ctx.closePath();
+            ctx.stroke();
+          }
+        }
+        if (this.showMountPosition) {
+          // A simple reticle (circle + full crosshair) rather than a
+          // filled dot - shouldn't read as "just another star" at a
+          // glance.
+          const R = 8;
+          ctx.strokeStyle = "#ff9800";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(center.x, center.y, R, 0, 2 * Math.PI);
+          ctx.moveTo(center.x - R, center.y);
+          ctx.lineTo(center.x + R, center.y);
+          ctx.moveTo(center.x, center.y - R);
+          ctx.lineTo(center.x, center.y + R);
+          ctx.stroke();
+        }
       }
     }
 

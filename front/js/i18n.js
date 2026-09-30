@@ -147,6 +147,8 @@ const STRINGS = {
   "navigator.equatorialGrid": { en: "Equatorial grid", fr: "Grille équatoriale", de: "Äquatorialgitter", it: "Griglia equatoriale", es: "Cuadrícula ecuatorial" },
   "navigator.azimuthalGrid": { en: "Azimuthal grid", fr: "Grille azimutale", de: "Azimutalgitter", it: "Griglia azimutale", es: "Cuadrícula azimutal" },
   "navigator.meridian": { en: "Meridian", fr: "Méridien", de: "Meridian", it: "Meridiano", es: "Meridiano" },
+  "navigator.mountPosition": { en: "Telescope position", fr: "Position du télescope", de: "Teleskopposition", it: "Posizione del telescopio", es: "Posición del telescopio" },
+  "navigator.sensorFov": { en: "Sensor field of view", fr: "Champ du capteur", de: "Sensor-Gesichtsfeld", it: "Campo del sensore", es: "Campo del sensor" },
   "navigator.dayMode": { en: "Day mode", fr: "Mode jour", de: "Tagmodus", it: "Modalità giorno", es: "Modo día" },
   "navigator.stereographic": { en: "Stereographic projection", fr: "Projection stéréographique", de: "Stereografische Projektion", it: "Proiezione stereografica", es: "Proyección estereográfica" },
   "navigator.catalogDepth": { en: "Star catalog", fr: "Catalogue d'étoiles", de: "Sternkatalog", it: "Catalogo stellare", es: "Catálogo de estrellas" },

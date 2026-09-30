@@ -23,7 +23,7 @@
 import {
   Observer, Spherical, VectorFromSphere, RotateVector,
   HorizonFromVector, VectorFromHorizon, EquatorFromVector,
-  Rotation_EQJ_HOR, Rotation_HOR_EQJ,
+  Rotation_EQJ_HOR, Rotation_HOR_EQJ, Rotation_EQD_HOR,
 } from "../lib/astronomy-engine.js";
 
 /** Builds an astronomy-engine Observer from a site (degrees, degrees, metres). */
@@ -70,6 +70,28 @@ export function equatorialToHorizontal(raDeg, decDeg, observer, date, rotation) 
   const eqjVec = VectorFromSphere(new Spherical(decDeg, raDeg, 1), date);
   const horVec = RotateVector(rotation || Rotation_EQJ_HOR(date, observer), eqjVec);
   const sphere = HorizonFromVector(horVec, "normal"); // {lat: altitude, lon: azimuth}
+  return { azimuth: sphere.lon, altitude: sphere.lat };
+}
+
+/**
+ * RA/Dec (degrees, OF DATE - e.g. navigator.cpp's own mountposition, fed
+ * straight from the mount's INDI EQUATORIAL_EOD_COORD property, "EOD"
+ * being exactly "epoch of date") -> {azimuth, altitude} (degrees), for one
+ * observer at one instant. Deliberately a SEPARATE function from
+ * equatorialToHorizontal() above rather than the same one reused - that
+ * one treats its input as J2000 and applies its own J2000->of-date
+ * precession/nutation step internally (Rotation_EQJ_HOR); feeding it
+ * already-of-date coordinates would silently apply that correction a
+ * second time, reintroducing the same class of "small but real" position
+ * error earlier work here specifically fixed (see that function's own doc
+ * comment) - this one uses Rotation_EQD_HOR instead, which works directly
+ * from sidereal time with no separate precession step, matching what the
+ * input already is.
+ */
+export function equatorialOfDateToHorizontal(raDeg, decDeg, observer, date) {
+  const eqdVec = VectorFromSphere(new Spherical(decDeg, raDeg, 1), date);
+  const horVec = RotateVector(Rotation_EQD_HOR(date, observer), eqdVec);
+  const sphere = HorizonFromVector(horVec, "normal");
   return { azimuth: sphere.lon, altitude: sphere.lat };
 }
 

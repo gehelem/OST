@@ -113,6 +113,8 @@ function saveDisplaySettings(engine) {
       showEquatorialGrid: engine.showEquatorialGrid,
       showAzimuthalGrid: engine.showAzimuthalGrid,
       showMeridian: engine.showMeridian,
+      showMountPosition: engine.showMountPosition,
+      showSensorFov: engine.showSensorFov,
       dayMode: engine.dayMode,
       zoom: engine.zoom,
       projection: engine.projection,
@@ -153,6 +155,8 @@ function buildSettingsPanel(engine) {
   wrap.appendChild(checkboxRow(t("navigator.equatorialGrid"), "showEquatorialGrid"));
   wrap.appendChild(checkboxRow(t("navigator.azimuthalGrid"), "showAzimuthalGrid"));
   wrap.appendChild(checkboxRow(t("navigator.meridian"), "showMeridian"));
+  wrap.appendChild(checkboxRow(t("navigator.mountPosition"), "showMountPosition"));
+  wrap.appendChild(checkboxRow(t("navigator.sensorFov"), "showSensorFov"));
   wrap.appendChild(checkboxRow(t("navigator.dayMode"), "dayMode"));
 
   // Not a plain boolean engine field (it's the string "orthographic"/
@@ -295,6 +299,40 @@ function buildSkyDome(client, moduleName, onSelect) {
     }
   });
 
+  // Telescope position (Gilles, 2026-10-03: "affiche la position du
+  // telescope (repere orange)") - navigator.cpp's own mountposition, fed
+  // straight from the mount's INDI EQUATORIAL_EOD_COORD (RA in HOURS,
+  // of-date - see engine.mountRaDeg's own doc comment in sky-engine.js
+  // for why that's a different conversion than everything else here uses;
+  // /15 here mirrors the *15 templates/navigator.js already does the
+  // other way for target.targetra).
+  const unsubMount = client.subscribe(client.topics.property(moduleName, "mountposition"), (prop) => {
+    const ra = prop && prop.elements.RA && prop.elements.RA.value;
+    const dec = prop && prop.elements.DEC && prop.elements.DEC.value;
+    if (typeof ra === "number" && typeof dec === "number") {
+      engine.mountRaDeg = ra * 15;
+      engine.mountDecDeg = dec;
+      engine.render();
+    }
+  });
+
+  // Sensor field of view (Gilles, 2026-10-03: "le champ du capteur (cadre
+  // rouge)") - the camera-FOV-not-eyepiece decision from this chantier's
+  // own requirements (Gilles, 2026-09-29: "on peut determiner le champ
+  // avec [le GPS, la camera et l'optique]"). `sampling` (arcsec/px) is
+  // always available once camera+optic are configured, independent of any
+  // plate solve - see OST/libs/model/element/common.h's own doc comment
+  // on ImgData::sampling.
+  const unsubImage = client.subscribe(client.topics.property(moduleName, "image"), (prop) => {
+    const img = prop && prop.elements.image && prop.elements.image.value;
+    const sampling = img && img.sampling;
+    if (sampling > 0 && img.width > 0 && img.height > 0) {
+      engine.sensorFovWidthDeg = (img.width * sampling) / 3600;
+      engine.sensorFovHeightDeg = (img.height * sampling) / 3600;
+      engine.render();
+    }
+  });
+
   // The sky visibly moves even standing still - a light periodic refresh
   // keeps it live without needing a real interaction. 30s is plenty (the
   // whole dome shifts ~0.125deg/30s from Earth's rotation, imperceptible
@@ -305,6 +343,8 @@ function buildSkyDome(client, moduleName, onSelect) {
     engine,
     dispose: () => {
       unsub();
+      unsubMount();
+      unsubImage();
       ro.disconnect();
       themeObserver.disconnect();
       clearInterval(timer);
