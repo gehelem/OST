@@ -71,22 +71,43 @@ function notifyVisibility(id, visible) {
   layer.dispatchEvent(new CustomEvent("panelvisibility", { detail: { id, visible } }));
 }
 
+// Gilles, 2026-10-03: "sur smartphone je ne peux pas deplacer les fenetres"
+// - drag/resize only ever listened for mouse events; a touch's own
+// mousedown/mousemove aren't reliably synthesized by mobile browsers (and
+// even where tap registers, the drag itself never tracked). Same fix as
+// sky-engine.js's own mouse+touch split (its _onMouseDown/_onTouchStart,
+// see that file's own header) rather than switching to the Pointer Events
+// API wholesale - one input model per file, consistent with the rest of
+// this app. `touches[0]` on a TouchEvent, `clientX/clientY` directly on a
+// MouseEvent - both land here, under one name the move/up handlers below
+// read from without caring which kind of event it came from.
+function pointXY(ev) {
+  const t = ev.touches && ev.touches[0];
+  return t ? { x: t.clientX, y: t.clientY } : { x: ev.clientX, y: ev.clientY };
+}
+
 function startDrag(panel, bar, id, ev, sc) {
   ev.preventDefault();
   const lr = layerRect();
   const r = panel.getBoundingClientRect();
-  const ox = ev.clientX - r.left, oy = ev.clientY - r.top;
+  const start = pointXY(ev);
+  const ox = start.x - r.left, oy = start.y - r.top;
   panel.classList.add("dragging");
   const move = (e) => {
+    const p = pointXY(e);
     const m = 6;
-    const x = Math.max(m, Math.min(e.clientX - lr.left - ox, lr.width - r.width - m));
-    const y = Math.max(SAFE_TOP, Math.min(e.clientY - lr.top - oy, lr.height - 36));
+    const x = Math.max(m, Math.min(p.x - lr.left - ox, lr.width - r.width - m));
+    const y = Math.max(SAFE_TOP, Math.min(p.y - lr.top - oy, lr.height - 36));
     panel.style.left = x + "px";
     panel.style.top = y + "px";
+    if (e.touches) e.preventDefault(); // stop the page itself from scrolling under the drag
   };
   const up = () => {
     document.removeEventListener("mousemove", move);
     document.removeEventListener("mouseup", up);
+    document.removeEventListener("touchmove", move);
+    document.removeEventListener("touchend", up);
+    document.removeEventListener("touchcancel", up);
     panel.classList.remove("dragging");
     const s = loadState(sc, id);
     s.x = parseInt(panel.style.left, 10);
@@ -95,22 +116,31 @@ function startDrag(panel, bar, id, ev, sc) {
   };
   document.addEventListener("mousemove", move);
   document.addEventListener("mouseup", up);
+  document.addEventListener("touchmove", move, { passive: false });
+  document.addEventListener("touchend", up);
+  document.addEventListener("touchcancel", up);
 }
 
 function startResize(panel, id, ev, sc) {
   ev.preventDefault();
   ev.stopPropagation();
-  const sx = ev.clientX, sy = ev.clientY;
+  const start = pointXY(ev);
+  const sx = start.x, sy = start.y;
   const sw = panel.offsetWidth, sh = panel.offsetHeight;
   const lr = layerRect();
   panel.classList.add("resized", "resizing");
   const move = (e) => {
-    panel.style.width = Math.max(220, Math.min(sw + (e.clientX - sx), lr.width - 12)) + "px";
-    panel.style.height = Math.max(120, Math.min(sh + (e.clientY - sy), lr.height - 12)) + "px";
+    const p = pointXY(e);
+    panel.style.width = Math.max(220, Math.min(sw + (p.x - sx), lr.width - 12)) + "px";
+    panel.style.height = Math.max(120, Math.min(sh + (p.y - sy), lr.height - 12)) + "px";
+    if (e.touches) e.preventDefault();
   };
   const up = () => {
     document.removeEventListener("mousemove", move);
     document.removeEventListener("mouseup", up);
+    document.removeEventListener("touchmove", move);
+    document.removeEventListener("touchend", up);
+    document.removeEventListener("touchcancel", up);
     panel.classList.remove("resizing");
     const s = loadState(sc, id);
     s.w = parseInt(panel.style.width, 10);
@@ -119,6 +149,9 @@ function startResize(panel, id, ev, sc) {
   };
   document.addEventListener("mousemove", move);
   document.addEventListener("mouseup", up);
+  document.addEventListener("touchmove", move, { passive: false });
+  document.addEventListener("touchend", up);
+  document.addEventListener("touchcancel", up);
 }
 
 /**
@@ -177,6 +210,7 @@ export function make(opts) {
   rz.className = "panel-float-resize";
   rz.title = t("chrome.resize");
   rz.addEventListener("mousedown", (e) => startResize(panel, id, e, sc));
+  rz.addEventListener("touchstart", (e) => startResize(panel, id, e, sc), { passive: false });
   panel.appendChild(rz);
 
   min.addEventListener("click", (e) => {
@@ -191,6 +225,10 @@ export function make(opts) {
     if (e.target === min) return;
     startDrag(panel, bar, id, e, sc);
   });
+  bar.addEventListener("touchstart", (e) => {
+    if (e.target === min) return;
+    startDrag(panel, bar, id, e, sc);
+  }, { passive: false });
 
   layer.appendChild(panel);
   if (!opts.persistent) live.push(panel);
