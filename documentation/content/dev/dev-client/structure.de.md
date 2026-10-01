@@ -412,7 +412,17 @@ Die LOV selbst wird auf Modulebene (`globallovs`) oder Controller-Ebene (`lovs`)
 
 ## Zugriffskontrolle
 
-Die Dump-Antwort enthält die Werte `grant-server` und `grant-client`:
+Die Dump-Antwort enthält die Werte `grant-server` und `grant-client`.
+
+`grant-server` ist die feste Zugriffsrichtlinie des Servers selbst (beim Serverstart festgelegt, für jeden Client gleich):
+
+| Wert | Bedeutung |
+|---|---|
+| `"0"` | Vollständiger Lese-Schreib-Zugriff, kein Login nötig — `grant-client` ist immer `"1"` |
+| `"1"` | Vollständiger Lesezugriff, kein Login nötig; der Schreibzugriff hängt von den Rechten des angemeldeten Benutzers ab — `grant-client` ist `"0"` oder `"1"` |
+| `"2"` | Ohne Login kein Zugriff; Lese- und Schreibzugriff hängen von den Rechten des angemeldeten Benutzers ab — `grant-client` ist `"-1"`, `"0"` oder `"1"` |
+
+`grant-client` ist der aktuelle Grant dieser Verbindung, der sich nach einem erfolgreichen `LO` (Login) ändern kann:
 
 | Wert | Bedeutung |
 |---|---|

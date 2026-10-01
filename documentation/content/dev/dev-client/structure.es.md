@@ -412,7 +412,17 @@ El LOV en sí se define a nivel módulo (`globallovs`) o controlador (`lovs`):
 
 ## Control de acceso
 
-La respuesta dump contiene los valores `grant-server` y `grant-client`:
+La respuesta dump contiene los valores `grant-server` y `grant-client`.
+
+`grant-server` es la política de acceso propia y fija del servidor (definida al arrancar el servidor, la misma para todos los clientes):
+
+| Valor | Significado |
+|---|---|
+| `"0"` | Acceso completo lectura-escritura, sin necesidad de autenticación — `grant-client` vale siempre `"1"` |
+| `"1"` | Acceso completo de solo lectura, sin necesidad de autenticación; el acceso en escritura depende de los derechos propios del usuario autenticado — `grant-client` vale `"0"` o `"1"` |
+| `"2"` | Sin ningún acceso sin autenticarse; el acceso en lectura y en escritura dependen de los derechos propios del usuario autenticado — `grant-client` vale `"-1"`, `"0"` o `"1"` |
+
+`grant-client` es el permiso propio y actual de esta conexión, que puede cambiar tras un `LO` (login) exitoso:
 
 | Valor | Significado |
 |---|---|

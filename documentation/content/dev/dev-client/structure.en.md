@@ -412,7 +412,17 @@ The LOV itself is defined at module level (`globallovs`) or controller level (`l
 
 ## Access control
 
-The dump response includes `grant-server` and `grant-client` values:
+The dump response includes `grant-server` and `grant-client` values.
+
+`grant-server` is the server's own fixed access policy (set at server startup, the same for every client):
+
+| Value | Meaning |
+|---|---|
+| `"0"` | Full read-write access, no login needed — `grant-client` is always `"1"` |
+| `"1"` | Full read-only access, no login needed; write access depends on the logged-in user's own rights — `grant-client` is `"0"` or `"1"` |
+| `"2"` | No access at all without logging in; read and write access depend on the logged-in user's own rights — `grant-client` is `"-1"`, `"0"`, or `"1"` |
+
+`grant-client` is this connection's own current grant, which may change after a successful `LO` (login):
 
 | Value | Meaning |
 |---|---|
