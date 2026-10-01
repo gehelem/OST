@@ -1193,7 +1193,7 @@ export class SkyEngine {
     // own starsFromGeoJson() doc comment: most have none, `name` stays
     // undefined for those) get a label - not a magnitude cutoff of their
     // own, just whatever's already passing starMagLimit above.
-    if (this.showNames) { ctx.font = uiFont(9); ctx.textAlign = "left"; ctx.textBaseline = "middle"; }
+    if (this.showNames) { ctx.font = uiFont(11); ctx.textAlign = "left"; ctx.textBaseline = "middle"; }
     for (const s of this.catalog.stars) {
       if (s.mag > starMagLimit) continue;
       const p = project(s.ra, s.dec);
@@ -1242,7 +1242,7 @@ export class SkyEngine {
       // present (unlike stars' proper names), not the longer `alt` common
       // name - shorter, and consistent with how every other chart labels
       // these.
-      if (this.showNames) { ctx.font = uiFont(9); ctx.textAlign = "left"; ctx.textBaseline = "middle"; }
+      if (this.showNames) { ctx.font = uiFont(11); ctx.textAlign = "left"; ctx.textBaseline = "middle"; }
       for (const m of this.catalog.messier) {
         const p = project(m.ra, m.dec);
         if (!p.visible) continue;
