@@ -744,8 +744,8 @@ export class SkyEngine {
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, w, h);
     const fg = isLightBg
-      ? { dome: "rgba(0,0,0,0.28)", cardinal: "rgba(0,0,0,0.6)", constellation: "rgba(40,80,140,0.45)", star: "#15181c", messier: "rgba(27,94,32,0.85)", horizon: "rgba(180,110,0,0.65)", equator: "rgba(0,121,107,0.6)", azimuthal: "rgba(123,31,162,0.6)", meridian: "rgba(13,71,161,0.95)", milkyway: "rgba(60,80,110,0.35)", milkywayFill: "rgba(70,75,85,0.10)", ecliptic: "rgba(230,140,20,0.75)", grad: "rgba(0,0,0,0.55)", ground: "#cdbb95" }
-      : { dome: "rgba(255,255,255,0.25)", cardinal: "rgba(255,255,255,0.55)", constellation: "rgba(100,160,220,0.35)", star: "#fff", messier: "rgba(129,199,132,0.85)", horizon: "rgba(255,193,7,0.55)", equator: "rgba(77,208,225,0.6)", azimuthal: "rgba(206,147,216,0.6)", meridian: "rgba(41,121,255,0.95)", milkyway: "rgba(200,215,235,0.18)", milkywayFill: "rgba(200,205,215,0.08)", ecliptic: "rgba(255,183,77,0.85)", grad: "rgba(255,255,255,0.75)", ground: "#241b12" };
+      ? { dome: "rgba(0,0,0,0.28)", cardinal: "rgba(0,0,0,0.6)", constellation: "rgba(40,80,140,0.45)", star: "#15181c", messier: "rgba(27,94,32,0.85)", horizon: "rgba(180,110,0,0.65)", equator: "rgba(0,121,107,0.6)", equatorLine: "rgba(198,40,40,0.9)", azimuthal: "rgba(123,31,162,0.6)", meridian: "rgba(13,71,161,0.95)", milkyway: "rgba(60,80,110,0.35)", milkywayFill: "rgba(70,75,85,0.10)", ecliptic: "rgba(230,140,20,0.75)", grad: "rgba(0,0,0,0.55)", ground: "#cdbb95" }
+      : { dome: "rgba(255,255,255,0.25)", cardinal: "rgba(255,255,255,0.55)", constellation: "rgba(100,160,220,0.35)", star: "#fff", messier: "rgba(129,199,132,0.85)", horizon: "rgba(255,193,7,0.55)", equator: "rgba(77,208,225,0.6)", equatorLine: "rgba(255,82,82,0.9)", azimuthal: "rgba(206,147,216,0.6)", meridian: "rgba(41,121,255,0.95)", milkyway: "rgba(200,215,235,0.18)", milkywayFill: "rgba(200,205,215,0.08)", ecliptic: "rgba(255,183,77,0.85)", grad: "rgba(255,255,255,0.75)", ground: "#241b12" };
 
     const cx = w / 2, cy = h / 2;
     const domeRadius = Math.min(w, h) / 2 * 0.96 * this.zoom;
@@ -926,9 +926,14 @@ export class SkyEngine {
       }
       for (const dec of rangeSteps(-90, 90, decMinor)) {
         const major = isMajorLine(dec, decMajor);
-        ctx.strokeStyle = fg.equator;
+        // Gilles, 2026-10-01: "dessine l'equateur en plus epais (DE=0)",
+        // then "ca n'est pas assez marque, mais je ne voudrais pas que ce
+        // soit plus epais : tente une autre couleur" - same thickness as
+        // any other major line, but its own distinct colour instead.
+        const isEquator = Math.abs(dec) < 1e-6;
+        ctx.strokeStyle = isEquator ? fg.equatorLine : fg.equator;
         ctx.lineWidth = major ? 1.3 : 0.5;
-        ctx.globalAlpha = major ? 1 : 0.55;
+        ctx.globalAlpha = isEquator ? 1 : major ? 1 : 0.55;
         const pts = [];
         for (let i = 0; i <= LINE_SAMPLES; i++) pts.push(project((360 * i) / LINE_SAMPLES, dec));
         const anchor = strokePolyline(ctx, pts, w, h, labelMargin);
