@@ -166,6 +166,12 @@ input[type="range"]::-moz-range-thumb {
 .elt-row:first-child td { border-top: none; }
 .elt-label { color: var(--text-muted); white-space: nowrap; width: 1%; padding-right: var(--space-3); font-size: 12px; }
 .elt-value { width: 99%; }
+/* A run of consecutive self-descriptive buttons (render.js's own
+ * renderPropertyBody(), the "actions" property above all) - Gilles,
+ * 2026-10-03: "si on a une suite de boutons il sont affiches les uns au
+ * dessus des autres verticalement ... c'est moche" - flows them left to
+ * right instead, wrapping to a new line once they run out of room. */
+.elt-button-row { display: flex; flex-wrap: wrap; gap: 6px; }
 .readonly-val { font-family: var(--font-mono); color: var(--text-secondary); }
 .freevalue { font-style: italic; color: var(--text-muted); margin-bottom: var(--space-2); }
 

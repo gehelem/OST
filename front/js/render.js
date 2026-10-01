@@ -490,8 +490,25 @@ function renderPropertyBody(client, moduleName, propName, prop) {
   }
 
   const table = el("table", { class: "elt-table" });
+  // A run of consecutive self-descriptive buttons (isGroupBtn/isDirectBtn,
+  // below) shares ONE row, laid out horizontally - Gilles, 2026-10-03: "si
+  // on a une suite de boutons il sont affiches les uns au dessus des
+  // autres verticalement, en particulier pour 'actions' - c'est moche".
+  // Flushed (made into an actual table row) as soon as a non-button
+  // element breaks the run, or at the very end - so buttons interspersed
+  // with other elements still land in their own correctly-ordered spot,
+  // only genuinely adjacent ones group together.
+  let buttonRun = null;
+  function flushButtonRun() {
+    if (!buttonRun) return;
+    const tr = el("tr", { class: "elt-row elt-row-buttons" });
+    const td = el("td", { class: "elt-value", colspan: "2" });
+    td.appendChild(buttonRun);
+    tr.appendChild(td);
+    table.appendChild(tr);
+    buttonRun = null;
+  }
   for (const [name, e] of Object.entries(prop.elements)) {
-    const tr = el("tr", { class: "elt-row" });
     const permOk = (prop.permission === 1 || prop.permission === 2) && prop.enabled !== false;
     const isGroupBtn = boolGroup.includes(name) && permOk;
     const isDirectBtn = !isGroupBtn && permOk && e.type === "bool" && e.directedit;
@@ -504,14 +521,14 @@ function renderPropertyBody(client, moduleName, propName, prop) {
       // !!! c'est ridicule"). sendGroupChoice() sends immediately via SA
       // (the whole group); the directedit case sends immediately via SV
       // (setValue) — the behavior Gilles asked to keep either way.
-      const td = el("td", { class: "elt-value", colspan: "2" });
+      if (!buttonRun) buttonRun = el("div", { class: "elt-button-row" });
       const send = isGroupBtn ? () => sendGroupChoice(name) : () => client.setValue(moduleName, propName, name, !e.value);
-      td.appendChild(el("button", { class: "btn toggle-btn" + (e.value ? " active" : ""), onclick: send }, boolButtonContent(e, name)));
-      tr.appendChild(td);
-      table.appendChild(tr);
+      buttonRun.appendChild(el("button", { class: "btn toggle-btn" + (e.value ? " active" : ""), onclick: send }, boolButtonContent(e, name)));
       continue;
     }
+    flushButtonRun();
 
+    const tr = el("tr", { class: "elt-row" });
     const labelCell = el("td", { class: "elt-label" });
     if (e.preicon) labelCell.appendChild(iconSlotButtons(moduleName, propName, e, client, name));
     const labelSpan = el("span", { text: e.label || name, title: e.hint || "" });
@@ -534,6 +551,7 @@ function renderPropertyBody(client, moduleName, propName, prop) {
     tr.appendChild(valueCell);
     table.appendChild(tr);
   }
+  flushButtonRun(); // a run ending at the very last element (actions' own common case) still needs flushing
   body.appendChild(table);
 
   const formable = editableNames.filter((n) => !boolGroup.includes(n) && !(prop.elements[n].type === "bool" && prop.elements[n].directedit));
