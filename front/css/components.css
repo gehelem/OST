@@ -124,6 +124,15 @@ input[type="range"]::-moz-range-thumb {
 }
 .property:hover { border-color: var(--border-strong); }
 .property.hidden { display: none; }
+/* render.js's renderProperty({ framed: false }) - Gilles, 2026-10-03: "les
+ * elements de la propriete restent tout de meme entoures par un cadre, ca
+ * mange de la place pour rien" (the actions window: its own window chrome
+ * already frames the property, a second border/background/padding box
+ * around its elements wastes space for nothing). Two classes (specificity
+ * matches/beats `.prop-group > .property` above, and this rule comes
+ * after it in source order either way) so it reliably wins over the
+ * plain .property box styling. */
+.property.property-bare { border: 0; background: none; margin: 0; padding: 0; }
 .prop-header { display: flex; align-items: center; gap: 8px; margin-bottom: var(--space-2); }
 .prop-label { font-weight: 600; }
 .icon-slots { display: inline-flex; gap: 2px; }

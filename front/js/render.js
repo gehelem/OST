@@ -110,7 +110,7 @@ export function renderActionsPanel(client, moduleName, mod, track, quickNavEntri
   const p = { x: 20, y: 210, w: 300, ...pos };
   const label = mod.properties.actions.label || t("common.actions");
   const b = Panels.make({ id: "actions", title: label, x: p.x, y: p.y, w: p.w });
-  b.appendChild(track(renderProperty(client, moduleName, "actions")));
+  b.appendChild(track(renderProperty(client, moduleName, "actions", { framed: false })));
   quickNavEntries.push({ id: "actions", label, icon: "apps", iconOnly: true });
 }
 
@@ -525,9 +525,25 @@ function renderPropertyBody(client, moduleName, propName, prop) {
  * source of updates for this node (see core/datastore.js). Returns
  * {node, dispose}; the caller (renderModuleScreen) must call dispose() when
  * the node is discarded, or the subscription leaks.
+ *
+ * `opts.framed` (default true) - whether to "encadrer" the property's own
+ * elements in their own bordered/background box with a labelled header
+ * (statusDot/preicons/label/badge/disabled-flag/posticons) above them.
+ * Gilles, 2026-10-03, having noticed the actions window showing its own
+ * label twice (once as the window's own title, once again here), then
+ * "les elements de la propriete restent tout de meme entoures par un
+ * cadre, ca mange de la place pour rien": "il faut lui passer un
+ * parametre pour dire si on doit encadrer les elements dans une boite
+ * avec le libelle, ou pas ... je veux garder un socle commun pour
+ * afficher des propriétés" - one shared function for every caller (this
+ * file's own generic fallback, every template) rather than a bespoke
+ * fork, so a caller whose OWN window chrome already frames the property
+ * (render.js's own renderActionsPanel(), currently the only one) can ask
+ * for the bare element list instead of a second, redundant frame around it.
  */
-export function renderProperty(client, moduleName, propName) {
-  const container = el("div", { class: "property" });
+export function renderProperty(client, moduleName, propName, opts) {
+  const framed = !opts || opts.framed !== false;
+  const container = el("div", { class: framed ? "property" : "property property-bare" });
   container.dataset.module = moduleName;
   container.dataset.prop = propName;
 
@@ -535,21 +551,23 @@ export function renderProperty(client, moduleName, propName) {
     container.innerHTML = "";
     if (!prop) { container.classList.add("hidden"); return; }
     container.classList.remove("hidden");
-    const header = el("div", { class: "prop-header" });
-    header.appendChild(statusDot(prop.status));
-    if (prop.preicon1 || prop.preicon2) header.appendChild(iconSlotButtons(moduleName, propName, prop, client));
-    header.appendChild(el("span", { class: "prop-label", text: prop.label || propName }));
-    if (prop.badge) header.appendChild(el("span", { class: "badge-star", text: "★" }));
-    if (prop.enabled === false) header.appendChild(el("span", { class: "muted small", text: "(disabled)" }));
-    header.appendChild(el("span", { class: "spacer" }));
-    if (prop.posticon1 || prop.posticon2) {
-      const post = el("span", { class: "icon-slots" });
-      for (const [field, slot] of [["posticon1", 3], ["posticon2", 4]]) {
-        if (prop[field]) post.appendChild(iconButton(prop[field], field, () => client.clickPropertyIcon(slot, moduleName, propName)));
+    if (framed) {
+      const header = el("div", { class: "prop-header" });
+      header.appendChild(statusDot(prop.status));
+      if (prop.preicon1 || prop.preicon2) header.appendChild(iconSlotButtons(moduleName, propName, prop, client));
+      header.appendChild(el("span", { class: "prop-label", text: prop.label || propName }));
+      if (prop.badge) header.appendChild(el("span", { class: "badge-star", text: "★" }));
+      if (prop.enabled === false) header.appendChild(el("span", { class: "muted small", text: "(disabled)" }));
+      header.appendChild(el("span", { class: "spacer" }));
+      if (prop.posticon1 || prop.posticon2) {
+        const post = el("span", { class: "icon-slots" });
+        for (const [field, slot] of [["posticon1", 3], ["posticon2", 4]]) {
+          if (prop[field]) post.appendChild(iconButton(prop[field], field, () => client.clickPropertyIcon(slot, moduleName, propName)));
+        }
+        header.appendChild(post);
       }
-      header.appendChild(post);
+      container.appendChild(header);
     }
-    container.appendChild(header);
     container.appendChild(renderPropertyBody(client, moduleName, propName, prop));
   });
 
