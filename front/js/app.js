@@ -432,6 +432,17 @@ client.subscribe(client.topics.modules(), () => {
   renderModbarNow();
 });
 
+// Gilles, 2026-10-03: "la quand je navigue l'onglet chrome indique
+// 'OST-UI3' - est-ce qu'il est possible de mettre controllerdata.banner
+// issu du backend ?" - same field views.js's own Controller screen
+// already shows as a banner div. Falls back to the page's own static
+// <title> (read once, before anything overwrites it) once disconnected
+// or for a server with no banner configured.
+const DEFAULT_TITLE = document.title;
+client.subscribe(client.topics.controllerData(), (cd) => {
+  document.title = (cd && cd.banner) || DEFAULT_TITLE;
+});
+
 // Gilles, 2026-10-03: "le bouton doit avoir le meme type de pastille que
 // les boutons de modules selon le niveau le plus eleve de tous les
 // messages (jaune=warning orange=error rouge=critical rien sinon)" - the
