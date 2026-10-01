@@ -54,6 +54,17 @@
         </div>
       </div>
       <button id="theme-toggle" class="glass icon-chip" title="Toggle theme"><span class="material-icons">brightness_2</span></button>
+      <!-- Gilles, 2026-10-03: "ajoute un bouton en haut a droite si
+           grantserver != 0 pour afficher une fenetre de login" - hidden by
+           default (app.js's own session subscription shows it once the
+           dump's grant-server says the server has access control enabled
+           at all - see that file's own comment for the "0"/"1"/"2"
+           meaning). Opens the same login dialog the app already shows
+           automatically when grant-client is "-1" (fully denied) - this
+           button is for the OTHER case, logging in for more than the
+           server's current default (e.g. read-only "1" -> write access),
+           where nothing forces the dialog open on its own. -->
+      <button id="login-toggle" class="glass icon-chip hidden" title="Login"><span class="material-icons">login</span></button>
       <div id="conn-widget">
         <button id="conn-toggle" class="glass conn-toggle" type="button">
           <span id="conn-dot" class="conn-dot disconnected"></span>

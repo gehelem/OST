@@ -57,6 +57,7 @@ const grantPill = document.getElementById("grant-pill");
 const wsUrlInput = document.getElementById("ws-url");
 const mediaUrlInput = document.getElementById("media-url");
 const themeToggle = document.getElementById("theme-toggle");
+const loginToggleEl = document.getElementById("login-toggle");
 const paramsToggleEl = document.getElementById("params-toggle");
 const reorganizeToggleEl = document.getElementById("reorganize-toggle");
 const dialogRootEl = document.getElementById("dialog-root");
@@ -76,6 +77,7 @@ function applyStaticLabels() {
   paramsToggleEl.title = t("chrome.parameters");
   zoomToggleEl.title = t("chrome.uiSize");
   themeToggle.title = t("chrome.toggleTheme");
+  loginToggleEl.title = t("chrome.login");
   connectBtnLabelEl.textContent = t("chrome.connect");
   disconnectBtnLabelEl.textContent = t("chrome.disconnect");
   connSummaryEl.textContent = t("status." + client.connection.status);
@@ -90,6 +92,7 @@ function setConnPanelOpen(open) {
   connWidgetEl.classList.toggle("open", open);
 }
 connToggleEl.addEventListener("click", () => setConnPanelOpen(connPanelEl.classList.contains("hidden")));
+loginToggleEl.addEventListener("click", () => renderLogin(client));
 document.addEventListener("click", (ev) => {
   if (!connPanelEl.classList.contains("hidden") && !connWidgetEl.contains(ev.target)) setConnPanelOpen(false);
 });
@@ -422,8 +425,15 @@ client.subscribe(client.topics.modules(), () => {
 });
 
 client.subscribe(client.topics.session(), (session) => {
-  if (session.grantClient === null) { loginShown = false; return; }
+  if (session.grantClient === null) { loginShown = false; loginToggleEl.classList.add("hidden"); return; }
   grantPill.textContent = `grant: client=${session.grantClient} server=${session.grantServer}`;
+  // Gilles, 2026-10-03: "ajoute un bouton ... si grantserver != 0" - "0"
+  // means the server grants full access to everyone (OST/src/
+  // wshandler.cpp's own WShandler ctor: mServerGrant "0"/"1"/"2"), no
+  // login ever does anything useful there. "1" (read-only by default) and
+  // "2" (denied by default) both make a login meaningful - either way,
+  // logging in can grant more than the server's own default.
+  loginToggleEl.classList.toggle("hidden", session.grantServer === "0");
   if (session.grantClient === "-1" && !loginShown) { loginShown = true; renderLogin(client); }
   else if (!activeView) {
     // First dump after connecting and no view chosen yet: restore whatever

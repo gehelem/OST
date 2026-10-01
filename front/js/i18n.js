@@ -71,6 +71,7 @@ const STRINGS = {
   "chrome.parameters": { en: "Parameters", fr: "Paramètres", de: "Parameter", it: "Parametri", es: "Parámetros" },
   "chrome.uiSize": { en: "UI size", fr: "Taille de l'interface", de: "Oberflächengröße", it: "Dimensione interfaccia", es: "Tamaño de la interfaz" },
   "chrome.toggleTheme": { en: "Toggle theme", fr: "Changer de thème", de: "Design umschalten", it: "Cambia tema", es: "Cambiar tema" },
+  "chrome.login": { en: "Login", fr: "Connexion", de: "Anmelden", it: "Accedi", es: "Iniciar sesión" },
   "chrome.connect": { en: "Connect", fr: "Connecter", de: "Verbinden", it: "Connetti", es: "Conectar" },
   "chrome.disconnect": { en: "Disconnect", fr: "Déconnecter", de: "Trennen", it: "Disconnetti", es: "Desconectar" },
   "chrome.minimize": { en: "Minimize", fr: "Réduire", de: "Minimieren", it: "Riduci a icona", es: "Minimizar" },
