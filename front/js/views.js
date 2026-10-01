@@ -120,7 +120,13 @@ export function renderLogin(client, onDone) {
   const overlay = el("div", { class: "dialog-overlay" });
   const user = el("input", { type: "text", class: "field-input", placeholder: t("views.userPlaceholder"), style: "width:100%" });
   const pw = el("input", { type: "password", class: "field-input", placeholder: t("views.passwordPlaceholder"), style: "width:100%" });
-  const submit = () => { client.login(user.value, pw.value); overlay.remove(); if (onDone) onDone(); };
+  // Gilles, 2026-10-03: "on ne peut pas fermer la fenetre de login si on
+  // veut" - same close convention as render.js's own grid create/edit
+  // dialog (backdrop click + an explicit button, no onclick-only way out).
+  // Dismissing it without logging in is fine even for the auto-popup case
+  // (grant-client "-1") - it just means staying denied, not a dead end.
+  const close = () => overlay.remove();
+  const submit = () => { client.login(user.value, pw.value); close(); if (onDone) onDone(); };
   pw.addEventListener("keydown", (ev) => { if (ev.key === "Enter") submit(); });
   const dialog = el("div", { class: "dialog" }, [
     el("h3", { text: t("views.loginRequired") }),
@@ -128,10 +134,12 @@ export function renderLogin(client, onDone) {
     el("div", { class: "form-row" }, [el("label", { text: t("views.user") }), user]),
     el("div", { class: "form-row" }, [el("label", { text: t("views.password") }), pw]),
     el("div", { class: "dialog-actions" }, [
+      el("button", { class: "btn", onclick: close }, t("common.close")),
       el("button", { class: "btn btn-primary", onclick: submit }, t("views.login")),
     ]),
   ]);
   overlay.appendChild(dialog);
+  overlay.addEventListener("click", (ev) => { if (ev.target === overlay) close(); });
   document.body.appendChild(overlay);
 }
 
