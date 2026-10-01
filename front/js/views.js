@@ -78,9 +78,9 @@ export function renderModbar(client, activeKey, onSelect) {
  * fenetre est visible ou pas") — Panels.togglePanel()/isPanelVisible() are
  * the *only* shared piece (render.js/templates own the entry list; see
  * render.js's setQuickNavRoot()). `data-panel-id` lets app.js's single
- * "panelvisibility" listener find and update this same button when the
- * panel's visibility changes some other way (reorganizeTiled(), currently
- * the only other one - a panel has no minimize button of its own any more).
+ * "panelvisibility" listener find and update this same button if the
+ * panel's visibility is ever changed some other way than this button's
+ * own click - decoupled on purpose, even with no such caller today.
  * Same DocumentFragment pattern as renderModbar, for the same reason (no
  * unstyled wrapper element). `icon` (a material-icons name) is optional —
  * most entries are text-only; a template can ask for an icon instead when

@@ -30,8 +30,8 @@ setQuickNavRoot(quicknavNavEl, quicknavSepEl);
 // One listener, registered once (not per-render, unlike the quicknav
 // buttons themselves which get rebuilt on every module change) — keeps a
 // quicknav button's "active" state in sync when a panel's visibility
-// changes some other way (its own minimize button, or the reorganize
-// button), not just when the quicknav button itself was clicked.
+// changes some other way, not just when the quicknav button itself was
+// clicked.
 panelLayerEl.addEventListener("panelvisibility", (ev) => {
   const btn = quicknavNavEl.querySelector(`[data-panel-id="${ev.detail.id}"]`);
   if (btn) btn.classList.toggle("active", ev.detail.visible);
@@ -61,7 +61,6 @@ const loginToggleEl = document.getElementById("login-toggle");
 const logToggleEl = document.getElementById("log-toggle");
 const logBadgeDotEl = document.getElementById("log-badge-dot");
 const paramsToggleEl = document.getElementById("params-toggle");
-const reorganizeToggleEl = document.getElementById("reorganize-toggle");
 const dialogRootEl = document.getElementById("dialog-root");
 const connectBtnLabelEl = document.getElementById("connect-btn-label");
 const disconnectBtnLabelEl = document.getElementById("disconnect-btn-label");
@@ -75,7 +74,6 @@ const disconnectBtnLabelEl = document.getElementById("disconnect-btn-label");
 // events that already run after setLanguage() has updated i18n.js's
 // current language, so those pick it up for free.
 function applyStaticLabels() {
-  reorganizeToggleEl.title = t("chrome.tidyUpPanels");
   paramsToggleEl.title = t("chrome.parameters");
   zoomToggleEl.title = t("chrome.uiSize");
   themeToggle.title = t("chrome.toggleTheme");
@@ -258,13 +256,6 @@ function updateParamsToggle() {
   paramsToggleEl.classList.toggle("has-changes", !!(mod && mod.profile && mod.profile.changed));
 }
 
-// Only meaningful once a module (with its own floating panels) is active —
-// Controller/Files/Logs/the connect screen don't have any.
-function updateReorganizeToggle() {
-  reorganizeToggleEl.disabled = !isModuleView();
-}
-reorganizeToggleEl.addEventListener("click", () => { if (!reorganizeToggleEl.disabled) Panels.reorganizeTiled(); });
-
 function openParamsDialog() {
   const moduleName = activeView;
   const mod = isModuleView() && client.get(client.topics.module(moduleName));
@@ -356,11 +347,10 @@ function renderContentNow() {
   panelLayerEl.classList.toggle("hidden", !isModule);
   dockedViewEl.classList.toggle("hidden", isModule);
   // #quicknav's own visibility follows the module view directly, not
-  // whether it has nav entries to show — the actions zone (reorganize/
-  // params) is still relevant for a module with zero level1 groups.
+  // whether it has nav entries to show — the actions zone (params) is
+  // still relevant for a module with zero level1 groups.
   quicknavEl.classList.toggle("hidden", !isModule);
   updateParamsToggle();
-  updateReorganizeToggle();
 
   if (!activeView) { dockedViewEl.appendChild(renderConnectScreen()); return; }
   if (isModule) {

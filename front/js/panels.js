@@ -63,9 +63,9 @@ function layerRect() { return layer.getBoundingClientRect(); }
 
 // Whoever cares whether a given panel is shown or hidden (views.js's
 // renderQuickNav() buttons, via app.js's single listener) hears about it
-// here, regardless of which of the 2 ways it happened: Panels.togglePanel()
-// or reorganizeTiled(). One small decoupled signal instead of every
-// caller having to know about every other caller.
+// here, whenever Panels.togglePanel() changes it - decoupled from that
+// caller rather than every interested party having to know about it
+// directly.
 function notifyVisibility(id, visible) {
   layer.dispatchEvent(new CustomEvent("panelvisibility", { detail: { id, visible } }));
 }
@@ -275,52 +275,3 @@ export function togglePanel(id) {
   return willShow;
 }
 
-/**
- * Tidies up the current scope's panels: every one of them shown (none
- * collapsed any more) and tiled in a roughly square grid filling the
- * available layer area, sorted alphabetically by title (reading order:
- * left-to-right, top-to-bottom). Gilles, 2026-10-03: "le bouton
- * 'reorganise' ne fait plus grand chose d'interessant ... il faudrait
- * qu'il affiche toutes les fenetres en mosaique" - the previous "all
- * collapsed into one left-hand stack" behavior stopped being useful once
- * "collapsed" went from "just its own title bar left visible" to
- * "genuinely gone" (panels.css's own comment on that change) - a stack of
- * nothing-but-titles was worth glancing over; a stack of literally
- * invisible panels isn't. Persists each panel's own new position/size the
- * same way a manual drag/resize already does, so the tiled layout
- * survives a reload too.
- */
-export function reorganizeTiled() {
-  const lr = layerRect();
-  const margin = 12, gap = 10;
-  const availW = lr.width - margin * 2;
-  const availH = lr.height - SAFE_TOP - margin;
-  const sorted = [...live].sort((a, b) => {
-    const ta = a.querySelector(".panel-float-title")?.textContent || "";
-    const tb = b.querySelector(".panel-float-title")?.textContent || "";
-    return ta.localeCompare(tb, undefined, { sensitivity: "base" });
-  });
-  const n = sorted.length;
-  if (!n) return;
-  // Roughly square grid (e.g. 4 panels -> 2x2, 5 -> 3x2) rather than a
-  // single row/column, so each panel still gets a reasonable amount of
-  // both width and height regardless of how many there are.
-  const cols = Math.ceil(Math.sqrt(n));
-  const rows = Math.ceil(n / cols);
-  const cellW = availW / cols, cellH = availH / rows;
-  sorted.forEach((panel, i) => {
-    const id = panel.dataset.panel;
-    const col = i % cols, row = Math.floor(i / cols);
-    const x = margin + col * cellW, y = SAFE_TOP + row * cellH;
-    const w = cellW - gap, h = cellH - gap;
-    panel.classList.remove("collapsed");
-    panel.classList.add("resized"); // makes the body fill the explicit height below instead of staying content-sized (same class a manual resize already sets)
-    panel.style.left = x + "px";
-    panel.style.top = y + "px";
-    panel.style.width = w + "px";
-    panel.style.height = h + "px";
-    const panelScope = panel.dataset.scope || scope;
-    saveState(panelScope, id, { x, y, w, h, collapsed: false });
-    notifyVisibility(id, true);
-  });
-}

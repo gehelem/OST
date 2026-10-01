@@ -33,8 +33,8 @@ export function getMediaBaseUrl() { return mediaBaseUrl; }
 // fills the nav zone with its own {id,label} entries every time it
 // (re)builds panels; there is no other coordination between them, per
 // Panels.togglePanel()'s doc comment. This only owns the *navigation* zone
-// and its separator — #quicknav itself (the reorganize/params actions zone
-// too) is shown/hidden by app.js from isModuleView(), since the actions
+// and its separator — #quicknav itself (the params actions zone too) is
+// shown/hidden by app.js from isModuleView(), since the actions
 // stay relevant even for a module with zero level1 groups (Gilles,
 // 2026-09-27: "le bouton params ... devrait y figurer" regardless).
 let quickNavRoot = null;

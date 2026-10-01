@@ -66,7 +66,7 @@
  * Per-module bottom bar, one glass pill like #modbar — Gilles, 2026-09-27:
  * generic across every module. Two zones: navigation (left — one button per
  * panel/level1, filled by render.js's setQuickNavRoot()/views.js's
- * renderQuickNav()) and actions (right — reorganize/params, this same
+ * renderQuickNav()) and actions (right — params, this same
  * module's own controls, moved out of #top-right since "le bouton params
  * ... se rapporte au module en cours d'affichage"). The whole bar is hidden
  * for non-module views (docked screens have neither); the nav zone alone
@@ -80,10 +80,11 @@
   overflow-x: auto;
 }
 .quicknav-zone { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-/* The reorganize/params chips no longer carry their own standalone .glass
-   background (they sit inside #quicknav's shared pill instead) but keep a
-   faint background/border of their own so they still read as buttons —
-   same scoping convention as #modbar's own .mod-btn. */
+/* The params chip (and, before it was removed, reorganize alongside it)
+   doesn't carry its own standalone .glass background (it sits inside
+   #quicknav's shared pill instead) but keeps a faint background/border of
+   its own so it still reads as a button — same scoping convention as
+   #modbar's own .mod-btn. */
 #quicknav-actions .icon-chip { background: var(--accent-faint); border: 1px solid var(--border-subtle); border-radius: var(--radius); }
 .quicknav-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;

@@ -68,7 +68,6 @@ const STRINGS = {
   "status.disconnected": { en: "Disconnected", fr: "Déconnecté", de: "Getrennt", it: "Disconnesso", es: "Desconectado" },
 
   // ---- app chrome: connect bar, top-right icon buttons (app.js/index.html) -
-  "chrome.tidyUpPanels": { en: "Tile all windows", fr: "Mosaïque des fenêtres", de: "Fenster kacheln", it: "Mosaico delle finestre", es: "Mosaico de ventanas" },
   "chrome.parameters": { en: "Parameters", fr: "Paramètres", de: "Parameter", it: "Parametri", es: "Parámetros" },
   "chrome.uiSize": { en: "UI size", fr: "Taille de l'interface", de: "Oberflächengröße", it: "Dimensione interfaccia", es: "Tamaño de la interfaz" },
   "chrome.toggleTheme": { en: "Toggle theme", fr: "Changer de thème", de: "Design umschalten", it: "Cambia tema", es: "Cambiar tema" },
