@@ -49,6 +49,71 @@ export function updateQuickNav(entries) {
   if (quickNavSep) quickNavSep.classList.toggle("hidden", !show);
 }
 
+// ---- shared "root template" pieces ---------------------------------------
+// Every template (this file's own generic renderModuleView below,
+// templates/scaffold.js, templates/guider.js, templates/navigator.js) is
+// built around the same module subscribe/missing/dispose lifecycle and the
+// same "actions" panel - Gilles, 2026-10-0X: "Template de module racine
+// [...] c'est le Template a partir duquel tous les autres sont construits,
+// un heritage comme en C++ - pour ne pas repeter le code quand je te
+// demanderai d'ajouter des trucs sur tous les templates". render.js is
+// already the shared import every template uses (renderProperty,
+// updateQuickNav, ...), so these live here rather than a new file.
+
+/** One missing-module fallback panel, same shape every template already
+ * built independently. */
+export function missingModulePanel(moduleName) {
+  const b = Panels.make({ id: "missing", title: moduleName, x: 20, y: 92, w: 320 });
+  b.appendChild(el("div", { class: "muted", text: t("common.moduleNotFound") }));
+}
+
+/**
+ * The subscribe/missing-module/dispose boilerplate every template's own
+ * `mount(client, moduleName)` otherwise re-implements nearly verbatim.
+ * `build(mod)` is called on every module dump/profile event; `extraDispose`
+ * (a template's own per-property subscriptions, e.g. render.js's own
+ * `disposeProperties` or a template's own `dispose`), if given, runs before
+ * Panels.clear() both when the module disappears and on final unmount.
+ * Returns the `{dispose}` every template's own `mount()` already returns.
+ */
+export function moduleLifecycle(client, moduleName, build, extraDispose) {
+  const unsub = client.subscribe(client.topics.module(moduleName), (mod) => {
+    if (!mod) {
+      if (extraDispose) extraDispose();
+      Panels.clear();
+      updateQuickNav([]);
+      missingModulePanel(moduleName);
+      return;
+    }
+    build(mod);
+  });
+  return { dispose: () => { unsub(); if (extraDispose) extraDispose(); Panels.clear(); updateQuickNav([]); } };
+}
+
+/**
+ * The "actions" panel (the module's own bool-only command buttons) + its
+ * quicknav entry - a no-op if the module has no `actions` property. The
+ * quicknav button itself is icon-only (views.js's renderQuickNav() own
+ * `iconOnly` field) - Gilles, 2026-10-03: "Fenetre action (deja
+ * existante): bouton = juste une icone 'dashboard_customize'" - that exact
+ * icon isn't in this app's vendored assets/fonts/MaterialIcons-Regular.ttf
+ * though (checked directly, same class of gap as the login button's own
+ * icon - its GSUB ligature table has no "dashboard_customize" entry,
+ * Gilles: "l'icone dashboard_customize n'apparait pas, c'est vide"), and
+ * "dashboard" (the closest available match by name) wasn't what Gilles
+ * actually wanted either: "je veux un truc qui symbolise des boutons
+ * multiples" - "apps" (the classic multi-square grid) is. The panel's own
+ * title bar is unaffected, it keeps its normal text label.
+ */
+export function renderActionsPanel(client, moduleName, mod, track, quickNavEntries, pos) {
+  if (!("actions" in mod.properties)) return;
+  const p = { x: 20, y: 210, w: 300, ...pos };
+  const label = mod.properties.actions.label || t("common.actions");
+  const b = Panels.make({ id: "actions", title: label, x: p.x, y: p.y, w: p.w });
+  b.appendChild(track(renderProperty(client, moduleName, "actions")));
+  quickNavEntries.push({ id: "actions", label, icon: "apps", iconOnly: true });
+}
+
 // ---- element value formatting / editing --------------------------------
 
 function formatScalar(type, value) {
@@ -635,16 +700,16 @@ export function buildParamsPanel(client, moduleName, mod, track, container) {
 }
 
 /**
- * Renders a module as a set of floating panels (js/panels.js): one "header"
- * panel (icon/label/description), one "actions" panel when the module has a
- * bool-only `actions` property, one panel per level1 group (level2
- * sub-groups as tabs when there are any — see fillLevel1Panel()), and a
- * "General" panel for properties with no level1. The profile-centric
- * "Parameters" box (buildParamsPanel above) is
+ * Renders a module as a set of floating panels (js/panels.js): one
+ * "actions" panel when the module has a bool-only `actions` property, one
+ * panel per level1 group (level2 sub-groups as tabs when there are any —
+ * see fillLevel1Panel()), and a "General" panel for properties with no
+ * level1. The profile-centric "Parameters" box (buildParamsPanel above) is
  * NOT one of these — it opens on demand as a modal instead, see app.js.
- * Each panel is independently draggable/resizable/minimizable and
- * remembers its own layout per module (Gilles, 2026-09-25: "des fenêtres
- * volantes déplaçables, regroupées par level1").
+ * Each panel is independently draggable/resizable and remembers its own
+ * layout per module (Gilles, 2026-09-25: "des fenêtres volantes
+ * déplaçables, regroupées par level1") — shown/hidden only through its own
+ * quicknav button, no minimize of its own any more (Gilles, 2026-10-03).
  *
  * Subscribes to `client.topics.module(name)` for the module-level layout
  * (property set + profile — this topic does NOT fire on ordinary ea/ee/ps
@@ -667,19 +732,24 @@ export function renderModuleView(client, moduleName) {
   function build(mod) {
     disposeProperties();
     Panels.clear();
-
-    const header = Panels.make({ id: "header", title: mod.infos.modulelabel || mod.infos.label || moduleName, x: 20, y: 92, w: 320 });
-    header.appendChild(el("div", { class: "muted small", text: mod.infos.description || "" }));
-    // Profile load/save moved out to its own dedicated "Parameters" panel
-    // below — see buildParamsPanel() — not duplicated here (Gilles,
+    // Profile load/save lives in its own dedicated "Parameters" panel
+    // instead — see buildParamsPanel() — not duplicated here (Gilles,
     // 2026-09-26: pointing out ostnoctua's dedicated OstWidgets.params box).
+    // No "header" panel either (name/description) any more - Gilles,
+    // 2026-10-03: "la supprimer completement", the module's own name is
+    // already shown in the module bar above, this was a window with no
+    // quicknav button of its own to hide it.
 
     const properties = mod.properties;
+    const quickNavEntries = [];
+    // Bool-only check kept here rather than folded into
+    // renderActionsPanel()'s own simpler "has the property at all" rule
+    // (every other template uses that simpler one) - this generic fallback
+    // is the one screen that also has to keep a non-bool-only `actions`
+    // property OUT of its own panel below, laying it out with the rest of
+    // the level1/level2 grid like any other property instead.
     const hasActions = properties.actions && Object.values(properties.actions.elements || {}).some((e) => e.type === "bool");
-    if (hasActions) {
-      const abody = Panels.make({ id: "actions", title: properties.actions.label || "Actions", x: 360, y: 92, w: 280 });
-      abody.appendChild(track(renderProperty(client, moduleName, "actions")));
-    }
+    if (hasActions) renderActionsPanel(client, moduleName, mod, track, quickNavEntries, { x: 360, y: 92, w: 280 });
     const layoutProps = hasActions ? Object.fromEntries(Object.entries(properties).filter(([n]) => n !== "actions")) : properties;
     const { noLevel1, tabs } = buildLayout(layoutProps);
 
@@ -687,7 +757,6 @@ export function renderModuleView(client, moduleName) {
     // One quicknav button per panel built below (Gilles, 2026-09-27: "un
     // bouton par level1 et un pour level1='' si necessaire") — reuses the
     // exact same noLevel1/tabs this loop already computed, no separate pass.
-    const quickNavEntries = [];
     if (noLevel1.length) {
       const pos = autoPos(i++);
       const gbody = Panels.make({ id: "general", title: t("common.general"), x: pos.x, y: pos.y, w: pos.w });
@@ -705,19 +774,7 @@ export function renderModuleView(client, moduleName) {
     // opens on demand from the gear button (app.js) instead.
   }
 
-  const unsubModule = client.subscribe(client.topics.module(moduleName), (mod) => {
-    if (!mod) {
-      disposeProperties();
-      Panels.clear();
-      updateQuickNav([]);
-      const body = Panels.make({ id: "missing", title: moduleName, x: 20, y: 92, w: 320 });
-      body.appendChild(el("div", { class: "muted", text: t("common.moduleNotFound") }));
-      return;
-    }
-    build(mod);
-  });
-
-  return { dispose: () => { unsubModule(); disposeProperties(); Panels.clear(); updateQuickNav([]); } };
+  return moduleLifecycle(client, moduleName, build, disposeProperties);
 }
 
 /**

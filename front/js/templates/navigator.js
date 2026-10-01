@@ -29,7 +29,7 @@
 // addtoplanner), centeringparams, slaves - plus image/optic/parms, generic
 // to any imager.
 
-import { renderProperty, updateQuickNav, getMediaBaseUrl } from "../render.js";
+import { renderProperty, updateQuickNav, getMediaBaseUrl, moduleLifecycle, renderActionsPanel } from "../render.js";
 import { el } from "../dom.js";
 import * as Panels from "../panels.js";
 import { SkyEngine, ZOOM_MIN, ZOOM_MAX } from "../sky-engine.js";
@@ -407,8 +407,8 @@ export function mount(client, moduleName) {
     const sky = buildSkyDome(client, moduleName, selection.onSelect);
     disposers.push(sky.dispose);
 
-    const header = Panels.make({ id: "header", title: mod.infos.modulelabel || mod.infos.label || moduleName, x: 20, y: 92, w: 320 });
-    header.appendChild(el("div", { class: "muted small", text: mod.infos.description || "" }));
+    // No "header" panel any more (render.js's own renderModuleView doc
+    // comment: Gilles, 2026-10-03, "la supprimer completement").
 
     const selectionPanel = Panels.make({ id: "selection", title: t("navigator.selection"), x: 340, y: 92, w: 300 });
     selectionPanel.appendChild(track(selection.node));
@@ -420,11 +420,7 @@ export function mount(client, moduleName) {
       quickNavEntries.push({ id: "settings", label: t("navigator.settingsQuicknav"), icon: "tune" });
     }
 
-    if (has("actions")) {
-      const b = Panels.make({ id: "actions", title: mod.properties.actions.label || "Commands", x: 20, y: 210, w: 300 });
-      b.appendChild(track(renderProperty(client, moduleName, "actions")));
-      quickNavEntries.push({ id: "actions", label: mod.properties.actions.label || "Actions" });
-    }
+    renderActionsPanel(client, moduleName, mod, track, quickNavEntries);
     if (has("location")) {
       const b = Panels.make({ id: "location", title: mod.properties.location.label || "Site", x: 20, y: 330, w: 300 });
       b.appendChild(track(renderProperty(client, moduleName, "location")));
@@ -454,17 +450,5 @@ export function mount(client, moduleName) {
     updateQuickNav(quickNavEntries);
   }
 
-  const unsub = client.subscribe(client.topics.module(moduleName), (mod) => {
-    if (!mod) {
-      dispose();
-      Panels.clear();
-      updateQuickNav([]);
-      const b = Panels.make({ id: "missing", title: moduleName, x: 20, y: 92, w: 320 });
-      b.appendChild(el("div", { class: "muted", text: t("common.moduleNotFound") }));
-      return;
-    }
-    build(mod);
-  });
-
-  return { dispose: () => { unsub(); dispose(); Panels.clear(); updateQuickNav([]); } };
+  return moduleLifecycle(client, moduleName, build, dispose);
 }

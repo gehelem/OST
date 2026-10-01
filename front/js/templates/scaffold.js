@@ -1,5 +1,5 @@
 // templates/scaffold.js — shared builder for a "prepared" module template:
-// header + actions + a caller-given list of the module's own named panels
+// actions + a caller-given list of the module's own named panels
 // (each via render.js's generic renderProperty()) + full image handling
 // (background, quick stats, stats+histogram button — imagelayer.js) when
 // the module has one + a catch-all for anything else + the quicknav list +
@@ -21,9 +21,8 @@
 // a template does NOT list stays modal-only, so a profile-backed setting
 // never shows twice by default.
 
-import { renderProperty, updateQuickNav } from "../render.js";
+import { renderProperty, updateQuickNav, moduleLifecycle, renderActionsPanel } from "../render.js";
 import { addImageBlock } from "../imagelayer.js";
-import { el } from "../dom.js";
 import * as Panels from "../panels.js";
 import { t } from "../i18n.js";
 
@@ -59,16 +58,12 @@ export function buildScaffoldTemplate(panelSpecs, imagePos) {
       const has = (name) => name in mod.properties;
       const quickNavEntries = [];
 
-      const header = Panels.make({ id: "header", title: mod.infos.modulelabel || mod.infos.label || moduleName, x: 20, y: 92, w: 320 });
-      header.appendChild(el("div", { class: "muted small", text: mod.infos.description || "" }));
       // Profile load/save lives in the dedicated "Parameters" box (app.js's
-      // gear button, buildParamsPanel in render.js) — not built here.
+      // gear button, buildParamsPanel in render.js) — not built here. No
+      // "header" panel either any more (render.js's own renderModuleView
+      // doc comment: Gilles, 2026-10-03, "la supprimer completement").
 
-      if (has("actions")) {
-        const b = Panels.make({ id: "actions", title: mod.properties.actions.label || "Commands", x: 20, y: 210, w: 300 });
-        b.appendChild(track(renderProperty(client, moduleName, "actions")));
-        quickNavEntries.push({ id: "actions", label: mod.properties.actions.label || "Actions" });
-      }
+      renderActionsPanel(client, moduleName, mod, track, quickNavEntries);
 
       const known = new Set(["actions", "image"]);
       for (const spec of panelSpecs) {
@@ -108,18 +103,6 @@ export function buildScaffoldTemplate(panelSpecs, imagePos) {
       updateQuickNav(quickNavEntries);
     }
 
-    const unsub = client.subscribe(client.topics.module(moduleName), (mod) => {
-      if (!mod) {
-        dispose();
-        Panels.clear();
-        updateQuickNav([]);
-        const b = Panels.make({ id: "missing", title: moduleName, x: 20, y: 92, w: 320 });
-        b.appendChild(el("div", { class: "muted", text: t("common.moduleNotFound") }));
-        return;
-      }
-      build(mod);
-    });
-
-    return { dispose: () => { unsub(); dispose(); Panels.clear(); updateQuickNav([]); } };
+    return moduleLifecycle(client, moduleName, build, dispose);
   };
 }

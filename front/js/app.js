@@ -263,7 +263,7 @@ function updateParamsToggle() {
 function updateReorganizeToggle() {
   reorganizeToggleEl.disabled = !isModuleView();
 }
-reorganizeToggleEl.addEventListener("click", () => { if (!reorganizeToggleEl.disabled) Panels.reorganizeStacked(); });
+reorganizeToggleEl.addEventListener("click", () => { if (!reorganizeToggleEl.disabled) Panels.reorganizeTiled(); });
 
 function openParamsDialog() {
   const moduleName = activeView;

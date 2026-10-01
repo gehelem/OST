@@ -63,10 +63,9 @@ function layerRect() { return layer.getBoundingClientRect(); }
 
 // Whoever cares whether a given panel is shown or hidden (views.js's
 // renderQuickNav() buttons, via app.js's single listener) hears about it
-// here, regardless of which of the 3 ways it happened: the panel's own
-// minimize (-) button, Panels.togglePanel(), or reorganizeStacked(). One
-// small decoupled signal instead of every caller having to know about
-// every other caller.
+// here, regardless of which of the 2 ways it happened: Panels.togglePanel()
+// or reorganizeTiled(). One small decoupled signal instead of every
+// caller having to know about every other caller.
 function notifyVisibility(id, visible) {
   layer.dispatchEvent(new CustomEvent("panelvisibility", { detail: { id, visible } }));
 }
@@ -193,14 +192,8 @@ export function make(opts) {
   const title = document.createElement("span");
   title.className = "panel-float-title";
   title.textContent = opts.title || id;
-  const min = document.createElement("button");
-  min.className = "panel-float-min";
-  min.type = "button";
-  min.textContent = "–";
-  min.title = t("chrome.minimize");
   bar.appendChild(grip);
   bar.appendChild(title);
-  bar.appendChild(min);
   panel.appendChild(bar);
 
   const body = document.createElement("div");
@@ -214,22 +207,13 @@ export function make(opts) {
   rz.addEventListener("touchstart", (e) => startResize(panel, id, e, sc), { passive: false });
   panel.appendChild(rz);
 
-  min.addEventListener("click", (e) => {
-    e.stopPropagation();
-    panel.classList.toggle("collapsed");
-    const s = loadState(sc, id);
-    s.collapsed = panel.classList.contains("collapsed");
-    saveState(sc, id, s);
-    notifyVisibility(id, !s.collapsed);
-  });
-  bar.addEventListener("mousedown", (e) => {
-    if (e.target === min) return;
-    startDrag(panel, bar, id, e, sc);
-  });
-  bar.addEventListener("touchstart", (e) => {
-    if (e.target === min) return;
-    startDrag(panel, bar, id, e, sc);
-  }, { passive: false });
+  // No minimize button on the panel itself any more (Gilles, 2026-10-03:
+  // "plus de passage en mode reduit des fenetres ... c'est le bouton de la
+  // barre de menu qui affiche/masque la fenetre") - showing/hiding a panel
+  // only ever happens through its own quicknav button (togglePanel(), same
+  // "collapsed" class this used to toggle directly) from here on.
+  bar.addEventListener("mousedown", (e) => startDrag(panel, bar, id, e, sc));
+  bar.addEventListener("touchstart", (e) => startDrag(panel, bar, id, e, sc), { passive: false });
 
   layer.appendChild(panel);
   if (!opts.persistent) live.push(panel);
@@ -253,9 +237,10 @@ export function isPanelVisible(id) {
 
 /**
  * Shows or hides one panel by id (Gilles, 2026-09-27: the quicknav button
- * "doit masquer/demasquer la fenetre" and reflect which state it's in) —
- * toggles the same "collapsed" state the panel's own minimize button uses,
- * so the two stay interchangeable. Showing it also brings it to front
+ * "doit masquer/demasquer la fenetre" and reflect which state it's in;
+ * 2026-10-03: "c'est le bouton de la barre de menu qui affiche/masque la
+ * fenetre" - now the ONLY way, a panel no longer has its own minimize
+ * button) — toggles the panel's own "collapsed" class. Showing it also brings it to front
  * (re-appended as the layer's last child — later in DOM order paints on
  * top among default-stacking siblings) and scrolls it into view, with a
  * brief flash so it's easy to spot; hiding it is just the collapse, no
@@ -291,30 +276,51 @@ export function togglePanel(id) {
 }
 
 /**
- * Tidies up the current scope's panels: all collapsed, sorted
- * alphabetically by title, stacked in one left-hand column below the
- * module bar — Gilles, 2026-09-27. Also clears any per-panel resize
- * (a collapsed panel showing a leftover wide/tall size from before looks
- * inconsistent in a tidy stack). Persists the same way drag/resize/
- * minimize already do, so the tidy layout survives a reload too.
+ * Tidies up the current scope's panels: every one of them shown (none
+ * collapsed any more) and tiled in a roughly square grid filling the
+ * available layer area, sorted alphabetically by title (reading order:
+ * left-to-right, top-to-bottom). Gilles, 2026-10-03: "le bouton
+ * 'reorganise' ne fait plus grand chose d'interessant ... il faudrait
+ * qu'il affiche toutes les fenetres en mosaique" - the previous "all
+ * collapsed into one left-hand stack" behavior stopped being useful once
+ * "collapsed" went from "just its own title bar left visible" to
+ * "genuinely gone" (panels.css's own comment on that change) - a stack of
+ * nothing-but-titles was worth glancing over; a stack of literally
+ * invisible panels isn't. Persists each panel's own new position/size the
+ * same way a manual drag/resize already does, so the tiled layout
+ * survives a reload too.
  */
-export function reorganizeStacked() {
-  const startX = 12, startY = SAFE_TOP, stepY = 38;
+export function reorganizeTiled() {
+  const lr = layerRect();
+  const margin = 12, gap = 10;
+  const availW = lr.width - margin * 2;
+  const availH = lr.height - SAFE_TOP - margin;
   const sorted = [...live].sort((a, b) => {
     const ta = a.querySelector(".panel-float-title")?.textContent || "";
     const tb = b.querySelector(".panel-float-title")?.textContent || "";
     return ta.localeCompare(tb, undefined, { sensitivity: "base" });
   });
+  const n = sorted.length;
+  if (!n) return;
+  // Roughly square grid (e.g. 4 panels -> 2x2, 5 -> 3x2) rather than a
+  // single row/column, so each panel still gets a reasonable amount of
+  // both width and height regardless of how many there are.
+  const cols = Math.ceil(Math.sqrt(n));
+  const rows = Math.ceil(n / cols);
+  const cellW = availW / cols, cellH = availH / rows;
   sorted.forEach((panel, i) => {
     const id = panel.dataset.panel;
-    const y = startY + i * stepY;
-    panel.classList.add("collapsed");
-    panel.classList.remove("resized");
-    panel.style.left = startX + "px";
+    const col = i % cols, row = Math.floor(i / cols);
+    const x = margin + col * cellW, y = SAFE_TOP + row * cellH;
+    const w = cellW - gap, h = cellH - gap;
+    panel.classList.remove("collapsed");
+    panel.classList.add("resized"); // makes the body fill the explicit height below instead of staying content-sized (same class a manual resize already sets)
+    panel.style.left = x + "px";
     panel.style.top = y + "px";
-    panel.style.width = "";
-    panel.style.height = "";
-    saveState(scope, id, { x: startX, y, collapsed: true });
-    notifyVisibility(id, false);
+    panel.style.width = w + "px";
+    panel.style.height = h + "px";
+    const panelScope = panel.dataset.scope || scope;
+    saveState(panelScope, id, { x, y, w, h, collapsed: false });
+    notifyVisibility(id, true);
   });
 }

@@ -1,7 +1,9 @@
 /* panels.css — floating panel layer, module bar, connection widget,
  * adapted from ostnoctua's .on-glass/.on-modbar/.on-conn-cluster/.on-mod/
  * .on-float (ostnoctua.css) onto UI3's own theme.css tokens. See
- * js/panels.js for the panel drag/resize/minimize behavior this styles.
+ * js/panels.js for the panel drag/resize/show-hide behavior this styles -
+ * a panel has no minimize button of its own, only its own quicknav button
+ * (Gilles, 2026-10-03).
  *
  * .glass is ostnoctua's actual "frosted" recipe (translucent background +
  * backdrop-filter blur + subtle border + soft shadow) — the one visual
@@ -93,6 +95,11 @@
 }
 .quicknav-btn .material-icons { font-size: 16px; }
 .quicknav-btn:hover { color: var(--accent); border-color: var(--accent-dim); }
+/* The actions window's own button (render.js's renderActionsPanel()) -
+ * icon only, no label span at all, so the wide text-oriented padding
+ * above would leave it looking oddly stretched - square it up instead,
+ * same width as it is tall. */
+.quicknav-btn-icon-only { width: 36px; padding: 0; }
 .quicknav-btn.active {
   background: var(--accent-subtle); color: var(--accent); border-color: var(--accent);
   box-shadow: var(--shadow-glow);
@@ -314,14 +321,13 @@
   text-transform: uppercase; color: var(--text-secondary);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.panel-float-min {
-  border: 0; background: transparent; color: var(--text-muted);
-  cursor: pointer; font-size: 16px; line-height: 1; padding: 0 4px; opacity: 0.7;
-}
-.panel-float-min:hover { opacity: 1; color: var(--accent); }
 .panel-float-body { padding: var(--space-3) var(--space-4); overflow: auto; max-height: 74vh; }
-.panel-float.collapsed .panel-float-body { display: none; }
-.panel-float.collapsed .panel-float-bar { border-bottom: 0; }
+/* Gilles, 2026-10-03: "soit la fenetre est completement masquee (invisible)
+ * soit elle est completement visible jamais elle ne doit avoir cet etat
+ * reduit avec juste son header, ca ne sert a rien" - the whole panel, not
+ * just its body, so "collapsed" (quicknav button off) means genuinely
+ * gone, not a bare title bar left floating on screen with nothing in it. */
+.panel-float.collapsed { display: none; }
 
 .panel-float-resize {
   position: absolute; right: 3px; bottom: 3px;
@@ -331,7 +337,6 @@
     linear-gradient(135deg, transparent 66%, var(--accent) 66% 80%, transparent 80%);
 }
 .panel-float-resize:hover { opacity: 0.9; }
-.panel-float.collapsed .panel-float-resize { display: none; }
 .panel-float.resizing { user-select: none; }
 .panel-float.resized { max-width: none; }
 .panel-float.resized .panel-float-body { flex: 1 1 auto; min-height: 0; max-height: none; }

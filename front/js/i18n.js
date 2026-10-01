@@ -43,6 +43,7 @@ export function getLanguage() {
 const STRINGS = {
   // ---- shared across several templates/panels ----------------------------
   "common.other": { en: "Other", fr: "Autre", de: "Sonstiges", it: "Altro", es: "Otro" },
+  "common.actions": { en: "Actions", fr: "Actions", de: "Aktionen", it: "Azioni", es: "Acciones" },
   "common.moduleNotFound": { en: "Module not found (unloaded?)", fr: "Module introuvable (déchargé ?)", de: "Modul nicht gefunden (entladen?)", it: "Modulo non trovato (scaricato?)", es: "Módulo no encontrado (¿descargado?)" },
   "common.general": { en: "General", fr: "Général", de: "Allgemein", it: "Generale", es: "General" },
   "common.close": { en: "Close", fr: "Fermer", de: "Schließen", it: "Chiudi", es: "Cerrar" },
@@ -67,7 +68,7 @@ const STRINGS = {
   "status.disconnected": { en: "Disconnected", fr: "Déconnecté", de: "Getrennt", it: "Disconnesso", es: "Desconectado" },
 
   // ---- app chrome: connect bar, top-right icon buttons (app.js/index.html) -
-  "chrome.tidyUpPanels": { en: "Tidy up panels", fr: "Réorganiser les fenêtres", de: "Fenster aufräumen", it: "Riordina i pannelli", es: "Ordenar los paneles" },
+  "chrome.tidyUpPanels": { en: "Tile all windows", fr: "Mosaïque des fenêtres", de: "Fenster kacheln", it: "Mosaico delle finestre", es: "Mosaico de ventanas" },
   "chrome.parameters": { en: "Parameters", fr: "Paramètres", de: "Parameter", it: "Parametri", es: "Parámetros" },
   "chrome.uiSize": { en: "UI size", fr: "Taille de l'interface", de: "Oberflächengröße", it: "Dimensione interfaccia", es: "Tamaño de la interfaz" },
   "chrome.toggleTheme": { en: "Toggle theme", fr: "Changer de thème", de: "Design umschalten", it: "Cambia tema", es: "Cambiar tema" },
@@ -75,7 +76,6 @@ const STRINGS = {
   "chrome.logs": { en: "Logs", fr: "Journaux", de: "Protokolle", it: "Log", es: "Registros" },
   "chrome.connect": { en: "Connect", fr: "Connecter", de: "Verbinden", it: "Connetti", es: "Conectar" },
   "chrome.disconnect": { en: "Disconnect", fr: "Déconnecter", de: "Trennen", it: "Disconnetti", es: "Desconectar" },
-  "chrome.minimize": { en: "Minimize", fr: "Réduire", de: "Minimieren", it: "Riduci a icona", es: "Minimizar" },
   "chrome.resize": { en: "Resize", fr: "Redimensionner", de: "Größe ändern", it: "Ridimensiona", es: "Redimensionar" },
   "chrome.parametersPrefix": { en: "Parameters — ", fr: "Paramètres — ", de: "Parameter — ", it: "Parametri — ", es: "Parámetros — " },
   "chrome.notConnectedLede": { en: "Not connected. Set the WebSocket URL above and press Connect.", fr: "Non connecté. Renseignez l'URL WebSocket ci-dessus et cliquez sur Connecter.", de: "Nicht verbunden. Geben Sie oben die WebSocket-URL ein und klicken Sie auf Verbinden.", it: "Non connesso. Imposta l'URL WebSocket sopra e premi Connetti.", es: "No conectado. Indique la URL WebSocket arriba y pulse Conectar." },

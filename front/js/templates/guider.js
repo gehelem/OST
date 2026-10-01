@@ -35,7 +35,7 @@
 // `image`, defined generically by IndiModule::defineMeAsImager() (see
 // libs/indimodule.cpp) for any imaging module, guider included.
 
-import { renderProperty, updateQuickNav } from "../render.js";
+import { renderProperty, updateQuickNav, moduleLifecycle, renderActionsPanel } from "../render.js";
 import { addImageBlock } from "../imagelayer.js";
 import { el } from "../dom.js";
 import * as Panels from "../panels.js";
@@ -275,20 +275,17 @@ export function mount(client, moduleName) {
     // control here once those panels are actually created.
     const quickNavEntries = [];
 
-    const header = Panels.make({ id: "header", title: mod.infos.modulelabel || mod.infos.label || moduleName, x: 20, y: 92, w: 320 });
-    header.appendChild(el("div", { class: "muted small", text: mod.infos.description || "" }));
     // Profile load/save lives in the dedicated "Parameters" box below
-    // (buildParamsPanel, shared with the generic renderer) — not here.
+    // (buildParamsPanel, shared with the generic renderer) — not here. No
+    // "header" panel either any more (render.js's own renderModuleView
+    // doc comment: Gilles, 2026-10-03, "la supprimer completement").
 
-    if (has("actions")) {
-      const b = Panels.make({ id: "actions", title: mod.properties.actions.label || "Commands", x: 20, y: 210, w: 300 });
-      b.appendChild(track(renderProperty(client, moduleName, "actions")));
-      quickNavEntries.push({ id: "actions", label: mod.properties.actions.label || "Actions" });
-    }
+    renderActionsPanel(client, moduleName, mod, track, quickNavEntries);
     if (has("values")) {
       const b = Panels.make({ id: "values", title: mod.properties.values.label || "Session values", x: 20, y: 470, w: 300 });
       b.appendChild(track(renderProperty(client, moduleName, "values")));
       if (has("calibrationvalues")) b.appendChild(track(renderProperty(client, moduleName, "calibrationvalues")));
+      quickNavEntries.push({ id: "values", label: mod.properties.values.label || "Session values" });
     }
     addImageBlock(client, moduleName, mod, "image", "image", Panels, track, disposers, quickNavEntries, { x: 350, y: 92, w: 260 });
     if (has("guiding")) {
@@ -321,17 +318,5 @@ export function mount(client, moduleName) {
     updateQuickNav(quickNavEntries);
   }
 
-  const unsub = client.subscribe(client.topics.module(moduleName), (mod) => {
-    if (!mod) {
-      dispose();
-      Panels.clear();
-      updateQuickNav([]);
-      const b = Panels.make({ id: "missing", title: moduleName, x: 20, y: 92, w: 320 });
-      b.appendChild(el("div", { class: "muted", text: "Module not found (unloaded?)" }));
-      return;
-    }
-    build(mod);
-  });
-
-  return { dispose: () => { unsub(); dispose(); Panels.clear(); updateQuickNav([]); } };
+  return moduleLifecycle(client, moduleName, build, dispose);
 }

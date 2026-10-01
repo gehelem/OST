@@ -79,7 +79,8 @@ export function renderModbar(client, activeKey, onSelect) {
  * the *only* shared piece (render.js/templates own the entry list; see
  * render.js's setQuickNavRoot()). `data-panel-id` lets app.js's single
  * "panelvisibility" listener find and update this same button when the
- * panel's own minimize button (or reorganizeStacked()) changes it instead.
+ * panel's visibility changes some other way (reorganizeTiled(), currently
+ * the only other one - a panel has no minimize button of its own any more).
  * Same DocumentFragment pattern as renderModbar, for the same reason (no
  * unstyled wrapper element). `icon` (a material-icons name) is optional —
  * most entries are text-only; a template can ask for an icon instead when
@@ -89,12 +90,19 @@ export function renderModbar(client, activeKey, onSelect) {
  */
 export function renderQuickNav(entries) {
   const bar = document.createDocumentFragment();
-  for (const { id, label, icon: iconName } of entries) {
+  for (const { id, label, icon: iconName, iconOnly } of entries) {
+    // `iconOnly` (render.js's own renderActionsPanel(): the actions
+    // window's button, Gilles, 2026-10-03: "bouton = juste une icone
+    // 'dashboard_customize'") drops the text span entirely - `title`
+    // still carries the label as a tooltip either way. Every other entry
+    // keeps its previous icon+label (icon given) or plain-text (no icon)
+    // shape, unchanged.
+    const content = iconOnly ? [icon(iconName)] : iconName ? [icon(iconName), el("span", { text: label })] : label;
     const btn = el("button", {
-      class: "quicknav-btn" + (isPanelVisible(id) ? " active" : ""),
+      class: "quicknav-btn" + (iconOnly ? " quicknav-btn-icon-only" : "") + (isPanelVisible(id) ? " active" : ""),
       title: label, "data-panel-id": id,
       onclick: () => btn.classList.toggle("active", togglePanel(id)),
-    }, iconName ? [icon(iconName), el("span", { text: label })] : label);
+    }, content);
     bar.appendChild(btn);
   }
   return bar;
