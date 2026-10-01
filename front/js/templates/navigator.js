@@ -116,6 +116,7 @@ function saveDisplaySettings(engine) {
       showMeridian: engine.showMeridian,
       showMilkyWay: engine.showMilkyWay,
       showEcliptic: engine.showEcliptic,
+      showNames: engine.showNames,
       showMountPosition: engine.showMountPosition,
       showSensorFov: engine.showSensorFov,
       showSensorImage: engine.showSensorImage,
@@ -162,6 +163,7 @@ function buildSettingsPanel(engine) {
   wrap.appendChild(checkboxRow(t("navigator.meridian"), "showMeridian"));
   wrap.appendChild(checkboxRow(t("navigator.milkyWay"), "showMilkyWay"));
   wrap.appendChild(checkboxRow(t("navigator.ecliptic"), "showEcliptic"));
+  wrap.appendChild(checkboxRow(t("navigator.objectNames"), "showNames"));
   wrap.appendChild(checkboxRow(t("navigator.mountPosition"), "showMountPosition"));
   wrap.appendChild(checkboxRow(t("navigator.sensorFov"), "showSensorFov"));
   wrap.appendChild(checkboxRow(t("navigator.sensorImage"), "showSensorImage"));

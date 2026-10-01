@@ -404,6 +404,12 @@ export class SkyEngine {
     // Gilles, 2026-10-01: "ajoute le trait de l'ecliptique en option" -
     // same default-off reference-overlay treatment.
     this.showEcliptic = false;
+    // Gilles, 2026-10-03: "ajoute le noms des objets connus (etoiles,
+    // messier)" - one toggle for both (star proper names + Messier
+    // designations), same default-off reference-overlay treatment as the
+    // other optional decorations above: at any real star-count depth this
+    // would otherwise clutter the view by default.
+    this.showNames = false;
     // Gilles, 2026-10-03: "affiche la position du telescope (repere
     // orange) et le champ du capteur (cadre rouge)". Both default to
     // shown, unlike the reference overlays above (grids/horizon) - this
@@ -1182,6 +1188,12 @@ export class SkyEngine {
     // the "full" ~118k-star depth is loaded at a wide-open, dezoomed view.
     const starMagLimit = this.dayMode ? 0 : starMagnitudeLimit(this.zoom, ZOOM_MIN);
     ctx.fillStyle = fg.star;
+    // Gilles, 2026-10-03: "ajoute le noms des objets connus (etoiles,
+    // messier)" - only stars with a known proper name (sky-catalog.js's
+    // own starsFromGeoJson() doc comment: most have none, `name` stays
+    // undefined for those) get a label - not a magnitude cutoff of their
+    // own, just whatever's already passing starMagLimit above.
+    if (this.showNames) { ctx.font = uiFont(9); ctx.textAlign = "left"; ctx.textBaseline = "middle"; }
     for (const s of this.catalog.stars) {
       if (s.mag > starMagLimit) continue;
       const p = project(s.ra, s.dec);
@@ -1198,6 +1210,7 @@ export class SkyEngine {
       ctx.beginPath();
       ctx.arc(p.x, p.y, r, 0, 2 * Math.PI);
       ctx.fill();
+      if (this.showNames && s.name) ctx.fillText(s.name, p.x + r + 3 * labelScale, p.y);
     }
 
     // Messier objects: real angular size when the catalog has it (Gilles,
@@ -1221,7 +1234,15 @@ export class SkyEngine {
     // size but no known paDeg.
     if (this.showMessier) {
       ctx.strokeStyle = fg.messier;
+      ctx.fillStyle = fg.messier;
       ctx.lineWidth = 1;
+      // Gilles, 2026-10-03: "ajoute le noms des objets connus (etoiles,
+      // messier)" - the catalog designation (sky-catalog.js's own
+      // messierFromGeoJson(): f.properties.name, e.g. "M31"), always
+      // present (unlike stars' proper names), not the longer `alt` common
+      // name - shorter, and consistent with how every other chart labels
+      // these.
+      if (this.showNames) { ctx.font = uiFont(9); ctx.textAlign = "left"; ctx.textBaseline = "middle"; }
       for (const m of this.catalog.messier) {
         const p = project(m.ra, m.dec);
         if (!p.visible) continue;
@@ -1291,6 +1312,7 @@ export class SkyEngine {
         ctx.beginPath();
         ctx.ellipse(p.x, p.y, rx, ry, rotation, 0, 2 * Math.PI);
         ctx.stroke();
+        if (this.showNames && m.name) ctx.fillText(m.name, p.x + rx + 3 * labelScale, p.y);
       }
     }
 
