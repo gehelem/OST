@@ -32,6 +32,7 @@ import { Body, Horizon, Equator, Illumination } from "../lib/astronomy-engine.js
 import { makeObserver, equatorialToHorizontal, equatorialOfDateToHorizontal, equatorialHorizontalRotation, horizontalToEquatorial, horizontalToVector, vectorToHorizontal, vectorToScreen, screenToVector, magnitudeToRadius, starMagnitudeLimit, sensorFovCorners, eclipticToEquatorial } from "./sky-projection.js";
 import { identity, multiply, conjugate, rotateVector, fromTwoVectors } from "./quaternion.js";
 import { loadCatalog } from "./sky-catalog.js";
+import { clipPolygonToHemisphere } from "../lib/sphere-clip.js";
 
 // Below this many CSS px of total movement between pointerdown and
 // pointerup, a gesture counts as a tap/click (selection) rather than a
@@ -743,8 +744,8 @@ export class SkyEngine {
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, w, h);
     const fg = isLightBg
-      ? { dome: "rgba(0,0,0,0.28)", cardinal: "rgba(0,0,0,0.6)", constellation: "rgba(40,80,140,0.45)", star: "#15181c", messier: "rgba(27,94,32,0.85)", horizon: "rgba(180,110,0,0.65)", equator: "rgba(0,121,107,0.6)", azimuthal: "rgba(123,31,162,0.6)", meridian: "rgba(13,71,161,0.95)", milkyway: "rgba(60,80,110,0.35)", ecliptic: "rgba(230,140,20,0.75)", grad: "rgba(0,0,0,0.55)", ground: "#cdbb95" }
-      : { dome: "rgba(255,255,255,0.25)", cardinal: "rgba(255,255,255,0.55)", constellation: "rgba(100,160,220,0.35)", star: "#fff", messier: "rgba(129,199,132,0.85)", horizon: "rgba(255,193,7,0.55)", equator: "rgba(77,208,225,0.6)", azimuthal: "rgba(206,147,216,0.6)", meridian: "rgba(41,121,255,0.95)", milkyway: "rgba(200,215,235,0.18)", ecliptic: "rgba(255,183,77,0.85)", grad: "rgba(255,255,255,0.75)", ground: "#241b12" };
+      ? { dome: "rgba(0,0,0,0.28)", cardinal: "rgba(0,0,0,0.6)", constellation: "rgba(40,80,140,0.45)", star: "#15181c", messier: "rgba(27,94,32,0.85)", horizon: "rgba(180,110,0,0.65)", equator: "rgba(0,121,107,0.6)", azimuthal: "rgba(123,31,162,0.6)", meridian: "rgba(13,71,161,0.95)", milkyway: "rgba(60,80,110,0.35)", milkywayFill: "rgba(70,75,85,0.10)", ecliptic: "rgba(230,140,20,0.75)", grad: "rgba(0,0,0,0.55)", ground: "#cdbb95" }
+      : { dome: "rgba(255,255,255,0.25)", cardinal: "rgba(255,255,255,0.55)", constellation: "rgba(100,160,220,0.35)", star: "#fff", messier: "rgba(129,199,132,0.85)", horizon: "rgba(255,193,7,0.55)", equator: "rgba(77,208,225,0.6)", azimuthal: "rgba(206,147,216,0.6)", meridian: "rgba(41,121,255,0.95)", milkyway: "rgba(200,215,235,0.18)", milkywayFill: "rgba(200,205,215,0.08)", ecliptic: "rgba(255,183,77,0.85)", grad: "rgba(255,255,255,0.75)", ground: "#241b12" };
 
     const cx = w / 2, cy = h / 2;
     const domeRadius = Math.min(w, h) / 2 * 0.96 * this.zoom;
@@ -1091,36 +1092,61 @@ export class SkyEngine {
     }
 
     // Milky Way outline (Gilles, 2026-10-01: "ajoute son affichage en
-    // optionnel dans les settings du module") - a plain contour, no fill.
-    // A fill was attempted (Gilles: "tu peux griser legerement l'interieur
-    // de ces contours") but every attempt at correctly clipping a filled
-    // shape against the dome edge/visible hemisphere boundary produced a
-    // real, visible bug (straight "bars" across the sky; then no fill at
-    // all, since a band circling the whole sky is essentially never 100%
-    // on-screen; then, on a third attempt, the fill covering the entire
-    // dome and flickering with panning) - reverted back to this simple,
-    // reliable contour-only version rather than keep shipping a broken
-    // fill (Gilles: "revenir au contour seul" when asked how to proceed).
-    // Drawn before constellations/stars, as the diffuse background band it
-    // represents. Each contiguous run of visible points gets its own
-    // moveTo/lineTo (not one straight lineTo across a gap, and never
-    // closed) - same reasoning as the true horizon/constellation lines:
-    // a ring dipping behind the viewer should just clip, not draw a stray
-    // line/chord clear across the dome.
+    // optionnel dans les settings du module", then "tu peux griser
+    // legerement l'interieur de ces contours") - contour stroked plus a
+    // light fill, one path per polygon covering every one of its rings
+    // (sky-catalog.js's own milkyWayFromGeoJson doc comment - ring[0] is
+    // the outer boundary, the rest are holes e.g. the Coalsack). Drawn
+    // before constellations/stars, as the diffuse background band it
+    // represents.
+    //
+    // Several earlier approaches here all drew phantom straight lines
+    // somewhere (Gilles, with real screenshots, circled them in red
+    // twice): each one closed a dome-edge-clipped "visible run" of points
+    // onto itself with a straight line, which is only geometrically valid
+    // for a small, compact run (a hole like the Coalsack) - the band's own
+    // big outer boundary, once cut by the dome edge, can leave a run
+    // spanning a huge arc, and a straight line across that is exactly the
+    // fake edge in the screenshots. A chord-length threshold (skip filling
+    // runs with a long closing chord) fixed the phantom lines but then
+    // left real gaps along the band's own outermost layer - the actual
+    // fix is a real clip, not a guess about which runs are "safe" to
+    // close: lib/sphere-clip.js (ported from d3-geo's own clipping
+    // pipeline, see its own header for why a port rather than another
+    // hand-rolled attempt) clips each polygon to the visible hemisphere
+    // properly, returning already-closed rings (dome-edge arcs included as
+    // real points) with the source GeoJSON's own winding preserved - no
+    // closing-chord guesswork, no evenodd workaround, holes just read as
+    // holes via the canvas's own default ("nonzero") fill rule.
     if (this.showMilkyWay) {
       ctx.strokeStyle = fg.milkyway;
+      ctx.fillStyle = fg.milkywayFill;
       ctx.lineWidth = 1;
+      // Each point's own view-frame unit vector (post-rotation, pre-
+      // projection) - sphere-clip.js's own input convention, matching
+      // vectorToScreen's "visible iff v.z>=0" exactly (see its doc
+      // comment), computed the same way project() does internally.
+      const toViewVector = (raDeg, decDeg) => {
+        const { azimuth, altitude } = equatorialToHorizontal(raDeg, decDeg, this.observer, date, eqjHorRotation);
+        return rotateVector(this.rotation, horizontalToVector(azimuth, altitude));
+      };
       for (const polygon of this.catalog.milkyWay) {
-        for (const ring of polygon) {
-          ctx.beginPath();
-          let started = false;
-          for (const pt of ring) {
-            const p = project(pt.ra, pt.dec);
-            if (!p.visible) { started = false; continue; }
-            if (!started) { ctx.moveTo(p.x, p.y); started = true; } else { ctx.lineTo(p.x, p.y); }
+        const rings = polygon.map((ring) => ring.map((pt) => toViewVector(pt.ra, pt.dec)));
+        const clipped = clipPolygonToHemisphere(rings);
+        if (clipped.length === 0) continue;
+
+        ctx.beginPath();
+        for (const ring of clipped) {
+          const p0 = vectorToScreen(ring[0], domeRadius, this.projection);
+          ctx.moveTo(cx + p0.x, cy + p0.y);
+          for (let i = 1; i < ring.length; i++) {
+            const p = vectorToScreen(ring[i], domeRadius, this.projection);
+            ctx.lineTo(cx + p.x, cy + p.y);
           }
-          ctx.stroke();
+          ctx.closePath();
         }
+        ctx.fill();
+        ctx.stroke();
       }
     }
 

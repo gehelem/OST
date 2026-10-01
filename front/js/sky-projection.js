@@ -343,9 +343,25 @@ export function vectorToHorizontal(v) {
  * as J2000, converting to of-date internally via INDI::J2000toObserved) —
  * so returning J2000 here, not of-date, is required for that value to be
  * usable as-is.
+ *
+ * altitudeDeg is clamped just shy of the exact zenith (90) before being
+ * used - found via an earlier Milky Way overlay experiment that sampled
+ * this function from a screen grid landing exactly on the dome's own
+ * center (the zenith) every render: astronomy-engine.js's own
+ * InverseRefraction() (called internally via VectorFromHorizon's "normal"
+ * refraction mode) runs an unbounded `for (;;)` fixed-point iteration that
+ * never converges at altitude exactly 90 (its own correction formula sits
+ * right on a tangent singularity there) and hangs forever. That overlay
+ * approach was itself abandoned (too slow), but the underlying hang is a
+ * real, separate characteristic of the vendored library that could still
+ * bite any future caller of this function (including a real mouse tap
+ * landing exactly on the zenith pixel, however unlikely) - worth keeping
+ * fixed here regardless. A thousandth of a degree of precision at a single
+ * mathematical point, traded for turning a guaranteed hang into a normal
+ * result.
  */
 export function horizontalToEquatorial(azimuthDeg, altitudeDeg, observer, date) {
-  const horVec = VectorFromHorizon(new Spherical(altitudeDeg, azimuthDeg, 1), date, "normal");
+  const horVec = VectorFromHorizon(new Spherical(Math.min(altitudeDeg, 89.999), azimuthDeg, 1), date, "normal");
   const eqjVec = RotateVector(Rotation_HOR_EQJ(date, observer), horVec);
   const equ = EquatorFromVector(eqjVec); // {ra: hours, dec: degrees}
   return { ra: equ.ra * 15, dec: equ.dec };
