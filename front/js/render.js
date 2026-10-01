@@ -28,6 +28,31 @@ let mediaBaseUrl = "";
 export function setMediaBaseUrl(url) { mediaBaseUrl = url; }
 export function getMediaBaseUrl() { return mediaBaseUrl; }
 
+// Dev-mode escape hatch (Gilles, 2026-10-03: "j'ai fait ca sur
+// Osterix/Rooster, en phase de dev ca fait une bouee de sauvetage : on
+// force l'utilisation du template de base ... je suis certain de pouvoir
+// toucher toutes les proprietes lorsque le template n'est pas encore bien
+// determine") - when on for a given module, app.js's own template dispatch
+// (renderContentNow) always uses the generic, level1-grouped fallback
+// (renderModuleView) instead of that module's bespoke templates/*.js
+// (infos.template), so every property stays reachable while that
+// particular template is still being built out. Per-module, not global
+// (Gilles, having first gotten the global version: "j'aurais bien aime
+// que la portee soit au niveau du module") - persisted as the set of
+// module names it's currently on for, under one flat
+// "ostcore-ui3.<name>" key like every other cross-cutting UI setting
+// already is (app.js's own theme/zoom), rather than one key per module.
+const DISABLE_TEMPLATES_KEY = "ostcore-ui3.disableTemplates";
+const disabledTemplateModules = new Set((() => {
+  try { return JSON.parse(localStorage.getItem(DISABLE_TEMPLATES_KEY)) || []; } catch (e) { return []; }
+})());
+export function getDisableTemplates(moduleName) { return disabledTemplateModules.has(moduleName); }
+export function setDisableTemplates(moduleName, v) {
+  if (v) disabledTemplateModules.add(moduleName);
+  else disabledTemplateModules.delete(moduleName);
+  try { localStorage.setItem(DISABLE_TEMPLATES_KEY, JSON.stringify([...disabledTemplateModules])); } catch (e) { /* ignore */ }
+}
+
 // #quicknav-nav / #quicknav-sep (app.js sets both once at boot) — each
 // module view (this file's generic renderer, or a bespoke templates/*.js)
 // fills the nav zone with its own {id,label} entries every time it
@@ -696,8 +721,13 @@ function renderInfosTab(mod) {
  * in practice this is never false), false otherwise — the caller decides
  * what "nothing to show" means for its own UI (app.js disables the gear
  * button; nothing else currently calls this without checking first).
+ *
+ * `onTemplateToggle`, if given, is called whenever the profile bar's own
+ * dev-mode checkbox (getDisableTemplates(), see its own doc comment)
+ * flips - app.js passes its own renderContentNow so the change is visible
+ * right away, without closing this modal.
  */
-export function buildParamsPanel(client, moduleName, mod, track, container) {
+export function buildParamsPanel(client, moduleName, mod, track, container, onTemplateToggle) {
   const names = Object.keys(mod.properties).filter((n) => mod.properties[n].hasprofile === true);
   const hasInfos = mod.infos && Object.keys(mod.infos).length > 0;
   if (!names.length && !hasInfos) return false;
@@ -709,7 +739,7 @@ export function buildParamsPanel(client, moduleName, mod, track, container) {
   // Nothing to load/save without a hasprofile property - a bare Info tab
   // (no profile-backed settings at all) skips the profile bar instead of
   // showing one with nothing underneath it to act on.
-  if (names.length) container.appendChild(track(renderProfileBar(client, moduleName, mod)));
+  if (names.length) container.appendChild(track(renderProfileBar(client, moduleName, mod, onTemplateToggle)));
 
   function fillGroup(target, tab) {
     if (tab.infosTab) { target.appendChild(renderInfosTab(mod)); return; }
@@ -835,7 +865,7 @@ export function renderModuleView(client, moduleName) {
  * the exact-case infos.classname (new field, added server-side the same
  * day) - not infos.template, and not a one-shot read.
  */
-export function renderProfileBar(client, moduleName, mod) {
+export function renderProfileBar(client, moduleName, mod, onTemplateToggle) {
   const bar = el("div", { class: "profile-bar" });
   bar.appendChild(el("span", { class: "muted", text: t("common.profile") }));
   const nameSpan = el("span", { class: "profile-name" + (mod.profile.changed ? " changed" : ""), text: mod.profile.name || "(none)" });
@@ -848,6 +878,21 @@ export function renderProfileBar(client, moduleName, mod) {
   bar.appendChild(nameInput);
   bar.appendChild(el("button", { class: "btn btn-sm", onclick: () => { const n = nameInput.value || select.value; if (n) client.loadProfile(moduleName, n); } }, [icon("folder_open", { small: true }), "Load"]));
   bar.appendChild(el("button", { class: "btn btn-sm", onclick: () => { const n = nameInput.value || select.value; if (n) client.saveProfile(moduleName, n); } }, [icon("save", { small: true }), "Save"]));
+
+  // Dev-mode "force the generic template" escape hatch - see
+  // getDisableTemplates()'s own doc comment above. Gilles: "ajoute un
+  // petit toggle discret a droite du bouton save" - plain small checkbox
+  // + label, same clickable-label shape as navigator.js's own settings
+  // panel checkboxes, not a dedicated switch widget of its own.
+  const templateCb = el("input", { type: "checkbox" });
+  templateCb.checked = getDisableTemplates(moduleName);
+  templateCb.addEventListener("change", () => {
+    setDisableTemplates(moduleName, templateCb.checked);
+    if (onTemplateToggle) onTemplateToggle();
+  });
+  bar.appendChild(el("label", { class: "profile-bar-dev-toggle muted small", title: t("common.disableTemplatesHint"), style: "cursor:pointer" }, [
+    templateCb, el("span", { text: t("common.disableTemplates") }),
+  ]));
 
   const classname = mod.infos.classname || "";
   const unsubscribe = client.subscribe(client.topics.lovs(), (lovs) => {

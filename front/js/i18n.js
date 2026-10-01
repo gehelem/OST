@@ -45,6 +45,8 @@ const STRINGS = {
   "common.other": { en: "Other", fr: "Autre", de: "Sonstiges", it: "Altro", es: "Otro" },
   "common.actions": { en: "Actions", fr: "Actions", de: "Aktionen", it: "Azioni", es: "Acciones" },
   "common.moduleInfo": { en: "Info", fr: "Infos", de: "Info", it: "Info", es: "Información" },
+  "common.disableTemplates": { en: "Disable templates", fr: "Désactiver les templates", de: "Vorlagen deaktivieren", it: "Disattiva i template", es: "Desactivar las plantillas" },
+  "common.disableTemplatesHint": { en: "Force the generic property view for this module (dev mode)", fr: "Force la vue générique des propriétés pour ce module (mode développement)", de: "Erzwingt die generische Eigenschaftsansicht für dieses Modul (Entwicklermodus)", it: "Forza la vista generica delle proprietà per questo modulo (modalità sviluppo)", es: "Fuerza la vista genérica de propiedades para este módulo (modo desarrollo)" },
   "common.moduleNotFound": { en: "Module not found (unloaded?)", fr: "Module introuvable (déchargé ?)", de: "Modul nicht gefunden (entladen?)", it: "Modulo non trovato (scaricato?)", es: "Módulo no encontrado (¿descargado?)" },
   "common.general": { en: "General", fr: "Général", de: "Allgemein", it: "Generale", es: "General" },
   "common.close": { en: "Close", fr: "Fermer", de: "Schließen", it: "Chiudi", es: "Cerrar" },

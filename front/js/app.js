@@ -7,7 +7,7 @@
 // shared canvas instead of a single docked node — see renderContentNow().
 
 import { createClient, deriveDefaultUrls } from "../core/index.js";
-import { renderModuleView, buildParamsPanel, setMediaBaseUrl, setDialogRoot, setQuickNavRoot } from "./render.js";
+import { renderModuleView, buildParamsPanel, setMediaBaseUrl, setDialogRoot, setQuickNavRoot, getDisableTemplates } from "./render.js";
 import { renderModbar, renderSystemViews, renderController, renderFiles, renderLogs, renderLogin, renderLogPanel } from "./views.js";
 import { el, icon, iconButton } from "./dom.js";
 import * as Panels from "./panels.js";
@@ -279,7 +279,7 @@ function openParamsDialog() {
   ]));
   const body = el("div");
   dialog.appendChild(body);
-  buildParamsPanel(client, moduleName, mod, track, body);
+  buildParamsPanel(client, moduleName, mod, track, body, renderContentNow);
 
   overlay.appendChild(dialog);
   overlay.addEventListener("click", (ev) => { if (ev.target === overlay) close(); });
@@ -363,8 +363,13 @@ function renderContentNow() {
     // A bespoke template (templates/index.js) wins over the generic,
     // level1-grouped renderer when infos.template names one we have —
     // see templates/index.js's header for the fallback-safety note.
+    // getDisableTemplates(activeView) (the Parameters box's own per-module
+    // dev-mode checkbox, render.js) forces the generic one for THIS
+    // module regardless, Gilles: "je suis certain de pouvoir toucher
+    // toutes les proprietes lorsque le template n'est pas encore bien
+    // determine".
     const mod = client.get(client.topics.module(activeView));
-    const bespoke = mod && templates[mod.infos.template];
+    const bespoke = !getDisableTemplates(activeView) && mod && templates[mod.infos.template];
     const result = bespoke ? bespoke.mount(client, activeView) : renderModuleView(client, activeView);
     // Keeps the gear button's "unsaved changes" dot live while this same
     // module stays active (updateParamsToggle() already ran once above,
