@@ -47,6 +47,19 @@
       </div>
     </nav>
     <div id="top-right">
+      <!-- Gilles, 2026-10-03: "en haut a droite, juste avant le bouton
+           d'ajustement de taille, ajoute encore un bouton pour la gestion
+           de logs" - opens the always-on floating log panel (views.js's
+           renderLogPanel()). Badge dot (hidden by default) tracks the
+           worst level currently in the log buffer - app.js's own
+           client.topics.logs() subscription, same "corner dot on a
+           #top-right icon-chip" shape as the login button's own grant
+           colouring above, not the module buttons' .status-dot vocabulary
+           (see panels.css's own comment on that button's dot). -->
+      <button id="log-toggle" class="glass icon-chip" title="Logs">
+        <span class="material-icons">list</span>
+        <span id="log-badge-dot" class="status-dot log-badge-dot hidden"></span>
+      </button>
       <div id="zoom-widget">
         <button id="zoom-toggle" class="glass icon-chip" title="UI size"><span class="material-icons">format_size</span></button>
         <div id="zoom-panel" class="glass zoom-panel hidden">

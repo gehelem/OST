@@ -56,6 +56,11 @@
   --error: #f36a6a;
   --error-rgb: 243, 106, 106;
   --warn: #f5b942;
+  /* Distinct from --warn (yellow) and --error (now "critical", red) -
+     log level 3/"error" sits between them (Gilles, 2026-10-03: "jaune
+     warning orange error rouge critical"). */
+  --orange: #f5832e;
+  --orange-rgb: 245, 131, 46;
 
   /* Semantic buttons */
   --btn-success: #4ade80;
@@ -128,6 +133,8 @@
   --error: #d1453d;
   --error-rgb: 209, 69, 61;
   --warn: #c98a12;
+  --orange: #c1630f;
+  --orange-rgb: 193, 99, 15;
 
   --btn-success: #2e9e5b;
   --btn-warning: #c98a12;

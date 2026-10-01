@@ -166,6 +166,20 @@
 #login-toggle.grant-readonly { color: var(--busy); }
 #login-toggle.grant-full { color: var(--ok); }
 
+/* Log button (#top-right): same corner-dot badge type as a module button's
+ * own global-state dot (.mod-btn-dot above, same .status-dot base) -
+ * Gilles, 2026-10-03: "le bouton doit avoir le meme type de pastille que
+ * les boutons de modules selon le niveau le plus eleve de tous les
+ * messages (jaune=warning orange=error rouge=critical rien sinon)". Colour
+ * classes of its own (app.js computes which, from the log buffer's own
+ * worst level) rather than reusing .status-ok/.status-busy/.status-error -
+ * those are a different, 4-state vocabulary (standby/ok/busy/error) with
+ * no "nothing above warning" case, and no yellow at all. */
+.log-badge-dot { position: absolute; top: 5px; right: 5px; margin-right: 0; }
+.log-badge-dot.level-warning { background: var(--warn); box-shadow: 0 0 8px rgba(var(--busy-rgb), 0.5); }
+.log-badge-dot.level-error { background: var(--orange); box-shadow: 0 0 8px rgba(var(--orange-rgb), 0.5); }
+.log-badge-dot.level-critical { background: var(--error); box-shadow: 0 0 8px rgba(var(--error-rgb), 0.5); }
+
 /* ------------------------------------------------------- connection widget
  * Collapsed to a small status pill once connected; click anywhere on it to
  * fold out the full settings (brand/URL/media URL/language/connect). */

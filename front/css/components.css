@@ -218,8 +218,26 @@ input[type="range"]::-moz-range-thumb {
 .log-table td { padding: 4px 10px; border-bottom: 1px solid var(--border-subtle); vertical-align: top; }
 .log-table tr:hover td { background: var(--bg-hover); }
 .log-warning td:last-child { color: var(--warn); }
-.log-error td:last-child, .log-critical td:last-child { color: var(--error); }
+.log-error td:last-child { color: var(--orange); }
+.log-critical td:last-child { color: var(--error); }
 .log-toolbar { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3); }
+
+/* ---------------------------------------------------- floating log panel
+ * (views.js's renderLogPanel(), #top-right's own log button in app.js) -
+ * same colour-by-level convention as .log-table above, compact rows
+ * instead of a table (ostnoctua's web/log.js's own .w-log-row shape). */
+.log-panel-body { display: flex; flex-direction: column; gap: var(--space-2); }
+.log-panel-body .log-toolbar { margin-bottom: 0; }
+.log-panel-body .log-filter-module { flex: 1 1 auto; min-width: 0; }
+.log-panel-list { display: flex; flex-direction: column; overflow-y: auto; max-height: 50vh; font-size: 12px; font-family: var(--font-mono); }
+.log-panel-row { display: flex; gap: 8px; padding: 2px 4px; border-bottom: 1px solid var(--border-subtle); }
+.log-panel-row:hover { background: var(--bg-hover); }
+.log-panel-time { color: var(--text-dim); flex-shrink: 0; }
+.log-panel-src { color: var(--text-muted); flex-shrink: 0; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.log-panel-msg { flex: 1 1 auto; min-width: 0; color: var(--text-secondary); }
+.log-panel-row.log-warning .log-panel-msg { color: var(--warn); }
+.log-panel-row.log-error .log-panel-msg { color: var(--orange); }
+.log-panel-row.log-critical .log-panel-msg { color: var(--error); }
 
 /* -------------------------------------------------------------- connect */
 .connect-screen { max-width: 560px; margin: 8vh auto; text-align: center; }

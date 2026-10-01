@@ -8,7 +8,7 @@
 
 import { createClient, deriveDefaultUrls } from "../core/index.js";
 import { renderModuleView, buildParamsPanel, setMediaBaseUrl, setDialogRoot, setQuickNavRoot } from "./render.js";
-import { renderModbar, renderSystemViews, renderController, renderFiles, renderLogs, renderLogin } from "./views.js";
+import { renderModbar, renderSystemViews, renderController, renderFiles, renderLogs, renderLogin, renderLogPanel } from "./views.js";
 import { el, icon, iconButton } from "./dom.js";
 import * as Panels from "./panels.js";
 import { setBgLayer } from "./imagelayer.js";
@@ -58,6 +58,8 @@ const wsUrlInput = document.getElementById("ws-url");
 const mediaUrlInput = document.getElementById("media-url");
 const themeToggle = document.getElementById("theme-toggle");
 const loginToggleEl = document.getElementById("login-toggle");
+const logToggleEl = document.getElementById("log-toggle");
+const logBadgeDotEl = document.getElementById("log-badge-dot");
 const paramsToggleEl = document.getElementById("params-toggle");
 const reorganizeToggleEl = document.getElementById("reorganize-toggle");
 const dialogRootEl = document.getElementById("dialog-root");
@@ -78,6 +80,7 @@ function applyStaticLabels() {
   zoomToggleEl.title = t("chrome.uiSize");
   themeToggle.title = t("chrome.toggleTheme");
   loginToggleEl.title = t("chrome.login");
+  logToggleEl.title = t("chrome.logs");
   connectBtnLabelEl.textContent = t("chrome.connect");
   disconnectBtnLabelEl.textContent = t("chrome.disconnect");
   connSummaryEl.textContent = t("status." + client.connection.status);
@@ -93,6 +96,11 @@ function setConnPanelOpen(open) {
 }
 connToggleEl.addEventListener("click", () => setConnPanelOpen(connPanelEl.classList.contains("hidden")));
 loginToggleEl.addEventListener("click", () => renderLogin(client));
+// Gilles, 2026-10-03: "quand on clique depuis un module ca selectionne
+// les messages du module" - isModuleView()/activeView defined further
+// down (function hoisting - this only runs on an actual click, long after
+// the whole module has loaded, so the forward reference is fine).
+logToggleEl.addEventListener("click", () => renderLogPanel(client, isModuleView() ? activeView : null));
 document.addEventListener("click", (ev) => {
   if (!connPanelEl.classList.contains("hidden") && !connWidgetEl.contains(ev.target)) setConnPanelOpen(false);
 });
@@ -422,6 +430,22 @@ client.subscribe(client.topics.modules(), () => {
   // subscribes to topics.module(name) directly and renders its own
   // "not found" state when a module is removed — see its module doc.
   renderModbarNow();
+});
+
+// Gilles, 2026-10-03: "le bouton doit avoir le meme type de pastille que
+// les boutons de modules selon le niveau le plus eleve de tous les
+// messages (jaune=warning orange=error rouge=critical rien sinon)" - the
+// WORST level currently in the log buffer (server-messages.en.md's "l"
+// field: 0 Debug ... 4 Critical), independent of whatever the log panel's
+// own module/level filter happens to be set to right now.
+client.subscribe(client.topics.logs(), (logs) => {
+  let worst = 0;
+  for (const entry of logs || []) if ((entry.l | 0) > worst) worst = entry.l | 0;
+  logBadgeDotEl.classList.remove("level-warning", "level-error", "level-critical");
+  logBadgeDotEl.classList.toggle("hidden", worst < 2);
+  if (worst === 2) logBadgeDotEl.classList.add("level-warning");
+  else if (worst === 3) logBadgeDotEl.classList.add("level-error");
+  else if (worst >= 4) logBadgeDotEl.classList.add("level-critical");
 });
 
 client.subscribe(client.topics.session(), (session) => {

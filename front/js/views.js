@@ -7,8 +7,14 @@
 // subscription open, so they just return a node.
 
 import { el, icon, iconButton, moduleIcon, statusDot, updateStatusDot } from "./dom.js";
-import { togglePanel, isPanelVisible } from "./panels.js";
+import { togglePanel, isPanelVisible, make as makePanel } from "./panels.js";
 import { t } from "./i18n.js";
+
+// Shared by renderLogs() (the full-page Logs system view) and
+// renderLogPanel() (the always-on floating one, below) - index == the
+// wire's own `l` field (server-messages.en.md's "l" message: 0 Debug, 1
+// Info, 2 Warning, 3 Error, 4 Critical).
+const LOG_LEVELS = ["debug", "info", "warning", "error", "critical"];
 
 // Horizontal module bar (ostnoctua's .on-modbar/.on-mod, see panels.css) —
 // only the actually-loaded OST modules. Controller/Files/Logs live in the
@@ -312,7 +318,6 @@ export function renderFiles(client, mediaBaseUrl) {
 export function renderLogs(client) {
   const root = el("div", { class: "logs-view" });
   const scope = client.scope();
-  const LEVELS = ["debug", "info", "warning", "error", "critical"];
 
   scope.subscribe(client.topics.logs(), (logs) => {
     root.innerHTML = "";
@@ -320,7 +325,7 @@ export function renderLogs(client) {
     root.appendChild(el("div", { class: "log-toolbar muted small", text: `${(logs || []).length} ${t("views.entriesCappedSuffix")}` }));
     const table = el("table", { class: "log-table" });
     for (const entry of (logs || []).slice().reverse()) {
-      const lvl = LEVELS[entry.l] || "info";
+      const lvl = LOG_LEVELS[entry.l] || "info";
       table.appendChild(el("tr", { class: "log-row log-" + lvl }, [
         el("td", { class: "small muted mono", text: entry.d }),
         el("td", { class: "small mono", text: entry.c }),
@@ -331,4 +336,120 @@ export function renderLogs(client) {
   });
 
   return { node: root, dispose: scope.dispose };
+}
+
+// ---- always-on floating log panel ----------------------------------------
+// Gilles, 2026-10-03: "en haut a droite ... ajoute ... un bouton pour la
+// gestion de logs - inspire de ostnoctua pour la forme de la fenetre a
+// afficher: selection du module / selection du niveau du message / quand
+// on clique depuis un module ca selectionne les messages du module /
+// couleur selon niveau du message". Shape mirrors ostnoctua's own
+// web/log.js (OstLog): a persistent floating panel (Panels.make()'s own
+// `persistent: true`, survives module switches, same as ostnoctua's own
+// "always-on" framing) with a module + minimum-level filter toolbar above
+// a scrollable, colour-coded list - but the module filter here is a real
+// per-module dropdown (every module that has actually logged something,
+// built from the log entries' own `c` field) rather than ostnoctua's
+// simpler this-module/all-modules toggle, since Gilles asked for
+// "selection du module" specifically.
+const LOG_FILTER_KEY = "ostcore-ui3:logs:filter";
+function loadLogFilter() {
+  try { return JSON.parse(localStorage.getItem(LOG_FILTER_KEY)) || {}; } catch (e) { return {}; }
+}
+function saveLogFilter(f) {
+  try { localStorage.setItem(LOG_FILTER_KEY, JSON.stringify(f)); } catch (e) { /* ignore */ }
+}
+const LOG_MODULE_ALL = "__all";
+
+export function renderLogPanel(client, initialModule) {
+  const existing = document.querySelector('.panel-float[data-panel="logs"]');
+  if (existing) {
+    // Already built (this is a toggle, not a re-create - the panel is
+    // persistent, it never gets torn down by a module switch). Re-apply
+    // the module filter if the button was clicked from a module's own
+    // view this time, same as a fresh creation would below, then just
+    // show/hide it like any other panel.
+    if (initialModule) {
+      const sel = existing.querySelector(".log-filter-module");
+      if (sel && [...sel.options].some((o) => o.value === initialModule)) {
+        sel.value = initialModule;
+        sel.dispatchEvent(new Event("change"));
+      }
+    }
+    togglePanel("logs");
+    return;
+  }
+
+  const filter = loadLogFilter();
+  if (initialModule) filter.module = initialModule;
+  if (!filter.level) filter.level = "0";
+
+  const body = makePanel({
+    id: "logs", title: t("views.logs"), persistent: true,
+    x: Math.max(20, window.innerWidth - 460), y: Math.max(80, window.innerHeight - 340), w: 420,
+  });
+  body.classList.add("log-panel-body");
+
+  const toolbar = el("div", { class: "log-toolbar" });
+  const moduleSel = el("select", { class: "field-input log-filter-module" });
+  const levelSel = el("select", { class: "field-input log-filter-level" });
+  for (const [key, label] of [
+    ["0", t("views.logLevelAll")], ["1", t("views.logLevelInfo")], ["2", t("views.logLevelWarning")],
+    ["3", t("views.logLevelError")], ["4", t("views.logLevelCritical")],
+  ]) {
+    const opt = el("option", { value: key }, label);
+    levelSel.appendChild(opt);
+  }
+  levelSel.value = filter.level;
+  toolbar.appendChild(moduleSel);
+  toolbar.appendChild(levelSel);
+  body.appendChild(toolbar);
+
+  const list = el("div", { class: "log-panel-list" });
+  body.appendChild(list);
+
+  function passes(entry) {
+    if ((entry.l | 0) < (filter.level | 0)) return false;
+    return !filter.module || filter.module === LOG_MODULE_ALL || entry.c === filter.module;
+  }
+  function rebuildRows(logs) {
+    const atBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 24;
+    list.innerHTML = "";
+    for (const entry of (logs || []).filter(passes)) {
+      list.appendChild(el("div", { class: "log-panel-row log-" + (LOG_LEVELS[entry.l] || "info") }, [
+        el("span", { class: "log-panel-time", text: String(entry.d || "").replace(/^.*[ T]/, "").slice(0, 8) }),
+        el("span", { class: "log-panel-src", text: entry.c || "" }),
+        el("span", { class: "log-panel-msg", text: entry.t || "" }),
+      ]));
+    }
+    if (atBottom) list.scrollTop = list.scrollHeight;
+  }
+
+  // Module options: every module that has actually logged something (built
+  // from the log entries' own `c` field, not the live module list - a
+  // module that's since been unloaded, or the fixed non-module "WS"
+  // source, keeps its own past entries reachable this way), plus "All".
+  // Rebuilt on every log update; the current selection (including one not
+  // presently in the list, e.g. just set via initialModule) is preserved.
+  client.subscribe(client.topics.logs(), (logs) => {
+    const sources = [...new Set((logs || []).map((e) => e.c).filter(Boolean))].sort();
+    if (filter.module && filter.module !== LOG_MODULE_ALL && !sources.includes(filter.module)) sources.push(filter.module);
+    const current = moduleSel.value || filter.module || LOG_MODULE_ALL;
+    moduleSel.innerHTML = "";
+    moduleSel.appendChild(el("option", { value: LOG_MODULE_ALL }, t("views.logModuleAll")));
+    for (const src of sources) moduleSel.appendChild(el("option", { value: src }, src));
+    moduleSel.value = [...moduleSel.options].some((o) => o.value === current) ? current : LOG_MODULE_ALL;
+    rebuildRows(logs);
+  });
+
+  moduleSel.addEventListener("change", () => {
+    filter.module = moduleSel.value;
+    saveLogFilter(filter);
+    rebuildRows(client.get(client.topics.logs()));
+  });
+  levelSel.addEventListener("change", () => {
+    filter.level = levelSel.value;
+    saveLogFilter(filter);
+    rebuildRows(client.get(client.topics.logs()));
+  });
 }

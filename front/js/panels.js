@@ -160,8 +160,8 @@ function startResize(panel, id, ev, sc) {
  * collapsed }. `collapsed: true` is only the first-ever-render default
  * (e.g. a detail panel meant to start hidden behind its own quicknav
  * button) — the user's own later choice always overrides it afterwards.
- * `persistent: true` panels survive clear() (none used yet in UI3, kept for
- * parity with ostnoctua's always-on log panel — see README if one is added).
+ * `persistent: true` panels survive clear() - the always-on log panel
+ * (views.js's renderLogPanel(), ostnoctua's own OstLog) is the first one.
  */
 export function make(opts) {
   const id = opts.id;
@@ -171,6 +171,7 @@ export function make(opts) {
   const panel = document.createElement("div");
   panel.className = "panel-float";
   panel.dataset.panel = id;
+  panel.dataset.scope = sc; // togglePanel()'s own lookup below needs this panel's own scope, not whatever scope happens to be active when it's later toggled
   panel.style.left = (st.x != null ? st.x : (opts.x != null ? opts.x : 20)) + "px";
   // Clamped even for an already-saved position: a layout saved from before
   // SAFE_TOP existed (or from before it was raised) would otherwise stay
@@ -235,10 +236,18 @@ export function make(opts) {
   return body;
 }
 
+// Looks a panel up by id directly in the layer's own DOM, not the `live`
+// array - `live` only ever holds non-persistent panels (make()'s own
+// `if (!opts.persistent) live.push(panel)`), so a lookup through it alone
+// would never find the persistent log panel (views.js's renderLogPanel()).
+function findPanel(id) {
+  return layer.querySelector('.panel-float[data-panel="' + id + '"]');
+}
+
 /** True if the panel exists and isn't collapsed — the quicknav button's own
  * initial on/off state (views.js's renderQuickNav()) comes from this. */
 export function isPanelVisible(id) {
-  const panel = live.find((p) => p.dataset.panel === id);
+  const panel = findPanel(id);
   return !!panel && !panel.classList.contains("collapsed");
 }
 
@@ -257,13 +266,19 @@ export function isPanelVisible(id) {
  * l'heritage core").
  */
 export function togglePanel(id) {
-  const panel = live.find((p) => p.dataset.panel === id);
+  const panel = findPanel(id);
   if (!panel) return false;
   const willShow = panel.classList.contains("collapsed");
   panel.classList.toggle("collapsed", !willShow);
-  const s = loadState(scope, id);
+  // This panel's OWN scope (make()'s own dataset.scope, above) - not
+  // whatever scope happens to be active right now. For a persistent panel
+  // (always "__app") those can differ: toggling it while some module
+  // happens to be on screen must not save its collapsed state under that
+  // module's own scope, or it stops persisting consistently.
+  const panelScope = panel.dataset.scope || scope;
+  const s = loadState(panelScope, id);
   s.collapsed = !willShow;
-  saveState(scope, id, s);
+  saveState(panelScope, id, s);
   if (willShow) {
     layer.appendChild(panel); // re-append = bring to front
     panel.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
