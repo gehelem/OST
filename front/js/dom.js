@@ -60,21 +60,20 @@ export function iconButton(name, title, onClick, opts) {
 // an unlisted/missing template just falls through to the same "extension"
 // default Rooster itself uses.
 //
-// Five of Rooster's icon names (zoom_in_map/calendar_today/manage_search/
-// garage/query_stats) don't exist in this project's vendored
-// MaterialIcons-Regular.ttf, the older "classic" set — see this file's
-// other note on that. Substituted with same-intent names confirmed present
-// in the font instead of carrying the gap over silently.
+// Matches Rooster's own names exactly now (base.css's own header comment
+// has the full story on why five of these used to be substituted here for
+// a font that didn't have them — not needed anymore since the switch to
+// Material Symbols Outlined).
 const TEMPLATE_ICON_MAP = {
   focus: "filter_center_focus",
   sequencer: "view_list",
   navigator: "explore",
-  guider: "gps_fixed", // Rooster: zoom_in_map (missing from this font)
+  guider: "zoom_in_map",
   allsky: "panorama",
-  planner: "event", // Rooster: calendar_today (missing from this font)
-  inspector: "search", // Rooster: manage_search (missing from this font)
-  parkmanager: "local_parking", // Rooster: garage (missing from this font)
-  monitor: "show_chart", // Rooster: query_stats (missing from this font)
+  planner: "calendar_today",
+  inspector: "manage_search",
+  parkmanager: "garage",
+  monitor: "query_stats",
 };
 export function moduleIcon(mod) {
   const template = ((mod && mod.infos && mod.infos.template) || "").toLowerCase();

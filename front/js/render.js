@@ -120,15 +120,13 @@ export function moduleLifecycle(client, moduleName, build, extraDispose) {
  * quicknav entry - a no-op if the module has no `actions` property. The
  * quicknav button itself is icon-only (views.js's renderQuickNav() own
  * `iconOnly` field) - Gilles, 2026-10-03: "Fenetre action (deja
- * existante): bouton = juste une icone 'dashboard_customize'" - that exact
- * icon isn't in this app's vendored assets/fonts/MaterialIcons-Regular.ttf
- * though (checked directly, same class of gap as the login button's own
- * icon - its GSUB ligature table has no "dashboard_customize" entry,
- * Gilles: "l'icone dashboard_customize n'apparait pas, c'est vide"), and
- * "dashboard" (the closest available match by name) wasn't what Gilles
- * actually wanted either: "je veux un truc qui symbolise des boutons
- * multiples" - "apps" (the classic multi-square grid) is. The panel's own
- * title bar is unaffected, it keeps its normal text label.
+ * existante): bouton = juste une icone 'dashboard_customize'", but after
+ * seeing "dashboard" (tried first, for a since-fixed font-gap reason - see
+ * base.css's header comment) he actually wanted something else regardless
+ * of availability: "je veux un truc qui symbolise des boutons multiples" -
+ * "apps" (the classic multi-square grid) is a deliberate choice, not a
+ * stand-in for "dashboard_customize" (which does resolve fine now). The
+ * panel's own title bar is unaffected, it keeps its normal text label.
  */
 export function renderActionsPanel(client, moduleName, mod, track, quickNavEntries, pos) {
   if (!("actions" in mod.properties)) return;

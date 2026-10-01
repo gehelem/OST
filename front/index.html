@@ -76,11 +76,11 @@
            button is for the OTHER case, logging in for more than the
            server's current default (e.g. read-only "1" -> write access),
            where nothing forces the dialog open on its own. -->
-      <!-- "login" isn't in this app's vendored assets/fonts/MaterialIcons-Regular.ttf
-           (checked directly - its GSUB ligature table has no "login" entry,
-           Gilles: "je ne vois pas d'icone sur le bouton de login") -
-           vpn_key is, and is also present. -->
-      <button id="login-toggle" class="glass icon-chip hidden" title="Login"><span class="material-icons">vpn_key</span></button>
+      <!-- Was "vpn_key" (a stand-in for a few weeks - the old vendored font
+           didn't have "login", see base.css's own header comment on the
+           Material Symbols switch). Back to the actually-intended name now
+           that it resolves correctly. -->
+      <button id="login-toggle" class="glass icon-chip hidden" title="Login"><span class="material-icons">login</span></button>
       <div id="conn-widget">
         <!-- Gilles, 2026-10-03: "diminue la taille du bouton connection =
              taille identique au toggle jour/nuit, juste icone

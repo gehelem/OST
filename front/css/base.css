@@ -26,9 +26,29 @@ h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: 
 p { margin: 0 0 var(--space-2); }
 a { color: var(--accent); }
 
+/* "Material Icons" is kept as the CSS font-family/class name (every
+ * `class="material-icons"` call site stays untouched) even though the
+ * vendored file underneath is now Google's current "Material Symbols
+ * Outlined" set, not the old discontinued "classic" Material Icons font
+ * (MaterialIcons-Regular.ttf, removed) - Gilles, 2026-10-03, after the
+ * classic set's missing-ligature problem bit a 3rd time (the "actions"
+ * property's own "event_upcoming"/"arrows_input" preicons, see render.js's
+ * renderActionsPanel() history): "ces icones existent bien, la preuve,
+ * occupe toi plutot de les charger dans tes ressources" - rather than keep
+ * hunting for same-intent substitutes every time a name is missing.
+ * Verified directly (fontTools/GSUB) that this file covers every icon name
+ * used anywhere in this app, including the three that used to be
+ * substituted for lack of a better option: "login", "dashboard_customize",
+ * "arrows_input"/"event_upcoming" all resolve correctly now.
+ * Substitution still works the exact same way (writing the icon's name as
+ * the span's plain text) because this font, like the old one, ligates that
+ * text into the icon glyph via GSUB - just under the 'rlig' (Required
+ * Ligatures) feature tag instead of 'liga', which is why font-feature-
+ * settings explicitly turns it on below (browsers apply 'rlig' by default,
+ * but there is no reason to rely on that silently). */
 @font-face {
   font-family: "Material Icons";
-  src: url("../assets/fonts/MaterialIcons-Regular.ttf") format("truetype");
+  src: url("../assets/fonts/MaterialSymbolsOutlined-Regular.woff2") format("woff2");
   font-weight: normal; font-style: normal; font-display: swap;
 }
 .material-icons {
@@ -37,6 +57,7 @@ a { color: var(--accent); }
   font-size: 20px; display: inline-block; line-height: 1;
   vertical-align: middle; -webkit-font-smoothing: antialiased;
   letter-spacing: normal; text-transform: none; white-space: nowrap;
+  font-feature-settings: "rlig" 1;
 }
 .icon-sm { font-size: 15px; }
 .icon-lg { font-size: 26px; }

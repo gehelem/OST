@@ -232,7 +232,7 @@ Run the same way as UI1 (static server, open `UI2/index.html`).
 Now `ostcore`'s own root (moved out of `UI3/` 2026-09-28, once it became
 the reference client — see the tree above): `index.html` + `js/
 {app,render,views,chart,dom}.js` + `css/{theme,base,components}.css` +
-`assets/fonts/MaterialIcons-Regular.ttf`. Internal naming (the
+`assets/fonts/MaterialSymbolsOutlined-Regular.woff2`. Internal naming (the
 `ostcore-ui3:*`/`ostcore-ui3.*` localStorage key prefixes, doc comments,
 the "UI3" product label in the page itself) was deliberately left alone —
 renaming those isn't part of the move and would silently orphan every
