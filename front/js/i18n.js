@@ -44,6 +44,7 @@ const STRINGS = {
   // ---- shared across several templates/panels ----------------------------
   "common.other": { en: "Other", fr: "Autre", de: "Sonstiges", it: "Altro", es: "Otro" },
   "common.actions": { en: "Actions", fr: "Actions", de: "Aktionen", it: "Azioni", es: "Acciones" },
+  "common.moduleInfo": { en: "Info", fr: "Infos", de: "Info", it: "Info", es: "Información" },
   "common.moduleNotFound": { en: "Module not found (unloaded?)", fr: "Module introuvable (déchargé ?)", de: "Modul nicht gefunden (entladen?)", it: "Modulo non trovato (scaricato?)", es: "Módulo no encontrado (¿descargado?)" },
   "common.general": { en: "General", fr: "Général", de: "Allgemein", it: "Generale", es: "General" },
   "common.close": { en: "Close", fr: "Fermer", de: "Schließen", it: "Chiudi", es: "Cerrar" },

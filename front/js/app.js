@@ -246,7 +246,13 @@ function isModuleView() {
 
 function updateParamsToggle() {
   const mod = isModuleView() && client.get(client.topics.module(activeView));
-  const hasParams = !!(mod && Object.values(mod.properties).some((p) => p.hasprofile === true));
+  // Gilles, 2026-10-03: the Parameters box's own new "Info" tab (mod.infos
+  // - render.js's buildParamsPanel()) means there's now something to show
+  // even for a module with zero hasprofile properties (infos always has
+  // at least a label) - the gear button needs to unlock for that case too,
+  // or that tab would be unreachable on exactly the modules most likely
+  // to have nothing else in the box.
+  const hasParams = !!(mod && (Object.values(mod.properties).some((p) => p.hasprofile === true) || (mod.infos && Object.keys(mod.infos).length > 0)));
   paramsToggleEl.disabled = !hasParams;
   paramsToggleEl.title = hasParams ? "Parameters" : "Parameters (this module has none)";
   // Small red dot when the active profile has unsaved changes (module.f.changed

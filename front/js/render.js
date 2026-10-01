@@ -650,10 +650,30 @@ function autoPos(index) {
   return { x: 20 + col * 440, y: 230 + row * 260, w: 420 };
 }
 
+// Plain key/value listing of mod.infos (modulelabel/description/template/
+// library/classname/families, plus undocumented internal build/version
+// fields - baseGithash, thisversion, startdatetime, "and others",
+// structure.en.md's own words - never individually listed there, so shown
+// generically here rather than hardcoding which ones exist). Gilles,
+// 2026-10-03: "ajoute un onglet qui affiche les infos du module
+// (startdatetime baseGitdate etc etc) sans fioritures, juste les couples
+// clef/valeur" - reuses .metric-row (views.js's own Controller screen:
+// cpu/ram/disk load), the existing plain label/value row style, rather
+// than inventing a new one.
+function renderInfosTab(mod) {
+  const wrap = el("div");
+  for (const [key, value] of Object.entries(mod.infos || {})) {
+    const text = Array.isArray(value) ? value.join(", ") : typeof value === "object" && value !== null ? JSON.stringify(value) : String(value);
+    wrap.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: key }), el("span", { class: "value", text })]));
+  }
+  return wrap;
+}
+
 /**
  * The dedicated "Parameters" box — ostnoctua's OstWidgets.params(), see
  * widgets.js: content-only (profile load/save toolbar + the module's
- * `hasprofile:true` properties, grouped into tabs by level1), appended
+ * `hasprofile:true` properties, grouped into tabs by level1, plus a
+ * plain-key/value "Info" tab for mod.infos — Gilles, 2026-10-03), appended
  * into whatever `container` the caller provides. Not shown by default and
  * not one of the draggable floating panels — Gilles, 2026-09-26: it opens
  * on demand from a dedicated gear button (app.js's openParamsDialog) as a
@@ -663,28 +683,36 @@ function autoPos(index) {
  * Those properties still also appear in their normal General/level1 panel
  * (ostnoctua's own default.js duplicates them the same way — that flat
  * panel is a complete read/write overview, this box is the profile-centric
- * editing surface). When nothing has a level1 (the common case — e.g.
- * guider's own hasprofile properties all have level1:"") there's nothing
- * to tab between, so no tab bar is shown, matching ostnoctua's own
+ * editing surface). When there's only one tab to show (the common case —
+ * e.g. guider's own hasprofile properties all have level1:"", and it has
+ * no other tab either) there's nothing to tab between, so no tab bar is
+ * shown, matching ostnoctua's own
  * `tabsEl.style.display = groups.length > 1 ? '' : 'none'`. (This box's own
  * level2 groups still show as <details> — see fillLevel1Panel() below for
  * the level1 panel's own level2-as-tabs treatment.)
  *
  * Returns true if it rendered anything (the module has at least one
- * `hasprofile:true` property), false otherwise — the caller decides what
- * "nothing to show" means for its own UI (app.js disables the gear
+ * `hasprofile:true` property, or any infos at all - virtually always, so
+ * in practice this is never false), false otherwise — the caller decides
+ * what "nothing to show" means for its own UI (app.js disables the gear
  * button; nothing else currently calls this without checking first).
  */
 export function buildParamsPanel(client, moduleName, mod, track, container) {
   const names = Object.keys(mod.properties).filter((n) => mod.properties[n].hasprofile === true);
-  if (!names.length) return false;
+  const hasInfos = mod.infos && Object.keys(mod.infos).length > 0;
+  if (!names.length && !hasInfos) return false;
   const props = Object.fromEntries(names.map((n) => [n, mod.properties[n]]));
   const { noLevel1, tabs } = buildLayout(props);
   const allTabs = noLevel1.length ? [{ name: "", direct: noLevel1, groups: [] }, ...tabs] : tabs;
+  if (hasInfos) allTabs.push({ name: t("common.moduleInfo"), infosTab: true });
 
-  container.appendChild(track(renderProfileBar(client, moduleName, mod)));
+  // Nothing to load/save without a hasprofile property - a bare Info tab
+  // (no profile-backed settings at all) skips the profile bar instead of
+  // showing one with nothing underneath it to act on.
+  if (names.length) container.appendChild(track(renderProfileBar(client, moduleName, mod)));
 
   function fillGroup(target, tab) {
+    if (tab.infosTab) { target.appendChild(renderInfosTab(mod)); return; }
     for (const { name } of tab.direct) target.appendChild(track(renderProperty(client, moduleName, name)));
     for (const grp of tab.groups) {
       const details = el("details", { class: "prop-group", open: true }, [el("summary", { text: grp.name })]);
