@@ -434,6 +434,12 @@ client.subscribe(client.topics.session(), (session) => {
   // "2" (denied by default) both make a login meaningful - either way,
   // logging in can grant more than the server's own default.
   loginToggleEl.classList.toggle("hidden", session.grantServer === "0");
+  // Gilles, 2026-10-03: "change la couleur interne du bouton de login en
+  // fonction de grant-client (rouge -1 jaune 0 vert 1)" - same --error/
+  // --busy/--ok palette the connection dot already uses (panels.css), not
+  // new colours of their own.
+  loginToggleEl.classList.remove("grant-denied", "grant-readonly", "grant-full");
+  loginToggleEl.classList.add(session.grantClient === "-1" ? "grant-denied" : session.grantClient === "1" ? "grant-full" : "grant-readonly");
   if (session.grantClient === "-1" && !loginShown) { loginShown = true; renderLogin(client); }
   else if (!activeView) {
     // First dump after connecting and no view chosen yet: restore whatever

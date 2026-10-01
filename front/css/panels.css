@@ -156,6 +156,15 @@
   width: 7px; height: 7px; border-radius: 50%;
   background: var(--error); box-shadow: 0 0 4px rgba(var(--error-rgb), 0.7);
 }
+/* Login button (#top-right): its own icon colour tracks the current
+ * grant-client (Gilles, 2026-10-03: "change la couleur interne du bouton
+ * de login en fonction de grant-client (rouge -1 jaune 0 vert 1)") - same
+ * --error/--busy/--ok palette .conn-dot already uses below, not colours of
+ * their own. .icon-chip's own :hover/.active rules already work this way
+ * (set `color`, the unstyled .material-icons span just inherits it). */
+#login-toggle.grant-denied { color: var(--error); }
+#login-toggle.grant-readonly { color: var(--busy); }
+#login-toggle.grant-full { color: var(--ok); }
 
 /* ------------------------------------------------------- connection widget
  * Collapsed to a small status pill once connected; click anywhere on it to
