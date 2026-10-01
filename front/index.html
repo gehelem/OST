@@ -82,10 +82,17 @@
            vpn_key is, and is also present. -->
       <button id="login-toggle" class="glass icon-chip hidden" title="Login"><span class="material-icons">vpn_key</span></button>
       <div id="conn-widget">
-        <button id="conn-toggle" class="glass conn-toggle" type="button">
-          <span id="conn-dot" class="conn-dot disconnected"></span>
-          <span id="conn-summary">Disconnected</span>
-          <span class="material-icons conn-caret">expand_more</span>
+        <!-- Gilles, 2026-10-03: "diminue la taille du bouton connection =
+             taille identique au toggle jour/nuit, juste icone
+             power_settings_new de google, avec la couleur qui change en
+             fonction de l'etat de la connection (pas de libelle)" - same
+             .icon-chip base as theme-toggle/log-toggle (36x36, no text),
+             .conn-toggle now only carries the status-based colour (app.js's
+             own onStatus()). The status text that used to be visible here
+             lives in `title` instead (a tooltip), kept in sync the same
+             places the old text node was. -->
+        <button id="conn-toggle" class="glass icon-chip conn-toggle" type="button">
+          <span class="material-icons">power_settings_new</span>
         </button>
         <div id="conn-panel" class="glass conn-panel">
           <div class="brand"><span class="material-icons">stars</span><span>OST — UI3</span></div>

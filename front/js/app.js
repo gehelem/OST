@@ -50,8 +50,6 @@ panelLayerEl.addEventListener("panelvisibility", (ev) => {
 // established way to reach an off-screen panel, not manual scrolling).
 const connWidgetEl = document.getElementById("conn-widget");
 const connToggleEl = document.getElementById("conn-toggle");
-const connDotEl = document.getElementById("conn-dot");
-const connSummaryEl = document.getElementById("conn-summary");
 const connPanelEl = document.getElementById("conn-panel");
 const grantPill = document.getElementById("grant-pill");
 const wsUrlInput = document.getElementById("ws-url");
@@ -81,7 +79,7 @@ function applyStaticLabels() {
   logToggleEl.title = t("chrome.logs");
   connectBtnLabelEl.textContent = t("chrome.connect");
   disconnectBtnLabelEl.textContent = t("chrome.disconnect");
-  connSummaryEl.textContent = t("status." + client.connection.status);
+  connToggleEl.title = t("status." + client.connection.status);
 }
 
 // ---- connection widget: collapsed status pill, click (or connecting/
@@ -317,8 +315,9 @@ document.getElementById("lang-select").addEventListener("change", (e) => {
 });
 
 client.onStatus((s) => {
-  connDotEl.className = "conn-dot " + s;
-  connSummaryEl.textContent = t("status." + s);
+  connToggleEl.classList.remove("status-connected", "status-connecting", "status-disconnected");
+  connToggleEl.classList.add("status-" + s);
+  connToggleEl.title = t("status." + s);
   if (s !== "connected") grantPill.textContent = "";
   // Minimal pill once connected; folded open again the moment there's
   // something the user needs to look at or act on.

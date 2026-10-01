@@ -189,21 +189,19 @@
 .log-badge-dot.level-critical { background: var(--error); box-shadow: 0 0 8px rgba(var(--error-rgb), 0.5); }
 
 /* ------------------------------------------------------- connection widget
- * Collapsed to a small status pill once connected; click anywhere on it to
- * fold out the full settings (brand/URL/media URL/language/connect). */
+ * A plain .icon-chip (same 36x36 size as theme-toggle/log-toggle) - Gilles,
+ * 2026-10-03: "diminue la taille du bouton connection = taille identique
+ * au toggle jour/nuit, juste icone power_settings_new ... avec la couleur
+ * qui change en fonction de l'etat de la connection (pas de libelle)".
+ * Click anywhere on it to fold out the full settings (brand/URL/media
+ * URL/language/connect); .conn-toggle itself only carries the
+ * status-based colour now (app.js's own onStatus()) - connecting pulses
+ * the same way a module button's own "busy" status dot already does
+ * (.status-dot.status-busy, panels.css above), not a colour of its own. */
 #conn-widget { position: relative; flex-shrink: 0; }
-.conn-toggle {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 0 12px; height: 36px;
-  color: var(--text-secondary); cursor: pointer; font: inherit; font-size: 12px;
-}
-.conn-toggle:hover { border-color: var(--accent-dim); }
-.conn-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--standby); }
-.conn-dot.connected { background: var(--ok); box-shadow: 0 0 6px rgba(var(--ok-rgb), 0.7); }
-.conn-dot.connecting { background: var(--busy); animation: pulse-dot 1s ease-in-out infinite; }
-.conn-dot.disconnected { background: var(--error); }
-.conn-caret { font-size: 16px !important; color: var(--text-dim); transition: transform 0.15s ease; }
-#conn-widget.open .conn-caret { transform: rotate(180deg); }
+.conn-toggle.status-connected { color: var(--ok); }
+.conn-toggle.status-connecting { color: var(--busy); animation: pulse-dot 1s ease-in-out infinite; }
+.conn-toggle.status-disconnected { color: var(--error); }
 .conn-panel {
   position: absolute; top: calc(100% + 6px); right: 0; z-index: 30;
   display: flex; flex-direction: column; gap: 8px;
