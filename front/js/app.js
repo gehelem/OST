@@ -62,6 +62,8 @@ const paramsToggleEl = document.getElementById("params-toggle");
 const dialogRootEl = document.getElementById("dialog-root");
 const connectBtnLabelEl = document.getElementById("connect-btn-label");
 const disconnectBtnLabelEl = document.getElementById("disconnect-btn-label");
+const clearCacheBtnEl = document.getElementById("clear-cache-btn");
+const clearCacheBtnLabelEl = document.getElementById("clear-cache-btn-label");
 
 // Static chrome (this file's own top-right icon chips + the connect bar) is
 // never rebuilt from a server dump the way a module's panels are, so a
@@ -79,6 +81,7 @@ function applyStaticLabels() {
   logToggleEl.title = t("chrome.logs");
   connectBtnLabelEl.textContent = t("chrome.connect");
   disconnectBtnLabelEl.textContent = t("chrome.disconnect");
+  clearCacheBtnLabelEl.textContent = t("chrome.clearCache");
   connToggleEl.title = t("status." + client.connection.status);
 }
 
@@ -299,6 +302,20 @@ document.getElementById("connect-btn").addEventListener("click", () => {
   client.connect(wsUrlInput.value, { language: lang });
 });
 document.getElementById("disconnect-btn").addEventListener("click", () => client.disconnect());
+// "Self-service recovery" button (see index.html's own comment on why) - a
+// stale localStorage value can break rendering in ways a hard reload
+// (Ctrl+Shift+R, which only bypasses the HTTP cache, never touches
+// localStorage) can't fix. Clears every storage mechanism this app could
+// plausibly have written to, then reloads - best-effort on Cache Storage
+// (no service worker registered today, but harmless/forward-compatible if
+// one ever is).
+clearCacheBtnEl.addEventListener("click", async () => {
+  if (!confirm(t("chrome.clearCacheConfirm"))) return;
+  try { localStorage.clear(); } catch (e) { /* ignore */ }
+  try { sessionStorage.clear(); } catch (e) { /* ignore */ }
+  try { if (window.caches) { for (const key of await caches.keys()) await caches.delete(key); } } catch (e) { /* ignore */ }
+  location.reload();
+});
 document.getElementById("lang-select").addEventListener("change", (e) => {
   setLanguage(e.target.value);
   applyStaticLabels();

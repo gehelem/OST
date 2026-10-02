@@ -114,6 +114,17 @@
             <button id="disconnect-btn" class="btn"><span id="disconnect-btn-label">Disconnect</span></button>
           </div>
           <div id="grant-pill" class="grant-pill"></div>
+          <div class="settings-sep"></div>
+          <!-- Gilles, 2026-10-02, after a stale localStorage value left his
+               regular Chrome profile's planetarium blank (stars gone, panels
+               still there) while a fresh profile/private window rendered
+               fine - a hard reload (Ctrl+Shift+R) bypasses the HTTP cache
+               but never touches localStorage, so it didn't help: "ajoute un
+               bouton 'clear cache + localstorage' avec confirmation - au
+               moins on sera a l'abris les prochains coups". Self-service
+               recovery from exactly this class of problem, no dev tools
+               needed. -->
+          <button id="clear-cache-btn" class="btn btn-sm btn-danger"><span class="material-icons">delete_sweep</span><span id="clear-cache-btn-label">Clear cache + localStorage</span></button>
         </div>
       </div>
     </div>
