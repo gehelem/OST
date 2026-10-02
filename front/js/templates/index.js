@@ -14,10 +14,16 @@ import * as guider from "./guider.js";
 import * as focus from "./focus.js";
 import * as sequencer from "./sequencer.js";
 import * as navigator_ from "./navigator.js";
+import * as inspector from "./inspector.js";
+import * as polar from "./polar.js";
+import * as parkmanager from "./parkmanager.js";
 
 export const templates = {
   guider,
   focus,
   sequencer,
   navigator: navigator_,
+  inspector,
+  polar,
+  parkmanager,
 };
