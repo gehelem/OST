@@ -60,10 +60,14 @@ export function iconButton(name, title, onClick, opts) {
 // an unlisted/missing template just falls through to the same "extension"
 // default Rooster itself uses.
 //
-// Matches Rooster's own names exactly now (base.css's own header comment
-// has the full story on why five of these used to be substituted here for
-// a font that didn't have them — not needed anymore since the switch to
-// Material Symbols Outlined).
+// Matches Rooster's own names exactly (base.css's own header comment has
+// the full story on why five of these used to be substituted here for a
+// font that didn't have them — not needed anymore since the switch to
+// Material Symbols Outlined), except "polar": Rooster's own
+// TEMPLATE_ICON_MAP doesn't give it one either (falls back to
+// "extension" there too) — Gilles, 2026-10-0X, asked for "center" here,
+// which isn't a real icon name in this font; "recenter" (confirmed
+// present) is the closest match he picked instead.
 const TEMPLATE_ICON_MAP = {
   focus: "filter_center_focus",
   sequencer: "view_list",
@@ -74,6 +78,7 @@ const TEMPLATE_ICON_MAP = {
   inspector: "manage_search",
   parkmanager: "garage",
   monitor: "query_stats",
+  polar: "recenter",
 };
 export function moduleIcon(mod) {
   const template = ((mod && mod.infos && mod.infos.template) || "").toLowerCase();
