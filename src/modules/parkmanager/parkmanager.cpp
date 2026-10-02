@@ -428,6 +428,14 @@ void Parkmanager::refreshDriversData(void)
         sendModNewSwitch(getString("devices", "weather").toStdString().c_str(), "WEATHER_REFRESH", "REFRESH", ISS_ON);
     }
 
+    // Every findWidgetByName() below can return nullptr even when
+    // devices.<x> is configured and non-empty: the device string being set
+    // doesn't mean the device is actually reachable right now (Gilles,
+    // 2026-10-0X, crash log: "sendModNewSwitch - Unable to find Weather
+    // Simulator device" - the very next block used to dereference that
+    // same kind of null unconditionally). Each access below is now guarded
+    // the same way: isValid() on the property AND a non-null widget before
+    // dereferencing it, logging a warning and skipping instead of crashing.
     if (getString("devices", "mount").isEmpty())
     {
         logWarning("Mount device missing");
@@ -436,15 +444,25 @@ void Parkmanager::refreshDriversData(void)
     {
         INDI::PropertyNumber pn = getDevice(getString("devices",
                                             "mount").toStdString().c_str()).getProperty("EQUATORIAL_EOD_COORD", INDI_NUMBER);
-        getEltFloat("mountstate", "RA")->setValue(pn.findWidgetByName("RA")->value, false);
-        getEltFloat("mountstate", "DEC")->setValue(pn.findWidgetByName("DEC")->value, true);
+        auto *raW = pn.isValid() ? pn.findWidgetByName("RA") : nullptr;
+        auto *decW = pn.isValid() ? pn.findWidgetByName("DEC") : nullptr;
+        if (raW && decW)
+        {
+            getEltFloat("mountstate", "RA")->setValue(raW->value, false);
+            getEltFloat("mountstate", "DEC")->setValue(decW->value, true);
+        }
+        else logWarning("Mount device configured but EQUATORIAL_EOD_COORD not available yet, skipping");
 
         INDI::PropertySwitch ps = getDevice(getString("devices",
                                             "mount").toStdString().c_str()).getProperty("TELESCOPE_TRACK_STATE", INDI_SWITCH);
-        getEltBool("mountstate", "tracking")->setValue(ps.findWidgetByName("TRACK_ON")->s, false);
+        auto *trackW = ps.isValid() ? ps.findWidgetByName("TRACK_ON") : nullptr;
+        if (trackW) getEltBool("mountstate", "tracking")->setValue(trackW->s, false);
+        else logWarning("Mount device configured but TELESCOPE_TRACK_STATE not available yet, skipping");
 
         ps = getDevice(getString("devices", "mount").toStdString().c_str()).getProperty("TELESCOPE_PARK", INDI_SWITCH);
-        getEltBool("mountstate", "parked")->setValue(ps.findWidgetByName("PARK")->s, false);
+        auto *mountParkW = ps.isValid() ? ps.findWidgetByName("PARK") : nullptr;
+        if (mountParkW) getEltBool("mountstate", "parked")->setValue(mountParkW->s, false);
+        else logWarning("Mount device configured but TELESCOPE_PARK not available yet, skipping");
     }
 
     if (getString("devices", "dome").isEmpty())
@@ -455,17 +473,23 @@ void Parkmanager::refreshDriversData(void)
     {
         INDI::PropertySwitch ps = getDevice(getString("devices", "dome").toStdString().c_str()).getProperty("DOME_SHUTTER",
                                   INDI_SWITCH);
-        getEltBool("domestate", "shutterclosed")->setValue(ps.findWidgetByName("SHUTTER_CLOSE")->s, true);
+        auto *shutterW = ps.isValid() ? ps.findWidgetByName("SHUTTER_CLOSE") : nullptr;
+        if (shutterW) getEltBool("domestate", "shutterclosed")->setValue(shutterW->s, true);
+        else logWarning("Dome device configured but DOME_SHUTTER not available yet, skipping");
 
         ps = getDevice(getString("devices", "dome").toStdString().c_str()).getProperty("DOME_PARK", INDI_SWITCH);
-        getEltBool("domestate", "parked")->setValue(ps.findWidgetByName("PARK")->s, true);
+        auto *domeParkW = ps.isValid() ? ps.findWidgetByName("PARK") : nullptr;
+        if (domeParkW) getEltBool("domestate", "parked")->setValue(domeParkW->s, true);
+        else logWarning("Dome device configured but DOME_PARK not available yet, skipping");
     }
 
     if (!getString("devices", "weather").isEmpty())
     {
         INDI::PropertyLight pl = getDevice(getString("devices",
                                            "weather").toStdString().c_str()).getProperty("WEATHER_STATUS", INDI_LIGHT);
-        getEltLight("weatherstate", "global")->setValue(OST::IntToState(pl.findWidgetByName("WEATHER_FORECAST")->s), true);
+        auto *forecastW = pl.isValid() ? pl.findWidgetByName("WEATHER_FORECAST") : nullptr;
+        if (forecastW) getEltLight("weatherstate", "global")->setValue(OST::IntToState(forecastW->s), true);
+        else logWarning("Weather device configured but WEATHER_STATUS not available yet, skipping");
     }
 }
 
