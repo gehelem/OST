@@ -463,6 +463,64 @@ function boolGroupNames(prop) {
   return Object.entries(prop.elements).filter(([, e]) => e.type === "bool" && !e.directedit).map(([n]) => n);
 }
 
+// Elements only reachable through the "Edit property" dialog (the pencil
+// button in the property's own header), never inline - Gilles, 2026-10-0X,
+// rejecting the previous design (inline-editable fields + a bottom bulk
+// "Save" button, each directedit field *also* getting its own send arrow):
+// "la seule vraie facon de gerer cette mise a jour 'par lot' des elements
+// d'une propriete est de passer par un formulaire - fonctionnellement c'est
+// exactement ca : on soumet plusieurs valeurs a mettre a jour en meme
+// temps [...] les elements qui ont directedit=false ne peuvent etre mis a
+// jour que via le formulaire" - mirroring OstErix/Rooster's own
+// property.component.ts (directedit elements edit inline/immediately,
+// confirmed read against its source) + DatastoreEditDialogComponent (one
+// detached buffer, one SA on submit). The pre-existing exclusive bool-group
+// mechanic (rule 0/1, its own immediate-send buttons, see boolGroupNames()
+// above) is a separate, already-approved exception and stays out of this
+// list too, same as before.
+export function formableElementNames(prop) {
+  const boolGroup = (prop.rule === 0 || prop.rule === 1) ? boolGroupNames(prop) : [];
+  return editableElementNames(prop).filter((n) => !boolGroup.includes(n) && prop.elements[n].directedit !== true);
+}
+
+/**
+ * The "Edit property" dialog itself - same detached-snapshot pattern as
+ * openGridDialog() above (the form's buffer is copied from the live values
+ * once, up front, then never reads the datastore again until Save), just
+ * for a property's own `formable` elements instead of one grid row.
+ *
+ * The SA payload sent on Save must carry *every* editable element of the
+ * property, not just the ones this form shows - client-messages.en.md's
+ * own "Always send every element" warning: "If any is missing, the
+ * backend applies nothing at all — not even the elements that were
+ * present". The elements this form doesn't show (directedit ones, the
+ * exclusive bool-group's own current choice) ride along unchanged, read
+ * fresh from `prop` at submit time.
+ */
+function openPropertyEditDialog(client, moduleName, propName, prop, formable) {
+  const initial = {};
+  for (const n of formable) initial[n] = prop.elements[n].value;
+  const form = buildElementsForm(client, moduleName, prop.elements, formable, initial);
+  const overlay = el("div", { class: "dialog-overlay" });
+  const dialog = el("div", { class: "dialog" }, [
+    el("h3", { text: prop.label || propName }),
+    form.node,
+    el("div", { class: "dialog-actions" }, [
+      el("button", { class: "btn", onclick: () => overlay.remove() }, t("common.cancel")),
+      el("button", { class: "btn btn-primary", onclick: () => {
+        const values = form.getValues();
+        const payload = {};
+        for (const n of editableElementNames(prop)) payload[n] = n in values ? values[n] : prop.elements[n].value;
+        client.setAll(moduleName, propName, payload);
+        overlay.remove();
+      } }, t("common.save")),
+    ]),
+  ]);
+  overlay.appendChild(dialog);
+  overlay.addEventListener("click", (ev) => { if (ev.target === overlay) overlay.remove(); });
+  (dialogRoot || document.body).appendChild(overlay);
+}
+
 function renderPropertyBody(client, moduleName, propName, prop) {
   const body = el("div", { class: "prop-body" });
 
@@ -475,15 +533,19 @@ function renderPropertyBody(client, moduleName, propName, prop) {
   // showElts:false still showed its elt-table unconditionally.
   if (prop.showElts === false) return body;
 
+  // Current values only - not a two-way edit buffer anymore (see
+  // formableElementNames()'s own doc comment on why): the only thing left
+  // reading this is sendGroupChoice() below, which needs every OTHER
+  // element's current value to complete its own SA payload.
   const editableNames = editableElementNames(prop);
-  const buffer = {};
-  for (const name of editableNames) buffer[name] = prop.elements[name].value;
+  const currentValues = {};
+  for (const name of editableNames) currentValues[name] = prop.elements[name].value;
 
   const boolGroup = (prop.rule === 0 || prop.rule === 1) ? boolGroupNames(prop) : [];
 
   function sendGroupChoice(chosen) {
     const payload = {};
-    for (const n of editableNames) payload[n] = boolGroup.includes(n) ? (n === chosen) : buffer[n];
+    for (const n of editableNames) payload[n] = boolGroup.includes(n) ? (n === chosen) : currentValues[n];
     client.setAll(moduleName, propName, payload);
   }
 
@@ -538,10 +600,17 @@ function renderPropertyBody(client, moduleName, propName, prop) {
 
     if (DISPLAY_ONLY_TYPES.has(e.type)) {
       valueCell.appendChild(renderDisplayOnly(name, e));
-    } else if (permOk) {
-      const ctrl = buildEditControl(client, moduleName, e, name, buffer, {});
+    } else if (permOk && e.directedit) {
+      // Only a directedit element gets an inline control here - anything
+      // else (directedit:false) is display-only in this table, editable
+      // only through the property's own "Edit property" dialog (the
+      // pencil button, see formableElementNames()'s doc comment on why).
+      // A local one-field buffer is enough - there's no bulk Save left to
+      // share it with.
+      const fieldBuffer = { [name]: e.value };
+      const ctrl = buildEditControl(client, moduleName, e, name, fieldBuffer, {});
       valueCell.appendChild(ctrl);
-      if (e.directedit) valueCell.appendChild(iconButton("send", t("common.sendNow"), () => client.setValue(moduleName, propName, name, buffer[name])));
+      valueCell.appendChild(iconButton("send", t("common.sendNow"), () => client.setValue(moduleName, propName, name, fieldBuffer[name])));
     } else {
       valueCell.appendChild(el("span", { class: "readonly-val", text: formatScalar(e.type, e.value) }));
     }
@@ -551,11 +620,6 @@ function renderPropertyBody(client, moduleName, propName, prop) {
   }
   flushButtonRun(); // a run ending at the very last element (actions' own common case) still needs flushing
   body.appendChild(table);
-
-  const formable = editableNames.filter((n) => !boolGroup.includes(n) && !(prop.elements[n].type === "bool" && prop.elements[n].directedit));
-  if (formable.length && (prop.permission === 1 || prop.permission === 2) && prop.enabled !== false) {
-    body.appendChild(el("button", { class: "btn btn-primary", style: "margin-top:10px", onclick: () => client.setAll(moduleName, propName, buffer) }, [icon("save", { small: true }), "Save"]));
-  }
 
   return body;
 }
@@ -606,6 +670,14 @@ export function renderProperty(client, moduleName, propName, opts) {
           if (prop[field]) post.appendChild(iconButton(prop[field], field, () => client.clickPropertyIcon(slot, moduleName, propName)));
         }
         header.appendChild(post);
+      }
+      // Pencil button - the only entry point for the property's own
+      // "Edit property" dialog (formableElementNames()'s own doc comment
+      // has the full story); last in the header, like OstErix/Rooster's
+      // own property-edit-button placement after the posticons.
+      const formable = formableElementNames(prop);
+      if (formable.length && (prop.permission === 1 || prop.permission === 2) && prop.enabled !== false) {
+        header.appendChild(iconButton("edit", t("common.editProperty"), () => openPropertyEditDialog(client, moduleName, propName, prop, formable)));
       }
       container.appendChild(header);
     }
