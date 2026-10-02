@@ -24,6 +24,41 @@ let layer = null;
 let scope = "";
 const live = [];
 
+// Stacking order is plain DOM order (no CSS z-index, see togglePanel()'s
+// own comment on "default-stacking siblings") - `nextZ()` hands out a
+// value guaranteed higher than anything persisted in a previous session
+// (seeded from Date.now(), which only moves forward), so a freshly raised
+// or freshly created panel always sorts above whatever was saved before,
+// while relative order among untouched panels stays whatever it was.
+let zCounter = Date.now();
+function nextZ() { return ++zCounter; }
+
+// Moves `panel` to the end of the layer's DOM (= front, see above) and
+// persists the new order under (sc, id) so it survives a reload - Gilles,
+// 2026-10-0X: "celle que je selectionne doit passer au premier plan ...
+// + a conserver dans le localstorage". Called on ANY interaction with the
+// panel (see make()'s own capture-phase listener below), not just the
+// quicknav button's own show/hide.
+function raisePanel(panel, id, sc) {
+  const z = nextZ();
+  panel.dataset.z = String(z);
+  const s = loadState(sc, id);
+  s.z = z;
+  saveState(sc, id, s);
+  layer.appendChild(panel);
+}
+
+// Inserts a freshly-made panel at its correct sorted position among
+// already-live siblings instead of always appending last - otherwise a
+// template's own Panels.make() call order would silently override
+// whatever stacking the user had previously set and saved, every time the
+// module's panels get rebuilt (e.g. on every property update).
+function insertSorted(panel, z) {
+  const next = [...layer.children].find((el) => el.classList.contains("panel-float") && Number(el.dataset.z) > z);
+  if (next) layer.insertBefore(panel, next);
+  else layer.appendChild(panel);
+}
+
 // #modbar/#top-right float at top:12px, and #modbar's own tallest content
 // (.mod-btn, 54px) plus its 8px top+bottom padding makes it 70px tall, so
 // its bottom edge sits at 12+70=82px in viewport (== layer) coordinates.
@@ -184,6 +219,14 @@ export function make(opts) {
   // choice (persisted as st.collapsed) always wins from then on.
   if (st.collapsed != null ? st.collapsed : opts.collapsed) panel.classList.add("collapsed");
 
+  // Every panel always has a z, persisted the first time it's assigned
+  // (same "stabilize once known" pattern x/y already follow) - see
+  // nextZ()'s own comment on why a never-touched panel still needs one,
+  // not just the ones the user has actually brought to front.
+  const z = st.z != null ? st.z : nextZ();
+  panel.dataset.z = String(z);
+  if (st.z == null) { st.z = z; saveState(sc, id, st); }
+
   const bar = document.createElement("div");
   bar.className = "panel-float-bar";
   const grip = document.createElement("span");
@@ -215,7 +258,15 @@ export function make(opts) {
   bar.addEventListener("mousedown", (e) => startDrag(panel, bar, id, e, sc));
   bar.addEventListener("touchstart", (e) => startDrag(panel, bar, id, e, sc), { passive: false });
 
-  layer.appendChild(panel);
+  // Any interaction anywhere on the panel brings it to front - Gilles,
+  // 2026-10-0X: "celle que je selectionne doit passer au premier plan (la
+  // elle reste derriere si elle a ete creee en premier)". Capture phase so
+  // it fires regardless of what an inner control (a button, an input...)
+  // does with the event afterwards.
+  panel.addEventListener("mousedown", () => raisePanel(panel, id, sc), { capture: true });
+  panel.addEventListener("touchstart", () => raisePanel(panel, id, sc), { capture: true, passive: true });
+
+  insertSorted(panel, z);
   if (!opts.persistent) live.push(panel);
   return body;
 }
@@ -240,11 +291,11 @@ export function isPanelVisible(id) {
  * "doit masquer/demasquer la fenetre" and reflect which state it's in;
  * 2026-10-03: "c'est le bouton de la barre de menu qui affiche/masque la
  * fenetre" - now the ONLY way, a panel no longer has its own minimize
- * button) — toggles the panel's own "collapsed" class. Showing it also brings it to front
- * (re-appended as the layer's last child — later in DOM order paints on
- * top among default-stacking siblings) and scrolls it into view, with a
- * brief flash so it's easy to spot; hiding it is just the collapse, no
- * extra effect needed. Returns the new visible state. This is the one
+ * button) — toggles the panel's own "collapsed" class. Showing it also
+ * brings it to front (raisePanel() - persisted, not just a one-off DOM
+ * move) and scrolls it into view, with a brief flash so it's easy to
+ * spot; hiding it is just the collapse, no extra effect needed. Returns
+ * the new visible state. This is the one
  * piece of behavior every quicknav bar shares regardless of who built the
  * panel list — the generic level1-grouped renderer or a bespoke template —
  * so it lives here, once, in core (Gilles: "il est important de conserver
@@ -265,7 +316,7 @@ export function togglePanel(id) {
   s.collapsed = !willShow;
   saveState(panelScope, id, s);
   if (willShow) {
-    layer.appendChild(panel); // re-append = bring to front
+    raisePanel(panel, id, panelScope);
     panel.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
     panel.classList.remove("flash");
     void panel.offsetWidth; // restart the animation if toggled again quickly
