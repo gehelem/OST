@@ -377,9 +377,23 @@ export function buildElementsForm(client, moduleName, elementDefs, order, initia
 
 // ---- property rendering -------------------------------------------------
 
+// An element's own "order" (string, same lexicographic comparison every
+// level1/level2/property sort in this file already uses) - NOT the
+// object's own key order, which is not reliable for this: Qt's
+// QJsonObject serializes object keys alphabetically, confirmed against a
+// live dump of inspector's own "actions" property (8 buttons, order
+// 10-90) coming back as "goextra/gohome/gointra/loop/reload/sethome/
+// shoot/stop" - alphabetical by key name, regardless of their real
+// "order" field (Gilles, 2026-10-0X, chasing an unrelated "Shoot button
+// does nothing" report that turned out to be a panel overlap instead -
+// this ordering bug was still real and worth fixing on its own).
+function orderedElementNames(elements) {
+  return Object.keys(elements).sort((a, b) => (elements[a].order > elements[b].order ? 1 : -1));
+}
+
 function editableElementNames(prop) {
   if (prop.permission === 0) return [];
-  return Object.keys(prop.elements).filter((n) => !DISPLAY_ONLY_TYPES.has(prop.elements[n].type));
+  return orderedElementNames(prop.elements).filter((n) => !DISPLAY_ONLY_TYPES.has(prop.elements[n].type));
 }
 
 // `showGrid` (default false — PropertyMulti's own default, see
@@ -473,7 +487,7 @@ function openGridDialog(client, moduleName, propName, prop, index, row) {
 // value gets there). A "boolGroup" needing the batched, all-elements SA
 // send is only the elements that have no directedit path of their own.
 function boolGroupNames(prop) {
-  return Object.entries(prop.elements).filter(([, e]) => e.type === "bool" && !e.directedit).map(([n]) => n);
+  return orderedElementNames(prop.elements).filter((n) => prop.elements[n].type === "bool" && !prop.elements[n].directedit);
 }
 
 // Elements only reachable through the "Edit property" dialog (the pencil
@@ -581,7 +595,8 @@ function renderPropertyBody(client, moduleName, propName, prop) {
     table.appendChild(tr);
     buttonRun = null;
   }
-  for (const [name, e] of Object.entries(prop.elements)) {
+  for (const name of orderedElementNames(prop.elements)) {
+    const e = prop.elements[name];
     const permOk = (prop.permission === 1 || prop.permission === 2) && prop.enabled !== false;
     const isGroupBtn = boolGroup.includes(name) && permOk;
     const isDirectBtn = !isGroupBtn && permOk && e.type === "bool" && e.directedit;
