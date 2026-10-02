@@ -150,6 +150,19 @@ function formatScalar(type, value) {
   }
 }
 
+// Shallow value-equality covering both scalars and the compound
+// date/time/datetime shape ({year,month,...}) - used only to decide
+// whether a directedit field's own "check" icon should turn green (see
+// renderPropertyBody's own directedit branch), nothing protocol-facing.
+function valuesEqual(a, b) {
+  if (a && b && typeof a === "object" && typeof b === "object") {
+    const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+    for (const k of keys) if (a[k] !== b[k]) return false;
+    return true;
+  }
+  return a === b;
+}
+
 // A bool toggle button's own content: its icon (if it has one — e.g. the
 // "stop"/"play_arrow"/"shuffle" preicons Focus/Guider's action elements
 // declare) + its label, never a literal "On"/"Off" (Gilles, 2026-09-27:
@@ -607,10 +620,37 @@ function renderPropertyBody(client, moduleName, propName, prop) {
       // pencil button, see formableElementNames()'s doc comment on why).
       // A local one-field buffer is enough - there's no bulk Save left to
       // share it with.
+      //
+      // WHEN the SV actually fires differs by control kind, matching
+      // OstErix/Rooster's own property.component.ts (confirmed against its
+      // source, Gilles 2026-10-0X: "a quel moment on envoie effectivement
+      // le message SV sur une mise a jour individuelle d'un element") - a
+      // select/LOV is already a complete, deliberate choice the instant it
+      // changes, so it sends immediately, same as the bool buttons above
+      // (no separate confirm step); a free-typed field (number/text/date/
+      // time) must NOT send on every keystroke, so it only buffers
+      // locally, with a "check" icon that stays invisible until the
+      // buffer actually differs from the server's own value, then turns
+      // green - replacing the previous unconditional "send" arrow, which
+      // Gilles found unclear: "la fleche n'est pas tres parlante".
       const fieldBuffer = { [name]: e.value };
-      const ctrl = buildEditControl(client, moduleName, e, name, fieldBuffer, {});
-      valueCell.appendChild(ctrl);
-      valueCell.appendChild(iconButton("send", t("common.sendNow"), () => client.setValue(moduleName, propName, name, fieldBuffer[name])));
+      if (client.resolveLov(moduleName, e)) {
+        const ctrl = buildEditControl(client, moduleName, e, name, fieldBuffer, {
+          onChange: () => client.setValue(moduleName, propName, name, fieldBuffer[name]),
+        });
+        valueCell.appendChild(ctrl);
+      } else {
+        const checkBtn = iconButton("check", t("common.sendNow"), () => {
+          client.setValue(moduleName, propName, name, fieldBuffer[name]);
+          checkBtn.classList.remove("dirty");
+        });
+        checkBtn.classList.add("send-check");
+        const ctrl = buildEditControl(client, moduleName, e, name, fieldBuffer, {
+          onChange: () => checkBtn.classList.toggle("dirty", !valuesEqual(fieldBuffer[name], e.value)),
+        });
+        valueCell.appendChild(ctrl);
+        valueCell.appendChild(checkBtn);
+      }
     } else {
       valueCell.appendChild(el("span", { class: "readonly-val", text: formatScalar(e.type, e.value) }));
     }

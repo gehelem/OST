@@ -30,6 +30,15 @@
   cursor: pointer; transition: all 0.15s ease; flex-shrink: 0;
 }
 .btn-icon:hover { color: var(--accent); background: var(--bg-hover); border-color: var(--border-subtle); }
+/* A directedit field's "send" confirm - invisible until the field is
+ * actually dirty, then turns green - Gilles, 2026-10-0X, on the previous
+ * unconditional "send" arrow: "la fleche n'est pas tres parlante, je
+ * prefererais une icone 'check' qui apparaisse en vert seulement si je
+ * modifie la zone". Space is reserved (opacity, not display:none) so
+ * typing doesn't shift the row. */
+.send-check { opacity: 0; pointer-events: none; }
+.send-check.dirty { opacity: 1; pointer-events: auto; color: var(--ok); }
+.send-check.dirty:hover { color: var(--ok); background: rgba(var(--ok-rgb), 0.12); }
 .toggle-btn { min-width: 52px; justify-content: center; }
 .toggle-btn.active { background: var(--accent-subtle); border-color: var(--accent); color: var(--accent-strong); box-shadow: 0 0 10px var(--accent-faint); }
 
