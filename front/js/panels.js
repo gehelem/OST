@@ -246,8 +246,8 @@ export function make(opts) {
   const rz = document.createElement("div");
   rz.className = "panel-float-resize";
   rz.title = t("chrome.resize");
-  rz.addEventListener("mousedown", (e) => startResize(panel, id, e, sc));
-  rz.addEventListener("touchstart", (e) => startResize(panel, id, e, sc), { passive: false });
+  rz.addEventListener("mousedown", (e) => { raisePanel(panel, id, sc); startResize(panel, id, e, sc); });
+  rz.addEventListener("touchstart", (e) => { raisePanel(panel, id, sc); startResize(panel, id, e, sc); }, { passive: false });
   panel.appendChild(rz);
 
   // No minimize button on the panel itself any more (Gilles, 2026-10-03:
@@ -255,16 +255,27 @@ export function make(opts) {
   // barre de menu qui affiche/masque la fenetre") - showing/hiding a panel
   // only ever happens through its own quicknav button (togglePanel(), same
   // "collapsed" class this used to toggle directly) from here on.
-  bar.addEventListener("mousedown", (e) => startDrag(panel, bar, id, e, sc));
-  bar.addEventListener("touchstart", (e) => startDrag(panel, bar, id, e, sc), { passive: false });
+  bar.addEventListener("mousedown", (e) => { raisePanel(panel, id, sc); startDrag(panel, bar, id, e, sc); });
+  bar.addEventListener("touchstart", (e) => { raisePanel(panel, id, sc); startDrag(panel, bar, id, e, sc); }, { passive: false });
 
   // Any interaction anywhere on the panel brings it to front - Gilles,
   // 2026-10-0X: "celle que je selectionne doit passer au premier plan (la
-  // elle reste derriere si elle a ete creee en premier)". Capture phase so
-  // it fires regardless of what an inner control (a button, an input...)
-  // does with the event afterwards.
-  panel.addEventListener("mousedown", () => raisePanel(panel, id, sc), { capture: true });
-  panel.addEventListener("touchstart", () => raisePanel(panel, id, sc), { capture: true, passive: true });
+  // elle reste derriere si elle a ete creee en premier)". On "click"
+  // (bubble phase, the default - fires AFTER an inner button/input's own
+  // click handler already ran, target-then-ancestor order), NOT on
+  // "mousedown" - a previous version raised on mousedown, which calls
+  // layer.appendChild() (a real DOM reparent) before the button's own
+  // click could even fire. Verified live (Playwright + a real dump) that
+  // this silently broke EVERY button inside EVERY panel: moving the
+  // pressed element out from under the cursor mid-gesture stops the
+  // browser from ever synthesizing the "click" at all, not just this
+  // one - the actual cause of "j'appuis sur le bouton shoot ... il ne se
+  // passe rien" (2026-10-0X), a regression from this same feature, not
+  // the panel-overlap bug fixed alongside it in templates/inspector.js.
+  // The drag bar/resize handle above still raise instantly on their own
+  // mousedown instead - neither is a button with its own click handler
+  // to protect, so there's nothing to break.
+  panel.addEventListener("click", () => raisePanel(panel, id, sc));
 
   insertSorted(panel, z);
   if (!opts.persistent) live.push(panel);
