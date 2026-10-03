@@ -94,11 +94,12 @@ const STRINGS = {
 
   // ---- imagelayer.js: shared image/stats block ----------------------------
   "imagelayer.dimensions": { en: "Dimensions", fr: "Dimensions", de: "Abmessungen", it: "Dimensioni", es: "Dimensiones" },
-  "imagelayer.focusAndStars": { en: "Focus & stars", fr: "Mise au point et étoiles", de: "Fokus & Sterne", it: "Messa a fuoco e stelle", es: "Enfoque y estrellas" },
+  "imagelayer.focus": { en: "Focus", fr: "Mise au point", de: "Fokus", it: "Messa a fuoco", es: "Enfoque" },
   "imagelayer.statistics": { en: "Statistics", fr: "Statistiques", de: "Statistik", it: "Statistiche", es: "Estadísticas" },
   "imagelayer.astrometry": { en: "Astrometry", fr: "Astrométrie", de: "Astrometrie", it: "Astrometria", es: "Astrometría" },
   "imagelayer.imageStats": { en: "Image stats", fr: "Statistiques de l'image", de: "Bildstatistik", it: "Statistiche immagine", es: "Estadísticas de la imagen" },
   "imagelayer.stats": { en: "Stats", fr: "Stats", de: "Statistik", it: "Statistiche", es: "Estadísticas" },
+  "imagelayer.histogram": { en: "Histogram", fr: "Histogramme", de: "Histogramm", it: "Istogramma", es: "Histograma" },
   "imagelayer.channelR": { en: "R", fr: "R", de: "R", it: "R", es: "R" },
   "imagelayer.channelG": { en: "G", fr: "V", de: "G", it: "V", es: "V" },
   "imagelayer.channelB": { en: "B", fr: "B", de: "B", it: "B", es: "A" },

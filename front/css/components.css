@@ -160,6 +160,17 @@ input[type="range"]::-moz-range-thumb {
 /* templates/guider.js's fuller image stats+histogram panel. */
 .stat-sec { margin: 10px 0 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); }
 .stat-sec:first-child { margin-top: 0; }
+/* imagelayer.js's statSecLine() - a stat-sec title with its own (already-
+ * merged) value inline, instead of stacked on its own line above it. */
+.stat-sec-line { display: flex; align-items: baseline; gap: var(--space-2); margin: 10px 0 4px; }
+.stat-sec-line:first-child { margin-top: 0; }
+.stat-sec-inline { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); flex-shrink: 0; }
+/* imagelayer.js's labeledPairsRow() - Stars/SNR, same small/dim/uppercase
+ * label font as .stat-sec-inline above (Gilles: "garde la meme police sur
+ * 'Stars' que pour 'FOCUS'"), left-aligned with a gap instead of
+ * .stat-row's space-between (several label:value pairs on one row, not
+ * just one). */
+.stat-inline-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2); padding: 3px 0; border-top: 1px solid var(--border-subtle); }
 .stat-row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); padding: 3px 0; border-top: 1px solid var(--border-subtle); }
 .stat-row:first-of-type { border-top: 0; }
 .stat-label { color: var(--text-muted); }

@@ -39,6 +39,38 @@ export function updateStatusDot(dotEl, status) {
   dotEl.title = t(STATUS_KEY[s]);
 }
 
+/**
+ * Small tab-bar + tab-panels widget (.tab-bar/.tab-btn/.tab-panel, same
+ * classes/click-swap behavior as render.js's own level1/level2 property
+ * tabs — kept visually identical rather than inventing a second tab look)
+ * — `tabs` is `[{label, node}, ...]`, the first one starts active. Returns
+ * the combined wrapper; callers keep their own reference to each `node` to
+ * update its content in place later (the tab bar/panels themselves are
+ * only ever built once, e.g. imagelayer.js's own Stats/Histogram split —
+ * Gilles, 2026-10-03: "modifie la fenetre 'image stats' pour qu'elle soit
+ * plus dense, par exemple un onglet histogramme et un onglet stats"). */
+export function buildTabs(tabs) {
+  const wrap = el("div");
+  const tabBar = el("div", { class: "tab-bar" });
+  const tabPanels = el("div", { class: "tab-panels" });
+  tabs.forEach(({ label, node }, i) => {
+    const btn = el("button", { class: "tab-btn" + (i === 0 ? " active" : ""), text: label });
+    const panel = el("div", { class: "tab-panel" + (i === 0 ? "" : " hidden") });
+    panel.appendChild(node);
+    btn.addEventListener("click", () => {
+      tabBar.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+      tabPanels.querySelectorAll(".tab-panel").forEach((p) => p.classList.add("hidden"));
+      btn.classList.add("active");
+      panel.classList.remove("hidden");
+    });
+    tabBar.appendChild(btn);
+    tabPanels.appendChild(panel);
+  });
+  wrap.appendChild(tabBar);
+  wrap.appendChild(tabPanels);
+  return wrap;
+}
+
 export function statusDot(status) {
   const dot = el("span", { class: "status-dot" });
   updateStatusDot(dot, status);

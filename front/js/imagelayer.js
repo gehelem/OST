@@ -23,7 +23,7 @@
 //   addImageBlock(client, moduleName, mod, propName, elName,
 //                 panelsApi, track, disposers, quickNavEntries, pos)  the whole thing, one call
 
-import { el, icon } from "./dom.js";
+import { el, icon, buildTabs } from "./dom.js";
 import { getMediaBaseUrl, imageStatsLine } from "./render.js";
 import { mediaUrl as buildMediaUrl } from "../core/index.js";
 import { t } from "./i18n.js";
@@ -181,22 +181,70 @@ function chAt(v, i) { return Array.isArray(v) ? (i < v.length ? fmtNum(v[i]) : "
 function statRow(label, value) {
   return el("div", { class: "stat-row" }, [el("span", { class: "stat-label", text: label }), el("span", { class: "stat-value mono", text: value })]);
 }
+// Section title + its own (single, already-merged) value on one line - a
+// further density pass on statRow()/stat-sec above (Gilles, 2026-10-03,
+// after a first cut still put the title on its own line above the value:
+// "ça prend encore trop de place ... Dimensions RGB 1024x768" - title and
+// value inline, not stacked). "Focus : HFR avg ..." (Gilles, same thread,
+// one more round): colon separator, same pattern applied to the
+// "Dimensions" line too for a consistent look between the two.
+// `value` is either a plain string (Dimensions' case) or an array mixing
+// plain mono strings with {tag, value} sub-labels (Focus's "HFR avg X''
+// dev Y''" - Gilles, one more round yet: "mets aussi le 'dev' avec cette
+// meme police", same small/dim/uppercase treatment as the section label
+// itself, not baked into the plain mono text).
+function statSecLine(label, value) {
+  const row = el("div", { class: "stat-sec-line" }, [el("span", { class: "stat-sec-inline", text: label + " :" })]);
+  for (const p of Array.isArray(value) ? value : [value]) {
+    if (p && typeof p === "object") {
+      row.appendChild(el("span", { class: "stat-sec-inline", text: p.tag + " :" }));
+      row.appendChild(el("span", { class: "mono", text: String(p.value) }));
+    } else {
+      row.appendChild(el("span", { class: "mono", text: p }));
+    }
+  }
+  return row;
+}
+// "Label : value" pairs on one row, for the Stars/SNR line below the Focus
+// one - no longer bare numbers (Gilles: "Stars : 93 · SNR : 2.60"), and
+// each label in the same small/dim/uppercase font as "FOCUS"/"DIMENSIONS"
+// above (Gilles, one more round: "garde la meme police sur 'Stars' que
+// pour 'FOCUS'") - so each label is its own .stat-sec-inline span, not
+// plain text baked into one mono string like statSecLine()'s value side.
+function labeledPairsRow(pairs) {
+  const row = el("div", { class: "stat-inline-row" });
+  pairs.forEach(([label, value], i) => {
+    if (i > 0) row.appendChild(el("span", { class: "stat-sec-inline", text: "·" }));
+    row.appendChild(el("span", { class: "stat-sec-inline", text: label + " :" }));
+    row.appendChild(el("span", { class: "mono", text: String(value) }));
+  });
+  return row;
+}
 
 function renderImageStatsTable(v) {
   const wrap = el("div", { class: "img-stats-full" });
   const ch = v.channels || 1;
 
-  wrap.appendChild(el("div", { class: "stat-sec", text: t("imagelayer.dimensions") }));
-  wrap.appendChild(statRow("Width", (v.width || "N/A") + " px"));
-  wrap.appendChild(statRow("Height", (v.height || "N/A") + " px"));
-  wrap.appendChild(statRow("Type", ch === 3 ? "RGB" : "Grayscale"));
+  // "×" matches render.js's own imageStatsLine() dimension formatting
+  // (same quick-stats line, kept visually consistent rather than a plain
+  // "x").
+  wrap.appendChild(statSecLine(t("imagelayer.dimensions"), `${ch === 3 ? "RGB" : "Grayscale"} ${v.width || "N/A"}×${v.height || "N/A"}`));
 
   if (v.hfravg != null || v.stars != null || v.snr != null) {
-    wrap.appendChild(el("div", { class: "stat-sec", text: t("imagelayer.focusAndStars") }));
-    if (v.hfravg != null) wrap.appendChild(statRow("HFR avg", fmtNum(v.hfravg)));
-    if (v.hfravgdev != null) wrap.appendChild(statRow("HFR avg dev", fmtNum(v.hfravgdev)));
-    if (v.stars != null) wrap.appendChild(statRow("Stars", String(v.stars)));
-    if (v.snr != null) wrap.appendChild(statRow("SNR", fmtNum(v.snr)));
+    // HFR avg + its own deviation on the section's title line - "''" (two
+    // straight quotes) is the arcsec shorthand focus.json's own element
+    // labels already use (e.g. "Average HFR ('')"), not guessed.
+    const hfrParts = [];
+    if (v.hfravg != null) hfrParts.push(`HFR avg ${fmtNum(v.hfravg)}''`);
+    if (v.hfravgdev != null) hfrParts.push({ tag: "dev", value: fmtNum(v.hfravgdev) + "''" });
+    wrap.appendChild(statSecLine(t("imagelayer.focus"), hfrParts));
+    // Stars/SNR merged underneath, each with its own "Label : value" pair
+    // this time (Gilles: "Stars : 93 · SNR : 2.60") - same " · " join
+    // style as render.js's own imageStatsLine().
+    const pairs = [];
+    if (v.stars != null) pairs.push(["Stars", v.stars]);
+    if (v.snr != null) pairs.push(["SNR", fmtNum(v.snr)]);
+    if (pairs.length) wrap.appendChild(labeledPairsRow(pairs));
   }
 
   wrap.appendChild(el("div", { class: "stat-sec", text: t("imagelayer.statistics") }));
@@ -267,15 +315,20 @@ function updateImageHistogram(v, canvas, chartRef) {
 
 /** Full per-channel stats table + histogram chart for one image element —
  * meant to be opened on demand (e.g. a template's own quicknav button),
- * not shown by default, see Panels.make()'s `collapsed` option. */
+ * not shown by default, see Panels.make()'s `collapsed` option. Split into
+ * a "Stats"/"Histogram" tab pair (dom.js's own buildTabs()) rather than
+ * stacked one above the other — Gilles, 2026-10-03: "modifie la fenetre
+ * 'image stats' pour qu'elle soit plus dense, par exemple un onglet
+ * histogramme et un onglet stats". */
 export function buildImageStatsHistogramPanel(client, moduleName, propName, elName) {
-  const wrap = el("div", { class: "img-stats-panel" });
   const info = el("div");
   const histoWrap = el("div", { class: "gd-chart" });
   const canvas = el("canvas");
   histoWrap.appendChild(canvas);
-  wrap.appendChild(info);
-  wrap.appendChild(histoWrap);
+  const wrap = buildTabs([
+    { label: t("imagelayer.stats"), node: info },
+    { label: t("imagelayer.histogram"), node: histoWrap },
+  ]);
   const chartRef = { chart: null };
 
   const unsub = client.subscribe(client.topics.property(moduleName, propName), (prop) => {
