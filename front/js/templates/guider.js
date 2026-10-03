@@ -11,9 +11,13 @@
 // corrections as bars. Ostnoctua already built exactly this (Chart.js,
 // vendored — see lib/chart.min.js) — this ports that same configuration
 // rather than reinventing it (Gilles, 2026-09-27: "tu as deja fait
-// strictement la meme chose dans ostnoctua"). Everything else (actions,
-// values, catch-all) stays on the generic renderProperty() path — still
-// "a bespoke template only ever adds presentation" for those.
+// strictement la meme chose dans ostnoctua"). "actions" stays on the
+// generic renderActionsPanel() path; "values" got its own bespoke
+// treatment too on 2026-10-03 (RMS boxes + pulse bars, see
+// buildValuesPanel() below) after Gilles found the plain generic table
+// "pas assez graphique" — still "a bespoke template only ever adds
+// presentation", just more of this module ended up needing it than
+// first assumed.
 //
 // `image` is the other ostnoctua-ported piece (Gilles, 2026-09-29:
 // "affiche l'image derriere en ecran de fond, comme dans ostnoctua"): the
@@ -35,9 +39,9 @@
 // `image`, defined generically by IndiModule::defineMeAsImager() (see
 // libs/indimodule.cpp) for any imaging module, guider included.
 
-import { renderProperty, updateQuickNav, moduleLifecycle, renderActionsPanel } from "../render.js";
+import { updateQuickNav, moduleLifecycle, renderActionsPanel } from "../render.js";
 import { addImageBlock } from "../imagelayer.js";
-import { el } from "../dom.js";
+import { el, statusDot } from "../dom.js";
 import * as Panels from "../panels.js";
 import { t } from "../i18n.js";
 
@@ -292,14 +296,13 @@ function pulseAxisRow(axisLabel, leftVal, rightVal, leftName, rightName, maxVal)
 function buildValuesPanel(client, moduleName) {
   const wrap = el("div", { class: "guider-values" });
   let pulsemax = 2000; // guideParams.json's own default, until the real dump arrives
-  const unsubParams = client.subscribe(client.topics.property(moduleName, "guideParams"), (prop) => {
-    const v = prop && prop.elements.pulsemax && prop.elements.pulsemax.value;
-    if (typeof v === "number" && v > 0) pulsemax = v;
-  });
-  const unsub = client.subscribe(client.topics.property(moduleName, "values"), (prop) => {
+  let valuesProp = null;
+  let calQualEl = null;
+
+  function render() {
     wrap.innerHTML = "";
-    if (!prop) return;
-    const e = prop.elements;
+    if (!valuesProp) return;
+    const e = valuesProp.elements;
     // Labels come from the server (already translated, structure.en.md -
     // "property/element labels ... DO come translated already") - never
     // re-invented locally, per js/i18n.js's own header rule.
@@ -314,8 +317,29 @@ function buildValuesPanel(client, moduleName) {
     wrap.appendChild(rmsRow);
     if (e.pulseE && e.pulseW) wrap.appendChild(pulseAxisRow("RA", e.pulseE.value, e.pulseW.value, "E", "W", pulsemax));
     if (e.pulseS && e.pulseN) wrap.appendChild(pulseAxisRow("DEC", e.pulseS.value, e.pulseN.value, "S", "N", pulsemax));
+    // Just the quality dot, not the rest of "calibrationvalues" (the
+    // actual calibration numbers are already reachable from the generic
+    // Parameters modal) - Gilles, 2026-10-03: "pas besoin de ce niveau de
+    // detail a cet endroit ... laisse juste le calibration quality en
+    // petit sous les pulses".
+    if (calQualEl) {
+      wrap.appendChild(el("div", { class: "cal-quality-row" }, [
+        statusDot(calQualEl.value),
+        el("span", { class: "muted small", text: calQualEl.label || "Calibration quality" }),
+      ]));
+    }
+  }
+
+  const unsubParams = client.subscribe(client.topics.property(moduleName, "guideParams"), (prop) => {
+    const v = prop && prop.elements.pulsemax && prop.elements.pulsemax.value;
+    if (typeof v === "number" && v > 0) { pulsemax = v; render(); }
   });
-  wrap._dispose = () => { unsub(); unsubParams(); };
+  const unsub = client.subscribe(client.topics.property(moduleName, "values"), (prop) => { valuesProp = prop; render(); });
+  const unsubCal = client.subscribe(client.topics.property(moduleName, "calibrationvalues"), (prop) => {
+    calQualEl = prop && prop.elements.calqual;
+    render();
+  });
+  wrap._dispose = () => { unsub(); unsubParams(); unsubCal(); };
   return wrap;
 }
 
@@ -348,7 +372,6 @@ export function mount(client, moduleName) {
     if (has("values")) {
       const b = Panels.make({ id: "values", title: mod.properties.values.label || "Session values", x: 20, y: 470, w: 300 });
       b.appendChild(track(buildValuesPanel(client, moduleName)));
-      if (has("calibrationvalues")) b.appendChild(track(renderProperty(client, moduleName, "calibrationvalues")));
       quickNavEntries.push({ id: "values", label: mod.properties.values.label || "Session values" });
     }
     addImageBlock(client, moduleName, mod, "image", "image", Panels, track, disposers, quickNavEntries, { x: 350, y: 92, w: 260 });

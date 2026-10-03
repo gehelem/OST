@@ -307,3 +307,4 @@ input[type="range"]::-moz-range-thumb {
 .pulse-bar-center { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--border-strong); }
 .pulse-bar-fill { position: absolute; top: 0; bottom: 0; background: var(--accent); }
 .pulse-axis-values { display: flex; justify-content: space-between; margin-top: 2px; color: var(--text-muted); }
+.cal-quality-row { display: flex; align-items: center; gap: var(--space-1); margin-top: var(--space-3); }
