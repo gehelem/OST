@@ -1,0 +1,60 @@
+# CI for ostcore's mobile wrapper (Capacitor, android/ — see
+# capacitor.config.json/package.json). Builds a debug-signed APK
+# (fr.ostserver.ostcore, "OST") and publishes it as the project's "latest"
+# GitLab release, same pattern OST/.gitlab-ci.yml already uses for its own
+# "latest" deb/rpm releases (generic package registry + release-cli,
+# delete-then-recreate the "latest" release each time).
+#
+# iOS is NOT in scope here (no macOS runner / Apple Developer account
+# available yet — see notes/NOTES-frontend-ostcore.md if that changes).
+#
+# Debug-signed, not a dedicated release keystore: zero signing setup,
+# installs directly by sideload on any Android device — the right
+# tradeoff for a "latest" build meant for personal/test use, not a Play
+# Store release (Gilles, 2026-10-03, picking this over setting up a
+# keystore now).
+
+stages:
+  - build
+  - release
+
+variables:
+  PACKAGE_REGISTRY_LATEST: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/latest/latest"
+  APK_FILE_LATEST: "ostcore_latest.apk"
+
+.build-rules: &build-rules
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+
+build-android:
+  stage: build
+  # Node + JDK + Android SDK/build-tools all in one, the common choice for
+  # Capacitor/React Native CI - no custom image maintained for this
+  # project yet (unlike OST/'s own $CI_REGISTRY_IMAGE/ci-build:*).
+  image: reactnativecommunity/react-native-android:latest
+  script:
+    - npm ci
+    - npm run prepare-www
+    - npx cap sync android
+    - cd android
+    - ./gradlew assembleDebug
+    - cd ..
+    - cp android/app/build/outputs/apk/debug/app-debug.apk "$APK_FILE_LATEST"
+  artifacts:
+    paths:
+      - "$APK_FILE_LATEST"
+    expire_in: 4 week
+  <<: *build-rules
+
+release-android-latest:
+  stage: release
+  dependencies:
+    - build-android
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  script:
+    - sh ./CI/CI-upload-release-latest.sh
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "push"'

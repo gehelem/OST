@@ -1,0 +1,11 @@
+{
+  "appId": "fr.ostserver.ostcore",
+  "appName": "OST",
+  "webDir": "www",
+  "server": {
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}
