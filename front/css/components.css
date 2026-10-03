@@ -301,10 +301,11 @@ input[type="range"]::-moz-range-thumb {
 .rms-box { flex: 1; padding: var(--space-2); border-radius: var(--radius-sm); border-left: 3px solid var(--ok); background: rgba(var(--ok-rgb), 0.08); }
 .rms-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); }
 .rms-number { font-size: 15px; font-weight: 600; font-family: var(--font-mono); margin-top: 2px; }
-.pulse-axis { margin-top: var(--space-2); }
-.pulse-axis-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); margin-bottom: 3px; }
-.pulse-bar { position: relative; height: 10px; border-radius: var(--radius-sm); background: var(--bg-elevated); border: 1px solid var(--border); overflow: hidden; }
+.pulse-axis { display: flex; align-items: center; gap: var(--space-1); margin-top: var(--space-2); }
+.pulse-axis-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); width: 24px; flex-shrink: 0; }
+.pulse-dir-label { font-size: 10px; color: var(--text-muted); flex-shrink: 0; }
+.pulse-bar { position: relative; flex: 1; height: 18px; border-radius: var(--radius-sm); background: var(--bg-elevated); border: 1px solid var(--border); overflow: hidden; }
 .pulse-bar-center { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--border-strong); }
 .pulse-bar-fill { position: absolute; top: 0; bottom: 0; background: var(--accent); }
-.pulse-axis-values { display: flex; justify-content: space-between; margin-top: 2px; color: var(--text-muted); }
+.pulse-bar-value { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text); text-shadow: 0 0 3px var(--bg), 0 0 3px var(--bg), 0 0 3px var(--bg); pointer-events: none; }
 .cal-quality-row { display: flex; align-items: center; gap: var(--space-1); margin-top: var(--space-3); }

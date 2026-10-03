@@ -274,18 +274,26 @@ function buildDriftChartPanel(client, moduleName) {
 // subscribed here JUST for that number - guideParams itself still only
 // reachable from the Parameters modal, same as any other hasprofile
 // property this template doesn't give its own panel).
+// One line per axis now (Gilles, 2026-10-03: "fais tenir les curseurs et
+// leurs libelles sur deux lignes en tout" - RA and DEC together, not two
+// each): axis label, E/S, the bar itself (its current value shown INSIDE
+// it, not as separate text below - "affiche la valeur a l'interieur du
+// curseur"), W/N.
 function pulseAxisRow(axisLabel, leftVal, rightVal, leftName, rightName, maxVal) {
   const row = el("div", { class: "pulse-axis" });
   row.appendChild(el("div", { class: "pulse-axis-label", text: axisLabel }));
+  row.appendChild(el("div", { class: "pulse-dir-label", text: leftName }));
   const bar = el("div", { class: "pulse-bar" });
   const fill = el("div", { class: "pulse-bar-fill" });
+  // Exactly one of leftVal/rightVal is ever nonzero at once (guider.cpp's
+  // own pulse logic always zeroes the opposite direction) - Math.max()
+  // picks whichever that is, 0 when neither is active.
+  const value = Math.max(leftVal || 0, rightVal || 0);
   bar.appendChild(fill);
   bar.appendChild(el("div", { class: "pulse-bar-center" }));
+  bar.appendChild(el("div", { class: "pulse-bar-value mono", text: String(Math.round(value)) }));
   row.appendChild(bar);
-  row.appendChild(el("div", { class: "pulse-axis-values mono small" }, [
-    el("span", { text: `${leftName} ${(leftVal || 0).toFixed(0)}` }),
-    el("span", { text: `${rightName} ${(rightVal || 0).toFixed(0)}` }),
-  ]));
+  row.appendChild(el("div", { class: "pulse-dir-label", text: rightName }));
   const signed = (rightVal || 0) - (leftVal || 0);
   const frac = Math.max(-1, Math.min(1, maxVal ? signed / maxVal : 0));
   if (frac >= 0) { fill.style.left = "50%"; fill.style.width = (frac * 50) + "%"; }
