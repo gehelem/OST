@@ -383,14 +383,26 @@ export function buildImageAlternatesPanel(client, moduleName, propName, elName) 
  * imported here, same as every template already does, to keep this file
  * itself DOM-shell-agnostic); `track`/`disposers`/`quickNavEntries` are the
  * caller's own bookkeeping, same shapes every template already uses.
+ *
+ * `opts.quickPanel: false` skips the small quick-stats panel + its own
+ * "Image" quicknav button (background image and the deeper Stats panel
+ * stay) — Gilles, 2026-10-03, on focus/guider specifically: "supprime le
+ * bouton 'image' et la fenetre associee" (the background already carries
+ * the picture full-screen, and the Stats panel/button already covers the
+ * same figures in more depth — the small panel was pure redundancy once
+ * both of those existed). Scaffolded templates (inspector/polar/
+ * parkmanager/sequencer, via templates/scaffold.js) keep the default.
  */
-export function addImageBlock(client, moduleName, mod, propName, elName, panelsApi, track, disposers, quickNavEntries, pos) {
+export function addImageBlock(client, moduleName, mod, propName, elName, panelsApi, track, disposers, quickNavEntries, pos, opts) {
   if (!(propName in mod.properties)) return;
   const p = { x: 660, y: 92, w: 280, ...pos };
   disposers.push(showBackgroundImage(client, moduleName, propName, elName).dispose);
-  const b = panelsApi.make({ id: propName, title: mod.properties[propName].label || "Image", x: p.x, y: p.y, w: p.w });
-  b.appendChild(track(buildImageQuickStats(client, moduleName, propName, elName)));
-  quickNavEntries.push({ id: propName, label: mod.properties[propName].label || "Image" });
+
+  if (!opts || opts.quickPanel !== false) {
+    const b = panelsApi.make({ id: propName, title: mod.properties[propName].label || "Image", x: p.x, y: p.y, w: p.w });
+    b.appendChild(track(buildImageQuickStats(client, moduleName, propName, elName)));
+    quickNavEntries.push({ id: propName, label: mod.properties[propName].label || "Image" });
+  }
 
   const sb = panelsApi.make({ id: propName + "-stats", title: t("imagelayer.imageStats"), x: p.x, y: p.y + 100, w: p.w + 100, collapsed: true });
   sb.appendChild(track(buildImageStatsHistogramPanel(client, moduleName, propName, elName)));

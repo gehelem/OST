@@ -236,7 +236,11 @@ export function mount(client, moduleName) {
       b.appendChild(track(buildFocusCurvePanel(client, moduleName)));
       quickNavEntries.push({ id: "values", label: mod.properties.values.label || "Focus curve" });
     }
-    addImageBlock(client, moduleName, mod, "image", "image", Panels, track, disposers, quickNavEntries, { x: 850, y: 92, w: 280 });
+    // No small "Image" quick-stats panel/button here (Gilles, 2026-10-03:
+    // "supprime le bouton 'image' et la fenetre associee") - the
+    // background already shows the picture full-screen, and the "Stats"
+    // panel/button (below) already covers the same figures in more depth.
+    addImageBlock(client, moduleName, mod, "image", "image", Panels, track, disposers, quickNavEntries, { x: 850, y: 92, w: 280 }, { quickPanel: false });
     if (has("image")) {
       const b = Panels.make({ id: "tilt", title: t("focus.tilt"), x: 1150, y: 92, w: 220 });
       b.appendChild(track(buildImageAlternatesPanel(client, moduleName, "image", "image")));

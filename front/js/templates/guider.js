@@ -29,9 +29,11 @@
 // whole thing (background + quick-stats line + the fuller stats/histogram
 // panel, one addImageBlock() call) lives in imagelayer.js (Gilles,
 // 2026-09-29, having asked "est-ce que ce truc d'image sera reutilisable
-// sur d'autres templates ?": "Go") — reused as-is by templates/scaffold.js
-// (focus/sequencer) too, so this file just wires it to guider's own
-// "image" property/element.
+// sur d'autres templates ?": "Go") — reused (minus its own quick-stats
+// panel/button here, see the opts.quickPanel:false call below — Gilles,
+// 2026-10-03: "supprime le bouton 'image' et la fenetre associee") by
+// templates/scaffold.js (inspector/polar/parkmanager/sequencer) too, so
+// this file just wires it to guider's own "image" property/element.
 //
 // Real property names confirmed against src/modules/guider/guider.json /
 // guider.cpp: actions, values, calibrationvalues, drift, guiding,
@@ -382,7 +384,11 @@ export function mount(client, moduleName) {
       b.appendChild(track(buildValuesPanel(client, moduleName)));
       quickNavEntries.push({ id: "values", label: mod.properties.values.label || "Session values" });
     }
-    addImageBlock(client, moduleName, mod, "image", "image", Panels, track, disposers, quickNavEntries, { x: 350, y: 92, w: 260 });
+    // No small "Image" quick-stats panel/button here (Gilles, 2026-10-03:
+    // "supprime le bouton 'image' et la fenetre associee") - the
+    // background already shows the picture full-screen, and the "Stats"
+    // panel/button (below) already covers the same figures in more depth.
+    addImageBlock(client, moduleName, mod, "image", "image", Panels, track, disposers, quickNavEntries, { x: 350, y: 92, w: 260 }, { quickPanel: false });
     if (has("guiding")) {
       const b = Panels.make({ id: "guiding", title: mod.properties.guiding.label || "Guiding", x: 350, y: 300, w: 620 });
       b.appendChild(track(buildGuidingChartPanel(client, moduleName)));
