@@ -301,20 +301,13 @@ export function mount(client, moduleName) {
     // The profile-centric "Parameters" box (buildParamsPanel, render.js) is
     // not built here — it opens on demand from the gear button (app.js),
     // same as the generic renderer. Its properties (hasprofile:true, from
-    // the module's own metadata, not a hardcoded list) are still excluded
-    // below so they don't also land in the "Other" catch-all.
-
-    // Anything this template doesn't know about explicitly (a future
-    // property this module gains) still needs to be reachable — fold it
-    // into one catch-all panel rather than silently dropping it.
-    const hasprofileNames = Object.keys(mod.properties).filter((n) => mod.properties[n].hasprofile === true);
-    const known = new Set(["actions", "values", "calibrationvalues", "image", "guiding", "drift", ...hasprofileNames]);
-    const rest = Object.keys(mod.properties).filter((n) => !known.has(n));
-    if (rest.length) {
-      const b = Panels.make({ id: "other", title: "Other", x: 20, y: 620, w: 300 });
-      for (const name of rest) b.appendChild(track(renderProperty(client, moduleName, name)));
-      quickNavEntries.push({ id: "other", label: "Other" });
-    }
+    // the module's own metadata) cover every one of the real guider
+    // module's remaining properties (calParams/guideParams/
+    // revCorrections/disCorrections/backlash, confirmed against
+    // src/modules/guider/guider.json) — no "Other" catch-all here, unlike
+    // every scaffolded template: there's nothing left to fall into one
+    // (Gilles, 2026-10-03, doing some cleanup: "enleve le 'other' et la
+    // fenetre" after confirming that).
     updateQuickNav(quickNavEntries);
   }
 
