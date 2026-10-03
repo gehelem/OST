@@ -25,12 +25,17 @@ import { buildScaffoldTemplate } from "./scaffold.js";
 export const mount = buildScaffoldTemplate(
   [
     // Icon-only (Gilles, 2026-10-03: "bouton 'sequence' => icone seulement
-    // = 'list'").
-    { id: "sequence", x: 350, y: 92, w: 340, icon: "list", iconOnly: true },
-    { id: "object", x: 350, y: 330, w: 300 },
+    // = 'list'") and no inner frame either (same thread, right after:
+    // "idem sur 'sequence'").
+    { id: "sequence", x: 350, y: 92, w: 340, icon: "list", iconOnly: true, framed: false },
+    // No inner frame either (same thread, right after: "idem sur
+    // 'object'").
+    { id: "object", x: 350, y: 330, w: 300, framed: false },
     // Icon-only too (same thread, right after: "bouton 'progress' =>
-    // seulement icone = 'progress_activity'").
-    { id: "progress", x: 20, y: 330, w: 300, icon: "progress_activity", iconOnly: true },
+    // seulement icone = 'progress_activity'"), and no inner frame either
+    // (same thread yet again: "pas besoin du cadre car une seule
+    // propriete" - the outer panel box above already gives it one).
+    { id: "progress", x: 20, y: 330, w: 300, icon: "progress_activity", iconOnly: true, framed: false },
   ],
   { x: 720, y: 92, w: 260 },
   // No small "Image" quick-stats panel/button (Gilles, 2026-10-03: "enleve

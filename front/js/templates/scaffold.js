@@ -27,17 +27,22 @@ import * as Panels from "../panels.js";
 import { t } from "../i18n.js";
 
 /**
- * `panelSpecs`: array of `{ id, title?, x, y, w, extra?, icon?, iconOnly? }`
- * — `id` is both the panel id and the property name passed to
+ * `panelSpecs`: array of `{ id, title?, x, y, w, extra?, icon?, iconOnly?,
+ * framed? }` — `id` is both the panel id and the property name passed to
  * renderProperty(); `extra`, if given, is a list of further property names
  * appended into the SAME panel body (see guider's own
  * values+calibrationvalues pairing); `icon`/`iconOnly`, if given, are
  * passed straight through to the quicknav entry (views.js's own
  * renderQuickNav(), same fields renderActionsPanel()'s "actions" button
  * already uses — e.g. sequencer.js's own "sequence" entry, Gilles,
- * 2026-10-03: "bouton 'sequence' => icone seulement = 'list'"). A spec
- * whose `id` isn't actually one of the module's properties is silently
- * skipped (safe to list one "just in case" across similar modules).
+ * 2026-10-03: "bouton 'sequence' => icone seulement = 'list'"); `framed:
+ * false`, like navigator.js's own location/mountposition calls, drops
+ * renderProperty()'s own redundant inner header for a panel with only one
+ * property in it (Gilles, same thread: "fenetre 'progress' : pas besoin
+ * du cadre car une seule propriete" — sequencer.js's own "progress" entry).
+ * A spec whose `id` isn't actually one of the module's properties is
+ * silently skipped (safe to list one "just in case" across similar
+ * modules).
  *
  * `imagePos`: optional `{x,y,w}` override for where the image/image-stats
  * panels default to (they'd otherwise land wherever a panelSpec also put
@@ -99,7 +104,7 @@ export function buildScaffoldTemplate(panelSpecs, imagePos, opts) {
         // current on import.
         const title = (spec.title && t(spec.title)) || mod.properties[spec.id].label || spec.id;
         const b = Panels.make({ id: spec.id, title, x: spec.x, y: spec.y, w: spec.w });
-        b.appendChild(track(renderProperty(client, moduleName, spec.id)));
+        b.appendChild(track(renderProperty(client, moduleName, spec.id, { framed: spec.framed !== false })));
         for (const extra of spec.extra || []) {
           if (has(extra)) b.appendChild(track(renderProperty(client, moduleName, extra)));
         }
