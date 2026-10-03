@@ -328,9 +328,19 @@ function renderDisplayOnly(elName, el_) {
   if (type === "light") return statusDot(value);
   if (type === "prg") {
     const v = value || { value: 0, dynlabel: "" };
+    const pct = Math.max(0, Math.min(100, v.value || 0));
     const wrap = el("div", { class: "prg" });
-    if (el_.prgtype === "spinner") wrap.appendChild(el("span", { class: "spinner" }));
-    else wrap.appendChild(el("div", { class: "prg-bar-outer" }, [el("div", { class: "prg-bar-inner", style: `width:${Math.max(0, Math.min(100, v.value || 0))}%` })]));
+    if (el_.prgtype === "spinner") {
+      // A real determinate ring (OstErix/Rooster's own mat-progress-spinner
+      // mode="determinate"), not an indeterminate always-spinning circle —
+      // see components.css's own header comment on this.
+      wrap.appendChild(el("div", { class: "prg-ring-wrap" }, [
+        el("div", { class: "prg-ring", style: `--pct:${pct}` }),
+        el("span", { class: "prg-ring-value", text: Math.round(pct) + "%" }),
+      ]));
+    } else {
+      wrap.appendChild(el("div", { class: "prg-bar-outer" }, [el("div", { class: "prg-bar-inner", style: `width:${pct}%` })]));
+    }
     if (v.dynlabel) wrap.appendChild(el("span", { class: "prg-label", text: v.dynlabel }));
     return wrap;
   }

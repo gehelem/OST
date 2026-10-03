@@ -210,8 +210,28 @@ input[type="range"]::-moz-range-thumb {
 .prg-bar-outer { width: 160px; height: 8px; background: var(--bg-elevated); border-radius: 5px; overflow: hidden; display: inline-block; vertical-align: middle; border: 1px solid var(--border); }
 .prg-bar-inner { height: 100%; background: linear-gradient(90deg, var(--accent-dim), var(--accent)); transition: width 0.25s ease; }
 .prg-label { margin-left: 8px; color: var(--text-muted); font-size: 12px; }
-.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+
+/* prgtype:"spinner" - a real determinate ring (value 0-100, same contract
+ * as the "bar" variant - structure.en.md's own prg table), not an
+ * indeterminate always-spinning circle. OstErix/Rooster's own
+ * property.component.html renders this exact case as a
+ * mat-progress-spinner mode="determinate" - Gilles, 2026-10-03, on the
+ * CSS-spin version this used to be: "ils s'affichent tous en 'indetermine'
+ * et 'ronds' ... regarde comment c'est fait sur rooster et fais pareil".
+ * Built as a conic-gradient ring with a radial-gradient mask cutting the
+ * donut hole (real transparency, not an occluding background color, so it
+ * never needs to match whatever's behind it - a table row, a panel, a
+ * dialog, ...) rather than an SVG circle (document.createElement() isn't
+ * namespace-aware, so dom.js's own el() can't build real SVG nodes). */
+.prg-ring-wrap { position: relative; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; flex-shrink: 0; }
+.prg-ring {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(var(--accent) calc(var(--pct, 0) * 1%), var(--border) 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px));
+  transition: background 0.25s ease;
+}
+.prg-ring-value { position: relative; font-size: 8.5px; font-weight: 600; font-family: var(--font-mono); color: var(--text-muted); }
 
 .img-elt .preview-img { max-width: 340px; max-height: 250px; border-radius: var(--radius-sm); display: block; border: 1px solid var(--border); }
 .preview-video { max-width: 340px; border-radius: var(--radius-sm); }
