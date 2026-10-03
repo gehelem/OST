@@ -35,6 +35,18 @@ export function mediaUrl(mediaBaseUrl, relativePath) {
   return mediaBaseUrl + path;
 }
 
+/** mediaUrl()'s own contract above needs a trailing "/" - easy to type
+ * without one (Gilles, 2026-10-03, after seeing it bite exactly this way:
+ * "on a des soucis avec le / de fin, s'il est omis a la saisie ca ne
+ * fonctionne pas"), silently producing a broken concatenated path instead
+ * of an error. Applied wherever a media URL is accepted as input (typed,
+ * restored from history, or filled in by zeroconf discovery) rather than
+ * just once at connect time, so an already-saved bad value self-heals too. */
+export function normalizeMediaUrl(url) {
+  if (!url) return url;
+  return url.endsWith("/") ? url : url + "/";
+}
+
 /**
  * Convenience factory bundling a Datastore + Connection into one object.
  * Everything it exposes is also reachable through `.datastore`/`.connection`

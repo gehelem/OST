@@ -100,6 +100,15 @@
           <div class="settings-sep"></div>
           <div class="form-row"><input id="ws-url" class="field-input" style="width:100%" placeholder="ws://host:9624"></div>
           <div class="form-row"><input id="media-url" class="field-input" style="width:100%" placeholder="http://host/ostmedia/"></div>
+          <!-- Gilles, 2026-10-03: "ajoute la fonction discover dans le cas
+               ou on utilise l'app android ... comme sur rooster" - hidden
+               by default (js/app.js only shows it once js/zeroconf.js's
+               own isAvailable() confirms this is the real native app, not
+               a browser - mDNS has no browser API to speak of). -->
+          <div class="form-row hidden" id="discover-row">
+            <button id="discover-btn" class="btn btn-sm" type="button"><span class="material-icons" style="font-size:15px;vertical-align:middle">wifi_find</span> <span id="discover-btn-label">Discover</span></button>
+          </div>
+          <div id="discover-results" class="discover-results"></div>
           <div class="form-row">
             <select id="lang-select" class="field-input">
               <option value="en">EN</option>

@@ -6,7 +6,7 @@
 // needs instead. UI3-specific: a module renders as floating panels on a
 // shared canvas instead of a single docked node — see renderContentNow().
 
-import { createClient, deriveDefaultUrls } from "../core/index.js";
+import { createClient, deriveDefaultUrls, normalizeMediaUrl } from "../core/index.js";
 import { renderModuleView, buildParamsPanel, setMediaBaseUrl, setDialogRoot, setQuickNavRoot, getDisableTemplates } from "./render.js";
 import { renderModbar, renderSystemViews, renderController, renderFiles, renderLogs, renderLogin, renderLogPanel } from "./views.js";
 import { el, icon, iconButton } from "./dom.js";
@@ -14,6 +14,7 @@ import * as Panels from "./panels.js";
 import { setBgLayer } from "./imagelayer.js";
 import { templates } from "./templates/index.js";
 import { setLanguage, t } from "./i18n.js";
+import * as zeroconf from "./zeroconf.js";
 
 const client = createClient();
 
@@ -64,6 +65,10 @@ const connectBtnLabelEl = document.getElementById("connect-btn-label");
 const disconnectBtnLabelEl = document.getElementById("disconnect-btn-label");
 const clearCacheBtnEl = document.getElementById("clear-cache-btn");
 const clearCacheBtnLabelEl = document.getElementById("clear-cache-btn-label");
+const discoverRowEl = document.getElementById("discover-row");
+const discoverBtnEl = document.getElementById("discover-btn");
+const discoverBtnLabelEl = document.getElementById("discover-btn-label");
+const discoverResultsEl = document.getElementById("discover-results");
 
 // Static chrome (this file's own top-right icon chips + the connect bar) is
 // never rebuilt from a server dump the way a module's panels are, so a
@@ -82,6 +87,7 @@ function applyStaticLabels() {
   connectBtnLabelEl.textContent = t("chrome.connect");
   disconnectBtnLabelEl.textContent = t("chrome.disconnect");
   clearCacheBtnLabelEl.textContent = t("chrome.clearCache");
+  discoverBtnLabelEl.textContent = t("chrome.discover");
   connToggleEl.title = t("status." + client.connection.status);
 }
 
@@ -151,7 +157,7 @@ function saveLastView(key) {
 const hist = loadHistory();
 const defaults = deriveDefaultUrls(window.location);
 wsUrlInput.value = (hist[0] && hist[0].wsUrl) || defaults.wsUrl;
-mediaUrlInput.value = (hist[0] && hist[0].mediaUrl) || defaults.mediaUrl;
+mediaUrlInput.value = normalizeMediaUrl((hist[0] && hist[0].mediaUrl) || defaults.mediaUrl);
 setMediaBaseUrl(mediaUrlInput.value);
 
 // ---- theme -----------------------------------------------------------
@@ -292,6 +298,7 @@ paramsToggleEl.addEventListener("click", () => { if (!paramsToggleEl.disabled) o
 // ---- connection controls --------------------------------------------------
 
 document.getElementById("connect-btn").addEventListener("click", () => {
+  mediaUrlInput.value = normalizeMediaUrl(mediaUrlInput.value);
   setMediaBaseUrl(mediaUrlInput.value);
   saveHistory({ wsUrl: wsUrlInput.value, mediaUrl: mediaUrlInput.value });
   loginShown = false;
@@ -316,6 +323,32 @@ clearCacheBtnEl.addEventListener("click", async () => {
   try { if (window.caches) { for (const key of await caches.keys()) await caches.delete(key); } } catch (e) { /* ignore */ }
   location.reload();
 });
+
+// ---- OST server discovery (Android app only, js/zeroconf.js) ----------
+if (zeroconf.isAvailable()) {
+  discoverRowEl.classList.remove("hidden");
+  discoverBtnEl.addEventListener("click", async () => {
+    discoverBtnEl.disabled = true;
+    discoverResultsEl.innerHTML = "";
+    discoverResultsEl.appendChild(el("div", { class: "muted small", text: t("chrome.discovering") }));
+    const servers = await zeroconf.discover();
+    discoverBtnEl.disabled = false;
+    discoverResultsEl.innerHTML = "";
+    if (!servers.length) {
+      discoverResultsEl.appendChild(el("div", { class: "muted small", text: t("chrome.discoverNone") }));
+      return;
+    }
+    for (const s of servers) {
+      const btn = el("button", { class: "btn btn-sm spacer", text: s.name });
+      btn.addEventListener("click", () => {
+        wsUrlInput.value = s.wsUrl;
+        mediaUrlInput.value = s.mediaUrl; // already normalizeMediaUrl()-shaped (built with a trailing "/", see zeroconf.js)
+        discoverResultsEl.innerHTML = "";
+      });
+      discoverResultsEl.appendChild(btn);
+    }
+  });
+}
 document.getElementById("lang-select").addEventListener("change", (e) => {
   setLanguage(e.target.value);
   applyStaticLabels();

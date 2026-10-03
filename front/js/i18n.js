@@ -88,6 +88,9 @@ const STRINGS = {
   "chrome.noHistoryYet": { en: "No history yet.", fr: "Aucun historique pour l'instant.", de: "Noch kein Verlauf.", it: "Ancora nessuna cronologia.", es: "Aún no hay historial." },
   "chrome.clearCache": { en: "Clear cache + localStorage", fr: "Vider le cache + localStorage", de: "Cache + localStorage leeren", it: "Svuota cache + localStorage", es: "Vaciar caché + localStorage" },
   "chrome.clearCacheConfirm": { en: "Clear all locally stored settings/layout and reload? You'll need to reconnect.", fr: "Vider tous les réglages/dispositions stockés localement et recharger ? Il faudra se reconnecter.", de: "Alle lokal gespeicherten Einstellungen/Layouts löschen und neu laden? Eine erneute Verbindung ist danach nötig.", it: "Svuotare tutte le impostazioni/layout salvati localmente e ricaricare? Dovrai riconnetterti.", es: "¿Vaciar todos los ajustes/diseños guardados localmente y recargar? Tendrás que reconectar." },
+  "chrome.discover": { en: "Discover", fr: "Découvrir", de: "Entdecken", it: "Scopri", es: "Descubrir" },
+  "chrome.discovering": { en: "Scanning the local network…", fr: "Recherche sur le réseau local…", de: "Lokales Netzwerk wird durchsucht…", it: "Scansione della rete locale…", es: "Buscando en la red local…" },
+  "chrome.discoverNone": { en: "No server found.", fr: "Aucun serveur trouvé.", de: "Kein Server gefunden.", it: "Nessun server trovato.", es: "No se encontró ningún servidor." },
 
   // ---- imagelayer.js: shared image/stats block ----------------------------
   "imagelayer.dimensions": { en: "Dimensions", fr: "Dimensions", de: "Abmessungen", it: "Dimensioni", es: "Dimensiones" },

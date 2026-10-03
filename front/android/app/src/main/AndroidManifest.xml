@@ -38,4 +38,16 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- capacitor-zeroconf (js/zeroconf.js) - confirmed required directly
+         against its own installed source
+         (node_modules/capacitor-zeroconf/android/.../ZeroConfPlugin.java's
+         own @Permission annotation), not the package's published README
+         (which lists different, stale permission names) - the plugin's
+         own bundled AndroidManifest.xml is empty, so Gradle's manifest
+         merge doesn't add these automatically; they have to be declared
+         here. CHANGE_WIFI_MULTICAST_STATE specifically is what lets
+         Android actually receive mDNS multicast packets at all (without
+         it, the OS's own Wi-Fi power-saving filters them out). -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
 </manifest>
