@@ -24,9 +24,28 @@ import { buildScaffoldTemplate } from "./scaffold.js";
 
 export const mount = buildScaffoldTemplate(
   [
-    { id: "sequence", x: 350, y: 92, w: 340 },
+    // Icon-only (Gilles, 2026-10-03: "bouton 'sequence' => icone seulement
+    // = 'list'").
+    { id: "sequence", x: 350, y: 92, w: 340, icon: "list", iconOnly: true },
     { id: "object", x: 350, y: 330, w: 300 },
-    { id: "progress", x: 20, y: 330, w: 300 },
+    // Icon-only too (same thread, right after: "bouton 'progress' =>
+    // seulement icone = 'progress_activity'").
+    { id: "progress", x: 20, y: 330, w: 300, icon: "progress_activity", iconOnly: true },
   ],
   { x: 720, y: 92, w: 260 },
+  // No small "Image" quick-stats panel/button (Gilles, 2026-10-03: "enleve
+  // aussi le bouton 'image' et la fenetre associee") - the background
+  // already shows the picture full-screen, and the Stats panel/button
+  // already covers the same figures in more depth.
+  //
+  // No "Other" catch-all either (same thread, right after: "enleve aussi
+  // le bouton 'other' et sa fenetre") - every one of sequencer.json's own
+  // remaining properties (slaves/parameters/guideparameters/
+  // focusparameters/focusprofiles) is hasprofile:true and already reaches
+  // the Parameters modal on its own, so nothing module-specific is lost
+  // here - but "Other" also carried the generic per-device
+  // connect/disconnect controls every IndiModule gets (libs/indimodule.cpp's
+  // "devicesactions"/"devices"/"server", not in sequencer.json itself),
+  // which this drops too.
+  { imageQuickPanel: false, otherPanel: false },
 );

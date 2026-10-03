@@ -27,10 +27,15 @@ import * as Panels from "../panels.js";
 import { t } from "../i18n.js";
 
 /**
- * `panelSpecs`: array of `{ id, title?, x, y, w, extra? }` — `id` is both
- * the panel id and the property name passed to renderProperty(); `extra`,
- * if given, is a list of further property names appended into the SAME
- * panel body (see guider's own values+calibrationvalues pairing). A spec
+ * `panelSpecs`: array of `{ id, title?, x, y, w, extra?, icon?, iconOnly? }`
+ * — `id` is both the panel id and the property name passed to
+ * renderProperty(); `extra`, if given, is a list of further property names
+ * appended into the SAME panel body (see guider's own
+ * values+calibrationvalues pairing); `icon`/`iconOnly`, if given, are
+ * passed straight through to the quicknav entry (views.js's own
+ * renderQuickNav(), same fields renderActionsPanel()'s "actions" button
+ * already uses — e.g. sequencer.js's own "sequence" entry, Gilles,
+ * 2026-10-03: "bouton 'sequence' => icone seulement = 'list'"). A spec
  * whose `id` isn't actually one of the module's properties is silently
  * skipped (safe to list one "just in case" across similar modules).
  *
@@ -38,10 +43,24 @@ import { t } from "../i18n.js";
  * panels default to (they'd otherwise land wherever a panelSpec also put
  * something, on a module with a lot of panels).
  *
+ * `opts.imageQuickPanel: false` skips the small "Image" quick-stats panel/
+ * button (imagelayer.js's own addImageBlock() `quickPanel` flag) while
+ * keeping the background image and the deeper Stats panel — Gilles,
+ * 2026-10-03, on sequencer specifically: "enleve aussi le bouton 'image'
+ * et la fenetre associee" (same request already applied to focus.js/
+ * guider.js's own hand-written templates). Other scaffolded templates
+ * (inspector/polar/parkmanager) keep the default.
+ *
+ * `opts.otherPanel: false` drops the "Other" catch-all panel/button below
+ * entirely (same thread, right after: "enleve aussi le bouton 'other' et
+ * sa fenetre") — unlike guider.js's own removal, this can genuinely drop
+ * reachability for whatever `panelSpecs` doesn't list, so only opt out of
+ * it for a module actually checked to have nothing worth keeping there.
+ *
  * Returns `mount(client, moduleName)`, ready to re-export as a template's
  * own `mount`.
  */
-export function buildScaffoldTemplate(panelSpecs, imagePos) {
+export function buildScaffoldTemplate(panelSpecs, imagePos, opts) {
   const ip = { x: 660, y: 92, w: 280, ...imagePos };
 
   return function mount(client, moduleName) {
@@ -84,10 +103,10 @@ export function buildScaffoldTemplate(panelSpecs, imagePos) {
         for (const extra of spec.extra || []) {
           if (has(extra)) b.appendChild(track(renderProperty(client, moduleName, extra)));
         }
-        quickNavEntries.push({ id: spec.id, label: title });
+        quickNavEntries.push({ id: spec.id, label: title, icon: spec.icon, iconOnly: spec.iconOnly });
       }
 
-      addImageBlock(client, moduleName, mod, "image", "image", Panels, track, disposers, quickNavEntries, ip);
+      addImageBlock(client, moduleName, mod, "image", "image", Panels, track, disposers, quickNavEntries, ip, { quickPanel: !opts || opts.imageQuickPanel !== false });
 
       // Anything this template doesn't know about explicitly (a future
       // property this module gains) still needs to be reachable — fold it
@@ -95,7 +114,7 @@ export function buildScaffoldTemplate(panelSpecs, imagePos) {
       const hasprofileNames = Object.keys(mod.properties).filter((n) => mod.properties[n].hasprofile === true);
       for (const n of hasprofileNames) known.add(n);
       const rest = Object.keys(mod.properties).filter((n) => !known.has(n));
-      if (rest.length) {
+      if (rest.length && (!opts || opts.otherPanel !== false)) {
         const b = Panels.make({ id: "other", title: t("common.other"), x: 20, y: 620, w: 300 });
         for (const name of rest) b.appendChild(track(renderProperty(client, moduleName, name)));
         quickNavEntries.push({ id: "other", label: t("common.other") });
