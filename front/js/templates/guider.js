@@ -314,12 +314,12 @@ function buildValuesPanel(client, moduleName) {
     // Labels come from the server (already translated, structure.en.md -
     // "property/element labels ... DO come translated already") - never
     // re-invented locally, per js/i18n.js's own header rule.
-    const rmsRow = el("div", { class: "rms-row" });
+    const rmsRow = el("div", { class: "value-row" });
     for (const key of ["rmsRA", "rmsDEC", "rmsTotal"]) {
       if (!e[key]) continue;
-      rmsRow.appendChild(el("div", { class: "rms-box" }, [
-        el("div", { class: "rms-label", text: e[key].label || key }),
-        el("div", { class: "rms-number", text: (e[key].value || 0).toFixed(2) }),
+      rmsRow.appendChild(el("div", { class: "value-box" }, [
+        el("div", { class: "value-box-label", text: e[key].label || key }),
+        el("div", { class: "value-box-number", text: (e[key].value || 0).toFixed(2) }),
       ]));
     }
     wrap.appendChild(rmsRow);

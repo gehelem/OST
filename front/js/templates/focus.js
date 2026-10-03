@@ -3,10 +3,15 @@
 // "values" panel (the V-curve) needed a real chart — Gilles, 2026-10-03,
 // on the plain generic table it used to render as: "la 'focus curve' est
 // trop minimale, regarde le graphique de rooster, avec la courbe de
-// regression et les barres d'erreur". results/progress stay on the
-// generic renderProperty() path (same as before, nothing wrong with those
-// as plain tables), grouped into one panel together (Gilles, 2026-10-03:
-// "on va regrouper les fenetres 'progress' et 'final result'"). "zones"
+// regression et les barres d'erreur". progress stays on the generic
+// renderProperty() path (nothing wrong with it as a plain table), grouped
+// into one panel together with results (Gilles, 2026-10-03: "on va
+// regrouper les fenetres 'progress' et 'final result'"). results' own
+// HFR/position got a further bespoke pass (Gilles, same day: "inspire toi
+// de l'affichage des valeurs RMS du guider pour afficher ... HFR et
+// position") — see buildResultsBoxes below, sharing guider.js's own
+// .value-row/.value-box boxed-figure look (renamed from .rms-* once a
+// second module wanted it — components.css's own comment on that). "zones"
 // (the per-zone best-position grid) briefly got a tile display here too,
 // then was dropped outright — Gilles: "toutes ces valeurs numeriques n'ont
 // pas d'interet" — in favour of what Rooster actually shows there: 4 tilt
@@ -168,6 +173,33 @@ function buildFocusCurvePanel(client, moduleName) {
   return wrap;
 }
 
+// ----------------------------------------------------------------- results
+/** "Final result" HFR/position as bordered value boxes, instead of the
+ * plain generic label/value table renderProperty() would otherwise give it
+ * — Gilles, 2026-10-03: "inspire toi de l'affichage des valeurs RMS du
+ * guider pour afficher ... HFR et position" (guider.js's own
+ * buildValuesPanel() RMS row). Self-subscribed to the "results" property,
+ * same fine-grained-topic pattern as the other bespoke panels here. */
+function buildResultsBoxes(client, moduleName) {
+  const wrap = el("div", { class: "value-row" });
+  const unsub = client.subscribe(client.topics.property(moduleName, "results"), (prop) => {
+    wrap.innerHTML = "";
+    if (!prop) return;
+    const e = prop.elements;
+    // Labels come from the server (already translated) - never re-invented
+    // locally, same rule guider.js's own RMS row follows.
+    for (const key of ["hfr", "pos"]) {
+      if (!e[key]) continue;
+      wrap.appendChild(el("div", { class: "value-box" }, [
+        el("div", { class: "value-box-label", text: e[key].label || key }),
+        el("div", { class: "value-box-number", text: (e[key].value || 0).toFixed(2) }),
+      ]));
+    }
+  });
+  wrap._dispose = unsub;
+  return wrap;
+}
+
 export function mount(client, moduleName) {
   Panels.setScope(moduleName);
   Panels.clear();
@@ -195,7 +227,7 @@ export function mount(client, moduleName) {
     if (has("results") || has("progress")) {
       const title = (mod.properties.results && mod.properties.results.label) || "Final result";
       const b = Panels.make({ id: "results", title, x: 20, y: 330, w: 300 });
-      if (has("results")) b.appendChild(track(renderProperty(client, moduleName, "results")));
+      if (has("results")) b.appendChild(track(buildResultsBoxes(client, moduleName)));
       if (has("progress")) b.appendChild(track(renderProperty(client, moduleName, "progress")));
       quickNavEntries.push({ id: "results", label: title });
     }

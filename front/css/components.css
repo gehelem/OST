@@ -300,16 +300,19 @@ input[type="range"]::-moz-range-thumb {
 .altitude-chart { aspect-ratio: 280 / 90; cursor: default; margin-top: var(--space-3); }
 .timenav-readout { flex: 1 1 auto; }
 
-/* guider's own "values" panel (Gilles, 2026-10-03: "rends-la plus
- * graphique") - RMS figures as bordered/accented boxes (matches
- * OstErix/Rooster's own guider.component.css, green left-border accent,
- * read directly rather than guessed), plus a centered correction-pulse
- * bar per axis (RA/DEC) - that second part is Gilles's own idea, no
- * Rooster equivalent. */
-.rms-row { display: flex; gap: var(--space-2); margin-bottom: var(--space-3); }
-.rms-box { flex: 1; padding: var(--space-2); border-radius: var(--radius-sm); border-left: 3px solid var(--ok); background: rgba(var(--ok-rgb), 0.08); }
-.rms-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); }
-.rms-number { font-size: 15px; font-weight: 600; font-family: var(--font-mono); margin-top: 2px; }
+/* Bordered/accented "value box" look, born on guider's own "values" panel
+ * (Gilles, 2026-10-03: "rends-la plus graphique") for its RMS figures
+ * (matches OstErix/Rooster's own guider.component.css, green left-border
+ * accent, read directly rather than guessed) - generic enough (just
+ * .value-row/.value-box, not RMS-specific) that focus.js's own "Final
+ * result" panel reuses it too (Gilles, 2026-10-03: "inspire toi de
+ * l'affichage des valeurs RMS du guider pour afficher ... HFR et
+ * position"), same class names both places rather than two near-duplicate
+ * CSS blocks. */
+.value-row { display: flex; gap: var(--space-2); margin-bottom: var(--space-3); }
+.value-box { flex: 1; padding: var(--space-2); border-radius: var(--radius-sm); border-left: 3px solid var(--ok); background: rgba(var(--ok-rgb), 0.08); }
+.value-box-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); }
+.value-box-number { font-size: 15px; font-weight: 600; font-family: var(--font-mono); margin-top: 2px; }
 .pulse-axis { display: flex; align-items: center; gap: var(--space-1); margin-top: var(--space-2); }
 .pulse-axis-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); width: 24px; flex-shrink: 0; }
 .pulse-dir-label { font-size: 10px; color: var(--text-muted); flex-shrink: 0; }
