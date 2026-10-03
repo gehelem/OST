@@ -14,6 +14,11 @@
      ostnoctua"); the generic renderer's own graph properties keep the
      dependency-free canvas renderer in js/chart.js. -->
 <script src="lib/chart.min.js"></script>
+<!-- Error-bar series type for the focus template's own V-curve chart
+     (Gilles, 2026-10-03: "regarde le graphique de rooster, avec la courbe
+     de regression et les barres d'erreur") - registers against the same
+     global `Chart` chart.min.js above just set, must load after it. -->
+<script src="lib/chart-error-bars.min.js"></script>
 </head>
 <body>
   <!-- One flat container: #canvas fills it edge to edge, #modbar, #quicknav
