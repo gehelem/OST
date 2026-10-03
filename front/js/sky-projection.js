@@ -143,10 +143,21 @@ const FOV_TANGENT_EPS_DEG = 1e-4;
  * direction (raDeg/decDeg, OF DATE - see equatorialOfDateToHorizontal()'s
  * own doc comment), rotated by `orientationDeg` (StellarSolver's own
  * Solution::orientation, "the orientation angle of the image from North
- * in degrees" - applied here as the standard astrometric convention,
- * rotating from North through East; not independently verified against a
- * real solved frame in this environment, check against one once
- * available and flip the sign below if a real frame comes out mirrored).
+ * in degrees" - rotating from North through West here (`-orientationDeg`
+ * below), the OPPOSITE sense from the standard astrometric convention
+ * (North through East). Gilles, 2026-10-03, comparing against a real
+ * solve: "l'orientation du repere du capteur n'est pas bonne, elle est
+ * decalee de 90 par rapport a celle donnee par Kstars" - a +90deg offset
+ * was tried first, reported still wrong and removed again; the image
+ * itself then turned out mirrored left/right (fixed separately, see
+ * js/sky-engine.js's own comment where sensorFovCorners()'s result is
+ * actually drawn). Gilles's own hunch tying the two reports together
+ * ("inverse le sens de rotation, je pense que c'est lie au miroir") is
+ * exactly right as a matter of geometry: mirroring an image reverses
+ * which way a positive angle visibly turns it, so a left/right-flipped
+ * image needs its rotation sense flipped too to still land correctly -
+ * same underlying mismatch, two different symptoms. Pending the next
+ * real-solve comparison.
  *
  * Deliberately NOT built from RA/Dec coordinate offsets (a "RA ±
  * dRA/cos(dec), Dec ± dDec" box, this function's own earlier version) -
@@ -181,7 +192,7 @@ export function sensorFovCorners(raDeg, decDeg, fovWidthDeg, fovHeightDeg, orien
   const east = v3norm(v3sub(eastDiff, v3scale(center, v3dot(eastDiff, center))));
   const north = v3norm(v3sub(northDiff, v3scale(center, v3dot(northDiff, center))));
 
-  const theta = ((orientationDeg || 0) * Math.PI) / 180;
+  const theta = (-(orientationDeg || 0) * Math.PI) / 180;
   const cosT = Math.cos(theta), sinT = Math.sin(theta);
   // Rodrigues' rotation formula around `center` (already a unit vector).
   function rotateAroundCenter(v) {

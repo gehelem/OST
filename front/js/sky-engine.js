@@ -1353,20 +1353,23 @@ export class SkyEngine {
             // drawn first, so the frame outline/up-marker below stay
             // legible on top of it. A single affine transform (3-point
             // correspondence: image top-left/top-right/bottom-left ->
-            // corners[3]/[2]/[0], sensorFovCorners()'s own sy=+1 "up"
-            // side is corners[2]/[3] - see its up-marker triangle just
-            // below) rather than a true 4-point perspective warp - exact
-            // for a parallelogram, and this quad is one to within the
-            // same negligible wide-FOV gnomonic distortion already
-            // established as irrelevant at realistic deep-sky FOV sizes
-            // (sensorFovCorners()'s own doc comment). Which raster edge
-            // is "left" vs "right" (i.e. whether the image is mirrored)
-            // is, like the orientation sign itself, unverified against a
-            // real solved frame - flip the corners[0]/[2] <-> mapping
-            // below if a real capture comes out mirrored. Clipped to the
-            // TRUE 4 corners (not just the parallelogram implied by 3 of
-            // them) so any tiny divergence at the unused 4th corner never
-            // bleeds outside the frame.
+            // corners[0]/[1]/[3]) rather than a true 4-point perspective
+            // warp - exact for a parallelogram, and this quad is one to
+            // within the same negligible wide-FOV gnomonic distortion
+            // already established as irrelevant at realistic deep-sky FOV
+            // sizes (sensorFovCorners()'s own doc comment). Clipped to
+            // the TRUE 4 corners (not just the parallelogram implied by 3
+            // of them) so any tiny divergence at the unused 4th corner
+            // never bleeds outside the frame.
+            //
+            // The exact corner pairing below has moved twice against real
+            // solves, both Gilles, 2026-10-03: first "l'image est en
+            // miroir comparee a Kstars" (left/right swapped from an
+            // earlier, unverified version), then "fais faire 180 degres a
+            // l'image (pas au marquage)" (every index +2 from the
+            // mirror-only version - the frame/up-marker below, which
+            // don't depend on this mapping, were deliberately left
+            // alone).
             if (this.showSensorImage && this._sensorImageEl) {
               const img = this._sensorImageEl;
               const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
@@ -1377,9 +1380,14 @@ export class SkyEngine {
                 for (let i = 1; i < corners.length; i++) ctx.lineTo(corners[i].x, corners[i].y);
                 ctx.closePath();
                 ctx.clip();
-                const a = (corners[2].x - corners[3].x) / iw, b = (corners[2].y - corners[3].y) / iw;
-                const c = (corners[0].x - corners[3].x) / ih, d = (corners[0].y - corners[3].y) / ih;
-                ctx.transform(a, b, c, d, corners[3].x, corners[3].y);
+                // +2 on every corner index from the mirror-only mapping
+                // above (0<->2, 1<->3) - a clean 180deg rotation of the
+                // IMAGE CONTENT within the frame, leaving the frame/up-
+                // marker untouched - Gilles, 2026-10-03: "fais faire 180
+                // degres a l'image (pas au marquage)".
+                const a = (corners[1].x - corners[0].x) / iw, b = (corners[1].y - corners[0].y) / iw;
+                const c = (corners[3].x - corners[0].x) / ih, d = (corners[3].y - corners[0].y) / ih;
+                ctx.transform(a, b, c, d, corners[0].x, corners[0].y);
                 ctx.drawImage(img, 0, 0, iw, ih);
                 ctx.restore();
               }
@@ -1393,15 +1401,16 @@ export class SkyEngine {
             ctx.closePath();
             ctx.stroke();
 
-            // Small filled triangle at the middle of the top edge (corners[2]
-            // and [3] are sensorFovCorners()'s sy=+1/"imageUp" corners),
-            // tip pointing outward - a visible "this way up" marker for the
-            // solved image orientation, so its effect (and sign convention,
-            // still unverified - see sensorFovCorners()'s own doc comment)
-            // is readable at a glance instead of only inferable from the
-            // rectangle's own rotation.
-            const topMidX = (corners[2].x + corners[3].x) / 2;
-            const topMidY = (corners[2].y + corners[3].y) / 2;
+            // Small filled triangle at the middle of the top edge - a
+            // visible "this way up" marker for the solved image
+            // orientation, so its effect is readable at a glance instead
+            // of only inferable from the rectangle's own rotation.
+            // corners[0]/[1] (sensorFovCorners()'s own sy=-1 side), NOT
+            // [2]/[3] (sy=+1) - Gilles, 2026-10-03, after seeing it on the
+            // wrong edge: "la fleche ... est du mauvais cote, mets-la sur
+            // l'autre cote".
+            const topMidX = (corners[0].x + corners[1].x) / 2;
+            const topMidY = (corners[0].y + corners[1].y) / 2;
             let dx = topMidX - center.x, dy = topMidY - center.y;
             const dlen = Math.hypot(dx, dy) || 1;
             dx /= dlen; dy /= dlen;
