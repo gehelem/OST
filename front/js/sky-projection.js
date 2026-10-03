@@ -24,6 +24,7 @@ import {
   Observer, Spherical, VectorFromSphere, RotateVector,
   HorizonFromVector, VectorFromHorizon, EquatorFromVector,
   Rotation_EQJ_HOR, Rotation_HOR_EQJ, Rotation_EQD_HOR, Rotation_ECL_EQJ,
+  Body, Equator, Horizon,
 } from "../lib/astronomy-engine.js";
 
 /** Builds an astronomy-engine Observer from a site (degrees, degrees, metres). */
@@ -365,4 +366,80 @@ export function horizontalToEquatorial(azimuthDeg, altitudeDeg, observer, date) 
   const eqjVec = RotateVector(Rotation_HOR_EQJ(date, observer), horVec);
   const equ = EquatorFromVector(eqjVec); // {ra: hours, dec: degrees}
   return { ra: equ.ra * 15, dec: equ.dec };
+}
+
+// ---- time-navigator / per-object visibility curve (Gilles, 2026-10-02,
+// after seeing astro2001's own "barre de temps" + per-object altitude
+// graph: "l'idee serait d'ajouter une 'fenetre temporelle' ... et aussi de
+// modifier [la fenetre Selection] pour donner plus d'infos") ------------
+
+/** Sun's altitude (degrees) at one instant - the day/night gradient both
+ * new widgets share is driven by this, not a clock-time heuristic (so it
+ * stays correct at any latitude/season, not just "6am-6pm is day"). Same
+ * Equator(Body.Sun, ...)+Horizon() pair sky-engine.js's own planet
+ * rendering already uses (it imports them directly from astronomy-engine
+ * itself rather than through here - this is the first caller outside that
+ * file to need the Sun's position specifically, so it's centralized here
+ * instead of a second copy). */
+export function sunAltitudeAt(observer, date) {
+  const equ = Equator(Body.Sun, date, observer, true, true);
+  return Horizon(date, observer, equ.ra, equ.dec, "normal").altitude;
+}
+
+/** Sun altitude sampled evenly across a time span - the time navigator's
+ * own day/night gradient. Recomputes the Sun's true position at every
+ * sample (not a fixed RA/Dec projected over time, unlike
+ * altitudeCurve() below) since it moves ~1deg/day and this already pays
+ * for a fresh calculation per sample regardless. */
+export function sunAltitudeCurve(observer, startDate, spanHours, stepMinutes) {
+  const stepMs = stepMinutes * 60000;
+  const n = Math.max(1, Math.round((spanHours * 3600000) / stepMs));
+  const samples = [];
+  for (let i = 0; i <= n; i++) {
+    const date = new Date(startDate.getTime() + i * stepMs);
+    samples.push({ date, altitude: sunAltitudeAt(observer, date) });
+  }
+  return samples;
+}
+
+/**
+ * A star/Messier object's own altitude sampled across a time span, plus
+ * its rise/transit/set for that same window - the Selection panel's "ce
+ * soir" visibility arc. raDeg/decDeg are J2000 (the catalog's own
+ * convention everywhere else in this file) and treated as fixed for the
+ * whole span - correct for anything in the star/DSO catalog (no
+ * detectable proper motion over 24h), NOT a general-purpose solar-system
+ * body function (that's sunAltitudeCurve() above, which does need to
+ * re-derive a fresh position every sample).
+ *
+ * riseDate/setDate are the span's first altitude=0 crossings (rising/
+ * setting), linearly interpolated between the two bracketing samples -
+ * plenty precise for a display, not a pointing computation. Either can
+ * come back null: never rises (always below the horizon in this window)
+ * or circumpolar (never sets) - maxAltitude/transitDate stay meaningful
+ * either way, since they're just the sampled max.
+ */
+export function altitudeCurve(raDeg, decDeg, observer, startDate, spanHours, stepMinutes) {
+  const stepMs = stepMinutes * 60000;
+  const n = Math.max(1, Math.round((spanHours * 3600000) / stepMs));
+  const samples = [];
+  for (let i = 0; i <= n; i++) {
+    const date = new Date(startDate.getTime() + i * stepMs);
+    const { altitude } = equatorialToHorizontal(raDeg, decDeg, observer, date);
+    samples.push({ date, altitude });
+  }
+  let maxAltitude = samples[0].altitude, transitDate = samples[0].date;
+  for (const s of samples) if (s.altitude > maxAltitude) { maxAltitude = s.altitude; transitDate = s.date; }
+  let riseDate = null, setDate = null;
+  for (let i = 1; i < samples.length; i++) {
+    const a = samples[i - 1], b = samples[i];
+    const span = b.date.getTime() - a.date.getTime();
+    if (riseDate === null && a.altitude < 0 && b.altitude >= 0) {
+      riseDate = new Date(a.date.getTime() + (-a.altitude / (b.altitude - a.altitude)) * span);
+    }
+    if (setDate === null && a.altitude >= 0 && b.altitude < 0) {
+      setDate = new Date(a.date.getTime() + (a.altitude / (a.altitude - b.altitude)) * span);
+    }
+  }
+  return { samples, riseDate, setDate, transitDate, maxAltitude };
 }

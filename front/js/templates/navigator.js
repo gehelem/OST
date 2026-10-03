@@ -34,6 +34,7 @@ import { el } from "../dom.js";
 import * as Panels from "../panels.js";
 import { SkyEngine, ZOOM_MIN, ZOOM_MAX } from "../sky-engine.js";
 import { STAR_DEPTHS } from "../sky-catalog.js";
+import { sunAltitudeCurve, altitudeCurve } from "../sky-projection.js";
 import { t } from "../i18n.js";
 import { mediaUrl } from "../../core/index.js";
 
@@ -44,6 +45,49 @@ function fmtHours(raDeg) {
   const mm = Math.floor((h - hh) * 60);
   const ss = Math.round(((h - hh) * 60 - mm) * 60);
   return `${hh}h${String(mm).padStart(2, "0")}m${String(ss).padStart(2, "0")}s`;
+}
+function fmtClock(d) {
+  if (!d) return "—";
+  return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+}
+
+// ---- time navigator + per-object visibility arc (Gilles, 2026-10-02,
+// after astro2001's own "barre de temps" + per-object altitude graph) ----
+
+// The 24h window both new widgets share: local noon of "today" (the
+// browser's own system timezone - this app has no other notion of the
+// site's timezone, same pragmatic choice `new Date()` already makes
+// everywhere else here) through local noon the next day, so a single
+// night's dusk-to-dawn always sits comfortably inside rather than being
+// split across two windows right when it matters most. `t` before local
+// noon still belongs to the night that started the PREVIOUS day.
+function nightWindowStart(t) {
+  const noonToday = new Date(t.getFullYear(), t.getMonth(), t.getDate(), 12, 0, 0, 0);
+  return t < noonToday ? new Date(noonToday.getTime() - 86400000) : noonToday;
+}
+
+// Night (very dark navy, close to this app's own dark theme background) ->
+// day (sky-engine.js's own dayMode sky colour, "#8ec8e8" - reused here
+// rather than inventing a second blue) - astronomical twilight (-18deg) to
+// sunrise/sunset (0deg) is the fade, not a sharp cut, same as astro2001's
+// own reference gradient.
+function dayNightColor(altDeg) {
+  const f = Math.max(0, Math.min(1, (altDeg + 18) / 18));
+  const night = [8, 10, 20], day = [142, 200, 232];
+  const c = night.map((n, i) => Math.round(n + (day[i] - n) * f));
+  return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+
+// Shared by both canvases below: fills the day/night gradient background
+// for one 24h window (`sunSamples`, from sunAltitudeCurve()) across the
+// canvas's full width.
+function drawDayNightBackground(ctx, w, h, sunSamples) {
+  const n = sunSamples.length - 1;
+  for (let i = 0; i < n; i++) {
+    const x0 = (i / n) * w, x1 = ((i + 1) / n) * w;
+    ctx.fillStyle = dayNightColor(sunSamples[i].altitude);
+    ctx.fillRect(x0, 0, x1 - x0 + 1, h);
+  }
 }
 
 /** The "Selection" panel's body: updated in place from sky-engine.js's
@@ -62,17 +106,103 @@ function fmtHours(raDeg) {
  * here was the actual cause of a GOTO landing in a "weird position" (Gilles,
  * 2026-09-30) — a 15x error, not the smaller J2000/of-date precession gap
  * fixed alongside it in sky-projection.js. */
-function buildSelectionPanel(client, moduleName) {
+/**
+ * `getEngine`/`getSimTime`: closures, not values, deliberately - this is
+ * built (in mount()'s own build()) BEFORE the engine exists yet (its own
+ * onSelect needs to already exist to hand to the engine's constructor),
+ * and `getSimTime` reflects whatever the time-navigator panel has most
+ * recently scrubbed to, read fresh on every redraw rather than captured
+ * once.
+ */
+function buildSelectionPanel(client, moduleName, getEngine, getSimTime) {
   const wrap = el("div");
   const info = el("div", { class: "muted small", text: t("navigator.tapToSelect") });
   const gotoBtn = el("button", { class: "btn btn-primary btn-sm", disabled: true }, [el("span", { class: "material-icons", style: "font-size:15px;vertical-align:middle" }, "gps_fixed"), " " + t("navigator.goto")]);
   const plannerBtn = el("button", { class: "btn btn-sm", disabled: true }, t("navigator.addToPlanner"));
   const actionsRow = el("div", { class: "form-row" }, [gotoBtn, plannerBtn]);
+  // The "ce soir" visibility arc (Gilles, 2026-10-02, on astro2001's own
+  // per-object fiche: "modifie [...] pour afficher toutes les infos sur
+  // l'objet selectionne, donc faire ce joli graphique d'altitude sur
+  // 24h") - canvas (day/night gradient + altitude curve + "now" line) +
+  // the same rise/transit/set/max-altitude readout astro2001 shows below
+  // its own version. Hidden until something is actually selected.
+  const chartCanvas = el("canvas", { class: "altitude-chart", width: "280", height: "90" });
+  const infoRows = el("div", { class: "metric-row-group hidden" });
+  function metricRow(label) {
+    const row = el("div", { class: "metric-row" }, [el("span", { class: "label", text: label }), el("span", { class: "value" })]);
+    infoRows.appendChild(row);
+    return row.lastElementChild;
+  }
+  const riseVal = metricRow(t("navigator.rise"));
+  const transitVal = metricRow(t("navigator.transit"));
+  const setVal = metricRow(t("navigator.set"));
+  const maxAltVal = metricRow(t("navigator.maxAltitude"));
+  const airmassVal = metricRow(t("navigator.airmassAtTransit"));
+  chartCanvas.classList.add("hidden");
+
   wrap.appendChild(info);
   wrap.appendChild(actionsRow);
+  wrap.appendChild(chartCanvas);
+  wrap.appendChild(infoRows);
 
   gotoBtn.addEventListener("click", () => client.setValue(moduleName, "actions", "gototarget", true));
   plannerBtn.addEventListener("click", () => client.setValue(moduleName, "actions", "addtoplanner", true));
+
+  let lastObj = null;
+
+  function redrawChart() {
+    if (!lastObj) return;
+    const engine = getEngine();
+    if (!engine) return;
+    const t0 = getSimTime() || new Date();
+    const windowStart = nightWindowStart(t0);
+    const sunSamples = sunAltitudeCurve(engine.observer, windowStart, 24, 10);
+    const curve = altitudeCurve(lastObj.ra, lastObj.dec, engine.observer, windowStart, 24, 10);
+
+    const w = chartCanvas.width, h = chartCanvas.height;
+    const ctx = chartCanvas.getContext("2d");
+    ctx.clearRect(0, 0, w, h);
+    drawDayNightBackground(ctx, w, h, sunSamples);
+
+    // Altitude axis: 0deg at the bottom, 90deg at the top - below-horizon
+    // stretches aren't drawn (nothing to show there, matches astro2001's
+    // own look: the arc only exists while the object is actually up).
+    const n = curve.samples.length;
+    ctx.strokeStyle = "#ffb74d";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    let penDown = false;
+    for (let i = 0; i < n; i++) {
+      const s = curve.samples[i];
+      const x = (i / (n - 1)) * w;
+      if (s.altitude < 0) { penDown = false; continue; }
+      const y = h - (s.altitude / 90) * h;
+      if (!penDown) { ctx.moveTo(x, y); penDown = true; } else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // "Now" cursor - same vertical line language as the time navigator's
+    // own canvas, drawn here too so this mini chart stays legible on its
+    // own even with that other panel collapsed/out of view.
+    const frac = Math.max(0, Math.min(1, (t0.getTime() - windowStart.getTime()) / (24 * 3600000)));
+    const cx = frac * w;
+    ctx.strokeStyle = "#ffffff";
+    ctx.globalAlpha = 0.8;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, h); ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    riseVal.textContent = fmtClock(curve.riseDate);
+    transitVal.textContent = fmtClock(curve.transitDate);
+    setVal.textContent = fmtClock(curve.setDate);
+    maxAltVal.textContent = curve.maxAltitude.toFixed(1) + "°";
+    // Airmass (plane-parallel approximation, sec(zenith angle) - a rough
+    // extinction proxy, not a real atmospheric model, same spirit as
+    // sky-engine.js's own existing "rough, not a real extinction model"
+    // dimming comment) - undefined/meaningless once the object never
+    // actually clears the horizon in this window.
+    airmassVal.textContent = curve.maxAltitude > 0 ? (1 / Math.sin(curve.maxAltitude * Math.PI / 180)).toFixed(2) : "—";
+  }
 
   function onSelect(obj) {
     const name = obj.name || (obj.kind === "star" ? t("navigator.star") : obj.kind === "messier" ? obj.desig || t("navigator.dso") : t("navigator.point"));
@@ -85,10 +215,20 @@ function buildSelectionPanel(client, moduleName) {
     client.setValue(moduleName, "target", "targetname", name);
     client.setValue(moduleName, "target", "targetra", obj.ra / 15); // degrees -> hours, see this function's own doc comment
     client.setValue(moduleName, "target", "targetde", obj.dec);
+
+    lastObj = obj;
+    chartCanvas.classList.remove("hidden");
+    infoRows.classList.remove("hidden");
+    redrawChart();
   }
 
+  // Called by the time-navigator panel (see buildTimeNavPanel()) whenever
+  // the simulated time changes - a no-op until something is actually
+  // selected, same guard redrawChart() already has.
+  function onTimeChange() { redrawChart(); }
+
   wrap._dispose = () => {};
-  return { node: wrap, onSelect };
+  return { node: wrap, onSelect, onTimeChange };
 }
 
 // Persisted like the theme/UI-zoom widgets elsewhere in this app (one
@@ -221,6 +361,94 @@ function buildSettingsPanel(engine) {
   return wrap;
 }
 
+/**
+ * The time-navigator panel itself (Gilles, 2026-10-02, after astro2001's
+ * own bottom time bar: "une fenetre supplementaire pour naviguer dans le
+ * temps"). A draggable cursor over a day/night gradient (same look/scale
+ * as the Selection panel's own per-object arc, see nightWindowStart()/
+ * drawDayNightBackground() above - no altitude curve here, that part is
+ * deliberately only in Selection, per Gilles's own split of the two
+ * widgets). Dragging freezes the dome at the scrubbed instant (and stays
+ * frozen - `setSimTime` doesn't re-arm itself); the "Now" button clears
+ * the override and resumes following real time.
+ */
+function buildTimeNavPanel(engine, getSimTime, setSimTime) {
+  const wrap = el("div", { class: "timenav" });
+  const canvas = el("canvas", { class: "timenav-canvas", width: "280", height: "48" });
+  const readout = el("div", { class: "muted small mono timenav-readout" });
+  const nowBtn = el("button", { class: "btn btn-sm", text: t("navigator.nowBtn") });
+  const row = el("div", { class: "form-row" }, [readout, el("span", { class: "spacer" }), nowBtn]);
+  wrap.appendChild(canvas);
+  wrap.appendChild(row);
+
+  function draw() {
+    const t0 = getSimTime() || new Date();
+    const windowStart = nightWindowStart(t0);
+    const w = canvas.width, h = canvas.height;
+    const ctx = canvas.getContext("2d");
+    const sunSamples = sunAltitudeCurve(engine.observer, windowStart, 24, 10);
+    drawDayNightBackground(ctx, w, h, sunSamples);
+
+    // Local-midnight reference tick - always exactly at mid-width, since
+    // the window itself is defined as starting at local noon (see
+    // nightWindowStart()'s own doc comment).
+    ctx.strokeStyle = "rgba(255,255,255,0.3)";
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h); ctx.stroke();
+
+    const frac = Math.max(0, Math.min(1, (t0.getTime() - windowStart.getTime()) / (24 * 3600000)));
+    const cx = frac * w;
+    ctx.strokeStyle = "#ffb300";
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, h); ctx.stroke();
+
+    readout.textContent = t0.toLocaleString();
+    nowBtn.disabled = getSimTime() == null;
+  }
+
+  function xToDate(clientX) {
+    const r = canvas.getBoundingClientRect();
+    const frac = r.width ? Math.max(0, Math.min(1, (clientX - r.left) / r.width)) : 0;
+    const windowStart = nightWindowStart(getSimTime() || new Date());
+    return new Date(windowStart.getTime() + frac * 24 * 3600000);
+  }
+
+  let dragging = false;
+  function pointX(ev) { return ev.touches ? ev.touches[0].clientX : ev.clientX; }
+  function onDown(ev) { dragging = true; onMove(ev); }
+  function onMove(ev) {
+    if (!dragging) return;
+    setSimTime(xToDate(pointX(ev)));
+    draw();
+    if (ev.touches) ev.preventDefault();
+  }
+  function onUp() { dragging = false; }
+  canvas.addEventListener("mousedown", onDown);
+  document.addEventListener("mousemove", onMove);
+  document.addEventListener("mouseup", onUp);
+  canvas.addEventListener("touchstart", onDown, { passive: false });
+  document.addEventListener("touchmove", onMove, { passive: false });
+  document.addEventListener("touchend", onUp);
+  nowBtn.addEventListener("click", () => { setSimTime(null); draw(); });
+
+  // Own 1s tick for a live-updating cursor/readout while "following now" -
+  // deliberately separate from buildSkyDome()'s own 30s dome-wide refresh
+  // (this is a tiny canvas, redrawing it every second is cheap; the full
+  // dome isn't).
+  const timer = setInterval(draw, 1000);
+  draw();
+
+  wrap._dispose = () => {
+    clearInterval(timer);
+    document.removeEventListener("mousemove", onMove);
+    document.removeEventListener("mouseup", onUp);
+    document.removeEventListener("touchmove", onMove);
+    document.removeEventListener("touchend", onUp);
+  };
+  wrap._redraw = draw; // called by setSimTime() in mount() so other triggers of a time change (none yet besides this panel itself) stay in sync too
+  return wrap;
+}
+
 // Same shared #bg-layer element imagelayer.js targets for guider/focus/
 // sequencer's own image background - looked up directly here (unlike
 // imagelayer.js's setBgLayer() indirection) since this is the only
@@ -238,7 +466,7 @@ function readUiZoom() {
   return raw > 0 ? raw : 1;
 }
 
-function buildSkyDome(client, moduleName, onSelect) {
+function buildSkyDome(client, moduleName, onSelect, getTime) {
   const bgLayer = document.getElementById("bg-layer");
   if (!bgLayer) return { dispose: () => {}, engine: null };
   bgLayer.classList.add("sky-active");
@@ -249,6 +477,7 @@ function buildSkyDome(client, moduleName, onSelect) {
   const engine = new SkyEngine(canvas, {
     onNeedsRender: () => engine.render(),
     onSelect,
+    getTime,
     lightUI: document.documentElement.getAttribute("data-theme") === "light",
     uiZoom: readUiZoom(),
   });
@@ -397,15 +626,36 @@ export function mount(client, moduleName) {
   function track(node) { disposers.push(node._dispose); return node; }
   function dispose() { while (disposers.length) disposers.pop()(); }
 
+  // Lives at mount()'s own scope, not build()'s - build() re-runs on every
+  // module update (any property change), and a scrubbed time must survive
+  // that, not reset to "now" on the next server dump.
+  let simulatedTime = null;
+
   function build(mod) {
     dispose();
     Panels.clear();
     const has = (name) => name in mod.properties;
     const quickNavEntries = [];
 
-    const selection = buildSelectionPanel(client, moduleName);
-    const sky = buildSkyDome(client, moduleName, selection.onSelect);
+    // `sky` is referenced inside these two closures before it's assigned
+    // below - safe, since neither is actually CALLED until well after this
+    // whole function has finished running (a user interaction, or the
+    // time-navigator's own setSimTime()), by which point `sky` is long
+    // since set. Same forward-reference pattern app.js's own
+    // logToggleEl listener already relies on (see its own comment).
+    const selection = buildSelectionPanel(client, moduleName, () => sky.engine, () => simulatedTime);
+    const sky = buildSkyDome(client, moduleName, selection.onSelect, () => simulatedTime || new Date());
     disposers.push(sky.dispose);
+
+    // Single entry point for every time change (today: only the
+    // time-navigator panel's own drag/Now button) - redraws the dome at
+    // the new instant and keeps the Selection panel's own "now" cursor
+    // (and, if the window itself shifted, its whole curve) in sync.
+    function setSimTime(d) {
+      simulatedTime = d;
+      if (sky.engine) sky.engine.render();
+      selection.onTimeChange();
+    }
 
     // No "header" panel any more (render.js's own renderModuleView doc
     // comment: Gilles, 2026-10-03, "la supprimer completement").
@@ -418,16 +668,20 @@ export function mount(client, moduleName) {
       const settingsPanel = Panels.make({ id: "settings", title: t("navigator.displaySettings"), x: 660, y: 92, w: 260, collapsed: true });
       settingsPanel.appendChild(track(buildSettingsPanel(sky.engine)));
       quickNavEntries.push({ id: "settings", label: t("navigator.settingsQuicknav"), icon: "tune" });
+
+      const timeNavPanel = Panels.make({ id: "timenav", title: t("navigator.timeNav"), x: 340, y: 463, w: 300 });
+      timeNavPanel.appendChild(track(buildTimeNavPanel(sky.engine, () => simulatedTime, setSimTime)));
+      quickNavEntries.push({ id: "timenav", label: t("navigator.timeNavQuicknav"), icon: "schedule" });
     }
 
     renderActionsPanel(client, moduleName, mod, track, quickNavEntries);
     if (has("location")) {
-      const b = Panels.make({ id: "location", title: mod.properties.location.label || "Site", x: 20, y: 330, w: 300 });
+      const b = Panels.make({ id: "location", title: mod.properties.location.label || "Site", x: 20, y: 371, w: 300 });
       b.appendChild(track(renderProperty(client, moduleName, "location")));
       quickNavEntries.push({ id: "location", label: mod.properties.location.label || "Site" });
     }
     if (has("mountposition")) {
-      const b = Panels.make({ id: "mountposition", title: mod.properties.mountposition.label || "Mount", x: 20, y: 500, w: 260 });
+      const b = Panels.make({ id: "mountposition", title: mod.properties.mountposition.label || "Mount", x: 20, y: 774, w: 260 });
       b.appendChild(track(renderProperty(client, moduleName, "mountposition")));
       quickNavEntries.push({ id: "mountposition", label: "Mount" });
     }
@@ -443,7 +697,7 @@ export function mount(client, moduleName) {
     const known = new Set(["actions", "location", "mountposition", ...hasprofileNames]);
     const rest = Object.keys(mod.properties).filter((n) => !known.has(n));
     if (rest.length) {
-      const b = Panels.make({ id: "other", title: t("common.other"), x: 340, y: 500, w: 340 });
+      const b = Panels.make({ id: "other", title: t("common.other"), x: 340, y: 631, w: 340 });
       for (const name of rest) b.appendChild(track(renderProperty(client, moduleName, name)));
       quickNavEntries.push({ id: "other", label: t("common.other") });
     }

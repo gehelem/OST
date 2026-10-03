@@ -178,6 +178,14 @@ const STRINGS = {
   "navigator.selection": { en: "Selection", fr: "Sélection", de: "Auswahl", it: "Selezione", es: "Selección" },
   "navigator.displaySettings": { en: "Display settings", fr: "Réglages d'affichage", de: "Anzeigeeinstellungen", it: "Impostazioni di visualizzazione", es: "Ajustes de visualización" },
   "navigator.settingsQuicknav": { en: "Settings", fr: "Réglages", de: "Einstellungen", it: "Impostazioni", es: "Ajustes" },
+  "navigator.timeNav": { en: "Time navigator", fr: "Navigation temporelle", de: "Zeitnavigator", it: "Navigatore temporale", es: "Navegador temporal" },
+  "navigator.timeNavQuicknav": { en: "Time", fr: "Temps", de: "Zeit", it: "Tempo", es: "Tiempo" },
+  "navigator.nowBtn": { en: "Now", fr: "Maintenant", de: "Jetzt", it: "Adesso", es: "Ahora" },
+  "navigator.rise": { en: "Rise", fr: "Lever", de: "Aufgang", it: "Levata", es: "Salida" },
+  "navigator.transit": { en: "Meridian passage", fr: "Passage méridien", de: "Meridiandurchgang", it: "Passaggio al meridiano", es: "Paso meridiano" },
+  "navigator.set": { en: "Set", fr: "Coucher", de: "Untergang", it: "Tramonto", es: "Puesta" },
+  "navigator.maxAltitude": { en: "Max altitude", fr: "Hauteur maximale", de: "Max. Höhe", it: "Altezza massima", es: "Altura máxima" },
+  "navigator.airmassAtTransit": { en: "Airmass at transit", fr: "Masse d'air au passage", de: "Luftmasse beim Durchgang", it: "Massa d'aria al passaggio", es: "Masa de aire en el paso" },
 
   // ---- templates/focus.js --------------------------------------------------
   "focus.focusCurve": { en: "Focus curve", fr: "Courbe de mise au point", de: "Fokuskurve", it: "Curva di messa a fuoco", es: "Curva de enfoque" },
