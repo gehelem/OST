@@ -389,15 +389,20 @@ export function mount(client, moduleName) {
     // background already shows the picture full-screen, and the "Stats"
     // panel/button (below) already covers the same figures in more depth.
     addImageBlock(client, moduleName, mod, "image", "image", Panels, track, disposers, quickNavEntries, { x: 350, y: 92, w: 260 }, { quickPanel: false });
+    // Icon-only quicknav buttons here too (Gilles, 2026-10-03: "idem sur
+    // le guider, bouton 'guiding graph' => icone 'browse_activity', bouton
+    // 'drift' => icone 'scatter_plot'" - same request as the Stats button
+    // just before, same ligature-verified-against-the-vendored-font
+    // discipline).
     if (has("guiding")) {
       const b = Panels.make({ id: "guiding", title: mod.properties.guiding.label || "Guiding", x: 350, y: 300, w: 620 });
       b.appendChild(track(buildGuidingChartPanel(client, moduleName)));
-      quickNavEntries.push({ id: "guiding", label: mod.properties.guiding.label || "Guiding" });
+      quickNavEntries.push({ id: "guiding", label: mod.properties.guiding.label || "Guiding", icon: "browse_activity", iconOnly: true });
     }
     if (has("drift")) {
       const b = Panels.make({ id: "drift", title: mod.properties.drift.label || "Drift", x: 990, y: 92, w: 340 });
       b.appendChild(track(buildDriftChartPanel(client, moduleName)));
-      quickNavEntries.push({ id: "drift", label: mod.properties.drift.label || "Drift" });
+      quickNavEntries.push({ id: "drift", label: mod.properties.drift.label || "Drift", icon: "scatter_plot", iconOnly: true });
     }
     // The profile-centric "Parameters" box (buildParamsPanel, render.js) is
     // not built here — it opens on demand from the gear button (app.js),

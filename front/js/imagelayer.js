@@ -406,5 +406,10 @@ export function addImageBlock(client, moduleName, mod, propName, elName, panelsA
 
   const sb = panelsApi.make({ id: propName + "-stats", title: t("imagelayer.imageStats"), x: p.x, y: p.y + 100, w: p.w + 100, collapsed: true });
   sb.appendChild(track(buildImageStatsHistogramPanel(client, moduleName, propName, elName)));
-  quickNavEntries.push({ id: propName + "-stats", label: t("imagelayer.stats") });
+  // Icon-only (render.js's own renderActionsPanel() set the precedent for
+  // this field pair) - Gilles, 2026-10-03: "modifie l'apparence du bouton
+  // 'Stats' pour n'afficher qu'une icone 'bar_chart'" - ligature verified
+  // against the vendored Material Symbols font before use (base.css's own
+  // header comment on why that check always comes first).
+  quickNavEntries.push({ id: propName + "-stats", label: t("imagelayer.stats"), icon: "bar_chart", iconOnly: true });
 }
