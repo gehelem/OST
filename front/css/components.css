@@ -170,6 +170,15 @@ input[type="range"]::-moz-range-thumb {
 .img-stats-table thead th { border-bottom: 1px solid var(--border); font-size: 10px; color: var(--text-dim); }
 .img-stats-table tbody tr { border-top: 1px solid var(--border-subtle); }
 
+/* imagelayer.js's buildImageAlternatesPanel() - a small strip of "alternate"
+ * crops for one image element (the focus module's own tilt quadrants -
+ * Gilles, 2026-10-03: "sur rooster on affiche 4 image supplementaires, de
+ * tilt"), same 2-per-row wrapping grid Rooster's own alternates-strip uses,
+ * clickable into the shared fullscreen viewer (.img-viewer above). */
+.img-alternates { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-2); }
+.img-alternate-thumb { width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: zoom-in; display: block; }
+.img-alternate-thumb:hover { border-color: var(--accent-dim); }
+
 .elt-table { width: 100%; border-collapse: collapse; }
 .elt-row td { padding: 6px 4px; vertical-align: middle; border-top: 1px solid var(--border-subtle); }
 .elt-row:first-child td { border-top: none; }

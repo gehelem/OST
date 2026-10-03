@@ -3,19 +3,28 @@
 // "values" panel (the V-curve) needed a real chart — Gilles, 2026-10-03,
 // on the plain generic table it used to render as: "la 'focus curve' est
 // trop minimale, regarde le graphique de rooster, avec la courbe de
-// regression et les barres d'erreur". results/progress/zones stay on the
+// regression et les barres d'erreur". results/progress stay on the
 // generic renderProperty() path (same as before, nothing wrong with those
-// as plain tables) — same split guider.js already settled on (bespoke only
-// where it actually earns its keep).
+// as plain tables), grouped into one panel together (Gilles, 2026-10-03:
+// "on va regrouper les fenetres 'progress' et 'final result'"). "zones"
+// (the per-zone best-position grid) briefly got a tile display here too,
+// then was dropped outright — Gilles: "toutes ces valeurs numeriques n'ont
+// pas d'interet" — in favour of what Rooster actually shows there: 4 tilt
+// crops from the image element's own `alternates` array ("sur rooster on
+// affiche 4 image supplementaires, de tilt" — see buildImageAlternatesPanel
+// in imagelayer.js, generic to any image element, not focus-specific).
+// Same "bespoke only where it actually earns its keep" split guider.js
+// already settled on.
 //
 // Real property names confirmed against src/modules/focus/focus.json:
 // values (V-curve data — hasGrid, graphType XY, graphParams focpos/
 // loopHFRavg, plus imgHFRdev for error bars and fitk0/fitk1/fitk2 for the
 // polynomial fit — see buildFocusCurvePanel below), results (hfr/pos
-// readout), progress (spinner), zones (zone/bestpos grid) — plus
-// parameters (hasprofile:true, Parameters modal only, not a panel),
-// actions (abortfocus/autofocus/loop) and image, both generic to any
-// IndiModule via defineMeAsFocuser()/defineMeAsImager().
+// readout), progress (spinner) — plus parameters (hasprofile:true,
+// Parameters modal only, not a panel), actions (abortfocus/autofocus/
+// loop) and image, both generic to any IndiModule via
+// defineMeAsFocuser()/defineMeAsImager(). "zones" exists too but gets no
+// panel — see above.
 //
 // The error-bars + polynomial-fit chart itself ports OstErix/Rooster's own
 // focus.component.ts updateFocusChart() (source read directly, not
@@ -29,9 +38,10 @@
 // guidingChartData) rather than Rooster's own light-theme palette.
 
 import { renderProperty, updateQuickNav, moduleLifecycle, renderActionsPanel } from "../render.js";
-import { addImageBlock } from "../imagelayer.js";
+import { addImageBlock, buildImageAlternatesPanel } from "../imagelayer.js";
 import { el } from "../dom.js";
 import * as Panels from "../panels.js";
+import { t } from "../i18n.js";
 
 if (window.Chart && window.Chart.registerables) {
   try { window.Chart.register(...window.Chart.registerables); } catch (e) { /* already done */ }
@@ -177,32 +187,35 @@ export function mount(client, moduleName) {
 
     renderActionsPanel(client, moduleName, mod, track, quickNavEntries);
 
-    if (has("results")) {
-      const b = Panels.make({ id: "results", title: mod.properties.results.label || "Final result", x: 20, y: 330, w: 300 });
-      b.appendChild(track(renderProperty(client, moduleName, "results")));
-      quickNavEntries.push({ id: "results", label: mod.properties.results.label || "Final result" });
-    }
-    if (has("progress")) {
-      const b = Panels.make({ id: "progress", title: mod.properties.progress.label || "Progress", x: 20, y: 450, w: 300 });
-      b.appendChild(track(renderProperty(client, moduleName, "progress")));
-      quickNavEntries.push({ id: "progress", label: mod.properties.progress.label || "Progress" });
+    // "Final result" + "Progress" grouped into one panel (Gilles,
+    // 2026-10-03: "on va regrouper les fenetres 'progress' et 'final
+    // result'") — each keeps its own full renderProperty() header/label
+    // (same stacking scaffold.js's own panelSpec.extra does for a
+    // secondary property sharing a primary one's box).
+    if (has("results") || has("progress")) {
+      const title = (mod.properties.results && mod.properties.results.label) || "Final result";
+      const b = Panels.make({ id: "results", title, x: 20, y: 330, w: 300 });
+      if (has("results")) b.appendChild(track(renderProperty(client, moduleName, "results")));
+      if (has("progress")) b.appendChild(track(renderProperty(client, moduleName, "progress")));
+      quickNavEntries.push({ id: "results", label: title });
     }
     if (has("values")) {
       const b = Panels.make({ id: "values", title: mod.properties.values.label || "Focus curve", x: 350, y: 92, w: 480 });
       b.appendChild(track(buildFocusCurvePanel(client, moduleName)));
       quickNavEntries.push({ id: "values", label: mod.properties.values.label || "Focus curve" });
     }
-    if (has("zones")) {
-      const b = Panels.make({ id: "zones", title: mod.properties.zones.label || "Zoning results", x: 350, y: 450, w: 300 });
-      b.appendChild(track(renderProperty(client, moduleName, "zones")));
-      quickNavEntries.push({ id: "zones", label: mod.properties.zones.label || "Zoning results" });
-    }
     addImageBlock(client, moduleName, mod, "image", "image", Panels, track, disposers, quickNavEntries, { x: 850, y: 92, w: 280 });
+    if (has("image")) {
+      const b = Panels.make({ id: "tilt", title: t("focus.tilt"), x: 1150, y: 92, w: 220 });
+      b.appendChild(track(buildImageAlternatesPanel(client, moduleName, "image", "image")));
+      quickNavEntries.push({ id: "tilt", label: t("focus.tilt") });
+    }
 
-    // Nothing left over: values/results/progress/zones/actions/image/
-    // parameters account for every property focus.json actually defines —
-    // no "Other" catch-all needed, same reasoning as guider.js's own
-    // removal of it (Gilles, 2026-10-03: "enleve le 'other' et la fenetre").
+    // values/results(+progress)/tilt/actions/image/parameters account for
+    // everything focus.json defines — "zones" gets no panel at all
+    // (see this file's own header comment) and no "Other" catch-all is
+    // needed either, same reasoning as guider.js's own removal of it
+    // (2026-10-03: "enleve le 'other' et la fenetre").
     updateQuickNav(quickNavEntries);
   }
 

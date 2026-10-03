@@ -289,6 +289,37 @@ export function buildImageStatsHistogramPanel(client, moduleName, propName, elNa
   return wrap;
 }
 
+// --------------------------------------------------------- alternate crops
+/** Small strip of an image element's own "alternates" (secondary crops
+ * alongside the main `urljpeg` — the focus module's own tilt quadrants:
+ * one crop per sensor corner, used to diagnose sensor tilt), ported from
+ * OstErix/Rooster's own image-element.component's alternates-strip (source
+ * read directly, not guessed — `alternates?: string[]` on its ImageElement
+ * model, same relative-media-path shape as `urljpeg` itself) — Gilles,
+ * 2026-10-03: "sur rooster on affiche 4 image supplementaires, de tilt".
+ * Generic to any image element carrying an `alternates` array (not
+ * focus-specific itself, same "image handling lives here, any template can
+ * reuse it" reasoning as the rest of this file); clicking a thumbnail opens
+ * it in the same fullscreen viewer as the main image. */
+export function buildImageAlternatesPanel(client, moduleName, propName, elName) {
+  const wrap = el("div", { class: "img-alternates" });
+  const unsub = client.subscribe(client.topics.property(moduleName, propName), (prop) => {
+    wrap.innerHTML = "";
+    const v = elValue(prop, elName);
+    const alts = v.alternates || [];
+    if (!alts.length) { wrap.appendChild(el("div", { class: "muted small", text: t("imagelayer.noAlternates") })); return; }
+    const ts = Date.now();
+    for (const path of alts) {
+      const src = buildMediaUrl(getMediaBaseUrl(), path) + "?t=" + ts;
+      const img = el("img", { class: "img-alternate-thumb", src, alt: "" });
+      img.addEventListener("click", () => openImageViewer(src));
+      wrap.appendChild(img);
+    }
+  });
+  wrap._dispose = unsub;
+  return wrap;
+}
+
 /**
  * The full "a module has an image" block a template wires in one call:
  * background + a small quick-stats panel + a deeper stats/histogram panel

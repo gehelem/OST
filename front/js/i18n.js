@@ -103,6 +103,7 @@ const STRINGS = {
   "imagelayer.channelG": { en: "G", fr: "V", de: "G", it: "V", es: "V" },
   "imagelayer.channelB": { en: "B", fr: "B", de: "B", it: "B", es: "A" },
   "imagelayer.channelValue": { en: "Value", fr: "Valeur", de: "Wert", it: "Valore", es: "Valor" },
+  "imagelayer.noAlternates": { en: "No image yet", fr: "Aucune image pour l'instant", de: "Noch kein Bild", it: "Nessuna immagine disponibile", es: "Aún no hay imagen" },
 
   // ---- views.js: modbar system entries, login, controller/files ----------
   "views.controller": { en: "Controller", fr: "Contrôleur", de: "Steuerung", it: "Controllore", es: "Controlador" },
@@ -192,6 +193,7 @@ const STRINGS = {
 
   // ---- templates/focus.js --------------------------------------------------
   "focus.focusCurve": { en: "Focus curve", fr: "Courbe de mise au point", de: "Fokuskurve", it: "Curva di messa a fuoco", es: "Curva de enfoque" },
+  "focus.tilt": { en: "Tilt", fr: "Tilt", de: "Tilt", it: "Tilt", es: "Tilt" },
 
   // ---- templates/guider.js -------------------------------------------------
   "guider.sessionValues": { en: "Session values", fr: "Valeurs de la session", de: "Sitzungswerte", it: "Valori della sessione", es: "Valores de la sesión" },
