@@ -660,47 +660,65 @@ export function mount(client, moduleName) {
     // No "header" panel any more (render.js's own renderModuleView doc
     // comment: Gilles, 2026-10-03, "la supprimer completement").
 
+    // "Actions" first in the quicknav bar (Gilles, 2026-10-03: "bouton
+    // 'actions' en premier") - every other template already calls this
+    // first (focus.js/guider.js's own build()); navigator.js was the one
+    // outlier, pushing it after Selection/Settings/Time instead.
+    renderActionsPanel(client, moduleName, mod, track, quickNavEntries);
+
     const selectionPanel = Panels.make({ id: "selection", title: t("navigator.selection"), x: 340, y: 92, w: 300 });
     selectionPanel.appendChild(track(selection.node));
-    quickNavEntries.push({ id: "selection", label: t("navigator.selection") });
+    // Icon-only (Gilles, 2026-10-03: "bouton 'selection' => juste icone =
+    // 'left_click'" - ligature verified against the vendored font first;
+    // "left_clic" doesn't exist, "left_click" does).
+    quickNavEntries.push({ id: "selection", label: t("navigator.selection"), icon: "left_click", iconOnly: true });
 
     if (sky.engine) {
       const settingsPanel = Panels.make({ id: "settings", title: t("navigator.displaySettings"), x: 660, y: 92, w: 260, collapsed: true });
       settingsPanel.appendChild(track(buildSettingsPanel(sky.engine)));
-      quickNavEntries.push({ id: "settings", label: t("navigator.settingsQuicknav"), icon: "tune" });
+      // Icon-only (Gilles, 2026-10-03: "boutons 'settings' et 'time' :
+      // juste les icones aussi (qui y sont deja), plus de libelle" - same
+      // icon/iconOnly fields as the Stats/Guiding graph/Drift buttons just
+      // before).
+      quickNavEntries.push({ id: "settings", label: t("navigator.settingsQuicknav"), icon: "tune", iconOnly: true });
 
       const timeNavPanel = Panels.make({ id: "timenav", title: t("navigator.timeNav"), x: 340, y: 463, w: 300 });
       timeNavPanel.appendChild(track(buildTimeNavPanel(sky.engine, () => simulatedTime, setSimTime)));
-      quickNavEntries.push({ id: "timenav", label: t("navigator.timeNavQuicknav"), icon: "schedule" });
+      quickNavEntries.push({ id: "timenav", label: t("navigator.timeNavQuicknav"), icon: "schedule", iconOnly: true });
     }
 
-    renderActionsPanel(client, moduleName, mod, track, quickNavEntries);
     if (has("location")) {
       const b = Panels.make({ id: "location", title: mod.properties.location.label || "Site", x: 20, y: 371, w: 300 });
-      b.appendChild(track(renderProperty(client, moduleName, "location")));
-      quickNavEntries.push({ id: "location", label: mod.properties.location.label || "Site" });
+      // framed:false (Gilles, 2026-10-03: "comme il n'y a qu'une propriete
+      // dedans, ca ne sert a rien de garder le cadre, on a mis une option
+      // expres pour ca") - the outer Panels.make box above already gives
+      // this its own border/title bar; renderProperty()'s own inner
+      // "prop-header" (status dot + repeated label) was pure duplication
+      // for a panel with only one property in it.
+      b.appendChild(track(renderProperty(client, moduleName, "location", { framed: false })));
+      // Icon-only (Gilles, 2026-10-03: "bouton 'location' => juste icone =
+      // 'location_on'" - a ligature that happens to resolve to the same
+      // glyph as "place", confirmed by properly unwrapping the font's
+      // GSUB ExtensionSubst (lookup type 7) this time; a first, simpler
+      // check missed it - see base.css's own header comment on this
+      // verification technique).
+      quickNavEntries.push({ id: "location", label: mod.properties.location.label || "Site", icon: "location_on", iconOnly: true });
     }
     if (has("mountposition")) {
       const b = Panels.make({ id: "mountposition", title: mod.properties.mountposition.label || "Mount", x: 20, y: 774, w: 260 });
-      b.appendChild(track(renderProperty(client, moduleName, "mountposition")));
+      // framed:false - same reasoning as "location" just above (Gilles,
+      // 2026-10-03: "idem sur 'mount position'").
+      b.appendChild(track(renderProperty(client, moduleName, "mountposition", { framed: false })));
       quickNavEntries.push({ id: "mountposition", label: "Mount" });
     }
 
-    // Anything this v1 doesn't have a dedicated panel for yet (search,
-    // target, results, gpslocation, gpstime, centeringparams, slaves,
-    // image/optic/parms...) still needs to be reachable - one catch-all
-    // panel rather than silently dropping it. hasprofile properties
-    // (centeringparams, slaves) are excluded here since they're already
-    // reachable from the Parameters modal, same rule every other template
-    // in this codebase follows.
-    const hasprofileNames = Object.keys(mod.properties).filter((n) => mod.properties[n].hasprofile === true);
-    const known = new Set(["actions", "location", "mountposition", ...hasprofileNames]);
-    const rest = Object.keys(mod.properties).filter((n) => !known.has(n));
-    if (rest.length) {
-      const b = Panels.make({ id: "other", title: t("common.other"), x: 340, y: 631, w: 340 });
-      for (const name of rest) b.appendChild(track(renderProperty(client, moduleName, name)));
-      quickNavEntries.push({ id: "other", label: t("common.other") });
-    }
+    // No "Other" catch-all any more (Gilles, 2026-10-03: "enleve le
+    // 'other' et la fenetre", same request already applied to guider.js -
+    // unlike that case, this one genuinely drops reachability for
+    // whatever this v1 has no dedicated panel for yet: search, target,
+    // results, selectnow, gpslocation, gpstime, the generic device-
+    // connection block, image/optic/parms... — worth a dedicated panel
+    // later if any of those turn out to matter day-to-day).
     updateQuickNav(quickNavEntries);
   }
 
