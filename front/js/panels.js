@@ -120,8 +120,31 @@ function pointXY(ev) {
   return t ? { x: t.clientX, y: t.clientY } : { x: ev.clientX, y: ev.clientY };
 }
 
+// app.js's own applyZoom() scales the whole app via the real CSS `zoom`
+// property (document.body.style.zoom), not a transform - which means
+// layout reads (getBoundingClientRect(), offsetWidth, MouseEvent's own
+// clientX/clientY) come back in real VIEWPORT pixels (already scaled),
+// while style.left/top/width/height WRITES on an element inside that
+// zoomed subtree are interpreted as LOCAL (pre-zoom) pixels and get
+// re-multiplied by the zoom factor at render time. Mixing the two
+// without converting was exactly Gilles's bug report, 2026-10-03: "des
+// que je commence a deplacer ma souris la fenetre fait un saut ... puis
+// se deplace a cote du curseur, decale - ca n'arrive pas au niveau de
+// zoom par defaut" - a 1:1 (z=1) zoom hides the bug since both unit
+// systems coincide there. Read fresh on every drag/resize start (not
+// cached) since the zoom slider can change between one drag and the
+// next. Same `--ui-zoom` custom property templates/navigator.js's own
+// readUiZoom() already reads, for the same reason (that file needs it
+// for label sizing, not duplicated as a shared import since it's two
+// lines and this module stays dependency-free otherwise).
+function uiZoom() {
+  const raw = parseFloat(document.documentElement.style.getPropertyValue("--ui-zoom"));
+  return raw > 0 ? raw : 1;
+}
+
 function startDrag(panel, bar, id, ev, sc) {
   ev.preventDefault();
+  const z = uiZoom();
   const lr = layerRect();
   const r = panel.getBoundingClientRect();
   const start = pointXY(ev);
@@ -130,8 +153,12 @@ function startDrag(panel, bar, id, ev, sc) {
   const move = (e) => {
     const p = pointXY(e);
     const m = 6;
-    const x = Math.max(m, Math.min(p.x - lr.left - ox, lr.width - r.width - m));
-    const y = Math.max(SAFE_TOP, Math.min(p.y - lr.top - oy, lr.height - 36));
+    // Clamped in viewport space (lr/r are already real, post-zoom
+    // pixels, consistent with each other) - only the FINAL result is
+    // converted to local/pre-zoom space (uiZoom()'s own doc comment),
+    // right before it's written into style.left/top.
+    const x = Math.max(m, Math.min(p.x - lr.left - ox, lr.width - r.width - m)) / z;
+    const y = Math.max(SAFE_TOP, Math.min(p.y - lr.top - oy, lr.height - 36)) / z;
     panel.style.left = x + "px";
     panel.style.top = y + "px";
     if (e.touches) e.preventDefault(); // stop the page itself from scrolling under the drag
@@ -158,15 +185,24 @@ function startDrag(panel, bar, id, ev, sc) {
 function startResize(panel, id, ev, sc) {
   ev.preventDefault();
   ev.stopPropagation();
+  const z = uiZoom();
   const start = pointXY(ev);
   const sx = start.x, sy = start.y;
-  const sw = panel.offsetWidth, sh = panel.offsetHeight;
+  // getBoundingClientRect(), not offsetWidth/Height - stays consistently
+  // in viewport space alongside sx/sy/lr below (same reasoning as
+  // startDrag() above; uiZoom()'s own doc comment has the full story).
+  const r0 = panel.getBoundingClientRect();
+  const sw = r0.width, sh = r0.height;
   const lr = layerRect();
   panel.classList.add("resized", "resizing");
   const move = (e) => {
     const p = pointXY(e);
-    panel.style.width = Math.max(220, Math.min(sw + (p.x - sx), lr.width - 12)) + "px";
-    panel.style.height = Math.max(120, Math.min(sh + (p.y - sy), lr.height - 12)) + "px";
+    // The 220/120 minimums are meant as LOCAL (CSS) pixels regardless of
+    // zoom (same minimum panel size whatever the UI scale), so they're
+    // scaled up to viewport space for this clamp, then the whole result
+    // converted back to local space (/ z) right before the style write.
+    panel.style.width = (Math.max(220 * z, Math.min(sw + (p.x - sx), lr.width - 12)) / z) + "px";
+    panel.style.height = (Math.max(120 * z, Math.min(sh + (p.y - sy), lr.height - 12)) / z) + "px";
     if (e.touches) e.preventDefault();
   };
   const up = () => {
