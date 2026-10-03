@@ -255,6 +255,70 @@ function buildDriftChartPanel(client, moduleName) {
   return wrap;
 }
 
+// --------------------------------------------------------------- values
+// Bespoke "values" panel (Gilles, 2026-10-03, on the plain generic table
+// it used to be: "rends-la plus graphique") - matches OstErix/Rooster's
+// own RMS presentation (guider.component.html's own "values-card": a
+// bordered, green-accented box per RMS figure instead of a label/value
+// table row - source read directly, not guessed) and adds something
+// Rooster doesn't have, Gilles's own idea: a small centered bar per axis
+// showing the current correction pulse, "0 au milieu, min a gauche (Est)
+// et max a droite (Ouest)" for RA - DEC mirrors that (South left/North
+// right - Gilles only specified RA explicitly, "idem" for DEC; flag it
+// if that pairing turns out backwards too, same iterate-on-feedback spirit
+// as the FOV frame fix). Scaled against guideParams.pulsemax (hasprofile,
+// subscribed here JUST for that number - guideParams itself still only
+// reachable from the Parameters modal, same as any other hasprofile
+// property this template doesn't give its own panel).
+function pulseAxisRow(axisLabel, leftVal, rightVal, leftName, rightName, maxVal) {
+  const row = el("div", { class: "pulse-axis" });
+  row.appendChild(el("div", { class: "pulse-axis-label", text: axisLabel }));
+  const bar = el("div", { class: "pulse-bar" });
+  const fill = el("div", { class: "pulse-bar-fill" });
+  bar.appendChild(fill);
+  bar.appendChild(el("div", { class: "pulse-bar-center" }));
+  row.appendChild(bar);
+  row.appendChild(el("div", { class: "pulse-axis-values mono small" }, [
+    el("span", { text: `${leftName} ${(leftVal || 0).toFixed(0)}` }),
+    el("span", { text: `${rightName} ${(rightVal || 0).toFixed(0)}` }),
+  ]));
+  const signed = (rightVal || 0) - (leftVal || 0);
+  const frac = Math.max(-1, Math.min(1, maxVal ? signed / maxVal : 0));
+  if (frac >= 0) { fill.style.left = "50%"; fill.style.width = (frac * 50) + "%"; }
+  else { fill.style.left = (50 + frac * 50) + "%"; fill.style.width = (-frac * 50) + "%"; }
+  return row;
+}
+
+function buildValuesPanel(client, moduleName) {
+  const wrap = el("div", { class: "guider-values" });
+  let pulsemax = 2000; // guideParams.json's own default, until the real dump arrives
+  const unsubParams = client.subscribe(client.topics.property(moduleName, "guideParams"), (prop) => {
+    const v = prop && prop.elements.pulsemax && prop.elements.pulsemax.value;
+    if (typeof v === "number" && v > 0) pulsemax = v;
+  });
+  const unsub = client.subscribe(client.topics.property(moduleName, "values"), (prop) => {
+    wrap.innerHTML = "";
+    if (!prop) return;
+    const e = prop.elements;
+    // Labels come from the server (already translated, structure.en.md -
+    // "property/element labels ... DO come translated already") - never
+    // re-invented locally, per js/i18n.js's own header rule.
+    const rmsRow = el("div", { class: "rms-row" });
+    for (const key of ["rmsRA", "rmsDEC", "rmsTotal"]) {
+      if (!e[key]) continue;
+      rmsRow.appendChild(el("div", { class: "rms-box" }, [
+        el("div", { class: "rms-label", text: e[key].label || key }),
+        el("div", { class: "rms-number", text: (e[key].value || 0).toFixed(2) }),
+      ]));
+    }
+    wrap.appendChild(rmsRow);
+    if (e.pulseE && e.pulseW) wrap.appendChild(pulseAxisRow("RA", e.pulseE.value, e.pulseW.value, "E", "W", pulsemax));
+    if (e.pulseS && e.pulseN) wrap.appendChild(pulseAxisRow("DEC", e.pulseS.value, e.pulseN.value, "S", "N", pulsemax));
+  });
+  wrap._dispose = () => { unsub(); unsubParams(); };
+  return wrap;
+}
+
 export function mount(client, moduleName) {
   Panels.setScope(moduleName);
   Panels.clear();
@@ -283,7 +347,7 @@ export function mount(client, moduleName) {
     renderActionsPanel(client, moduleName, mod, track, quickNavEntries);
     if (has("values")) {
       const b = Panels.make({ id: "values", title: mod.properties.values.label || "Session values", x: 20, y: 470, w: 300 });
-      b.appendChild(track(renderProperty(client, moduleName, "values")));
+      b.appendChild(track(buildValuesPanel(client, moduleName)));
       if (has("calibrationvalues")) b.appendChild(track(renderProperty(client, moduleName, "calibrationvalues")));
       quickNavEntries.push({ id: "values", label: mod.properties.values.label || "Session values" });
     }

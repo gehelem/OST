@@ -290,3 +290,20 @@ input[type="range"]::-moz-range-thumb {
 .timenav-canvas, .altitude-chart { display: block; width: 100%; max-width: 280px; height: auto; aspect-ratio: 280 / 48; border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: ew-resize; margin-top: var(--space-2); }
 .altitude-chart { aspect-ratio: 280 / 90; cursor: default; margin-top: var(--space-3); }
 .timenav-readout { flex: 1 1 auto; }
+
+/* guider's own "values" panel (Gilles, 2026-10-03: "rends-la plus
+ * graphique") - RMS figures as bordered/accented boxes (matches
+ * OstErix/Rooster's own guider.component.css, green left-border accent,
+ * read directly rather than guessed), plus a centered correction-pulse
+ * bar per axis (RA/DEC) - that second part is Gilles's own idea, no
+ * Rooster equivalent. */
+.rms-row { display: flex; gap: var(--space-2); margin-bottom: var(--space-3); }
+.rms-box { flex: 1; padding: var(--space-2); border-radius: var(--radius-sm); border-left: 3px solid var(--ok); background: rgba(var(--ok-rgb), 0.08); }
+.rms-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); }
+.rms-number { font-size: 15px; font-weight: 600; font-family: var(--font-mono); margin-top: 2px; }
+.pulse-axis { margin-top: var(--space-2); }
+.pulse-axis-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); margin-bottom: 3px; }
+.pulse-bar { position: relative; height: 10px; border-radius: var(--radius-sm); background: var(--bg-elevated); border: 1px solid var(--border); overflow: hidden; }
+.pulse-bar-center { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--border-strong); }
+.pulse-bar-fill { position: absolute; top: 0; bottom: 0; background: var(--accent); }
+.pulse-axis-values { display: flex; justify-content: space-between; margin-top: 2px; color: var(--text-muted); }
