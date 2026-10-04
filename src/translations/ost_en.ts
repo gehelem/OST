@@ -7359,74 +7359,6 @@
         <translation>   ///////   ////////      //     </translation>
     </message>
     <message>
-        <source>Git Hash              =801d0de02d3603692556553b62baf216de627fa5-dirty</source>
-        <translation>Git Hash              =801d0de02d3603692556553b62baf216de627fa5-dirty</translation>
-    </message>
-    <message>
-        <source>Git Date              =Mon Sep 21 21:43:27 2026</source>
-        <translation>Git Date              =Mon Sep 21 21:43:27 2026</translation>
-    </message>
-    <message>
-        <source>Git Commit subject    =Document controller data, GlobalDatastore and the file system</source>
-        <translation>Git Commit subject    =Document controller data, GlobalDatastore and the file system</translation>
-    </message>
-    <message>
-        <source>Git Tag               =801d0de0</source>
-        <translation>Git Tag               =801d0de0</translation>
-    </message>
-    <message>
-        <source>Webroot               =/home/gilles/ostmedia</source>
-        <translation>Webroot               =/home/gilles/ostmedia</translation>
-    </message>
-    <message>
-        <source>DB Path               =</source>
-        <translation>DB Path               =</translation>
-    </message>
-    <message>
-        <source>Modules Library Path  =/home/gilles/claude/OST/OST/buildqt6</source>
-        <translation>Modules Library Path  =/home/gilles/claude/OST/OST/buildqt6</translation>
-    </message>
-    <message>
-        <source>Load configuration    =default</source>
-        <translation>Load configuration    =default</translation>
-    </message>
-    <message>
-        <source>Embedded Indi server  =Y</source>
-        <translation>Embedded Indi server  =Y</translation>
-    </message>
-    <message>
-        <source>WebSocket SSL         =N</source>
-        <translation>WebSocket SSL         =N</translation>
-    </message>
-    <message>
-        <source>Language              =en</source>
-        <translation>Language              =en</translation>
-    </message>
-    <message>
-        <source>Security              =0</source>
-        <translation>Security              =0</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-23_22-26-40.log</source>
-        <translation>Log file              =ostserver_2026-09-23_22-26-40.log</translation>
-    </message>
-    <message>
-        <source>Log level             =0</source>
-        <translation>Log level             =0</translation>
-    </message>
-    <message>
-        <source>Banner                =Observatoire Sans tête</source>
-        <translation>Banner                =Observatoire Sans tête</translation>
-    </message>
-    <message>
-        <source>System watch interval =10s (0 to disable)</source>
-        <translation>System watch interval =10s (0 to disable)</translation>
-    </message>
-    <message>
-        <source>Min free disk space   =10%</source>
-        <translation>Min free disk space   =10%</translation>
-    </message>
-    <message>
         <source>Check available modules in /usr/lib</source>
         <translation>Check available modules in /usr/lib</translation>
     </message>
@@ -7583,14 +7515,6 @@
         <translation>%1 - Loading device conf for %2</translation>
     </message>
     <message>
-        <source>Log file              =ostserver_2026-09-23_22-27-47.log</source>
-        <translation>Log file              =ostserver_2026-09-23_22-27-47.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-23_22-30-36.log</source>
-        <translation>Log file              =ostserver_2026-09-23_22-30-36.log</translation>
-    </message>
-    <message>
         <source>listOfValues references a controller-wide LOV (optics, shared across all modules), listOfValuesIsExternal marks it as such</source>
         <translation>listOfValues references a controller-wide LOV (optics, shared across all modules), listOfValuesIsExternal marks it as such</translation>
     </message>
@@ -7619,108 +7543,8 @@
         <translation>LOV scopes (local / module / controller)</translation>
     </message>
     <message>
-        <source>Git Hash              =1cd2b193519a0f01496fcf42ee06e6cad4855079-dirty</source>
-        <translation>Git Hash              =1cd2b193519a0f01496fcf42ee06e6cad4855079-dirty</translation>
-    </message>
-    <message>
-        <source>Git Date              =Thu Sep 24 11:06:32 2026</source>
-        <translation>Git Date              =Thu Sep 24 11:06:32 2026</translation>
-    </message>
-    <message>
-        <source>Git Commit subject    =Reorder dev-client documentation pages and document module templates</source>
-        <translation>Git Commit subject    =Reorder dev-client documentation pages and document module templates</translation>
-    </message>
-    <message>
-        <source>Git Tag               =1cd2b193</source>
-        <translation>Git Tag               =1cd2b193</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_13-56-58.log</source>
-        <translation>Log file              =ostserver_2026-09-24_13-56-58.log</translation>
-    </message>
-    <message>
         <source>Load all catalogs     =Y</source>
         <translation>Load all catalogs     =Y</translation>
-    </message>
-    <message>
-        <source>Webroot               =/tmp/catalog-timing-real/webroot</source>
-        <translation>Webroot               =/tmp/catalog-timing-real/webroot</translation>
-    </message>
-    <message>
-        <source>DB Path               =/tmp/catalog-timing-real/</source>
-        <translation>DB Path               =/tmp/catalog-timing-real/</translation>
-    </message>
-    <message>
-        <source>Modules Library Path  =</source>
-        <translation>Modules Library Path  =</translation>
-    </message>
-    <message>
-        <source>Load configuration    =nonexistent</source>
-        <translation>Load configuration    =nonexistent</translation>
-    </message>
-    <message>
-        <source>Embedded Indi server  =N</source>
-        <translation>Embedded Indi server  =N</translation>
-    </message>
-    <message>
-        <source>Language              =fr</source>
-        <translation>Language              =fr</translation>
-    </message>
-    <message>
-        <source>Log file              =/tmp/catalog-timing-real/test.log</source>
-        <translation>Log file              =/tmp/catalog-timing-real/test.log</translation>
-    </message>
-    <message>
-        <source>Log level             =1</source>
-        <translation>Log level             =1</translation>
-    </message>
-    <message>
-        <source>Git Hash              =83512cc807948a8eb50f91996fcb02133b66b53f</source>
-        <translation>Git Hash              =83512cc807948a8eb50f91996fcb02133b66b53f</translation>
-    </message>
-    <message>
-        <source>Git Date              =Thu Sep 24 14:27:45 2026</source>
-        <translation>Git Date              =Thu Sep 24 14:27:45 2026</translation>
-    </message>
-    <message>
-        <source>Git Commit subject    =Load all star catalogs unconditionally at DB init, remove popcat</source>
-        <translation>Git Commit subject    =Load all star catalogs unconditionally at DB init, remove popcat</translation>
-    </message>
-    <message>
-        <source>Git Tag               =83512cc8</source>
-        <translation>Git Tag               =83512cc8</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_14-30-57.log</source>
-        <translation>Log file              =ostserver_2026-09-24_14-30-57.log</translation>
-    </message>
-    <message>
-        <source>Git Hash              =45972bd895877dcc1cf6a58bb4ffa015c9044cef</source>
-        <translation>Git Hash              =45972bd895877dcc1cf6a58bb4ffa015c9044cef</translation>
-    </message>
-    <message>
-        <source>Git Date              =Thu Sep 24 14:53:44 2026</source>
-        <translation>Git Date              =Thu Sep 24 14:53:44 2026</translation>
-    </message>
-    <message>
-        <source>Git Commit subject    =Document the profiles keying convention</source>
-        <translation>Git Commit subject    =Document the profiles keying convention</translation>
-    </message>
-    <message>
-        <source>Git Tag               =45972bd8</source>
-        <translation>Git Tag               =45972bd8</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_15-01-49.log</source>
-        <translation>Log file              =ostserver_2026-09-24_15-01-49.log</translation>
-    </message>
-    <message>
-        <source>Git Hash              =45972bd895877dcc1cf6a58bb4ffa015c9044cef-dirty</source>
-        <translation>Git Hash              =45972bd895877dcc1cf6a58bb4ffa015c9044cef-dirty</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_15-12-42.log</source>
-        <translation>Log file              =ostserver_2026-09-24_15-12-42.log</translation>
     </message>
     <message>
         <source>GlobalDatastore cannot be killed</source>
@@ -7739,204 +7563,8 @@
         <translation>Save configuration %1 failed</translation>
     </message>
     <message>
-        <source>Git Hash              =89bd0d34c90cc58beac0c9e556bdce2220cc0aa3</source>
-        <translation>Git Hash              =89bd0d34c90cc58beac0c9e556bdce2220cc0aa3</translation>
-    </message>
-    <message>
-        <source>Git Date              =Thu Sep 24 15:15:04 2026</source>
-        <translation>Git Date              =Thu Sep 24 15:15:04 2026</translation>
-    </message>
-    <message>
-        <source>Git Commit subject    =Document the af/df/ad/dd file event format, drop the evt/ev pitfall note</source>
-        <translation>Git Commit subject    =Document the af/df/ad/dd file event format, drop the evt/ev pitfall note</translation>
-    </message>
-    <message>
-        <source>Git Tag               =89bd0d34</source>
-        <translation>Git Tag               =89bd0d34</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_15-28-04.log</source>
-        <translation>Log file              =ostserver_2026-09-24_15-28-04.log</translation>
-    </message>
-    <message>
-        <source>System watch interval =60s (0 to disable)</source>
-        <translation>System watch interval =60s (0 to disable)</translation>
-    </message>
-    <message>
-        <source>Git Hash              =89bd0d34c90cc58beac0c9e556bdce2220cc0aa3-dirty</source>
-        <translation>Git Hash              =89bd0d34c90cc58beac0c9e556bdce2220cc0aa3-dirty</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_15-42-19.log</source>
-        <translation>Log file              =ostserver_2026-09-24_15-42-19.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_15-44-05.log</source>
-        <translation>Log file              =ostserver_2026-09-24_15-44-05.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_15-57-59.log</source>
-        <translation>Log file              =ostserver_2026-09-24_15-57-59.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_16-01-11.log</source>
-        <translation>Log file              =ostserver_2026-09-24_16-01-11.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_16-01-41.log</source>
-        <translation>Log file              =ostserver_2026-09-24_16-01-41.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_16-04-29.log</source>
-        <translation>Log file              =ostserver_2026-09-24_16-04-29.log</translation>
-    </message>
-    <message>
-        <source>System watch interval =0s (0 to disable)</source>
-        <translation>System watch interval =0s (0 to disable)</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_16-18-51.log</source>
-        <translation>Log file              =ostserver_2026-09-24_16-18-51.log</translation>
-    </message>
-    <message>
         <source>DEBUG OnFileWatcherEvent call #%1 pEvent=%2</source>
         <translation>DEBUG OnFileWatcherEvent call #%1 pEvent=%2</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_16-24-18.log</source>
-        <translation>Log file              =ostserver_2026-09-24_16-24-18.log</translation>
-    </message>
-    <message>
-        <source>Git Hash              =8bbaf6fe81cfd92d3d72a58490f1b10c1d8116e8-dirty</source>
-        <translation>Git Hash              =8bbaf6fe81cfd92d3d72a58490f1b10c1d8116e8-dirty</translation>
-    </message>
-    <message>
-        <source>Git Date              =Thu Sep 24 16:25:47 2026</source>
-        <translation>Git Date              =Thu Sep 24 16:25:47 2026</translation>
-    </message>
-    <message>
-        <source>Git Commit subject    =Fix redundant/duplicate messages around file/folder watching</source>
-        <translation>Git Commit subject    =Fix redundant/duplicate messages around file/folder watching</translation>
-    </message>
-    <message>
-        <source>Git Tag               =8bbaf6fe</source>
-        <translation>Git Tag               =8bbaf6fe</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_16-58-22.log</source>
-        <translation>Log file              =ostserver_2026-09-24_16-58-22.log</translation>
-    </message>
-    <message>
-        <source>Git Hash              =2551ac77d53705bee34d362fbfb2953cfa2b2b25</source>
-        <translation>Git Hash              =2551ac77d53705bee34d362fbfb2953cfa2b2b25</translation>
-    </message>
-    <message>
-        <source>Git Date              =Thu Sep 24 18:27:10 2026</source>
-        <translation>Git Date              =Thu Sep 24 18:27:10 2026</translation>
-    </message>
-    <message>
-        <source>Git Commit subject    =Document property forms, WS URL convention, graph types, configuration internals</source>
-        <translation>Git Commit subject    =Document property forms, WS URL convention, graph types, configuration internals</translation>
-    </message>
-    <message>
-        <source>Git Tag               =2551ac77</source>
-        <translation>Git Tag               =2551ac77</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_19-49-39.log</source>
-        <translation>Log file              =ostserver_2026-09-24_19-49-39.log</translation>
-    </message>
-    <message>
-        <source>Git Hash              =2551ac77d53705bee34d362fbfb2953cfa2b2b25-dirty</source>
-        <translation>Git Hash              =2551ac77d53705bee34d362fbfb2953cfa2b2b25-dirty</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_20-16-28.log</source>
-        <translation>Log file              =ostserver_2026-09-24_20-16-28.log</translation>
-    </message>
-    <message>
-        <source>System watch interval =30s (0 to disable)</source>
-        <translation>System watch interval =30s (0 to disable)</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_20-41-53.log</source>
-        <translation>Log file              =ostserver_2026-09-24_20-41-53.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_21-11-54.log</source>
-        <translation>Log file              =ostserver_2026-09-24_21-11-54.log</translation>
-    </message>
-    <message>
-        <source>Git Hash              =d7afe0e7fda12882bfedfe931b244bcdf5727da9</source>
-        <translation>Git Hash              =d7afe0e7fda12882bfedfe931b244bcdf5727da9</translation>
-    </message>
-    <message>
-        <source>Git Date              =Thu Sep 24 20:33:46 2026</source>
-        <translation>Git Date              =Thu Sep 24 20:33:46 2026</translation>
-    </message>
-    <message>
-        <source>Git Commit subject    =Clarify controllerdata.libraries keys are libost-prefixed, ML rejects double prefixing</source>
-        <translation>Git Commit subject    =Clarify controllerdata.libraries keys are libost-prefixed, ML rejects double prefixing</translation>
-    </message>
-    <message>
-        <source>Git Tag               =d7afe0e7</source>
-        <translation>Git Tag               =d7afe0e7</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_21-26-10.log</source>
-        <translation>Log file              =ostserver_2026-09-24_21-26-10.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_21-50-25.log</source>
-        <translation>Log file              =ostserver_2026-09-24_21-50-25.log</translation>
-    </message>
-    <message>
-        <source>Git Hash              =d7afe0e7fda12882bfedfe931b244bcdf5727da9-dirty</source>
-        <translation>Git Hash              =d7afe0e7fda12882bfedfe931b244bcdf5727da9-dirty</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-25_10-10-54.log</source>
-        <translation>Log file              =ostserver_2026-09-25_10-10-54.log</translation>
-    </message>
-    <message>
-        <source>Git Hash              =58509500f2d7b66c26a7f089104c62c44279f29c</source>
-        <translation>Git Hash              =58509500f2d7b66c26a7f089104c62c44279f29c</translation>
-    </message>
-    <message>
-        <source>Git Date              =Fri Sep 25 14:55:34 2026</source>
-        <translation>Git Date              =Fri Sep 25 14:55:34 2026</translation>
-    </message>
-    <message>
-        <source>Git Commit subject    =Restore QY/qa docs, reframed as inter-module communication</source>
-        <translation>Git Commit subject    =Restore QY/qa docs, reframed as inter-module communication</translation>
-    </message>
-    <message>
-        <source>Git Tag               =58509500</source>
-        <translation>Git Tag               =58509500</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-25_15-39-07.log</source>
-        <translation>Log file              =ostserver_2026-09-25_15-39-07.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-25_16-04-14.log</source>
-        <translation>Log file              =ostserver_2026-09-25_16-04-14.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-25_16-19-43.log</source>
-        <translation>Log file              =ostserver_2026-09-25_16-19-43.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-25_16-26-46.log</source>
-        <translation>Log file              =ostserver_2026-09-25_16-26-46.log</translation>
-    </message>
-    <message>
-        <source>Git Hash              =58509500f2d7b66c26a7f089104c62c44279f29c-dirty</source>
-        <translation>Git Hash              =58509500f2d7b66c26a7f089104c62c44279f29c-dirty</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-26_11-55-28.log</source>
-        <translation>Log file              =ostserver_2026-09-26_11-55-28.log</translation>
     </message>
     <message>
         <source>loadedModules-focus</source>
@@ -8003,26 +7631,6 @@
         <translation>profiles-Sequencer</translation>
     </message>
     <message>
-        <source>Git Hash              =de9603660bffdf5b60db2152ae7b6f0c7b64129d</source>
-        <translation>Git Hash              =de9603660bffdf5b60db2152ae7b6f0c7b64129d</translation>
-    </message>
-    <message>
-        <source>Git Date              =Sat Sep 26 16:11:09 2026</source>
-        <translation>Git Date              =Sat Sep 26 16:11:09 2026</translation>
-    </message>
-    <message>
-        <source>Git Commit subject    =Harmonize slave-facing action commands into shared defineMeAsX</source>
-        <translation>Git Commit subject    =Harmonize slave-facing action commands into shared defineMeAsX</translation>
-    </message>
-    <message>
-        <source>Git Tag               =de960366</source>
-        <translation>Git Tag               =de960366</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-26_16-13-23.log</source>
-        <translation>Log file              =ostserver_2026-09-26_16-13-23.log</translation>
-    </message>
-    <message>
         <source>libostcollimator Cannot load library /home/gilles/claude/OST/OST/buildqt6/libostcollimator: (/home/gilles/claude/OST/OST/buildqt6/libostcollimator.so: undefined symbol: _ZThn256_N10IndiModule9newDeviceEN4INDI10BaseDeviceE)</source>
         <translation>libostcollimator Cannot load library /home/gilles/claude/OST/OST/buildqt6/libostcollimator: (/home/gilles/claude/OST/OST/buildqt6/libostcollimator.so: undefined symbol: _ZThn256_N10IndiModule9newDeviceEN4INDI10BaseDeviceE)</translation>
     </message>
@@ -8051,64 +7659,20 @@
         <translation>Sequence error</translation>
     </message>
     <message>
-        <source>Git Hash              =da5d307f3261981ef3b5f7342e9367d3ee69583c</source>
-        <translation>Git Hash              =da5d307f3261981ef3b5f7342e9367d3ee69583c</translation>
-    </message>
-    <message>
-        <source>Git Date              =Sat Sep 26 16:33:03 2026</source>
-        <translation>Git Date              =Sat Sep 26 16:33:03 2026</translation>
-    </message>
-    <message>
-        <source>Git Commit subject    =Sequencer: log the real cause of a Sequence error, not just the fact</source>
-        <translation>Git Commit subject    =Sequencer: log the real cause of a Sequence error, not just the fact</translation>
-    </message>
-    <message>
-        <source>Git Tag               =da5d307f</source>
-        <translation>Git Tag               =da5d307f</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-26_16-34-29.log</source>
-        <translation>Log file              =ostserver_2026-09-26_16-34-29.log</translation>
-    </message>
-    <message>
         <source>Sequence error - cause: %1</source>
         <translation>Sequence error - cause: %1</translation>
-    </message>
-    <message>
-        <source>Git Hash              =da5d307f3261981ef3b5f7342e9367d3ee69583c-dirty</source>
-        <translation>Git Hash              =da5d307f3261981ef3b5f7342e9367d3ee69583c-dirty</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-26_16-45-22.log</source>
-        <translation>Log file              =ostserver_2026-09-26_16-45-22.log</translation>
     </message>
     <message>
         <source>Slave event from %1: ev=%2 prp=%3 elt=%4 data=%5</source>
         <translation>Slave event from %1: ev=%2 prp=%3 elt=%4 data=%5</translation>
     </message>
     <message>
-        <source>Log file              =ostserver_2026-09-26_16-50-29.log</source>
-        <translation>Log file              =ostserver_2026-09-26_16-50-29.log</translation>
-    </message>
-    <message>
         <source>Focus signals: o=%1 s=%2 sd=%3 Focusing=%4</source>
         <translation>Focus signals: o=%1 s=%2 sd=%3 Focusing=%4</translation>
     </message>
     <message>
-        <source>Log file              =ostserver_2026-09-26_16-55-49.log</source>
-        <translation>Log file              =ostserver_2026-09-26_16-55-49.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-26_17-02-16.log</source>
-        <translation>Log file              =ostserver_2026-09-26_17-02-16.log</translation>
-    </message>
-    <message>
         <source>Focus signals after : o=%1 s=%2 sd=%3 Focusing=%4</source>
         <translation>Focus signals after : o=%1 s=%2 sd=%3 Focusing=%4</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-26_17-04-07.log</source>
-        <translation>Log file              =ostserver_2026-09-26_17-04-07.log</translation>
     </message>
     <message>
         <source>Starting guider on %1</source>
@@ -8117,10 +7681,6 @@
     <message>
         <source>Mount position: RA=17.7, DEC=-32.8, Pier=East</source>
         <translation>Mount position: RA=17.7, DEC=-32.8, Pier=East</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-26_17-05-41.log</source>
-        <translation>Log file              =ostserver_2026-09-26_17-05-41.log</translation>
     </message>
     <message>
         <source>Guider resumed after focus</source>
@@ -8159,14 +7719,6 @@
         <translation>Mount position: RA=12.9, DEC=55.4, Pier=East</translation>
     </message>
     <message>
-        <source>Log file              =ostserver_2026-09-26_17-49-41.log</source>
-        <translation>Log file              =ostserver_2026-09-26_17-49-41.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-26_18-18-46.log</source>
-        <translation>Log file              =ostserver_2026-09-26_18-18-46.log</translation>
-    </message>
-    <message>
         <source>loadedFamilies-focus</source>
         <translation>loadedFamilies-focus</translation>
     </message>
@@ -8177,18 +7729,6 @@
     <message>
         <source>loadedModules-blindpec</source>
         <translation>loadedModules-blindpec</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-26_19-07-56.log</source>
-        <translation>Log file              =ostserver_2026-09-26_19-07-56.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-26_19-12-28.log</source>
-        <translation>Log file              =ostserver_2026-09-26_19-12-28.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-26_19-18-12.log</source>
-        <translation>Log file              =ostserver_2026-09-26_19-18-12.log</translation>
     </message>
     <message>
         <source>Mount position: RA=12.9, DEC=55.3, Pier=East</source>
@@ -8213,10 +7753,6 @@
     <message>
         <source>Mount position: RA=12.9, DEC=54.4, Pier=East</source>
         <translation>Mount position: RA=12.9, DEC=54.4, Pier=East</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-27_18-48-36.log</source>
-        <translation>Log file              =ostserver_2026-09-27_18-48-36.log</translation>
     </message>
     <message>
         <source>Mount position: RA=12.9, DEC=54.3, Pier=East</source>
@@ -8311,10 +7847,6 @@
         <translation>Mount position: RA=12.9, DEC=60.3, Pier=East</translation>
     </message>
     <message>
-        <source>Log file              =ostserver_2026-09-29_09-30-02.log</source>
-        <translation>Log file              =ostserver_2026-09-29_09-30-02.log</translation>
-    </message>
-    <message>
         <source>Mount position: RA=12.8, DEC=56.5, Pier=West</source>
         <translation>Mount position: RA=12.8, DEC=56.5, Pier=West</translation>
     </message>
@@ -8329,10 +7861,6 @@
     <message>
         <source>Mount position: RA=11.2, DEC=62.9, Pier=East</source>
         <translation>Mount position: RA=11.2, DEC=62.9, Pier=East</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-30_23-20-20.log</source>
-        <translation>Log file              =ostserver_2026-09-30_23-20-20.log</translation>
     </message>
     <message>
         <source>indiserver started (PID 1529995)</source>
@@ -8411,44 +7939,12 @@
         <translation>Starting goto with centering: max 5 iterations, tolerance 60.0&quot;</translation>
     </message>
     <message>
-        <source>Log file              =ostserver_2026-10-01_00-23-20.log</source>
-        <translation>Log file              =ostserver_2026-10-01_00-23-20.log</translation>
-    </message>
-    <message>
         <source>Reusing orphaned indiserver (PID 1529995)</source>
         <translation>Reusing orphaned indiserver (PID 1529995)</translation>
     </message>
     <message>
-        <source>Security              =1</source>
-        <translation>Security              =1</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-01_13-55-01.log</source>
-        <translation>Log file              =ostserver_2026-10-01_13-55-01.log</translation>
-    </message>
-    <message>
-        <source>Security              =-1</source>
-        <translation>Security              =-1</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-01_14-05-54.log</source>
-        <translation>Log file              =ostserver_2026-10-01_14-05-54.log</translation>
-    </message>
-    <message>
-        <source>Security              =2</source>
-        <translation>Security              =2</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-01_14-08-07.log</source>
-        <translation>Log file              =ostserver_2026-10-01_14-08-07.log</translation>
-    </message>
-    <message>
         <source>getGrants - Invalid credentials - %1-%2</source>
         <translation>getGrants - Invalid credentials - %1-%2</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-01_14-29-05.log</source>
-        <translation>Log file              =ostserver_2026-10-01_14-29-05.log</translation>
     </message>
     <message>
         <source>Mount position: RA=8.7, DEC=19.6, Pier=East</source>
@@ -8469,10 +7965,6 @@
     <message>
         <source>Orientation</source>
         <translation>Orientation</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-01_19-08-50.log</source>
-        <translation>Log file              =ostserver_2026-10-01_19-08-50.log</translation>
     </message>
     <message>
         <source>SMInit</source>
@@ -8575,20 +8067,12 @@
         <translation>Correction loop: dAz=%1 dAlt=%2 remainAz=%3 remainAlt=%4</translation>
     </message>
     <message>
-        <source>Log file              =ostserver_2026-10-02_15-04-53.log</source>
-        <translation>Log file              =ostserver_2026-10-02_15-04-53.log</translation>
-    </message>
-    <message>
         <source>loadedModules-parkmanager</source>
         <translation>loadedModules-parkmanager</translation>
     </message>
     <message>
         <source>Solver failed to find a solution</source>
         <translation>Solver failed to find a solution</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-02_15-18-05.log</source>
-        <translation>Log file              =ostserver_2026-10-02_15-18-05.log</translation>
     </message>
     <message>
         <source>Cannot start driver indi_simulator_ccd: FIFO not available (No such device or address)</source>
@@ -8623,56 +8107,12 @@
         <translation>Cannot start driver indi_simulator_weather: FIFO not available (No such device or address)</translation>
     </message>
     <message>
-        <source>Log file              =ostserver_2026-10-02_15-21-43.log</source>
-        <translation>Log file              =ostserver_2026-10-02_15-21-43.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-02_15-23-19.log</source>
-        <translation>Log file              =ostserver_2026-10-02_15-23-19.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-02_15-27-34.log</source>
-        <translation>Log file              =ostserver_2026-10-02_15-27-34.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-02_15-31-36.log</source>
-        <translation>Log file              =ostserver_2026-10-02_15-31-36.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-02_15-33-02.log</source>
-        <translation>Log file              =ostserver_2026-10-02_15-33-02.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-02_15-34-16.log</source>
-        <translation>Log file              =ostserver_2026-10-02_15-34-16.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-02_15-35-23.log</source>
-        <translation>Log file              =ostserver_2026-10-02_15-35-23.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-02_15-36-56.log</source>
-        <translation>Log file              =ostserver_2026-10-02_15-36-56.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-02_15-40-37.log</source>
-        <translation>Log file              =ostserver_2026-10-02_15-40-37.log</translation>
-    </message>
-    <message>
         <source>Dome device configured but DOME_SHUTTER not available yet, skipping</source>
         <translation>Dome device configured but DOME_SHUTTER not available yet, skipping</translation>
     </message>
     <message>
         <source>Dome device configured but DOME_PARK not available yet, skipping</source>
         <translation>Dome device configured but DOME_PARK not available yet, skipping</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-02_16-55-24.log</source>
-        <translation>Log file              =ostserver_2026-10-02_16-55-24.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-02_17-00-06.log</source>
-        <translation>Log file              =ostserver_2026-10-02_17-00-06.log</translation>
     </message>
     <message>
         <source>Mount position: RA=7.2, DEC=90.0, Pier=East</source>
@@ -8719,10 +8159,6 @@
         <translation>Mount position: RA=14.2, DEC=21.7, Pier=West</translation>
     </message>
     <message>
-        <source>Log file              =ostserver_2026-10-04_16-36-11.log</source>
-        <translation>Log file              =ostserver_2026-10-04_16-36-11.log</translation>
-    </message>
-    <message>
         <source>Mount device configured but EQUATORIAL_EOD_COORD not available yet, skipping</source>
         <translation>Mount device configured but EQUATORIAL_EOD_COORD not available yet, skipping</translation>
     </message>
@@ -8733,14 +8169,6 @@
     <message>
         <source>Mount device configured but TELESCOPE_PARK not available yet, skipping</source>
         <translation>Mount device configured but TELESCOPE_PARK not available yet, skipping</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-04_16-39-22.log</source>
-        <translation>Log file              =ostserver_2026-10-04_16-39-22.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-04_23-26-53.log</source>
-        <translation>Log file              =ostserver_2026-10-04_23-26-53.log</translation>
     </message>
     <message>
         <source>Detection locality (frame size / N, higher = more local)</source>

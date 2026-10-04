@@ -6296,74 +6296,6 @@
         <translation>   ///////   ////////      //     </translation>
     </message>
     <message>
-        <source>Git Hash              =801d0de02d3603692556553b62baf216de627fa5-dirty</source>
-        <translation>Git-Hash              =801d0de02d3603692556553b62baf216de627fa5-dirty</translation>
-    </message>
-    <message>
-        <source>Git Date              =Mon Sep 21 21:43:27 2026</source>
-        <translation>Git-Datum             =Mon Sep 21 21:43:27 2026</translation>
-    </message>
-    <message>
-        <source>Git Commit subject    =Document controller data, GlobalDatastore and the file system</source>
-        <translation>Git-Commit-Betreff    =Document controller data, GlobalDatastore and the file system</translation>
-    </message>
-    <message>
-        <source>Git Tag               =801d0de0</source>
-        <translation>Git-Tag               =801d0de0</translation>
-    </message>
-    <message>
-        <source>Webroot               =/home/gilles/ostmedia</source>
-        <translation>Webroot               =/home/gilles/ostmedia</translation>
-    </message>
-    <message>
-        <source>DB Path               =</source>
-        <translation>DB-Pfad               =</translation>
-    </message>
-    <message>
-        <source>Modules Library Path  =/home/gilles/claude/OST/OST/buildqt6</source>
-        <translation>Modul-Bibliothekspfad =/home/gilles/claude/OST/OST/buildqt6</translation>
-    </message>
-    <message>
-        <source>Load configuration    =default</source>
-        <translation>Geladene Konfiguration=default</translation>
-    </message>
-    <message>
-        <source>Embedded Indi server  =Y</source>
-        <translation>Eingebetteter INDI-Server=Y</translation>
-    </message>
-    <message>
-        <source>WebSocket SSL         =N</source>
-        <translation>WebSocket-SSL         =N</translation>
-    </message>
-    <message>
-        <source>Language              =en</source>
-        <translation>Sprache               =en</translation>
-    </message>
-    <message>
-        <source>Security              =0</source>
-        <translation>Sicherheit            =0</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-23_22-30-36.log</source>
-        <translation>Protokolldatei        =ostserver_2026-09-23_22-30-36.log</translation>
-    </message>
-    <message>
-        <source>Log level             =0</source>
-        <translation>Protokollstufe        =0</translation>
-    </message>
-    <message>
-        <source>Banner                =Observatoire Sans tête</source>
-        <translation>Banner                =Observatoire Sans tête</translation>
-    </message>
-    <message>
-        <source>System watch interval =10s (0 to disable)</source>
-        <translation>Systemüberwachungsintervall=10s (0 zum Deaktivieren)</translation>
-    </message>
-    <message>
-        <source>Min free disk space   =10%</source>
-        <translation>Min. freier Speicherplatz=10%</translation>
-    </message>
-    <message>
         <source>Check available modules in /usr/lib</source>
         <translation>Verfügbare Module in /usr/lib prüfen</translation>
     </message>
@@ -6584,30 +6516,6 @@
         <translation>LOV-Geltungsbereiche (lokal / Modul / Controller)</translation>
     </message>
     <message>
-        <source>Git Hash              =2551ac77d53705bee34d362fbfb2953cfa2b2b25</source>
-        <translation>Git-Hash              =2551ac77d53705bee34d362fbfb2953cfa2b2b25</translation>
-    </message>
-    <message>
-        <source>Git Date              =Thu Sep 24 18:27:10 2026</source>
-        <translation>Git-Datum             =Thu Sep 24 18:27:10 2026</translation>
-    </message>
-    <message>
-        <source>Git Commit subject    =Document property forms, WS URL convention, graph types, configuration internals</source>
-        <translation>Git-Commit-Betreff    =Document property forms, WS URL convention, graph types, configuration internals</translation>
-    </message>
-    <message>
-        <source>Git Tag               =2551ac77</source>
-        <translation>Git-Tag               =2551ac77</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_19-49-39.log</source>
-        <translation>Protokolldatei        =ostserver_2026-09-24_19-49-39.log</translation>
-    </message>
-    <message>
-        <source>System watch interval =0s (0 to disable)</source>
-        <translation>Systemüberwachungsintervall=0s (0 zum Deaktivieren)</translation>
-    </message>
-    <message>
         <source>Start focus</source>
         <translation>Fokussierung starten</translation>
     </message>
@@ -6658,70 +6566,6 @@
     <message>
         <source>Global tilt plane: gradX=%1 steps/zone  gradY=%2 steps/zone</source>
         <translation>Globale Tilt-Ebene: gradX=%1 Schritte/Zone  gradY=%2 Schritte/Zone</translation>
-    </message>
-    <message>
-        <source>Git Hash              =2551ac77d53705bee34d362fbfb2953cfa2b2b25-dirty</source>
-        <translation>Git-Hash              =2551ac77d53705bee34d362fbfb2953cfa2b2b25-dirty</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_20-16-28.log</source>
-        <translation>Protokolldatei        =ostserver_2026-09-24_20-16-28.log</translation>
-    </message>
-    <message>
-        <source>System watch interval =30s (0 to disable)</source>
-        <translation>Systemüberwachungsintervall=30s (0 zum Deaktivieren)</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_20-41-53.log</source>
-        <translation>Protokolldatei        =ostserver_2026-09-24_20-41-53.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_21-11-54.log</source>
-        <translation>Protokolldatei        =ostserver_2026-09-24_21-11-54.log</translation>
-    </message>
-    <message>
-        <source>Git Hash              =d7afe0e7fda12882bfedfe931b244bcdf5727da9</source>
-        <translation>Git-Hash              =d7afe0e7fda12882bfedfe931b244bcdf5727da9</translation>
-    </message>
-    <message>
-        <source>Git Date              =Thu Sep 24 20:33:46 2026</source>
-        <translation>Git-Datum             =Thu Sep 24 20:33:46 2026</translation>
-    </message>
-    <message>
-        <source>Git Commit subject    =Clarify controllerdata.libraries keys are libost-prefixed, ML rejects double prefixing</source>
-        <translation>Git-Commit-Betreff    =Clarify controllerdata.libraries keys are libost-prefixed, ML rejects double prefixing</translation>
-    </message>
-    <message>
-        <source>Git Tag               =d7afe0e7</source>
-        <translation>Git-Tag               =d7afe0e7</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_21-26-10.log</source>
-        <translation>Protokolldatei        =ostserver_2026-09-24_21-26-10.log</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_21-50-25.log</source>
-        <translation>Protokolldatei        =ostserver_2026-09-24_21-50-25.log</translation>
-    </message>
-    <message>
-        <source>Git Hash              =da5d307f3261981ef3b5f7342e9367d3ee69583c-dirty</source>
-        <translation>Git-Hash              =da5d307f3261981ef3b5f7342e9367d3ee69583c-dirty</translation>
-    </message>
-    <message>
-        <source>Git Date              =Sat Sep 26 16:33:03 2026</source>
-        <translation>Git-Datum             =Sat Sep 26 16:33:03 2026</translation>
-    </message>
-    <message>
-        <source>Git Commit subject    =Sequencer: log the real cause of a Sequence error, not just the fact</source>
-        <translation>Git-Commit-Betreff    =Sequencer: log the real cause of a Sequence error, not just the fact</translation>
-    </message>
-    <message>
-        <source>Git Tag               =da5d307f</source>
-        <translation>Git-Tag               =da5d307f</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-29_09-30-02.log</source>
-        <translation>Protokolldatei        =ostserver_2026-09-29_09-30-02.log</translation>
     </message>
     <message>
         <source>libostcollimator Cannot load library /home/gilles/claude/OST/OST/buildqt6/libostcollimator: (/home/gilles/claude/OST/OST/buildqt6/libostcollimator.so: undefined symbol: _ZThn256_N10IndiModule9newDeviceEN4INDI10BaseDeviceE)</source>
@@ -6908,10 +6752,6 @@
         <translation>Montierungsposition: RA=11.2, DEK=62.9, Pfeiler=Ost</translation>
     </message>
     <message>
-        <source>Log file              =ostserver_2026-10-01_00-23-20.log</source>
-        <translation>Protokolldatei        =ostserver_2026-10-01_00-23-20.log</translation>
-    </message>
-    <message>
         <source>Reusing orphaned indiserver (PID 1529995)</source>
         <translation>Verwaisten indiserver wiederverwenden (PID 1529995)</translation>
     </message>
@@ -6926,14 +6766,6 @@
     <message>
         <source>Centering successful after 3 iteration(s) - within tolerance</source>
         <translation>Zentrierung erfolgreich nach 3 Iteration(en) - innerhalb der Toleranz</translation>
-    </message>
-    <message>
-        <source>Embedded Indi server  =N</source>
-        <translation>Eingebetteter INDI-Server=N</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-02_17-00-06.log</source>
-        <translation>Protokolldatei        =ostserver_2026-10-02_17-00-06.log</translation>
     </message>
     <message>
         <source>Cannot start driver indi_simulator_ccd: FIFO not available (No such device or address)</source>
@@ -6982,10 +6814,6 @@
     <message>
         <source>loadedModules-parkmanager</source>
         <translation>loadedModules-parkmanager</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-04_23-26-53.log</source>
-        <translation>Protokolldatei        =ostserver_2026-10-04_23-26-53.log</translation>
     </message>
     <message>
         <source>Detection locality (frame size / N, higher = more local)</source>

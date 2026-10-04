@@ -6232,74 +6232,6 @@
         <translation>   ///////   ////////      //     </translation>
     </message>
     <message>
-        <source>Git Hash              =801d0de02d3603692556553b62baf216de627fa5-dirty</source>
-        <translation>Hash Git              =801d0de02d3603692556553b62baf216de627fa5-dirty</translation>
-    </message>
-    <message>
-        <source>Git Date              =Mon Sep 21 21:43:27 2026</source>
-        <translation>Data Git              =Mon Sep 21 21:43:27 2026</translation>
-    </message>
-    <message>
-        <source>Git Commit subject    =Document controller data, GlobalDatastore and the file system</source>
-        <translation>Oggetto commit Git    =Document controller data, GlobalDatastore and the file system</translation>
-    </message>
-    <message>
-        <source>Git Tag               =801d0de0</source>
-        <translation>Tag Git               =801d0de0</translation>
-    </message>
-    <message>
-        <source>Webroot               =/home/gilles/ostmedia</source>
-        <translation>Webroot               =/home/gilles/ostmedia</translation>
-    </message>
-    <message>
-        <source>DB Path               =</source>
-        <translation>Percorso DB           =</translation>
-    </message>
-    <message>
-        <source>Modules Library Path  =/home/gilles/claude/OST/OST/buildqt6</source>
-        <translation>Percorso libreria moduli =/home/gilles/claude/OST/OST/buildqt6</translation>
-    </message>
-    <message>
-        <source>Load configuration    =default</source>
-        <translation>Configurazione caricata =default</translation>
-    </message>
-    <message>
-        <source>Embedded Indi server  =Y</source>
-        <translation>Server INDI integrato =Y</translation>
-    </message>
-    <message>
-        <source>WebSocket SSL         =N</source>
-        <translation>WebSocket SSL         =N</translation>
-    </message>
-    <message>
-        <source>Language              =en</source>
-        <translation>Lingua                =en</translation>
-    </message>
-    <message>
-        <source>Security              =0</source>
-        <translation>Sicurezza             =0</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-23_22-30-36.log</source>
-        <translation>File di log           =ostserver_2026-09-23_22-30-36.log</translation>
-    </message>
-    <message>
-        <source>Log level             =0</source>
-        <translation>Livello di log        =0</translation>
-    </message>
-    <message>
-        <source>Banner                =Observatoire Sans tête</source>
-        <translation>Banner                =Observatoire Sans tête</translation>
-    </message>
-    <message>
-        <source>System watch interval =10s (0 to disable)</source>
-        <translation>Intervallo controllo sistema =10s (0 per disabilitare)</translation>
-    </message>
-    <message>
-        <source>Min free disk space   =10%</source>
-        <translation>Spazio disco libero minimo =10%</translation>
-    </message>
-    <message>
         <source>Check available modules in /usr/lib</source>
         <translation>Controllo moduli disponibili in /usr/lib</translation>
     </message>
@@ -6536,30 +6468,6 @@
         <translation>Piano di tilt globale: gradX=%1 step/zona  gradY=%2 step/zona</translation>
     </message>
     <message>
-        <source>Git Hash              =d7afe0e7fda12882bfedfe931b244bcdf5727da9</source>
-        <translation>Hash Git              =d7afe0e7fda12882bfedfe931b244bcdf5727da9</translation>
-    </message>
-    <message>
-        <source>Git Date              =Thu Sep 24 20:33:46 2026</source>
-        <translation>Data Git              =Thu Sep 24 20:33:46 2026</translation>
-    </message>
-    <message>
-        <source>Git Commit subject    =Clarify controllerdata.libraries keys are libost-prefixed, ML rejects double prefixing</source>
-        <translation>Oggetto commit Git    =Clarify controllerdata.libraries keys are libost-prefixed, ML rejects double prefixing</translation>
-    </message>
-    <message>
-        <source>Git Tag               =d7afe0e7</source>
-        <translation>Tag Git               =d7afe0e7</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-24_21-50-25.log</source>
-        <translation>File di log           =ostserver_2026-09-24_21-50-25.log</translation>
-    </message>
-    <message>
-        <source>System watch interval =30s (0 to disable)</source>
-        <translation>Intervallo controllo sistema =30s (0 per disabilitare)</translation>
-    </message>
-    <message>
         <source>Dome device configured but DOME_SHUTTER not available yet, skipping</source>
         <translation>Dispositivo cupola configurato ma DOME_SHUTTER non ancora disponibile, saltato</translation>
     </message>
@@ -6670,30 +6578,6 @@
     <message>
         <source>DFT upsample factor (kappa)</source>
         <translation>DFT upsample factor (kappa)</translation>
-    </message>
-    <message>
-        <source>Git Hash              =da5d307f3261981ef3b5f7342e9367d3ee69583c-dirty</source>
-        <translation>Hash Git              =da5d307f3261981ef3b5f7342e9367d3ee69583c-dirty</translation>
-    </message>
-    <message>
-        <source>Git Date              =Sat Sep 26 16:33:03 2026</source>
-        <translation>Data Git              =Sat Sep 26 16:33:03 2026</translation>
-    </message>
-    <message>
-        <source>Git Commit subject    =Sequencer: log the real cause of a Sequence error, not just the fact</source>
-        <translation>Oggetto commit Git    =Sequencer: log the real cause of a Sequence error, not just the fact</translation>
-    </message>
-    <message>
-        <source>Git Tag               =da5d307f</source>
-        <translation>Tag Git               =da5d307f</translation>
-    </message>
-    <message>
-        <source>Embedded Indi server  =N</source>
-        <translation>Server INDI integrato =N</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-04_23-26-53.log</source>
-        <translation>File di log           =ostserver_2026-10-04_23-26-53.log</translation>
     </message>
     <message>
         <source>libostcollimator Cannot load library /home/gilles/claude/OST/OST/buildqt6/libostcollimator: (/home/gilles/claude/OST/OST/buildqt6/libostcollimator.so: undefined symbol: _ZThn256_N10IndiModule9newDeviceEN4INDI10BaseDeviceE)</source>

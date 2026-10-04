@@ -6224,74 +6224,6 @@
         <translation>   ///////   ////////      //     </translation>
     </message>
     <message>
-        <source>Git Hash              =801d0de02d3603692556553b62baf216de627fa5-dirty</source>
-        <translation>Hash de Git           =801d0de02d3603692556553b62baf216de627fa5-dirty</translation>
-    </message>
-    <message>
-        <source>Git Date              =Mon Sep 21 21:43:27 2026</source>
-        <translation>Fecha de Git          =Mon Sep 21 21:43:27 2026</translation>
-    </message>
-    <message>
-        <source>Git Commit subject    =Document controller data, GlobalDatastore and the file system</source>
-        <translation>Asunto del commit de Git=Document controller data, GlobalDatastore and the file system</translation>
-    </message>
-    <message>
-        <source>Git Tag               =801d0de0</source>
-        <translation>Etiqueta de Git       =801d0de0</translation>
-    </message>
-    <message>
-        <source>Webroot               =/home/gilles/ostmedia</source>
-        <translation>Raíz web              =/home/gilles/ostmedia</translation>
-    </message>
-    <message>
-        <source>DB Path               =</source>
-        <translation>Ruta de la BD         =</translation>
-    </message>
-    <message>
-        <source>Modules Library Path  =/home/gilles/claude/OST/OST/buildqt6</source>
-        <translation>Ruta de la biblioteca de módulos=/home/gilles/claude/OST/OST/buildqt6</translation>
-    </message>
-    <message>
-        <source>Load configuration    =default</source>
-        <translation>Cargar configuración  =default</translation>
-    </message>
-    <message>
-        <source>Embedded Indi server  =Y</source>
-        <translation>Servidor Indi embebido=Y</translation>
-    </message>
-    <message>
-        <source>WebSocket SSL         =N</source>
-        <translation>SSL de WebSocket      =N</translation>
-    </message>
-    <message>
-        <source>Language              =en</source>
-        <translation>Idioma                =en</translation>
-    </message>
-    <message>
-        <source>Security              =0</source>
-        <translation>Seguridad             =0</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-23_22-30-36.log</source>
-        <translation>Archivo de registro   =ostserver_2026-09-23_22-30-36.log</translation>
-    </message>
-    <message>
-        <source>Log level             =0</source>
-        <translation>Nivel de registro     =0</translation>
-    </message>
-    <message>
-        <source>Banner                =Observatoire Sans tête</source>
-        <translation>Banner                =Observatoire Sans tête</translation>
-    </message>
-    <message>
-        <source>System watch interval =10s (0 to disable)</source>
-        <translation>Intervalo de vigilancia del sistema=10s (0 para desactivar)</translation>
-    </message>
-    <message>
-        <source>Min free disk space   =10%</source>
-        <translation>Espacio mínimo libre en disco=10%</translation>
-    </message>
-    <message>
         <source>Check available modules in /usr/lib</source>
         <translation>Comprobando módulos disponibles en /usr/lib</translation>
     </message>
@@ -6528,30 +6460,6 @@
         <translation>Plano de inclinación global: gradX=%1 pasos/zona  gradY=%2 pasos/zona</translation>
     </message>
     <message>
-        <source>Git Hash              =da5d307f3261981ef3b5f7342e9367d3ee69583c-dirty</source>
-        <translation>Hash de Git           =da5d307f3261981ef3b5f7342e9367d3ee69583c-dirty</translation>
-    </message>
-    <message>
-        <source>Git Date              =Sat Sep 26 16:33:03 2026</source>
-        <translation>Fecha de Git          =Sat Sep 26 16:33:03 2026</translation>
-    </message>
-    <message>
-        <source>Git Commit subject    =Sequencer: log the real cause of a Sequence error, not just the fact</source>
-        <translation>Asunto del commit de Git=Sequencer: log the real cause of a Sequence error, not just the fact</translation>
-    </message>
-    <message>
-        <source>Git Tag               =da5d307f</source>
-        <translation>Etiqueta de Git       =da5d307f</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-09-29_09-30-02.log</source>
-        <translation>Archivo de registro   =ostserver_2026-09-29_09-30-02.log</translation>
-    </message>
-    <message>
-        <source>System watch interval =30s (0 to disable)</source>
-        <translation>Intervalo de vigilancia del sistema=30s (0 para desactivar)</translation>
-    </message>
-    <message>
         <source>libostcollimator Cannot load library /home/gilles/claude/OST/OST/buildqt6/libostcollimator: (/home/gilles/claude/OST/OST/buildqt6/libostcollimator.so: undefined symbol: _ZThn256_N10IndiModule9newDeviceEN4INDI10BaseDeviceE)</source>
         <translation>libostcollimator no se puede cargar la biblioteca /home/gilles/claude/OST/OST/buildqt6/libostcollimator: (/home/gilles/claude/OST/OST/buildqt6/libostcollimator.so: undefined symbol: _ZThn256_N10IndiModule9newDeviceEN4INDI10BaseDeviceE)</translation>
     </message>
@@ -6658,14 +6566,6 @@
     <message>
         <source>DFT upsample factor (kappa)</source>
         <translation>resolución de zoom local = 1/kappa px (50 -&gt; 0.02 px, muy por debajo del ruido). El costo de CPU crece ~kappa^2; 50 es un buen valor por defecto, 100 si una CPU de clase Pi puede seguir el ritmo</translation>
-    </message>
-    <message>
-        <source>Embedded Indi server  =N</source>
-        <translation>Servidor Indi embebido=N</translation>
-    </message>
-    <message>
-        <source>Log file              =ostserver_2026-10-04_23-26-53.log</source>
-        <translation>Archivo de registro   =ostserver_2026-10-04_23-26-53.log</translation>
     </message>
     <message>
         <source>Cannot start driver indi_simulator_ccd: FIFO not available (No such device or address)</source>
