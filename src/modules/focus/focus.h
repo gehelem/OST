@@ -43,6 +43,7 @@ class MODULE_INIT Focus : public IndiModule
         void SMRequestGotoStart();
         void SMRequestExposure();
         void SMFindStars();
+        Parameters buildStarDetectionParameters();
         void SMCompute();
         void SMRequestGotoNext();
 

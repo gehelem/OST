@@ -337,12 +337,55 @@ void Focus::SMRequestExposure()
 
 }
 
+// Built from "1-Default" (StellarSolver's own built-in profile list,
+// stellarSolverProfiles[0] -- "Generic and not optimized for any specific
+// purpose", used as-is until now), with the detection/deblending knobs
+// below tuned instead of left at their native defaults -- Gilles,
+// 2026-10-04, testing on a real raw sub: "le module en compte quelques
+// centaines, j'ai aussi enormement de faux positifs / et en defocalise
+// c'est pire, les etoiles s'etalent et sont mal detectees (pire comptent
+// pour plusieurs)". A sweep across the V-curve runs from near-focus (small
+// point sources) out to deliberately defocused frames at its extremes
+// (large, uneven blobs/donuts), so this has to hold up across that whole
+// range, not just at best focus.
+//
+// Two distinct native defaults are responsible:
+//  - threshold_bg_multiple=2.0 (detection threshold, in multiples of the
+//    background noise) is quite permissive -- plenty of pure noise peaks
+//    on a real sensor clear a 2-sigma bar, read as "stars" (-> "enormement
+//    de faux positifs").
+//  - deblend_contrast=0.005 (0.5% of a detection's own flux) is the
+//    classic over-segmentation trap: a defocused/donut-shaped star's
+//    intensity profile isn't a single clean peak (ring texture, secondary
+//    shadow), so SEP's deblending very easily slices it into several
+//    separate "stars" (-> "les etoiles s'etalent ... comptent pour
+//    plusieurs").
+// minarea/r_min are raised too, as a cheaper first filter against small
+// noise specks and any leftover over-segmented fragments, same spirit as
+// inspector.cpp's own minArea/minRadius bounds on its separate OpenCV
+// donut pipeline.
+//
+// All four are tunable elements on "parameters" (focus.json) rather than
+// hardcoded, same reasoning as inspector.cpp's own new "parms" tunables:
+// the right values depend on the actual camera/gain/optics and can only
+// really be found by testing against real frames, not guessed from here.
+Parameters Focus::buildStarDetectionParameters()
+{
+    Parameters params = _solver.stellarSolverProfiles[0];
+    params.listName = "Focus (tuned)";
+    params.threshold_bg_multiple = getFloat("parameters", "detthreshold");
+    params.minarea               = getInt("parameters", "detminarea");
+    params.deblend_contrast      = getFloat("parameters", "deblendcontrast") / 100.0;
+    params.r_min                 = getFloat("parameters", "detminradius");
+    return params;
+}
+
 void Focus::SMFindStars()
 {
     stats = _image->getStats();
     _solver.ResetSolver(stats, _image->getImageBuffer(), getInt("parameters", "zoning"));
     connect(&_solver, &Solver::successSEP, this, &Focus::OnSucessSEP);
-    _solver.FindStars(_solver.stellarSolverProfiles[0]);
+    _solver.FindStars(buildStarDetectionParameters());
 }
 
 void Focus::OnSucessSEP()
