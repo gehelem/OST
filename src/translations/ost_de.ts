@@ -5303,5 +5303,1741 @@
             <source>Use guiding</source>
             <translation>Nachführung verwenden</translation>
         </message>
+    <message>
+        <source>Float value</source>
+        <translation>Gleitkommawert</translation>
+    </message>
+    <message>
+        <source>String value</source>
+        <translation>Zeichenkettenwert</translation>
+    </message>
+    <message>
+        <source>Automatically trigger focus when the filter changes, including the first line of the sequence (no focus has happened yet since the module started) — and skips it if the last focus already matches the current filter</source>
+        <translation>Fokussierung automatisch auslösen, wenn der Filter wechselt, einschließlich der ersten Zeile der Sequenz (es hat noch keine Fokussierung stattgefunden, seit das Modul gestartet wurde) — und überspringt sie, wenn der letzte Fokus bereits zum aktuellen Filter passt</translation>
+    </message>
+    <message>
+        <source>Profile to load on the focus module before requesting autofocus; leave empty to keep whatever profile is currently loaded there</source>
+        <translation>Profil, das vor dem Anfordern des Autofokus auf dem Fokussiermodul geladen wird; leer lassen, um das dort aktuell geladene Profil zu behalten</translation>
+    </message>
+    <message>
+        <source>Focus profile to load</source>
+        <translation>Zu ladendes Fokusprofil</translation>
+    </message>
+    <message>
+        <source>Focus profile</source>
+        <translation>Fokusprofil</translation>
+    </message>
+    <message>
+        <source>Focus profile per filter</source>
+        <translation>Fokusprofil pro Filter</translation>
+    </message>
+    <message>
+        <source>Request camera cooling to the target temperature before starting the sequence, and wait until it is reached</source>
+        <translation>Kamerakühlung vor dem Sequenzstart auf die Zieltemperatur anfordern und warten, bis sie erreicht ist</translation>
+    </message>
+    <message>
+        <source>Enable camera cooling</source>
+        <translation>Kamerakühlung aktivieren</translation>
+    </message>
+    <message>
+        <source>Frame type for every line of this sequence</source>
+        <translation>Bildtyp für jede Zeile dieser Sequenz</translation>
+    </message>
+    <message>
+        <source>Camera gain for every line of this sequence</source>
+        <translation>Kameraverstärkung für jede Zeile dieser Sequenz</translation>
+    </message>
+    <message>
+        <source>Camera offset for every line of this sequence</source>
+        <translation>Kamera-Offset für jede Zeile dieser Sequenz</translation>
+    </message>
+    <message>
+        <source>Sensor target temperature in °C; the sequence waits until this is reached before starting</source>
+        <translation>Sensor-Zieltemperatur in °C; die Sequenz wartet, bis diese erreicht ist, bevor sie startet</translation>
+    </message>
+    <message>
+        <source>Target temperature (°C)</source>
+        <translation>Zieltemperatur (°C)</translation>
+    </message>
+    <message>
+        <source>Sequence parameters</source>
+        <translation>Sequenzparameter</translation>
+    </message>
+    <message>
+        <source>Average time spent waiting for autofocus, since this module was loaded</source>
+        <translation>Durchschnittliche Wartezeit auf Autofokus, seit dieses Modul geladen wurde</translation>
+    </message>
+    <message>
+        <source>Average focus duration</source>
+        <translation>Durchschnittliche Fokussierdauer</translation>
+    </message>
+    <message>
+        <source>Average time spent waiting for the guider to start, since this module was loaded</source>
+        <translation>Durchschnittliche Wartezeit auf den Guiderstart, seit dieses Modul geladen wurde</translation>
+    </message>
+    <message>
+        <source>Average guide-start duration</source>
+        <translation>Durchschnittliche Guide-Startdauer</translation>
+    </message>
+    <message>
+        <source>Sequence (shots)</source>
+        <translation>Sequenz (Aufnahmen)</translation>
+    </message>
+    <message>
+        <source>Wall-clock time since the sequence was started, reset to zero at each start</source>
+        <translation>Verstrichene Realzeit seit dem Sequenzstart, bei jedem Start auf Null zurückgesetzt</translation>
+    </message>
+    <message>
+        <source>Real elapsed duration</source>
+        <translation>Tatsächliche verstrichene Dauer</translation>
+    </message>
+    <message>
+        <source>Theoretical total duration minus the time already accounted for by completed/in-progress shots</source>
+        <translation>Theoretische Gesamtdauer abzüglich der bereits durch abgeschlossene/laufende Aufnahmen verbrauchten Zeit</translation>
+    </message>
+    <message>
+        <source>Theoretical remaining duration</source>
+        <translation>Theoretische Restdauer</translation>
+    </message>
+    <message>
+        <source>Sum of count x exposure over every line of the grid, recalculated whenever the grid changes</source>
+        <translation>Summe aus Anzahl x Belichtung über alle Zeilen des Rasters, neu berechnet bei jeder Rasteränderung</translation>
+    </message>
+    <message>
+        <source>Theoretical total duration</source>
+        <translation>Theoretische Gesamtdauer</translation>
+    </message>
+    <message>
+        <source>Sequence (time)</source>
+        <translation>Sequenz (Zeit)</translation>
+    </message>
+    <message>
+        <source>Bit depth</source>
+        <translation>Bittiefe</translation>
+    </message>
+    <message>
+        <source>Go extra</source>
+        <translation>Extra anfahren</translation>
+    </message>
+    <message>
+        <source>Go home</source>
+        <translation>Home anfahren</translation>
+    </message>
+    <message>
+        <source>Go intra</source>
+        <translation>Intra anfahren</translation>
+    </message>
+    <message>
+        <source>Set home</source>
+        <translation>Home setzen</translation>
+    </message>
+    <message>
+        <source>Collimator analysis</source>
+        <translation>Kollimator-Analyse</translation>
+    </message>
+    <message>
+        <source>Inspector analysis</source>
+        <translation>Inspector-Analyse</translation>
+    </message>
+    <message>
+        <source>Analysis selection</source>
+        <translation>Analyseauswahl</translation>
+    </message>
+    <message>
+        <source>Collimation map</source>
+        <translation>Kollimationskarte</translation>
+    </message>
+    <message>
+        <source>Amplitude (arcsec)</source>
+        <translation>Amplitude (Bogensek.)</translation>
+    </message>
+    <message>
+        <source>Convergence point x (px)</source>
+        <translation>Konvergenzpunkt x (px)</translation>
+    </message>
+    <message>
+        <source>Convergence point y (px)</source>
+        <translation>Konvergenzpunkt y (px)</translation>
+    </message>
+    <message>
+        <source>C.x (px)</source>
+        <translation>C.x (px)</translation>
+    </message>
+    <message>
+        <source>C.y (px)</source>
+        <translation>C.y (px)</translation>
+    </message>
+    <message>
+        <source>Quality</source>
+        <translation>Qualität</translation>
+    </message>
+    <message>
+        <source>Collimation vector</source>
+        <translation>Kollimationsvektor</translation>
+    </message>
+    <message>
+        <source>Home defined</source>
+        <translation>Home definiert</translation>
+    </message>
+    <message>
+        <source>Home position (steps)</source>
+        <translation>Home-Position (Schritte)</translation>
+    </message>
+    <message>
+        <source>Focuser home</source>
+        <translation>Fokussierer-Home</translation>
+    </message>
+    <message>
+        <source>Focuser offset (steps)</source>
+        <translation>Fokussierer-Offset (Schritte)</translation>
+    </message>
+    <message>
+        <source>Defocus parameters</source>
+        <translation>Defokussierungsparameter</translation>
+    </message>
+    <message>
+        <source>Screw 1 (turns, + = tighten)</source>
+        <translation>Schraube 1 (Umdrehungen, + = anziehen)</translation>
+    </message>
+    <message>
+        <source>Screw 2 (turns, + = tighten)</source>
+        <translation>Schraube 2 (Umdrehungen, + = anziehen)</translation>
+    </message>
+    <message>
+        <source>Screw 3 (turns, + = tighten)</source>
+        <translation>Schraube 3 (Umdrehungen, + = anziehen)</translation>
+    </message>
+    <message>
+        <source>Screw corrections</source>
+        <translation>Schraubenkorrekturen</translation>
+    </message>
+    <message>
+        <source>Deformation X (px)</source>
+        <translation>Deformation X (px)</translation>
+    </message>
+    <message>
+        <source>Deformation Y (px)</source>
+        <translation>Deformation Y (px)</translation>
+    </message>
+    <message>
+        <source>X (px)</source>
+        <translation>X (px)</translation>
+    </message>
+    <message>
+        <source>Y (px)</source>
+        <translation>Y (px)</translation>
+    </message>
+    <message>
+        <source>Detected stars</source>
+        <translation>Erkannte Sterne</translation>
+    </message>
+    <message>
+        <source>Analyzing</source>
+        <translation>Analysiere</translation>
+    </message>
+    <message>
+        <source>Adaptive estimate, adjusted automatically after each DEC direction reversal - set an initial guess if you know it, otherwise leave at 0 and let it learn</source>
+        <translation>Adaptiver Schätzwert, automatisch angepasst nach jeder DEK-Richtungsumkehr - einen Anfangswert setzen, falls bekannt, sonst bei 0 lassen und lernen lassen</translation>
+    </message>
+    <message>
+        <source>Current compensation (ms)</source>
+        <translation>Aktuelle Kompensation (ms)</translation>
+    </message>
+    <message>
+        <source>Add an adaptive extra pulse whenever the DEC guide direction reverses, to take up mechanical backlash before the real correction takes effect</source>
+        <translation>Fügt bei jeder Umkehr der DEK-Führungsrichtung einen adaptiven Zusatzimpuls hinzu, um das mechanische Spiel aufzunehmen, bevor die eigentliche Korrektur wirkt</translation>
+    </message>
+    <message>
+        <source>Maximum compensation (ms)</source>
+        <translation>Maximale Kompensation (ms)</translation>
+    </message>
+    <message>
+        <source>Minimum compensation (ms)</source>
+        <translation>Minimale Kompensation (ms)</translation>
+    </message>
+    <message>
+        <source>How much the estimate is nudged up or down after each reversal, based on measured over/undershoot</source>
+        <translation>Wie stark der Schätzwert nach jeder Umkehr anhand des gemessenen Über-/Unterschwingens nach oben oder unten angepasst wird</translation>
+    </message>
+    <message>
+        <source>Adjustment step (ms)</source>
+        <translation>Anpassungsschritt (ms)</translation>
+    </message>
+    <message>
+        <source>DEC backlash compensation</source>
+        <translation>DEK-Spielkompensation</translation>
+    </message>
+    <message>
+        <source>Calibration is rejected if the constant background drift (tracking / polar-alignment error) exceeds this fraction of the pulse displacement. A high value here usually means the mount is poorly polar-aligned. 0 disables the check.</source>
+        <translation>Die Kalibrierung wird abgelehnt, wenn der konstante Hintergrunddrift (Nachführ-/Polausrichtungsfehler) diesen Anteil der Impulsverschiebung überschreitet. Ein hoher Wert deutet meist auf eine schlechte Polausrichtung der Montierung hin. 0 deaktiviert die Prüfung.</translation>
+    </message>
+    <message>
+        <source>Max background drift ratio</source>
+        <translation>Max. Hintergrunddrift-Verhältnis</translation>
+    </message>
+    <message>
+        <source>Abort calibration if the star drifts further than this fraction of the smaller frame dimension from its start, before it leaves the sensor. 0 disables.</source>
+        <translation>Kalibrierung abbrechen, wenn der Stern weiter als dieser Anteil der kleineren Bildabmessung von seiner Startposition abdriftet, bevor er den Sensor verlässt. 0 deaktiviert dies.</translation>
+    </message>
+    <message>
+        <source>Max star excursion</source>
+        <translation>Max. Sternauslenkung</translation>
+    </message>
+    <message>
+        <source>How many times to restart calibration when it is rejected for poor quality before giving up</source>
+        <translation>Wie oft die Kalibrierung bei schlechter Qualität neu gestartet wird, bevor aufgegeben wird</translation>
+    </message>
+    <message>
+        <source>Calibration retries</source>
+        <translation>Kalibrierungswiederholungen</translation>
+    </message>
+    <message>
+        <source>Extra pulse sent before the North pass and before the South pass, to take up mechanical backlash so the timed calibration pulses aren&apos;t partially wasted engaging the gears</source>
+        <translation>Zusatzimpuls vor dem Nord- und vor dem Süd-Durchgang, um das mechanische Spiel aufzunehmen, damit die zeitgesteuerten Kalibrierungsimpulse nicht teilweise durch das Eingreifen der Zahnräder verschwendet werden</translation>
+    </message>
+    <message>
+        <source>DEC backlash kick (ms)</source>
+        <translation>DEK-Spielausgleichsimpuls (ms)</translation>
+    </message>
+    <message>
+        <source>Rate used for guiding - North/South combined</source>
+        <translation>Für die Nachführung verwendete Rate - Nord/Süd kombiniert</translation>
+    </message>
+    <message>
+        <source>DEC rate (ms/px)</source>
+        <translation>DEK-Rate (ms/px)</translation>
+    </message>
+    <message>
+        <source>raw N (ms/px, diag)</source>
+        <translation>roh N (ms/px, Diag.)</translation>
+    </message>
+    <message>
+        <source>Rate used for guiding - West/East combined, background drift removed</source>
+        <translation>Für die Nachführung verwendete Rate - West/Ost kombiniert, Hintergrunddrift entfernt</translation>
+    </message>
+    <message>
+        <source>RA rate (ms/px)</source>
+        <translation>RA-Rate (ms/px)</translation>
+    </message>
+    <message>
+        <source>green = clean, orange = usable but background drift is significant, red = rejected (poor polar alignment)</source>
+        <translation>grün = sauber, orange = nutzbar, aber Hintergrunddrift ist signifikant, rot = abgelehnt (schlechte Polausrichtung)</translation>
+    </message>
+    <message>
+        <source>Calibration quality</source>
+        <translation>Kalibrierungsqualität</translation>
+    </message>
+    <message>
+        <source>Same as RA integral gain, for the DEC axis. 0 = pure proportional.</source>
+        <translation>Wie die RA-Integralverstärkung, für die DEK-Achse. 0 = rein proportional.</translation>
+    </message>
+    <message>
+        <source>DEC integral gain</source>
+        <translation>DEK-Integralverstärkung</translation>
+    </message>
+    <message>
+        <source>Anti-windup: the integral accumulator is clamped to this magnitude (pixels). 0 disables the clamp.</source>
+        <translation>Anti-Windup: Der Integralakkumulator wird auf diesen Betrag (Pixel) begrenzt. 0 deaktiviert die Begrenzung.</translation>
+    </message>
+    <message>
+        <source>Integral clamp (px)</source>
+        <translation>Integralbegrenzung (px)</translation>
+    </message>
+    <message>
+        <source>Search radius when matching a reference star to the current frame. Larger tolerates more centroid noise / small field rotation; the sub-pixel refit tightens it afterwards.</source>
+        <translation>Suchradius beim Zuordnen eines Referenzsterns zum aktuellen Bild. Größer toleriert mehr Centroid-Rauschen / kleine Feldrotation; die anschließende Subpixel-Nachanpassung verfeinert dies.</translation>
+    </message>
+    <message>
+        <source>Star match gate (px)</source>
+        <translation>Sternzuordnungstoleranz (px)</translation>
+    </message>
+    <message>
+        <source>Cap on the brightest stars taken from each frame for matching</source>
+        <translation>Obergrenze der hellsten Sterne, die pro Bild für die Zuordnung verwendet werden</translation>
+    </message>
+    <message>
+        <source>Max stars used</source>
+        <translation>Max. verwendete Sterne</translation>
+    </message>
+    <message>
+        <source>Fewest reference stars that must be recovered in the current frame for the drift measurement to be trusted</source>
+        <translation>Mindestanzahl an Referenzsternen, die im aktuellen Bild wiedergefunden werden müssen, damit die Driftmessung als vertrauenswürdig gilt</translation>
+    </message>
+    <message>
+        <source>Min matched stars</source>
+        <translation>Min. zugeordnete Sterne</translation>
+    </message>
+    <message>
+        <source>When the star field can&apos;t be correlated with the reference, the guide frame is skipped (no pulse); guiding is aborted only after this many in a row</source>
+        <translation>Wenn das Sternfeld nicht mit der Referenz korreliert werden kann, wird das Guide-Bild übersprungen (kein Impuls); die Nachführung wird erst nach so vielen aufeinanderfolgenden Fällen abgebrochen</translation>
+    </message>
+    <message>
+        <source>Max consecutive lost frames</source>
+        <translation>Max. aufeinanderfolgende verlorene Bilder</translation>
+    </message>
+    <message>
+        <source>Gain on the accumulated RA residual. A true integrator nulls the steady-state lag a proportional-only controller leaves against a constant drift (tracking / polar-alignment error). 0 = pure proportional. Too high oscillates.</source>
+        <translation>Verstärkung auf das akkumulierte RA-Residuum. Ein echter Integrator eliminiert die bleibende Verzögerung, die ein rein proportionaler Regler gegenüber einem konstanten Drift (Nachführ-/Polausrichtungsfehler) hinterlässt. 0 = rein proportional. Zu hoch führt zu Schwingungen.</translation>
+    </message>
+    <message>
+        <source>RA integral gain</source>
+        <translation>RA-Integralverstärkung</translation>
+    </message>
+    <message>
+        <source>Test aid only. Adds 180 deg to the calibration angle at guide start (the effect a real meridian flip has on the drift-&gt;RA/DEC mapping), so reverse-correction handling can be exercised against the CCD Simulator, which never rotates its own field. With this ON, stable guiding should require revRA AND revDE both ON. Leave OFF in real use.</source>
+        <translation>Nur ein Testhilfsmittel. Fügt dem Kalibrierungswinkel beim Guide-Start 180 Grad hinzu (der Effekt, den ein echter Meridianflip auf die Zuordnung Drift-&gt;RA/DEK hat), damit die Behandlung der Umkehrkorrektur gegen den CCD-Simulator getestet werden kann, der sein eigenes Feld niemals dreht. Bei EIN sollte eine stabile Nachführung sowohl revRA ALS AUCH revDE auf EIN erfordern. Im Realbetrieb AUS lassen.</translation>
+    </message>
+    <message>
+        <source>SIM: fake meridian flip</source>
+        <translation>SIM: Meridianflip simulieren</translation>
+    </message>
+    <message>
+        <source>Abort if the camera or mount stops responding for this long (exposure, pulse, frame reset, star extraction). 0 disables the watchdog.</source>
+        <translation>Abbrechen, wenn die Kamera oder die Montierung so lange nicht mehr reagiert (Belichtung, Impuls, Bild-Reset, Sternextraktion). 0 deaktiviert den Watchdog.</translation>
+    </message>
+    <message>
+        <source>Hardware timeout (s)</source>
+        <translation>Hardware-Timeout (s)</translation>
+    </message>
+    <message>
+        <source>step 2: W/E pulse length; must move the image by a clearly measurable amount</source>
+        <translation>Schritt 2: W/O-Impulslänge; muss das Bild um einen klar messbaren Betrag verschieben</translation>
+    </message>
+    <message>
+        <source>Gain-cal pulse (ms)</source>
+        <translation>Verstärkungskal.-Impuls (ms)</translation>
+    </message>
+    <message>
+        <source>step 2 sends this many W pulses and this many E pulses, alternating</source>
+        <translation>Schritt 2 sendet abwechselnd so viele W-Impulse und so viele O-Impulse</translation>
+    </message>
+    <message>
+        <source>Gain-cal pulses per direction</source>
+        <translation>Verstärkungskal.-Impulse pro Richtung</translation>
+    </message>
+    <message>
+        <source>calibration step 1: observe the free-run sidereal drift for this long (mount tracking, no pulses) to get the RA axis angle, rate and scale - all geometric, stored and reused until the microscope is moved. Set &gt;= one worm period for a clean V and a real PE measurement</source>
+        <translation>Kalibrierungsschritt 1: den freien siderischen Drift so lange beobachten (Montierung nachführend, keine Impulse), um Winkel, Rate und Skalierung der RA-Achse zu ermitteln - alles geometrisch, gespeichert und wiederverwendet, bis das Mikroskop bewegt wird. &gt;= eine Schneckenperiode einstellen für ein sauberes V und eine echte PE-Messung</translation>
+    </message>
+    <message>
+        <source>Characterization duration (s)</source>
+        <translation>Charakterisierungsdauer (s)</translation>
+    </message>
+    <message>
+        <source>run step 1 alone: measure the free-run drift + periodic error over &apos;chardur&apos; seconds, log the PE peak-to-peak and a decimated PE curve, then stop. Set chardur &gt;= one worm period</source>
+        <translation>Nur Schritt 1 ausführen: den freien Drift + periodischen Fehler über &apos;chardur&apos; Sekunden messen, den PE-Spitze-zu-Spitze-Wert und eine dezimierte PE-Kurve protokollieren, dann anhalten. chardur &gt;= eine Schneckenperiode einstellen</translation>
+    </message>
+    <message>
+        <source>Observe only (no gain cal, no guiding)</source>
+        <translation>Nur beobachten (keine Verstärkungskal., keine Nachführung)</translation>
+    </message>
+    <message>
+        <source>ms of W/E guide pulse per px of image displacement</source>
+        <translation>ms W/O-Führungsimpuls pro px Bildverschiebung</translation>
+    </message>
+    <message>
+        <source>Gain (ms/px)</source>
+        <translation>Verstärkung (ms/px)</translation>
+    </message>
+    <message>
+        <source>image speed for perfect sidereal tracking; refined online (adaptive)</source>
+        <translation>Bildgeschwindigkeit für perfekte siderische Nachführung; online verfeinert (adaptiv)</translation>
+    </message>
+    <message>
+        <source>Target rate (px/s)</source>
+        <translation>Zielrate (px/s)</translation>
+    </message>
+    <message>
+        <source>sidereal_rate / V from step 1 (15.041 arcsec/s divided by the measured drift px/s). Independent of the microscope optics</source>
+        <translation>sidereal_rate / V aus Schritt 1 (15,041 Bogensek./s geteilt durch die gemessene Drift in px/s). Unabhängig von der Mikroskopoptik</translation>
+    </message>
+    <message>
+        <source>Scale (arcsec/px)</source>
+        <translation>Skalierung (Bogensek./px)</translation>
+    </message>
+    <message>
+        <source>Mount guide rate (x sidereal)</source>
+        <translation>Mount-Führungsrate (x siderisch)</translation>
+    </message>
+    <message>
+        <source>manual override: flip the sense of the RA correction (normally wdir handles it)</source>
+        <translation>Manuelle Übersteuerung: Vorzeichen der RA-Korrektur umkehren (normalerweise übernimmt wdir dies)</translation>
+    </message>
+    <message>
+        <source>direction of the RA axis in the microscope image, from the free-run sidereal drift</source>
+        <translation>Richtung der RA-Achse im Mikroskopbild, aus dem freien siderischen Drift</translation>
+    </message>
+    <message>
+        <source>RA axis angle (deg)</source>
+        <translation>RA-Achsenwinkel (Grad)</translation>
+    </message>
+    <message>
+        <source>sign of a West pulse&apos;s effect along +theta (+1 or -1), from gain calibration</source>
+        <translation>Vorzeichen der Wirkung eines West-Impulses entlang +theta (+1 oder -1), aus der Verstärkungskalibrierung</translation>
+    </message>
+    <message>
+        <source>W pulse sign</source>
+        <translation>W-Impuls-Vorzeichen</translation>
+    </message>
+    <message>
+        <source>Microscope</source>
+        <translation>Mikroskop</translation>
+    </message>
+    <message>
+        <source>PI on the target rate: V += alphaV * residual_px each frame, clamped to +-20% of the characterized V. Corrects a V biased by a too-short characterization. 0 = fixed V. 0.002-0.02 typical</source>
+        <translation>PI auf die Zielrate: V += alphaV * residual_px pro Bild, begrenzt auf +-20% des charakterisierten V. Korrigiert ein durch eine zu kurze Charakterisierung verzerrtes V. 0 = festes V. 0,002-0,02 typisch</translation>
+    </message>
+    <message>
+        <source>V adaptation gain</source>
+        <translation>V-Anpassungsverstärkung</translation>
+    </message>
+    <message>
+        <source>frames measured but not corrected right after a pulse, to skip the mechanical transient</source>
+        <translation>Bilder, die direkt nach einem Impuls gemessen, aber nicht korrigiert werden, um den mechanischen Einschwingvorgang zu überspringen</translation>
+    </message>
+    <message>
+        <source>Blank frames after a pulse</source>
+        <translation>Leerbilder nach einem Impuls</translation>
+    </message>
+    <message>
+        <source>RA-only dither (DEC component of a sequencer dither request is a no-op here)</source>
+        <translation>Nur-RA-Dithering (die DEK-Komponente einer Dithering-Anfrage des Sequenzgebers bleibt hier wirkungslos)</translation>
+    </message>
+    <message>
+        <source>anti-windup: the integral accumulator is clamped to this magnitude. 0 -&gt; default 50</source>
+        <translation>Anti-Windup: Der Integralakkumulator wird auf diesen Betrag begrenzt. 0 -&gt; Standard 50</translation>
+    </message>
+    <message>
+        <source>print a numeric guiding summary (p, residual, cross, V, pulse, I, rms) every N frames. 0 = off</source>
+        <translation>gibt alle N Bilder eine numerische Nachführzusammenfassung aus (p, Residuum, Cross, V, Impuls, I, rms). 0 = aus</translation>
+    </message>
+    <message>
+        <source>Guide log every N frames</source>
+        <translation>Guide-Protokoll alle N Bilder</translation>
+    </message>
+    <message>
+        <source>RMS over x frames</source>
+        <translation>RMS über x Bilder</translation>
+    </message>
+    <message>
+        <source>abort if the camera or mount stops responding for this long. 0 disables</source>
+        <translation>abbrechen, wenn die Kamera oder die Montierung so lange nicht mehr reagiert. 0 deaktiviert</translation>
+    </message>
+    <message>
+        <source>Cross axis</source>
+        <translation>Querachse</translation>
+    </message>
+    <message>
+        <source>Response</source>
+        <translation>Antwort</translation>
+    </message>
+    <message>
+        <source>convergence threshold on the correlation coefficient. Smaller = finer sub-pixel, more iterations. 1e-4 .. 1e-6</source>
+        <translation>Konvergenzschwelle für den Korrelationskoeffizienten. Kleiner = feineres Subpixel, mehr Iterationen. 1e-4 .. 1e-6</translation>
+    </message>
+    <message>
+        <source>ECC convergence eps</source>
+        <translation>ECC-Konvergenz eps</translation>
+    </message>
+    <message>
+        <source>size of the Gaussian ECC applies to images and gradients each iteration (forced odd). Larger = smoother gradients, less pixel-locking, slightly less sharp. Stacks with preblur</source>
+        <translation>Größe des Gauß-Kerns, den ECC bei jeder Iteration auf Bilder und Gradienten anwendet (auf ungerade gezwungen). Größer = glattere Gradienten, weniger Pixel-Locking, etwas weniger scharf. Addiert sich mit preblur</translation>
+    </message>
+    <message>
+        <source>ECC internal blur kernel</source>
+        <translation>ECC-interner Weichzeichnungskern</translation>
+    </message>
+    <message>
+        <source>Gauss-Newton iterations cap. Seeded from the coarse shift so it converges in ~5-15; 60 is a safe ceiling. Lower if the frame rate suffers</source>
+        <translation>Obergrenze der Gauß-Newton-Iterationen. Wird aus der groben Verschiebung initialisiert, sodass die Konvergenz in ~5-15 Schritten erfolgt; 60 ist eine sichere Obergrenze. Bei Bildrateproblemen verringern</translation>
+    </message>
+    <message>
+        <source>ECC max iterations</source>
+        <translation>ECC max. Iterationen</translation>
+    </message>
+    <message>
+        <source>refine the sub-pixel shift with findTransformECC (interpolation-based, low pixel-locking) after a coarse phaseCorrelate. Off = phaseCorrelate centroid only (fast, strong pixel-locking)</source>
+        <translation>Die Subpixel-Verschiebung mit findTransformECC verfeinern (interpolationsbasiert, geringes Pixel-Locking) nach einem groben phaseCorrelate. Aus = nur phaseCorrelate-Centroid (schnell, starkes Pixel-Locking)</translation>
+    </message>
+    <message>
+        <source>ECC sub-pixel refinement</source>
+        <translation>ECC-Subpixel-Verfeinerung</translation>
+    </message>
+    <message>
+        <source>guiding is aborted after this many untrusted frames in a row</source>
+        <translation>Die Nachführung wird nach so vielen aufeinanderfolgenden nicht vertrauenswürdigen Bildern abgebrochen</translation>
+    </message>
+    <message>
+        <source>Max consecutive bad frames</source>
+        <translation>Max. aufeinanderfolgende schlechte Bilder</translation>
+    </message>
+    <message>
+        <source>reject a frame whose move since the last accepted one exceeds this (vibration / glitch)</source>
+        <translation>Verwirft ein Bild, dessen Bewegung seit dem letzten akzeptierten Bild dies überschreitet (Vibration / Störung)</translation>
+    </message>
+    <message>
+        <source>Max step (px)</source>
+        <translation>Max. Schritt (px)</translation>
+    </message>
+    <message>
+        <source>reject a frame whose normalised cross-correlation with the anchor at the found shift is below this. Estimator-independent (0-1). A good textured surface gives 0.8-0.97; 0.5 is a safe floor</source>
+        <translation>Verwirft ein Bild, dessen normalisierte Kreuzkorrelation mit dem Anker bei der gefundenen Verschiebung darunter liegt. Schätzerunabhängig (0-1). Eine gute strukturierte Oberfläche liefert 0,8-0,97; 0,5 ist eine sichere Untergrenze</translation>
+    </message>
+    <message>
+        <source>Min correlation (NCC)</source>
+        <translation>Min. Korrelation (NCC)</translation>
+    </message>
+    <message>
+        <source>Gaussian blur applied to both frames before registration. Widens the correlation peak and cuts pixel-locking (peak-locking) bias. 0 = off; 0.8-1.5 typical. THE main anti-pixel-locking knob</source>
+        <translation>Gaußscher Weichzeichner, der vor der Registrierung auf beide Bilder angewendet wird. Verbreitert den Korrelationspeak und reduziert den Pixel-Locking-Bias (Peak-Locking). 0 = aus; 0,8-1,5 typisch. DER wichtigste Anti-Pixel-Locking-Regler</translation>
+    </message>
+    <message>
+        <source>Pre-correlation blur (px sigma)</source>
+        <translation>Vor-Korrelations-Weichzeichner (px Sigma)</translation>
+    </message>
+    <message>
+        <source>re-drop the reference anchor once the running shift exceeds this fraction of half the frame. Smaller = higher overlap / response, more re-anchor events</source>
+        <translation>Den Referenzanker erneut setzen, sobald die laufende Verschiebung diesen Anteil der halben Bildgröße überschreitet. Kleiner = höhere Überlappung / Reaktionsfähigkeit, mehr Neuverankerungen</translation>
+    </message>
+    <message>
+        <source>Re-anchor fraction</source>
+        <translation>Neuverankerungsanteil</translation>
+    </message>
+    <message>
+        <source>once, at the first anchor: probe the estimator&apos;s residual pixel-locking bias with Fourier-shifted copies of the anchor, fit it, and subtract it from every shift. Targets exactly the frame-to-frame yo-yo. Adds ~1-2 s to the first frame</source>
+        <translation>Einmalig, beim ersten Anker: den verbleibenden Pixel-Locking-Bias des Schätzers mit Fourier-verschobenen Kopien des Ankers testen, anpassen und von jeder Verschiebung abziehen. Zielt genau auf das Bild-zu-Bild-Hin-und-Her. Fügt dem ersten Bild ~1-2 s hinzu</translation>
+    </message>
+    <message>
+        <source>Pixel-locking S-curve correction</source>
+        <translation>Pixel-Locking-S-Kurven-Korrektur</translation>
+    </message>
+    <message>
+        <source>harmonics in the S-curve fit. The 1-hump-per-pixel term dominates; 2-3 is plenty</source>
+        <translation>Harmonische in der S-Kurven-Anpassung. Der Term mit einem Höcker pro Pixel dominiert; 2-3 reichen aus</translation>
+    </message>
+    <message>
+        <source>S-curve harmonics</source>
+        <translation>S-Kurven-Harmonische</translation>
+    </message>
+    <message>
+        <source>number of fractional-shift probes per axis for the S-curve fit. More = smoother curve, longer one-time calibration</source>
+        <translation>Anzahl der Teilverschiebungs-Messpunkte pro Achse für die S-Kurven-Anpassung. Mehr = glattere Kurve, längere einmalige Kalibrierung</translation>
+    </message>
+    <message>
+        <source>S-curve samples / axis</source>
+        <translation>S-Kurven-Messpunkte / Achse</translation>
+    </message>
+    <message>
+        <source>Image measurement (correlation / sub-pixel)</source>
+        <translation>Bildmessung (Korrelation / Subpixel)</translation>
+    </message>
+    <message>
+        <source>derivative gain. Leave at 0: on a slow (~2 fps) noisy loop the D term mostly amplifies measurement noise</source>
+        <translation>Differentialverstärkung. Bei 0 lassen: In einer langsamen (~2 fps), verrauschten Regelschleife verstärkt der D-Anteil meist nur das Messrauschen</translation>
+    </message>
+    <message>
+        <source>integral gain (px.s). Nulls a steady offset a P-only law would leave; 0 = pure P</source>
+        <translation>Integralverstärkung (px.s). Eliminiert einen bleibenden Offset, den ein reines P-Gesetz hinterlassen würde; 0 = reines P</translation>
+    </message>
+    <message>
+        <source>proportional gain on the residual. kp=1 tries to fully null the error in one pulse (deadbeat) and rings given the ~1-2 s loop period; use 0.3-0.6</source>
+        <translation>Proportionalverstärkung auf das Residuum. kp=1 versucht, den Fehler in einem Impuls vollständig zu eliminieren (deadbeat) und schwingt angesichts der ~1-2 s Regelschleifenperiode; 0,3-0,6 verwenden</translation>
+    </message>
+    <message>
+        <source>Control law</source>
+        <translation>Regelgesetz</translation>
+    </message>
+    <message>
+        <source>displacement on the image axis orthogonal to RA; should stay near 0 (health signal: CD slip / tilt)</source>
+        <translation>Verschiebung auf der zur RA-Achse orthogonalen Bildachse; sollte nahe 0 bleiben (Gesundheitssignal: CD-Schlupf / Verkippung)</translation>
+    </message>
+    <message>
+        <source>Cross-axis (px)</source>
+        <translation>Querachse (px)</translation>
+    </message>
+    <message>
+        <source>p - V.t on the RA axis: the periodic error plus what is left of the tracking drift</source>
+        <translation>p - V.t auf der RA-Achse: der periodische Fehler plus das, was vom Nachführdrift übrig bleibt</translation>
+    </message>
+    <message>
+        <source>Residual (px)</source>
+        <translation>Residuum (px)</translation>
+    </message>
+    <message>
+        <source>phaseCorrelate peak sharpness; low = frame not trusted</source>
+        <translation>Schärfe des phaseCorrelate-Peaks; niedrig = Bild nicht vertrauenswürdig</translation>
+    </message>
+    <message>
+        <source>Correlation response</source>
+        <translation>Korrelationsantwort</translation>
+    </message>
+    <message>
+        <source>Calibration match: d=(%1,%2)px  matched %3/%4  rms=%5px</source>
+        <translation>Kalibrierungsabgleich: d=(%1,%2)px  zugeordnet %3/%4  rms=%5px</translation>
+    </message>
+    <message>
+        <source>Calibration %1 - step %2/%3</source>
+        <translation>Kalibrierung %1 - Schritt %2/%3</translation>
+    </message>
+    <message>
+        <source>%1 pass: increment (ref-cur)=(%2,%3)px  raw %4 ms/px (drift=%5&quot;)</source>
+        <translation>%1-Durchgang: Inkrement (ref-cur)=(%2,%3)px  roh %4 ms/Px (Drift=%5&quot;)</translation>
+    </message>
+    <message>
+        <source>B2 test: rot(RAaxis)=(%1,%2) [want (+-%3,~0)]  rot(DECaxis)=(%4,%5) [want (~0,+-%6)]</source>
+        <translation>B2-Test: rot(RAaxis)=(%1,%2) [soll (+-%3,~0)]  rot(DECaxis)=(%4,%5) [soll (~0,+-%6)]</translation>
+    </message>
+    <message>
+        <source>B2 test: RA-DEC axis separation=%1 deg (want +-90)  RA-axis DEC-leak=%2%%  DEC-axis RA-leak=%3%%</source>
+        <translation>B2-Test: RA-DEK-Achsentrennung=%1 Grad (soll +-90)  RA-Achse DEK-Leck=%2%%  DEK-Achse RA-Leck=%3%%</translation>
+    </message>
+    <message>
+        <source>Calibration: RA %1 ms/px, DEC %2 ms/px, angle %3 deg (RA %4 / DE %5), background drift (%6,%7) px/frame, drift ratio %8</source>
+        <translation>Kalibrierung: RA %1 ms/Px, DEK %2 ms/Px, Winkel %3 Grad (RA %4 / DE %5), Hintergrunddrift (%6,%7) px/Bild, Driftverhältnis %8</translation>
+    </message>
+    <message>
+        <source>DEC normalisation: RA rate %1 ms/px at calDEC=%2 deg -&gt; equatorial %3 ms/px (factor %4)</source>
+        <translation>DEK-Normalisierung: RA-Rate %1 ms/Px bei calDEC=%2 Grad -&gt; äquatorial %3 ms/Px (Faktor %4)</translation>
+    </message>
+    <message>
+        <source>RA compensation factor: 1/%1 (1/cos(%2 deg))</source>
+        <translation>RA-Kompensationsfaktor: 1/%1 (1/cos(%2 Grad))</translation>
+    </message>
+    <message>
+        <source>Guide rates: RA equatorial=%1 ms/px -&gt; at curDEC %2 ms/px  |  DEC=%3 ms/px  (calDEC=%4)</source>
+        <translation>Führungsraten: RA äquatorial=%1 ms/Px -&gt; bei curDEC %2 ms/Px  |  DEK=%3 ms/Px  (calDEC=%4)</translation>
+    </message>
+    <message>
+        <source>Guide start: ccdOrientation=%1 deg  revRA=%2 revDE=%3</source>
+        <translation>Guide-Start: ccdOrientation=%1 Grad  revRA=%2 revDE=%3</translation>
+    </message>
+    <message>
+        <source>First guide frame: settling, no correction (drift = (%1,%2) px)</source>
+        <translation>Erstes Guide-Bild: Einschwingen, keine Korrektur (Drift = (%1,%2) px)</translation>
+    </message>
+    <message>
+        <source>Driver Debug</source>
+        <translation>Treiber-Debug</translation>
+    </message>
+    <message>
+        <source>Errors</source>
+        <translation>Fehler</translation>
+    </message>
+    <message>
+        <source>Alignment Subsystem</source>
+        <translation>Ausrichtungssubsystem</translation>
+    </message>
+    <message>
+        <source>Messages</source>
+        <translation>Meldungen</translation>
+    </message>
+    <message>
+        <source>Warnings</source>
+        <translation>Warnungen</translation>
+    </message>
+    <message>
+        <source>Debug Levels</source>
+        <translation>Debug-Stufen</translation>
+    </message>
+    <message>
+        <source>Logging Levels</source>
+        <translation>Protokollierungsstufen</translation>
+    </message>
+    <message>
+        <source>To Client</source>
+        <translation>An Client</translation>
+    </message>
+    <message>
+        <source>To Log File</source>
+        <translation>In Protokolldatei</translation>
+    </message>
+    <message>
+        <source>Log Output</source>
+        <translation>Protokollausgabe</translation>
+    </message>
+    <message>
+        <source>16-bit</source>
+        <translation>16-Bit</translation>
+    </message>
+    <message>
+        <source>8-bit</source>
+        <translation>8-Bit</translation>
+    </message>
+    <message>
+        <source>Stream Depth</source>
+        <translation>Stream-Tiefe</translation>
+    </message>
+    <message>
+        <source>Rouge</source>
+        <translation>Rot</translation>
+    </message>
+    <message>
+        <source>Vert</source>
+        <translation>Grün</translation>
+    </message>
+    <message>
+        <source>Bleu</source>
+        <translation>Blau</translation>
+    </message>
+    <message>
+        <source>Ha</source>
+        <translation>Ha</translation>
+    </message>
+    <message>
+        <source>Add entries at end of set</source>
+        <translation>Einträge am Ende der Menge hinzufügen</translation>
+    </message>
+    <message>
+        <source>Delete all the entries in the set</source>
+        <translation>Alle Einträge in der Menge löschen</translation>
+    </message>
+    <message>
+        <source>Delete entry at current index</source>
+        <translation>Eintrag am aktuellen Index löschen</translation>
+    </message>
+    <message>
+        <source>Overwrite entry at current index</source>
+        <translation>Eintrag am aktuellen Index überschreiben</translation>
+    </message>
+    <message>
+        <source>Insert entries at current index</source>
+        <translation>Einträge am aktuellen Index einfügen</translation>
+    </message>
+    <message>
+        <source>Load the alignment database from local storage</source>
+        <translation>Die Ausrichtungsdatenbank aus dem lokalen Speicher laden</translation>
+    </message>
+    <message>
+        <source>Read the entry at the current pointer</source>
+        <translation>Den Eintrag am aktuellen Zeiger lesen</translation>
+    </message>
+    <message>
+        <source>Increment the pointer before reading the entry</source>
+        <translation>Den Zeiger vor dem Lesen des Eintrags erhöhen</translation>
+    </message>
+    <message>
+        <source>Save the alignment database to local storage</source>
+        <translation>Die Ausrichtungsdatenbank im lokalen Speicher sichern</translation>
+    </message>
+    <message>
+        <source>Action to take</source>
+        <translation>Auszuführende Aktion</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Execute the action</source>
+        <translation>Aktion ausführen</translation>
+    </message>
+    <message>
+        <source>Pointer</source>
+        <translation>Zeiger</translation>
+    </message>
+    <message>
+        <source>Current Set</source>
+        <translation>Aktuelle Menge</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Größe</translation>
+    </message>
+    <message>
+        <source>Declination (dd:mm:ss)</source>
+        <translation>Deklination (dd:mm:ss)</translation>
+    </message>
+    <message>
+        <source>Observation Julian date</source>
+        <translation>Julianisches Datum der Beobachtung</translation>
+    </message>
+    <message>
+        <source>Right Ascension (hh:mm:ss)</source>
+        <translation>Rektaszension (hh:mm:ss)</translation>
+    </message>
+    <message>
+        <source>Telescope direction vector x</source>
+        <translation>Teleskop-Richtungsvektor x</translation>
+    </message>
+    <message>
+        <source>Telescope direction vector y</source>
+        <translation>Teleskop-Richtungsvektor y</translation>
+    </message>
+    <message>
+        <source>Telescope direction vector z</source>
+        <translation>Teleskop-Richtungsvektor z</translation>
+    </message>
+    <message>
+        <source>Mandatory sync point numeric fields</source>
+        <translation>Pflicht-Zahlenfelder des Sync-Punkts</translation>
+    </message>
+    <message>
+        <source>Private binary data</source>
+        <translation>Private Binärdaten</translation>
+    </message>
+    <message>
+        <source>Optional sync point binary data</source>
+        <translation>Optionale Sync-Punkt-Binärdaten</translation>
+    </message>
+    <message>
+        <source>Alignment Subsystem Active</source>
+        <translation>Ausrichtungssubsystem aktiv</translation>
+    </message>
+    <message>
+        <source>Activate alignment subsystem</source>
+        <translation>Ausrichtungssubsystem aktivieren</translation>
+    </message>
+    <message>
+        <source>Inbuilt Math Plugin</source>
+        <translation>Eingebautes Mathe-Plugin</translation>
+    </message>
+    <message>
+        <source>Nearest Math Plugin</source>
+        <translation>Nearest-Mathe-Plugin</translation>
+    </message>
+    <message>
+        <source>SPK Math Plugin</source>
+        <translation>SPK-Mathe-Plugin</translation>
+    </message>
+    <message>
+        <source>SVD Math Plugin</source>
+        <translation>SVD-Mathe-Plugin</translation>
+    </message>
+    <message>
+        <source>Math Plugins</source>
+        <translation>Mathe-Plugins</translation>
+    </message>
+    <message>
+        <source>(Re)Initialise Plugin</source>
+        <translation>Plugin (neu) initialisieren</translation>
+    </message>
+    <message>
+        <source>True Pointing</source>
+        <translation>Echtes Pointing</translation>
+    </message>
+    <message>
+        <source>Cone (CH) &apos;</source>
+        <translation>Konus (CH) &apos;</translation>
+    </message>
+    <message>
+        <source>Dec Zero (ID) &apos;</source>
+        <translation>Dec-Null (ID) &apos;</translation>
+    </message>
+    <message>
+        <source>Ha Zero (IH) &apos;</source>
+        <translation>Ha-Null (IH) &apos;</translation>
+    </message>
+    <message>
+        <source>Pole Azm (MA) &apos;</source>
+        <translation>Pol-Azimut (MA) &apos;</translation>
+    </message>
+    <message>
+        <source>Pole elev (ME) &apos;</source>
+        <translation>Pol-Höhe (ME) &apos;</translation>
+    </message>
+    <message>
+        <source>Ha/Dec (NP) &apos;</source>
+        <translation>Ha/Dec (NP) &apos;</translation>
+    </message>
+    <message>
+        <source>sub-pixel shift by upsampled-DFT cross-correlation (Guizar-Sicairos): no interpolation, no pixel-locking, deterministic, no start-up calibration. ON = ignores eccrefine/scurve. OFF = legacy phaseCorrelate + ECC + S-curve</source>
+        <translation>Subpixel-Verschiebung mittels hochabgetasteter DFT-Kreuzkorrelation (Guizar-Sicairos): keine Interpolation, kein Pixel-Locking, deterministisch, keine Start-Kalibrierung. EIN = ignoriert eccrefine/scurve. AUS = klassisches phaseCorrelate + ECC + S-Kurve</translation>
+    </message>
+    <message>
+        <source>Upsampled-DFT sub-pixel</source>
+        <translation>Hochabgetastete DFT-Subpixel</translation>
+    </message>
+    <message>
+        <source>local zoom resolution = 1/kappa px (50 -&gt; 0.02 px, well under the noise). CPU cost grows ~kappa^2; 50 is a good default, 100 if a Pi-class CPU keeps up</source>
+        <translation>Lokale Zoomauflösung = 1/kappa px (50 -&gt; 0,02 px, deutlich unter dem Rauschen). CPU-Kosten wachsen ~kappa^2; 50 ist ein guter Standardwert, 100 falls eine Pi-Klasse-CPU mithält</translation>
+    </message>
+    <message>
+        <source>DFT upsample factor (kappa)</source>
+        <translation>DFT-Hochabtastfaktor (kappa)</translation>
+    </message>
+    <message>
+        <source>OST starting up, ladies and gentlemen, squeeze your ALZ !</source>
+        <translation>OST startet, Ladies and Gentlemen, drückt euren ALZ !</translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>    *******    ******** **********</source>
+        <translation>    *******    ******** **********</translation>
+    </message>
+    <message>
+        <source>   **/////**  **////// /////**/// </source>
+        <translation>   **/////**  **////// /////**/// </translation>
+    </message>
+    <message>
+        <source>  **     //**/**           /**    </source>
+        <translation>  **     //**/**           /**    </translation>
+    </message>
+    <message>
+        <source> /**      /**/*********    /**    </source>
+        <translation> /**      /**/*********    /**    </translation>
+    </message>
+    <message>
+        <source> /**      /**////////**    /**    </source>
+        <translation> /**      /**////////**    /**    </translation>
+    </message>
+    <message>
+        <source> //**     **        /**    /**    </source>
+        <translation> //**     **        /**    /**    </translation>
+    </message>
+    <message>
+        <source>  //*******   ********     /**    </source>
+        <translation>  //*******   ********     /**    </translation>
+    </message>
+    <message>
+        <source>   ///////   ////////      //     </source>
+        <translation>   ///////   ////////      //     </translation>
+    </message>
+    <message>
+        <source>Git Hash              =801d0de02d3603692556553b62baf216de627fa5-dirty</source>
+        <translation>Git-Hash              =801d0de02d3603692556553b62baf216de627fa5-dirty</translation>
+    </message>
+    <message>
+        <source>Git Date              =Mon Sep 21 21:43:27 2026</source>
+        <translation>Git-Datum             =Mon Sep 21 21:43:27 2026</translation>
+    </message>
+    <message>
+        <source>Git Commit subject    =Document controller data, GlobalDatastore and the file system</source>
+        <translation>Git-Commit-Betreff    =Document controller data, GlobalDatastore and the file system</translation>
+    </message>
+    <message>
+        <source>Git Tag               =801d0de0</source>
+        <translation>Git-Tag               =801d0de0</translation>
+    </message>
+    <message>
+        <source>Webroot               =/home/gilles/ostmedia</source>
+        <translation>Webroot               =/home/gilles/ostmedia</translation>
+    </message>
+    <message>
+        <source>DB Path               =</source>
+        <translation>DB-Pfad               =</translation>
+    </message>
+    <message>
+        <source>Modules Library Path  =/home/gilles/claude/OST/OST/buildqt6</source>
+        <translation>Modul-Bibliothekspfad =/home/gilles/claude/OST/OST/buildqt6</translation>
+    </message>
+    <message>
+        <source>Load configuration    =default</source>
+        <translation>Geladene Konfiguration=default</translation>
+    </message>
+    <message>
+        <source>Embedded Indi server  =Y</source>
+        <translation>Eingebetteter INDI-Server=Y</translation>
+    </message>
+    <message>
+        <source>WebSocket SSL         =N</source>
+        <translation>WebSocket-SSL         =N</translation>
+    </message>
+    <message>
+        <source>Language              =en</source>
+        <translation>Sprache               =en</translation>
+    </message>
+    <message>
+        <source>Security              =0</source>
+        <translation>Sicherheit            =0</translation>
+    </message>
+    <message>
+        <source>Log file              =ostserver_2026-09-23_22-30-36.log</source>
+        <translation>Protokolldatei        =ostserver_2026-09-23_22-30-36.log</translation>
+    </message>
+    <message>
+        <source>Log level             =0</source>
+        <translation>Protokollstufe        =0</translation>
+    </message>
+    <message>
+        <source>Banner                =Observatoire Sans tête</source>
+        <translation>Banner                =Observatoire Sans tête</translation>
+    </message>
+    <message>
+        <source>System watch interval =10s (0 to disable)</source>
+        <translation>Systemüberwachungsintervall=10s (0 zum Deaktivieren)</translation>
+    </message>
+    <message>
+        <source>Min free disk space   =10%</source>
+        <translation>Min. freier Speicherplatz=10%</translation>
+    </message>
+    <message>
+        <source>Check available modules in /usr/lib</source>
+        <translation>Verfügbare Module in /usr/lib prüfen</translation>
+    </message>
+    <message>
+        <source>Check available modules in /usr/lib/x86_64-linux-gnu/qt6/plugins</source>
+        <translation>Verfügbare Module in /usr/lib/x86_64-linux-gnu/qt6/plugins prüfen</translation>
+    </message>
+    <message>
+        <source>Check available modules in /home/gilles/claude/OST/OST/buildqt6</source>
+        <translation>Verfügbare Module in /home/gilles/claude/OST/OST/buildqt6 prüfen</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostallsky</source>
+        <translation>Bibliothek gefunden: /home/gilles/claude/OST/OST/buildqt6/libostallsky</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostblindpec</source>
+        <translation>Bibliothek gefunden: /home/gilles/claude/OST/OST/buildqt6/libostblindpec</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostcollimator</source>
+        <translation>Bibliothek gefunden: /home/gilles/claude/OST/OST/buildqt6/libostcollimator</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostdummy</source>
+        <translation>Bibliothek gefunden: /home/gilles/claude/OST/OST/buildqt6/libostdummy</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostfocus</source>
+        <translation>Bibliothek gefunden: /home/gilles/claude/OST/OST/buildqt6/libostfocus</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostguider</source>
+        <translation>Bibliothek gefunden: /home/gilles/claude/OST/OST/buildqt6/libostguider</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostindipanel</source>
+        <translation>Bibliothek gefunden: /home/gilles/claude/OST/OST/buildqt6/libostindipanel</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostinspector</source>
+        <translation>Bibliothek gefunden: /home/gilles/claude/OST/OST/buildqt6/libostinspector</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostmeteo</source>
+        <translation>Bibliothek gefunden: /home/gilles/claude/OST/OST/buildqt6/libostmeteo</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostmonitor</source>
+        <translation>Bibliothek gefunden: /home/gilles/claude/OST/OST/buildqt6/libostmonitor</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostnavigator</source>
+        <translation>Bibliothek gefunden: /home/gilles/claude/OST/OST/buildqt6/libostnavigator</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostparkmanager</source>
+        <translation>Bibliothek gefunden: /home/gilles/claude/OST/OST/buildqt6/libostparkmanager</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostplanner</source>
+        <translation>Bibliothek gefunden: /home/gilles/claude/OST/OST/buildqt6/libostplanner</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostpolar</source>
+        <translation>Bibliothek gefunden: /home/gilles/claude/OST/OST/buildqt6/libostpolar</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostsequencer</source>
+        <translation>Bibliothek gefunden: /home/gilles/claude/OST/OST/buildqt6/libostsequencer</translation>
+    </message>
+    <message>
+        <source>Scanning INDI drivers in /usr/share/indi</source>
+        <translation>Suche INDI-Treiber in /usr/share/indi</translation>
+    </message>
+    <message>
+        <source>Found 424 INDI drivers</source>
+        <translation>424 INDI-Treiber gefunden</translation>
+    </message>
+    <message>
+        <source>Reusing orphaned indiserver (PID 8097)</source>
+        <translation>Verwaisten indiserver wiederverwenden (PID 8097)</translation>
+    </message>
+    <message>
+        <source>Recovered active driver: Weather Simulator (indi_simulator_weather)</source>
+        <translation>Aktiven Treiber wiederhergestellt: Weather Simulator (indi_simulator_weather)</translation>
+    </message>
+    <message>
+        <source>Recovered active driver: GPS Simulator (indi_simulator_gps)</source>
+        <translation>Aktiven Treiber wiederhergestellt: GPS Simulator (indi_simulator_gps)</translation>
+    </message>
+    <message>
+        <source>Recovered active driver: Dome Simulator (indi_simulator_dome)</source>
+        <translation>Aktiven Treiber wiederhergestellt: Dome Simulator (indi_simulator_dome)</translation>
+    </message>
+    <message>
+        <source>Recovered active driver: Telescope Simulator (indi_simulator_telescope)</source>
+        <translation>Aktiven Treiber wiederhergestellt: Telescope Simulator (indi_simulator_telescope)</translation>
+    </message>
+    <message>
+        <source>Recovered active driver: Guide Simulator (indi_simulator_guide)</source>
+        <translation>Aktiven Treiber wiederhergestellt: Guide Simulator (indi_simulator_guide)</translation>
+    </message>
+    <message>
+        <source>Recovered active driver: Focuser Simulator (indi_simulator_focus)</source>
+        <translation>Aktiven Treiber wiederhergestellt: Focuser Simulator (indi_simulator_focus)</translation>
+    </message>
+    <message>
+        <source>Recovered active driver: Filter Simulator (indi_simulator_wheel)</source>
+        <translation>Aktiven Treiber wiederhergestellt: Filter Simulator (indi_simulator_wheel)</translation>
+    </message>
+    <message>
+        <source>Recovered active driver: CCD Simulator (indi_simulator_ccd)</source>
+        <translation>Aktiven Treiber wiederhergestellt: CCD Simulator (indi_simulator_ccd)</translation>
+    </message>
+    <message>
+        <source>8 active INDI driver(s) recovered</source>
+        <translation>8 aktive(r) INDI-Treiber wiederhergestellt</translation>
+    </message>
+    <message>
+        <source>Driver already active, skipping: indi_simulator_ccd</source>
+        <translation>Treiber bereits aktiv, wird übersprungen: indi_simulator_ccd</translation>
+    </message>
+    <message>
+        <source>Driver already active, skipping: indi_simulator_dome</source>
+        <translation>Treiber bereits aktiv, wird übersprungen: indi_simulator_dome</translation>
+    </message>
+    <message>
+        <source>Driver already active, skipping: indi_simulator_wheel</source>
+        <translation>Treiber bereits aktiv, wird übersprungen: indi_simulator_wheel</translation>
+    </message>
+    <message>
+        <source>Driver already active, skipping: indi_simulator_focus</source>
+        <translation>Treiber bereits aktiv, wird übersprungen: indi_simulator_focus</translation>
+    </message>
+    <message>
+        <source>Driver already active, skipping: indi_simulator_gps</source>
+        <translation>Treiber bereits aktiv, wird übersprungen: indi_simulator_gps</translation>
+    </message>
+    <message>
+        <source>Driver already active, skipping: indi_simulator_guide</source>
+        <translation>Treiber bereits aktiv, wird übersprungen: indi_simulator_guide</translation>
+    </message>
+    <message>
+        <source>Driver already active, skipping: indi_simulator_telescope</source>
+        <translation>Treiber bereits aktiv, wird übersprungen: indi_simulator_telescope</translation>
+    </message>
+    <message>
+        <source>Driver already active, skipping: indi_simulator_weather</source>
+        <translation>Treiber bereits aktiv, wird übersprungen: indi_simulator_weather</translation>
+    </message>
+    <message>
+        <source>System watch started, interval: %1s</source>
+        <translation>Systemüberwachung gestartet, Intervall: %1s</translation>
+    </message>
+    <message>
+        <source>A line that fails the visibility/moon check this many times is marked Failed and is no longer retried</source>
+        <translation>Eine Zeile, die die Sichtbarkeits-/Mondprüfung so oft nicht besteht, wird als Fehlgeschlagen markiert und nicht mehr erneut versucht</translation>
+    </message>
+    <message>
+        <source>Max retries before giving up</source>
+        <translation>Max. Wiederholungen vor dem Aufgeben</translation>
+    </message>
+    <message>
+        <source>Target must stay above this elevation for the whole estimated sequence duration, otherwise the line is skipped</source>
+        <translation>Das Ziel muss während der gesamten geschätzten Sequenzdauer über dieser Höhe bleiben, sonst wird die Zeile übersprungen</translation>
+    </message>
+    <message>
+        <source>Minimum elevation (°)</source>
+        <translation>Mindesthöhe (°)</translation>
+    </message>
+    <message>
+        <source>Moon avoidance only applies when the moon&apos;s illuminated fraction is above this percentage</source>
+        <translation>Mondvermeidung gilt nur, wenn der beleuchtete Anteil des Mondes über diesem Prozentsatz liegt</translation>
+    </message>
+    <message>
+        <source>Moon illumination threshold (%)</source>
+        <translation>Mondhelligkeits-Schwellenwert (%)</translation>
+    </message>
+    <message>
+        <source>Rejected only if the target is closer than this AND the moon illumination exceeds the threshold above</source>
+        <translation>Nur abgelehnt, wenn das Ziel näher als dieser Wert ist UND die Mondhelligkeit den obigen Schwellenwert überschreitet</translation>
+    </message>
+    <message>
+        <source>Moon separation threshold (°)</source>
+        <translation>Mondabstands-Schwellenwert (°)</translation>
+    </message>
+    <message>
+        <source>Visibility constraints</source>
+        <translation>Sichtbarkeitsbeschränkungen</translation>
+    </message>
+    <message>
+        <source>listOfValues references a controller-wide LOV (optics, shared across all modules), listOfValuesIsExternal marks it as such</source>
+        <translation>listOfValues verweist auf ein controllerweites LOV (Optik, von allen Modulen gemeinsam genutzt), listOfValuesIsExternal kennzeichnet dies</translation>
+    </message>
+    <message>
+        <source>Global to the controller</source>
+        <translation>Global für den Controller</translation>
+    </message>
+    <message>
+        <source>listOfValues is an inline array of pairs, not shared with any other element</source>
+        <translation>listOfValues ist ein Inline-Array von Paaren, das mit keinem anderen Element gemeinsam genutzt wird</translation>
+    </message>
+    <message>
+        <source>Local to this element</source>
+        <translation>Lokal für dieses Element</translation>
+    </message>
+    <message>
+        <source>listOfValues references a key in this module&apos;s own globallov section (dummylov)</source>
+        <translation>listOfValues verweist auf einen Schlüssel im eigenen globallov-Abschnitt dieses Moduls (dummylov)</translation>
+    </message>
+    <message>
+        <source>Global to this module</source>
+        <translation>Global für dieses Modul</translation>
+    </message>
+    <message>
+        <source>LOV scopes (local / module / controller)</source>
+        <translation>LOV-Geltungsbereiche (lokal / Modul / Controller)</translation>
+    </message>
+    <message>
+        <source>Git Hash              =2551ac77d53705bee34d362fbfb2953cfa2b2b25</source>
+        <translation>Git-Hash              =2551ac77d53705bee34d362fbfb2953cfa2b2b25</translation>
+    </message>
+    <message>
+        <source>Git Date              =Thu Sep 24 18:27:10 2026</source>
+        <translation>Git-Datum             =Thu Sep 24 18:27:10 2026</translation>
+    </message>
+    <message>
+        <source>Git Commit subject    =Document property forms, WS URL convention, graph types, configuration internals</source>
+        <translation>Git-Commit-Betreff    =Document property forms, WS URL convention, graph types, configuration internals</translation>
+    </message>
+    <message>
+        <source>Git Tag               =2551ac77</source>
+        <translation>Git-Tag               =2551ac77</translation>
+    </message>
+    <message>
+        <source>Log file              =ostserver_2026-09-24_19-49-39.log</source>
+        <translation>Protokolldatei        =ostserver_2026-09-24_19-49-39.log</translation>
+    </message>
+    <message>
+        <source>System watch interval =0s (0 to disable)</source>
+        <translation>Systemüberwachungsintervall=0s (0 zum Deaktivieren)</translation>
+    </message>
+    <message>
+        <source>Start focus</source>
+        <translation>Fokussierung starten</translation>
+    </message>
+    <message>
+        <source>Moving to start position - backlash %1</source>
+        <translation>Fahre zur Startposition - Spiel %1</translation>
+    </message>
+    <message>
+        <source>Moving to start position %1</source>
+        <translation>Fahre zur Startposition %1</translation>
+    </message>
+    <message>
+        <source>Exposure %1</source>
+        <translation>Belichtung %1</translation>
+    </message>
+    <message>
+        <source>%1 stars found - HFR: %2</source>
+        <translation>%1 Sterne gefunden - HFR: %2</translation>
+    </message>
+    <message>
+        <source>Moving to position  1 %1</source>
+        <translation>Fahre zu Position  1 %1</translation>
+    </message>
+    <message>
+        <source>Moving to position 2 %1</source>
+        <translation>Fahre zu Position 2 %1</translation>
+    </message>
+    <message>
+        <source>Polynomial fit unreliable (R²=%1 &lt; %2) - using measured minimum</source>
+        <translation>Polynomanpassung unzuverlässig (R²=%1 &lt; %2) - verwende gemessenes Minimum</translation>
+    </message>
+    <message>
+        <source>Polynomial fit reliability (bad / 0.95 / good / 0.99 / excellent)  : R²=%1</source>
+        <translation>Zuverlässigkeit der Polynomanpassung (schlecht / 0,95 / gut / 0,99 / ausgezeichnet)  : R²=%1</translation>
+    </message>
+    <message>
+        <source>Falling back to measured minimum position %1</source>
+        <translation>Rückfall auf gemessene Minimumposition %1</translation>
+    </message>
+    <message>
+        <source>Moving to best position %1</source>
+        <translation>Fahre zur besten Position %1</translation>
+    </message>
+    <message>
+        <source>Tilt heatmap saved (range: %1 - %2 steps)</source>
+        <translation>Tilt-Heatmap gespeichert (Bereich: %1 - %2 Schritte)</translation>
+    </message>
+    <message>
+        <source>Global tilt plane: gradX=%1 steps/zone  gradY=%2 steps/zone</source>
+        <translation>Globale Tilt-Ebene: gradX=%1 Schritte/Zone  gradY=%2 Schritte/Zone</translation>
+    </message>
+    <message>
+        <source>Git Hash              =2551ac77d53705bee34d362fbfb2953cfa2b2b25-dirty</source>
+        <translation>Git-Hash              =2551ac77d53705bee34d362fbfb2953cfa2b2b25-dirty</translation>
+    </message>
+    <message>
+        <source>Log file              =ostserver_2026-09-24_20-16-28.log</source>
+        <translation>Protokolldatei        =ostserver_2026-09-24_20-16-28.log</translation>
+    </message>
+    <message>
+        <source>System watch interval =30s (0 to disable)</source>
+        <translation>Systemüberwachungsintervall=30s (0 zum Deaktivieren)</translation>
+    </message>
+    <message>
+        <source>Log file              =ostserver_2026-09-24_20-41-53.log</source>
+        <translation>Protokolldatei        =ostserver_2026-09-24_20-41-53.log</translation>
+    </message>
+    <message>
+        <source>Log file              =ostserver_2026-09-24_21-11-54.log</source>
+        <translation>Protokolldatei        =ostserver_2026-09-24_21-11-54.log</translation>
+    </message>
+    <message>
+        <source>Git Hash              =d7afe0e7fda12882bfedfe931b244bcdf5727da9</source>
+        <translation>Git-Hash              =d7afe0e7fda12882bfedfe931b244bcdf5727da9</translation>
+    </message>
+    <message>
+        <source>Git Date              =Thu Sep 24 20:33:46 2026</source>
+        <translation>Git-Datum             =Thu Sep 24 20:33:46 2026</translation>
+    </message>
+    <message>
+        <source>Git Commit subject    =Clarify controllerdata.libraries keys are libost-prefixed, ML rejects double prefixing</source>
+        <translation>Git-Commit-Betreff    =Clarify controllerdata.libraries keys are libost-prefixed, ML rejects double prefixing</translation>
+    </message>
+    <message>
+        <source>Git Tag               =d7afe0e7</source>
+        <translation>Git-Tag               =d7afe0e7</translation>
+    </message>
+    <message>
+        <source>Log file              =ostserver_2026-09-24_21-26-10.log</source>
+        <translation>Protokolldatei        =ostserver_2026-09-24_21-26-10.log</translation>
+    </message>
+    <message>
+        <source>Log file              =ostserver_2026-09-24_21-50-25.log</source>
+        <translation>Protokolldatei        =ostserver_2026-09-24_21-50-25.log</translation>
+    </message>
+    <message>
+        <source>Git Hash              =da5d307f3261981ef3b5f7342e9367d3ee69583c-dirty</source>
+        <translation>Git-Hash              =da5d307f3261981ef3b5f7342e9367d3ee69583c-dirty</translation>
+    </message>
+    <message>
+        <source>Git Date              =Sat Sep 26 16:33:03 2026</source>
+        <translation>Git-Datum             =Sat Sep 26 16:33:03 2026</translation>
+    </message>
+    <message>
+        <source>Git Commit subject    =Sequencer: log the real cause of a Sequence error, not just the fact</source>
+        <translation>Git-Commit-Betreff    =Sequencer: log the real cause of a Sequence error, not just the fact</translation>
+    </message>
+    <message>
+        <source>Git Tag               =da5d307f</source>
+        <translation>Git-Tag               =da5d307f</translation>
+    </message>
+    <message>
+        <source>Log file              =ostserver_2026-09-29_09-30-02.log</source>
+        <translation>Protokolldatei        =ostserver_2026-09-29_09-30-02.log</translation>
+    </message>
+    <message>
+        <source>libostcollimator Cannot load library /home/gilles/claude/OST/OST/buildqt6/libostcollimator: (/home/gilles/claude/OST/OST/buildqt6/libostcollimator.so: undefined symbol: _ZThn256_N10IndiModule9newDeviceEN4INDI10BaseDeviceE)</source>
+        <translation>libostcollimator Bibliothek /home/gilles/claude/OST/OST/buildqt6/libostcollimator kann nicht geladen werden: (/home/gilles/claude/OST/OST/buildqt6/libostcollimator.so: undefined symbol: _ZThn256_N10IndiModule9newDeviceEN4INDI10BaseDeviceE)</translation>
+    </message>
+    <message>
+        <source>Offset correction : dRA %1arcs dDEC %2arcs</source>
+        <translation>Offset-Korrektur: dRA %1Bogensek. dDEC %2Bogensek.</translation>
+    </message>
+    <message>
+        <source>Centering successful after 4 iteration(s) - within tolerance</source>
+        <translation>Zentrierung erfolgreich nach 4 Iteration(en) - innerhalb der Toleranz</translation>
+    </message>
+    <message>
+        <source>Checking visibility for target %1</source>
+        <translation>Prüfe Sichtbarkeit für Ziel %1</translation>
+    </message>
+    <message>
+        <source>Set filter to %1</source>
+        <translation>Filter auf %1 setzen</translation>
+    </message>
+    <message>
+        <source>Requesting autofocus from %1</source>
+        <translation>Autofokus von %1 anfordern</translation>
+    </message>
+    <message>
+        <source>Requesting focus profile %1 on %2</source>
+        <translation>Fordere Fokusprofil %1 auf %2 an</translation>
+    </message>
+    <message>
+        <source>Focus completed</source>
+        <translation>Fokussierung abgeschlossen</translation>
+    </message>
+    <message>
+        <source>Starting guider on %1</source>
+        <translation>Starte Guider auf %1</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.8, DEC=56.5, Pier=West</source>
+        <translation>Montierungsposition: RA=12.8, DEK=56.5, Pfeiler=West</translation>
+    </message>
+    <message>
+        <source>Sending %1ms DEC backlash kick before the %2 calibration pass</source>
+        <translation>Sende %1ms DEK-Spielausgleichsimpuls vor dem %2-Kalibrierungsdurchgang</translation>
+    </message>
+    <message>
+        <source>Calibration quality poor: background drift is %1x the pulse signal (limit %2) - check the mount&apos;s polar alignment</source>
+        <translation>Kalibrierungsqualität schlecht: Hintergrunddrift beträgt das %1-fache des Impulssignals (Grenzwert %2) - Polausrichtung der Montierung prüfen</translation>
+    </message>
+    <message>
+        <source>Retrying calibration (%1/%2)</source>
+        <translation>Wiederhole Kalibrierung (%1/%2)</translation>
+    </message>
+    <message>
+        <source>Guider resumed after focus</source>
+        <translation>Guider nach Fokussierung fortgesetzt</translation>
+    </message>
+    <message>
+        <source>Waiting %1 s for guiding to settle</source>
+        <translation>Warte %1 s auf das Einschwingen der Nachführung</translation>
+    </message>
+    <message>
+        <source>Guiding settle complete</source>
+        <translation>Einschwingen der Nachführung abgeschlossen</translation>
+    </message>
+    <message>
+        <source>HFR %1 exceeds threshold %2 — refocusing</source>
+        <translation>HFR %1 überschreitet Schwellenwert %2 — Refokussierung</translation>
+    </message>
+    <message>
+        <source>Suspending guiding on %1</source>
+        <translation>Nachführung auf %1 wird unterbrochen</translation>
+    </message>
+    <message>
+        <source>loadedFamilies-focus</source>
+        <translation>loadedFamilies-focus</translation>
+    </message>
+    <message>
+        <source>loadedFamilies-guiding</source>
+        <translation>loadedFamilies-guiding</translation>
+    </message>
+    <message>
+        <source>loadedModules-blindpec</source>
+        <translation>loadedModules-blindpec</translation>
+    </message>
+    <message>
+        <source>loadedModules-dummy</source>
+        <translation>loadedModules-dummy</translation>
+    </message>
+    <message>
+        <source>loadedModules-focus</source>
+        <translation>loadedModules-focus</translation>
+    </message>
+    <message>
+        <source>loadedModules-guider</source>
+        <translation>loadedModules-guider</translation>
+    </message>
+    <message>
+        <source>loadedModules-inspector</source>
+        <translation>loadedModules-inspector</translation>
+    </message>
+    <message>
+        <source>loadedModules-navigator</source>
+        <translation>loadedModules-navigator</translation>
+    </message>
+    <message>
+        <source>loadedModules-planner</source>
+        <translation>loadedModules-planner</translation>
+    </message>
+    <message>
+        <source>loadedModules-polar</source>
+        <translation>loadedModules-polar</translation>
+    </message>
+    <message>
+        <source>loadedModules-sequencer</source>
+        <translation>loadedModules-sequencer</translation>
+    </message>
+    <message>
+        <source>profiles-Focus</source>
+        <translation>profiles-Focus</translation>
+    </message>
+    <message>
+        <source>profiles-GlobalDatastore</source>
+        <translation>profiles-GlobalDatastore</translation>
+    </message>
+    <message>
+        <source>profiles-Guider</source>
+        <translation>profiles-Guider</translation>
+    </message>
+    <message>
+        <source>profiles-Inspector</source>
+        <translation>profiles-Inspector</translation>
+    </message>
+    <message>
+        <source>profiles-Monitor</source>
+        <translation>profiles-Monitor</translation>
+    </message>
+    <message>
+        <source>profiles-Navigator</source>
+        <translation>profiles-Navigator</translation>
+    </message>
+    <message>
+        <source>profiles-Parkmanager</source>
+        <translation>profiles-Parkmanager</translation>
+    </message>
+    <message>
+        <source>profiles-Planner</source>
+        <translation>profiles-Planner</translation>
+    </message>
+    <message>
+        <source>profiles-Polar</source>
+        <translation>profiles-Polar</translation>
+    </message>
+    <message>
+        <source>profiles-Sequencer</source>
+        <translation>profiles-Sequencer</translation>
+    </message>
+    <message>
+        <source>Changing filter from %1 to %2</source>
+        <translation>Filterwechsel von %1 zu %2</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.7, DEC=56.5, Pier=West</source>
+        <translation>Montierungsposition: RA=12.7, DEK=56.5, Pfeiler=West</translation>
+    </message>
+    <message>
+        <source>No star correlation with reference (%1/%2) - skipping frame [ref=%3 cur=%4 matched=%5]</source>
+        <translation>Keine Sternkorrelation mit der Referenz (%1/%2) - Bild wird übersprungen [ref=%3 cur=%4 matched=%5]</translation>
+    </message>
+    <message>
+        <source>Lost star correlation for %1 consecutive frames - Abort</source>
+        <translation>Sternkorrelation für %1 aufeinanderfolgende Bilder verloren - Abbruch</translation>
+    </message>
+    <message>
+        <source>Guider stopped unexpectedly</source>
+        <translation>Guider unerwartet gestoppt</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=11.1, DEC=62.5, Pier=East</source>
+        <translation>Montierungsposition: RA=11.1, DEK=62.5, Pfeiler=Ost</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=11.2, DEC=62.9, Pier=East</source>
+        <translation>Montierungsposition: RA=11.2, DEK=62.9, Pfeiler=Ost</translation>
+    </message>
+    <message>
+        <source>Log file              =ostserver_2026-10-01_00-23-20.log</source>
+        <translation>Protokolldatei        =ostserver_2026-10-01_00-23-20.log</translation>
+    </message>
+    <message>
+        <source>Reusing orphaned indiserver (PID 1529995)</source>
+        <translation>Verwaisten indiserver wiederverwenden (PID 1529995)</translation>
+    </message>
+    <message>
+        <source>%1 - Couldn&apos;t find CONNECTION switch for %2</source>
+        <translation>%1 - CONNECTION-Schalter für %2 nicht gefunden</translation>
+    </message>
+    <message>
+        <source>Starting goto with centering: max 5 iterations, tolerance 300.0&quot;</source>
+        <translation>Starte Goto mit Zentrierung: max 5 Iterationen, Toleranz 300.0&quot;</translation>
+    </message>
+    <message>
+        <source>Centering successful after 3 iteration(s) - within tolerance</source>
+        <translation>Zentrierung erfolgreich nach 3 Iteration(en) - innerhalb der Toleranz</translation>
+    </message>
+    <message>
+        <source>Embedded Indi server  =N</source>
+        <translation>Eingebetteter INDI-Server=N</translation>
+    </message>
+    <message>
+        <source>Log file              =ostserver_2026-10-02_17-00-06.log</source>
+        <translation>Protokolldatei        =ostserver_2026-10-02_17-00-06.log</translation>
+    </message>
+    <message>
+        <source>Cannot start driver indi_simulator_ccd: FIFO not available (No such device or address)</source>
+        <translation>Treiber indi_simulator_ccd kann nicht gestartet werden: FIFO nicht verfügbar (Kein passendes Gerät oder keine Adresse)</translation>
+    </message>
+    <message>
+        <source>Cannot start driver indi_simulator_dome: FIFO not available (No such device or address)</source>
+        <translation>Treiber indi_simulator_dome kann nicht gestartet werden: FIFO nicht verfügbar (Kein passendes Gerät oder keine Adresse)</translation>
+    </message>
+    <message>
+        <source>Cannot start driver indi_simulator_wheel: FIFO not available (No such device or address)</source>
+        <translation>Treiber indi_simulator_wheel kann nicht gestartet werden: FIFO nicht verfügbar (Kein passendes Gerät oder keine Adresse)</translation>
+    </message>
+    <message>
+        <source>Cannot start driver indi_simulator_focus: FIFO not available (No such device or address)</source>
+        <translation>Treiber indi_simulator_focus kann nicht gestartet werden: FIFO nicht verfügbar (Kein passendes Gerät oder keine Adresse)</translation>
+    </message>
+    <message>
+        <source>Cannot start driver indi_simulator_gps: FIFO not available (No such device or address)</source>
+        <translation>Treiber indi_simulator_gps kann nicht gestartet werden: FIFO nicht verfügbar (Kein passendes Gerät oder keine Adresse)</translation>
+    </message>
+    <message>
+        <source>Cannot start driver indi_simulator_guide: FIFO not available (No such device or address)</source>
+        <translation>Treiber indi_simulator_guide kann nicht gestartet werden: FIFO nicht verfügbar (Kein passendes Gerät oder keine Adresse)</translation>
+    </message>
+    <message>
+        <source>Cannot start driver indi_simulator_telescope: FIFO not available (No such device or address)</source>
+        <translation>Treiber indi_simulator_telescope kann nicht gestartet werden: FIFO nicht verfügbar (Kein passendes Gerät oder keine Adresse)</translation>
+    </message>
+    <message>
+        <source>Cannot start driver indi_simulator_weather: FIFO not available (No such device or address)</source>
+        <translation>Treiber indi_simulator_weather kann nicht gestartet werden: FIFO nicht verfügbar (Kein passendes Gerät oder keine Adresse)</translation>
+    </message>
+    <message>
+        <source>Dome device configured but DOME_SHUTTER not available yet, skipping</source>
+        <translation>Kuppelgerät konfiguriert, aber DOME_SHUTTER noch nicht verfügbar, wird übersprungen</translation>
+    </message>
+    <message>
+        <source>Dome device configured but DOME_PARK not available yet, skipping</source>
+        <translation>Kuppelgerät konfiguriert, aber DOME_PARK noch nicht verfügbar, wird übersprungen</translation>
+    </message>
+    <message>
+        <source>Focus module reported done, but sequencer isn&apos;t in Focusing (ignored)</source>
+        <translation>Fokussiermodul hat Fertigstellung gemeldet, aber Sequenzgeber befindet sich nicht im Zustand Fokussieren (ignoriert)</translation>
+    </message>
+    <message>
+        <source>loadedModules-parkmanager</source>
+        <translation>loadedModules-parkmanager</translation>
+    </message>
+    <message>
+        <source>Log file              =ostserver_2026-10-04_23-26-53.log</source>
+        <translation>Protokolldatei        =ostserver_2026-10-04_23-26-53.log</translation>
+    </message>
+    <message>
+        <source>Detection locality (frame size / N, higher = more local)</source>
+        <translation>Erkennungslokalität (Bildgröße / N, höher = lokaler)</translation>
+    </message>
+    <message>
+        <source>Max candidate size (% of frame)</source>
+        <translation>Max. Kandidatengröße (% des Bildes)</translation>
+    </message>
+    <message>
+        <source>Min. std dev to analyze (ADU)</source>
+        <translation>Min. Standardabw. zur Analyse (ADU)</translation>
+    </message>
+    <message>
+        <source>Min. candidate radius (pixels)</source>
+        <translation>Min. Kandidatenradius (Pixel)</translation>
+    </message>
+    <message>
+        <source>Detection sensitivity margin (0-255, lower = more sensitive)</source>
+        <translation>Erkennungsempfindlichkeitsspielraum (0-255, niedriger = empfindlicher)</translation>
+    </message>
+    <message>
+        <source>minimum flux a secondary peak inside one detection must have (as a percentage of the total) before SEP splits it into a separate star - native default is 0.5%, so a single defocused/donut-shaped star (uneven ring, secondary shadow) is very easily counted as several. Raise this to stop that</source>
+        <translation>Mindestfluss, den ein sekundärer Peak innerhalb einer Detektion haben muss (als Prozentsatz des Gesamtwerts), bevor SEP ihn als separaten Stern abspaltet - der native Standardwert ist 0,5%, sodass ein einzelner defokussierter/donutförmiger Stern (ungleichmäßiger Ring, sekundärer Schatten) sehr leicht als mehrere gezählt wird. Diesen Wert erhöhen, um das zu verhindern</translation>
+    </message>
+    <message>
+        <source>Deblend contrast (%)</source>
+        <translation>Deblend-Kontrast (%)</translation>
+    </message>
+    <message>
+        <source>minimum pixel area for a star detection, smaller ones are ignored - native default is 10, small enough that a single noise speck can pass</source>
+        <translation>Mindest-Pixelfläche für eine Sterndetektion, kleinere werden ignoriert - der native Standardwert ist 10, klein genug, dass ein einzelnes Rauschkorn durchrutschen kann</translation>
+    </message>
+    <message>
+        <source>Min. detection area (px)</source>
+        <translation>Min. Detektionsfläche (px)</translation>
+    </message>
+    <message>
+        <source>rejects detections smaller than this radius - native default is 3.5px</source>
+        <translation>Verwirft Detektionen, die kleiner als dieser Radius sind - der native Standardwert ist 3,5px</translation>
+    </message>
+    <message>
+        <source>Min. star radius (px)</source>
+        <translation>Min. Sternradius (px)</translation>
+    </message>
+    <message>
+        <source>star extraction (StellarSolver/SEP) detection threshold, in multiples of the background noise - native default is 2, very permissive (lots of noise false positives on a real sensor). Raise if the focus V-curve picks up far more &apos;stars&apos; than are actually in the frame</source>
+        <translation>Erkennungsschwelle der Sternextraktion (StellarSolver/SEP), in Vielfachen des Hintergrundrauschens - der native Standardwert ist 2, sehr permissiv (viele Rauschfehlalarme bei einem echten Sensor). Erhöhen, wenn die Fokus-V-Kurve weit mehr &apos;Sterne&apos; erkennt, als tatsächlich im Bild sind</translation>
+    </message>
+    <message>
+        <source>Detection threshold (sigma)</source>
+        <translation>Erkennungsschwelle (Sigma)</translation>
+    </message>
 </context>
 </TS>
