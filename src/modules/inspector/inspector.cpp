@@ -1,6 +1,7 @@
 #include "inspector.h"
 #include <QPainter>
 #include <opencv2/opencv.hpp>
+#include <algorithm>
 #include <cmath>
 #include "version.cc"
 
@@ -120,6 +121,30 @@ Inspector::Inspector(QString name, QString label, QString profile, QVariantMap a
     i->setValue(200);
     i->setSlider(OST::SliderAndValue, false);
     getProperty("parms")->addElt(i);
+
+    // Collimation-analysis safety bounds (Gilles, 2026-10-04: a flat/
+    // featureless frame -- overexposed, underexposed, or just no donut in
+    // frame -- makes the OpenCV contour pipeline in analyzeFrame() both
+    // very slow and prone to drawing incoherent contours across the whole
+    // image; a saturated frame in particular can threshold into one giant
+    // blob, whose "local refinement" step then runs an expensive Otsu
+    // threshold + contour search over a near-full-frame ROI -- see
+    // analyzeFrame()'s own comments on each bound for the full story).
+    auto *f = new OST::ElementFloat("mindynrange", "Min. std dev to analyze (ADU)", "52", "");
+    f->setAutoUpdate(true);
+    f->setDirectEdit(true);
+    f->setMinMax(0, 1000, false);
+    f->setValue(20);
+    f->setSlider(OST::SliderAndValue, false);
+    getProperty("parms")->addElt(f);
+
+    f = new OST::ElementFloat("maxstarsize", "Max candidate size (% of frame)", "54", "");
+    f->setAutoUpdate(true);
+    f->setDirectEdit(true);
+    f->setMinMax(0.1, 50, false);
+    f->setValue(5);
+    f->setSlider(OST::SliderAndValue, false);
+    getProperty("parms")->addElt(f);
 
     getEltLight("states", "idle")->setValue(OST::Ok, true);
     getEltLight("focushome", "defined")->setValue(OST::Idle, true);
@@ -766,6 +791,36 @@ void Inspector::analyzeFrame(void)
     if (!buffer || stats.width == 0 || stats.height == 0)
         return;
 
+    // A frame with (almost) no local contrast -- flat sky, fully
+    // saturated, or essentially black -- has nothing for the contour
+    // pipeline below to usefully find, and running it anyway is both slow
+    // and prone to drawing incoherent contours across the whole frame (see
+    // the "coarse candidate detection" comment further down for why) --
+    // Gilles, 2026-10-04: "si l'image est plate ... l'analyse opencv est
+    // tres tres longue, et me dessine des contours incoherents sur toute
+    // l'image". Bail out the same way the <2-donuts case below does,
+    // before doing any OpenCV work at all.
+    if (stats.stddev[0] < getFloat("parms", "mindynrange"))
+    {
+        getProperty("stars")->clearGrid();
+        getProperty("stars")->emitAll();
+        getEltLight("correction", "quality")->setValue(OST::Error, true);
+
+        double const scale = getSampling();
+        QImage rawImage = _image->getRawQImage();
+        QImage overlay = rawImage.convertToFormat(QImage::Format_RGB32);
+        overlay.setColorTable(rawImage.colorTable());
+        double const sx = overlay.width() > 0 ? overlay.width() / static_cast<double>(stats.width) : 1.0;
+        double const sy = overlay.height() > 0 ? overlay.height() / static_cast<double>(stats.height) : 1.0;
+        QPainter painter(&overlay);
+        painter.setRenderHint(QPainter::Antialiasing);
+        drawConvergenceOverlay(painter, stats.width / 2.0, stats.height / 2.0, 0, 0, false,
+                               std::isfinite(scale) && scale > 0 ? scale : 0, sx, sy);
+        painter.end();
+        publishCollimationImages(overlay);
+        return;
+    }
+
     // Wrap the raw buffer as an OpenCV Mat. v1 assumes a mono camera (the
     // usual case for collimation/guide cameras) -- color/Bayer is not
     // handled here.
@@ -797,14 +852,48 @@ void Inspector::analyzeFrame(void)
     cv::morphologyEx(coarseBin, coarseBin, cv::MORPH_CLOSE, morphKernel);
     cv::morphologyEx(coarseBin, coarseBin, cv::MORPH_OPEN, morphKernel);
 
-    std::vector<std::vector<cv::Point>> candidates;
-    cv::findContours(coarseBin, candidates, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+    std::vector<std::vector<cv::Point>> rawCandidates;
+    cv::findContours(coarseBin, rawCandidates, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
     getProperty("stars")->clearGrid();
 
     double const minArea = 30.0; // reject noise speckles
+    // Upper bound too -- a real donut is always a small fraction of the
+    // frame. Without this, a saturated/overexposed frame (near-uniform
+    // bright value) can threshold into one giant blob covering almost the
+    // whole image; the "local refinement" step below then runs an
+    // expensive Otsu threshold + contour search + per-pixel centroid loop
+    // over a near-full-frame ROI -- the main source of both "tres tres
+    // longue" and the crash on small configs (a correspondingly huge
+    // cv::Mat::zeros allocation) -- Gilles, 2026-10-04: "limite la
+    // recherche des contours sur une surface raisonnable".
+    double const maxArea = getFloat("parms", "maxstarsize") / 100.0 * stats.width * stats.height;
     double const cx0 = stats.width / 2.0;
     double const cy0 = stats.height / 2.0;
+
+    // Also bound how many candidates actually reach that expensive local-
+    // refinement step: a frame that's just noisy (not flat enough to trip
+    // the stddev bail-out above, but with no real donuts) can still
+    // produce hundreds of small contours that individually pass
+    // minArea/maxArea. A real collimation frame realistically has a
+    // handful of donuts, so keep only the largest ones.
+    std::vector<std::vector<cv::Point>> candidates;
+    for (const std::vector<cv::Point> &c : rawCandidates)
+    {
+        double const area = cv::contourArea(c);
+        if (area >= minArea && area <= maxArea)
+            candidates.push_back(c);
+    }
+    int const maxCandidates = 60;
+    if (static_cast<int>(candidates.size()) > maxCandidates)
+    {
+        std::sort(candidates.begin(), candidates.end(),
+                  [](const std::vector<cv::Point> &a, const std::vector<cv::Point> &b)
+        {
+            return cv::contourArea(a) > cv::contourArea(b);
+        });
+        candidates.resize(maxCandidates);
+    }
 
     // Pixels -> arcsec, same convention as the rest of OST (getSampling()).
     double scale = getSampling();
@@ -829,8 +918,7 @@ void Inspector::analyzeFrame(void)
 
     for (const std::vector<cv::Point> &candidate : candidates)
     {
-        if (cv::contourArea(candidate) < minArea)
-            continue;
+        // candidates is already filtered to [minArea, maxArea] above.
 
         // Local refinement: re-threshold (Otsu) just this candidate's own
         // neighborhood, expanded a bit around its coarse bounding box. This
