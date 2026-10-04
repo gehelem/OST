@@ -49,6 +49,21 @@ Estos parámetros son accesibles desde el menú **Parámetros** del módulo. Un 
 | **Backlash** | Sobrepaso aplicado antes de cada desplazamiento para corregir el juego mecánico. El enfocador retrocede este valor antes de avanzar hacia el objetivo |
 | **Zoning** | División de la imagen en zonas (1×1 a 9×9). Ver sección dedicada abajo |
 
+### Detección de estrellas
+
+La medición HFR se basa en StellarSolver (extracción de fuentes SEP), con un ajuste pensado para funcionar en todo el rango recorrido por el enfoque — desde el punto nítido hasta los extremos voluntariamente desenfocados al principio/final de la secuencia.
+
+| Parámetro | Defecto | Descripción |
+|---|---|---|
+| **Umbral de detección (σ)** | 4 | Umbral de detección, en múltiplos del ruido de fondo. Aumentarlo reduce los falsos positivos (ruido del sensor detectado como estrella) |
+| **Área mín. de detección (px)** | 20 | Área mínima en píxeles para que una detección sea retenida — elimina los pequeños artefactos de ruido |
+| **Contraste de separación (%)** | 5 % | Flujo mínimo que un pico secundario debe representar (en % del flujo total) antes de que SEP lo separe en un objeto distinto. De lo contrario, una estrella desenfocada (anillo irregular, sombra del secundario) se fragmenta fácilmente en varias «estrellas» — aumentar para evitarlo |
+| **Radio mín. de estrella (px)** | 5 | Rechaza las detecciones más pequeñas que este radio — filtra los fragmentos residuales de una sobresegmentación |
+
+{{% notice style="note" title="Número de estrellas anormalmente elevado, o que varía bruscamente en desenfoque" %}}
+Si el número de estrellas reportado parece muy superior a lo que se observa a simple vista en la imagen, o aumenta claramente en los extremos desenfocados de la secuencia, es señal de que estos ajustes son demasiado permisivos para el sensor/la óptica utilizada — aumentar el umbral de detección y/o el contraste de separación anteriores.
+{{% /notice %}}
+
 ## Algoritmo
 
 El enfoque se desarrolla en dos fases.

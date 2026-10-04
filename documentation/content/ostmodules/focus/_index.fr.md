@@ -49,6 +49,21 @@ Ces paramètres sont accessibles depuis le menu **Paramètres** du module. Un je
 | **Backlash** | Surshoot appliqué avant chaque déplacement pour corriger le jeu mécanique. Le focaliseur recule de cette valeur avant d'avancer vers la cible |
 | **Zoning** | Découpe de l'image en zones (1×1 à 9×9). Voir section dédiée ci-dessous |
 
+### Détection d'étoiles
+
+La mesure HFR repose sur StellarSolver (extraction de sources SEP), avec un réglage pensé pour tenir sur toute la plage balayée par la mise au point — du point net jusqu'aux extrémités volontairement défocalisées en début/fin de séquence.
+
+| Paramètre | Défaut | Description |
+|---|---|---|
+| **Seuil de détection (σ)** | 4 | Seuil de détection, en multiples du bruit de fond. Augmenter réduit les faux positifs (bruit capteur détecté comme étoile) |
+| **Aire min. de détection (px)** | 20 | Aire minimale en pixels pour qu'une détection soit retenue — élimine les petits artefacts de bruit |
+| **Contraste de séparation (%)** | 5 % | Flux minimal qu'un pic secondaire doit représenter (en % du flux total) avant que SEP le sépare en objet distinct. Une étoile défocalisée (anneau irrégulier, ombre du secondaire) est sinon facilement découpée en plusieurs « étoiles » — augmenter pour l'éviter |
+| **Rayon min. d'étoile (px)** | 5 | Rejette les détections plus petites que ce rayon — filtre les fragments résiduels d'une sur-segmentation |
+
+{{% notice style="note" title="Nombre d'étoiles anormalement élevé, ou qui saute en défocalisé" %}}
+Si le nombre d'étoiles rapporté semble très supérieur à ce qui est visible à l'œil sur l'image, ou augmente nettement aux extrémités défocalisées de la séquence, c'est le signe que ces réglages sont trop permissifs pour le capteur/l'optique utilisée — augmenter le seuil de détection et/ou le contraste de séparation ci-dessus.
+{{% /notice %}}
+
 ## Algorithme
 
 La mise au point se déroule en deux phases.

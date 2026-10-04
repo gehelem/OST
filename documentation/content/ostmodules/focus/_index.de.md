@@ -49,6 +49,21 @@ Diese Parameter sind über das Menü **Parameter** des Moduls erreichbar. Ein Pa
 | **Backlash** | Überschuss, der vor jeder Bewegung angewendet wird, um das mechanische Spiel zu korrigieren. Der Fokussierer fährt um diesen Wert zurück, bevor er sich auf das Ziel zu bewegt |
 | **Zoning** | Aufteilung des Bilds in Zonen (1×1 bis 9×9). Siehe eigener Abschnitt unten |
 
+### Sternerkennung
+
+Die HFR-Messung basiert auf StellarSolver (SEP-Quellenextraktion), mit einer Einstellung, die so gewählt ist, dass sie über den gesamten von der Fokussierung durchlaufenen Bereich funktioniert — von der scharfen Fokusposition bis zu den am Sequenzanfang/-ende bewusst defokussierten Extremen.
+
+| Parameter | Standard | Beschreibung |
+|---|---|---|
+| **Erkennungsschwelle (σ)** | 4 | Erkennungsschwelle, als Vielfaches des Hintergrundrauschens. Eine Erhöhung reduziert Falschmeldungen (Sensorrauschen, das als Stern erkannt wird) |
+| **Min. Erkennungsfläche (px)** | 20 | Minimale Fläche in Pixeln, damit eine Erkennung berücksichtigt wird — eliminiert kleine Rauschartefakte |
+| **Trennkontrast (%)** | 5 % | Minimaler Fluss, den ein sekundärer Peak darstellen muss (in % des Gesamtflusses), bevor SEP ihn als eigenständiges Objekt abtrennt. Ein defokussierter Stern (unregelmäßiger Ring, Schatten des Sekundärspiegels) wird sonst leicht in mehrere „Sterne“ aufgespalten — erhöhen, um dies zu vermeiden |
+| **Min. Sternradius (px)** | 5 | Verwirft Erkennungen, die kleiner als dieser Radius sind — filtert verbleibende Fragmente einer Übersegmentierung |
+
+{{% notice style="note" title="Ungewöhnlich hohe Sternzahl oder starke Schwankungen im defokussierten Bereich" %}}
+Wenn die gemeldete Sternzahl deutlich höher erscheint als das, was auf dem Bild mit dem Auge erkennbar ist, oder an den defokussierten Enden der Sequenz deutlich ansteigt, ist das ein Hinweis darauf, dass diese Einstellungen für den verwendeten Sensor/die verwendete Optik zu permissiv sind — die Erkennungsschwelle und/oder den Trennkontrast oben erhöhen.
+{{% /notice %}}
+
 ## Algorithmus
 
 Die Fokussierung läuft in zwei Phasen ab.
