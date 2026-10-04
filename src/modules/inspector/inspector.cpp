@@ -146,6 +146,47 @@ Inspector::Inspector(QString name, QString label, QString profile, QVariantMap a
     f->setSlider(OST::SliderAndValue, false);
     getProperty("parms")->addElt(f);
 
+    // Coarse-detection sensitivity (Gilles, 2026-10-04, on a real noisy
+    // frame where several real donuts weren't detected at all: "je suis un
+    // peu decu de la detection des donuts" -- the coarse adaptiveThreshold()
+    // in analyzeFrame() is the gatekeeper; anything it misses never reaches
+    // the per-candidate local-refinement step that could otherwise recover
+    // it). Exposed as tunables (defaults match the previous hardcoded
+    // behavior exactly: margin=5, blockdivisor=8) rather than guessed new
+    // constants, since the right values depend on the actual camera/gain/
+    // noise floor and can only really be found by testing against real
+    // frames -- not something buildable/testable from here.
+    f = new OST::ElementFloat("threshmargin", "Detection sensitivity margin (0-255, lower = more sensitive)", "56",
+                              "");
+    f->setAutoUpdate(true);
+    f->setDirectEdit(true);
+    f->setMinMax(0, 50, false);
+    f->setValue(5);
+    f->setSlider(OST::SliderAndValue, false);
+    getProperty("parms")->addElt(f);
+
+    auto *bd = new OST::ElementInt("blockdivisor", "Detection locality (frame size / N, higher = more local)", "58",
+                                   "");
+    bd->setAutoUpdate(true);
+    bd->setDirectEdit(true);
+    bd->setMinMax(2, 64, false);
+    bd->setValue(8);
+    bd->setSlider(OST::SliderAndValue, false);
+    getProperty("parms")->addElt(bd);
+
+    // Reject point-like candidates (frame not actually defocused enough for
+    // the donut method -- see analyzeFrame()'s own comment on this) below
+    // this equivalent radius, in pixels -- Gilles, 2026-10-04, after a
+    // wild convergence line turned out to come from a near-focus star
+    // field, not real donuts.
+    auto *msr = new OST::ElementInt("minstarradius", "Min. candidate radius (pixels)", "60", "");
+    msr->setAutoUpdate(true);
+    msr->setDirectEdit(true);
+    msr->setMinMax(0, 200, false);
+    msr->setValue(5);
+    msr->setSlider(OST::SliderAndValue, false);
+    getProperty("parms")->addElt(msr);
+
     getEltLight("states", "idle")->setValue(OST::Ok, true);
     getEltLight("focushome", "defined")->setValue(OST::Idle, true);
 
@@ -845,9 +886,18 @@ void Inspector::analyzeFrame(void)
     // neighborhood instead, so it catches both. Morphological close/open
     // bridges small gaps in a ring's edge and removes speckle noise before
     // contour extraction.
-    int const blockSize = std::max(21, (std::min(stats.width, stats.height) / 8) | 1); // odd
+    //
+    // Both knobs below are tunable ("threshmargin"/"blockdivisor" on
+    // "parms") -- this is the step that actually decides whether a faint
+    // donut gets picked up at all; anything it misses never reaches the
+    // per-candidate local-refinement step further down. Gilles, 2026-10-04,
+    // on a real frame where several visible donuts weren't detected: "je
+    // suis un peu decu de la detection des donuts".
+    int const blockDivisor = getInt("parms", "blockdivisor");
+    int const blockSize = std::max(21, (std::min(stats.width, stats.height) / blockDivisor) | 1); // odd
     cv::Mat coarseBin;
-    cv::adaptiveThreshold(img8, coarseBin, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, blockSize, -5);
+    cv::adaptiveThreshold(img8, coarseBin, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, blockSize,
+                          -getFloat("parms", "threshmargin"));
     cv::Mat const morphKernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(3, 3));
     cv::morphologyEx(coarseBin, coarseBin, cv::MORPH_CLOSE, morphKernel);
     cv::morphologyEx(coarseBin, coarseBin, cv::MORPH_OPEN, morphKernel);
@@ -871,18 +921,35 @@ void Inspector::analyzeFrame(void)
     double const cx0 = stats.width / 2.0;
     double const cy0 = stats.height / 2.0;
 
-    // Also bound how many candidates actually reach that expensive local-
-    // refinement step: a frame that's just noisy (not flat enough to trip
-    // the stddev bail-out above, but with no real donuts) can still
+    // A real donut, meaningfully defocused, has a sizeable apparent radius;
+    // a plain point-like star (frame not actually defocused, or barely so)
+    // thresholds into a tiny blob that still clears minArea but carries no
+    // real ring-deformation signal -- its "deformation vector" further down
+    // is then pure centroid noise. Left in, a field of such points (cf.
+    // Gilles, 2026-10-04, showing the raw frame behind an earlier wild
+    // convergence-line screenshot: real point stars, not donuts) poisons
+    // the convergence fit with noise instead of being correctly recognized
+    // as "not enough donuts to analyze" (the existing starPos.size() < 2
+    // case). Reject anything whose equivalent radius (from its coarse
+    // area) is below a tunable floor before it's even considered a
+    // candidate.
+    double const minRadiusPx = getInt("parms", "minstarradius");
+
+    // Also bound how many candidates actually reach the expensive local-
+    // refinement step below: a frame that's just noisy (not flat enough to
+    // trip the stddev bail-out above, but with no real donuts) can still
     // produce hundreds of small contours that individually pass
-    // minArea/maxArea. A real collimation frame realistically has a
-    // handful of donuts, so keep only the largest ones.
+    // minArea/maxArea/minRadiusPx. A real collimation frame realistically
+    // has a handful of donuts, so keep only the largest ones.
     std::vector<std::vector<cv::Point>> candidates;
     for (const std::vector<cv::Point> &c : rawCandidates)
     {
         double const area = cv::contourArea(c);
-        if (area >= minArea && area <= maxArea)
-            candidates.push_back(c);
+        if (area < minArea || area > maxArea)
+            continue;
+        if (minRadiusPx > 0 && std::sqrt(area / CV_PI) < minRadiusPx)
+            continue;
+        candidates.push_back(c);
     }
     int const maxCandidates = 60;
     if (static_cast<int>(candidates.size()) > maxCandidates)
@@ -1065,6 +1132,26 @@ void Inspector::analyzeFrame(void)
     {
         convX = cx0 + Cx / k;
         convY = cy0 + Cy / k;
+
+        // Reject a convergence point so far outside the frame it isn't a
+        // meaningful answer -- an ill-conditioned fit (k near zero, or
+        // deformation vectors dominated by per-star noise rather than a
+        // real collimation signal, e.g. stars that aren't actually
+        // defocused enough for the donut method to mean anything) can
+        // extrapolate arbitrarily far; drawing that literally (a line
+        // shooting off past the image edge) is more confusing than useful
+        // -- Gilles, 2026-10-04, on exactly this ("et avec cette image ?",
+        // the convergence line running clean off the frame).
+        double const maxConvDist = 3.0 * std::hypot(stats.width, stats.height);
+        if (std::hypot(convX - cx0, convY - cy0) > maxConvDist)
+        {
+            hasConvergence = false;
+            convX = cx0;
+            convY = cy0;
+        }
+    }
+    if (hasConvergence)
+    {
         getEltFloat("correction", "convergencex")->setValue(convX, false);
         getEltFloat("correction", "convergencey")->setValue(convY, false);
     }
