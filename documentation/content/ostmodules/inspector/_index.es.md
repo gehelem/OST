@@ -49,6 +49,18 @@ Ambos interruptores son independientes (no exclusivos) y se guardan con el perfi
 |---|---|
 | **Zoning** | Cuadrícula N×N de división de la imagen para el análisis por zona (de 1×1 a 64×64) |
 
+### Detección de colimación
+
+Estos parámetros acotan y ajustan la detección de donuts para el análisis de colimación (ver «Detección por estrella» más abajo) — valores por defecto pensados para funcionar sin ajuste, a modificar solo si es necesario.
+
+| Parámetro | Por defecto | Descripción |
+|---|---|---|
+| **Desviación estándar mínima (ADU)** | 20 | Por debajo de este valor, la imagen se considera plana (sobreexpuesta, subexpuesta, sin donut) y el análisis de colimación se omite por completo para esa captura |
+| **Tamaño máx. del candidato (% de imagen)** | 5 % | Un contorno mayor que esta fracción de la imagen se rechaza directamente (nunca es un donut real — normalmente un artefacto de saturación) |
+| **Margen de detección (0-255)** | 5 | Contraste local mínimo exigido para que un píxel se considere parte de un donut. **Disminuirlo** para detectar donuts más débiles/con menos contraste (con el riesgo de captar más ruido — ya acotado por los demás parámetros de aquí) |
+| **Finura de detección (divisor)** | 8 | Controla el tamaño de la ventana de análisis local (tamaño de la imagen / N). **Aumentarlo** (ventana más pequeña, más local) también ayuda a detectar donuts débiles sobre un fondo ligeramente desigual |
+| **Radio mínimo del candidato (píxeles)** | 5 | Rechaza candidatos demasiado pequeños/puntuales para ser un donut desenfocado real — evita que un campo de estrellas no suficientemente desenfocado (puntos casi puntuales) contamine el ajuste de colimación con ruido |
+
 ### Desenfoque
 
 | Parámetro | Descripción |
@@ -120,6 +132,8 @@ Para cada estrella detectada:
 - Un ajuste de círculo por mínimos cuadrados sobre el contorno externo da el centro teórico de la estrella — este método sigue siendo fiable incluso cuando el anillo está muy deformado (creciente, en caso de decolimación importante)
 - El vector de deformación es la diferencia entre este centro teórico y el centroide ponderado por intensidad del anillo (sombra excluida)
 
+Los donuts visiblemente presentes en la imagen pero no detectados indican una sensibilidad de umbral demasiado estricta (disminuir el **Margen de detección**, o aumentar la **Finura de detección**). Por el contrario, un campo de estrellas no suficientemente desenfocado (puntos casi puntuales en lugar de anillos reales) no aporta ninguna señal de deformación utilizable — el **Radio mínimo del candidato** garantiza que dicho campo caiga limpiamente en «no se han detectado suficientes donuts» en lugar de producir un ajuste ruidoso y un punto de convergencia erróneo. Ver «Detección de colimación» en los parámetros anteriores.
+
 ### Regresión y punto de convergencia
 
 Los vectores de deformación de todas las estrellas detectadas se ajustan por mínimos cuadrados al modelo `D(P) = C - k·P`. El vector `C` obtenido se convierte en arcosegundos (focal y tamaño de píxel del sensor), y luego se proyecta sobre los 3 tornillos de colimación a 120° para obtener un signo y una amplitud por tornillo.
@@ -136,7 +150,7 @@ El análisis de colimación publica su propia imagen anotada (la imagen principa
 
 Y para el conjunto del campo:
 - Un bullseye (anillos discontinuos) centrado en la imagen, que materializa los mismos umbrales de tolerancia que el indicador de calidad
-- Una línea que conecta el centro teórico de la imagen con el punto de convergencia calculado
+- Una línea que conecta el centro teórico de la imagen con el punto de convergencia calculado — ausente si el ajuste se considera poco fiable (punto de convergencia extrapolado demasiado lejos fuera de la imagen, señal de un campo no suficientemente desenfocado o de muy pocos donuts utilizables)
 
 #### Antes de la colimación (ejemplo)
 

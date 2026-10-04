@@ -49,6 +49,18 @@ The two toggles are independent (not mutually exclusive) and are persisted with 
 |---|---|
 | **Zoning** | N×N grid for per-zone analysis (from 1×1 to 64×64) |
 
+### Collimation detection
+
+These parameters bound and tune donut detection for the collimation analysis (see "Per-star detection" below) — defaults are meant to work out of the box, only adjust if needed.
+
+| Parameter | Default | Description |
+|---|---|---|
+| **Min. std dev (ADU)** | 20 | Below this, the frame is considered flat (overexposed, underexposed, no donut) and the collimation analysis is skipped entirely for that capture |
+| **Max candidate size (% of frame)** | 5 % | A contour larger than this fraction of the frame is rejected outright (never a real donut — typically a saturation artifact) |
+| **Detection sensitivity margin (0-255)** | 5 | Minimum local contrast required for a pixel to be considered part of a donut. **Lower** it to pick up fainter/lower-contrast donuts (at the risk of catching more noise — already bounded by the other parameters here) |
+| **Detection locality (divisor)** | 8 | Controls the size of the local analysis window (frame size / N). **Raise** it (smaller, more local window) to also help detect faint donuts sitting against a slightly uneven background |
+| **Min. candidate radius (pixels)** | 5 | Rejects candidates too small/point-like to be a real defocused donut — keeps a field that isn't defocused enough (near-point stars) from polluting the collimation fit with noise |
+
 ### Defocus
 
 | Parameter | Description |
@@ -120,6 +132,8 @@ For each detected star:
 - A least-squares circle fit on the outer contour gives the star's theoretical center — this method stays reliable even when the ring is heavily distorted (a crescent shape, in case of severe decollimation)
 - The deformation vector is the offset between this theoretical center and the intensity-weighted centroid of the ring (shadow excluded)
 
+Donuts visibly present in the frame but left undetected point to a threshold that's too strict (lower **Detection sensitivity margin**, or raise **Detection locality**). Conversely, a field that isn't defocused enough (near-point stars rather than real rings) carries no usable deformation signal — **Min. candidate radius** makes sure such a field cleanly falls into "not enough donuts detected" instead of producing a noisy fit and a bogus convergence point. See "Collimation detection" in the parameters above.
+
 ### Regression and convergence point
 
 The deformation vectors of all detected stars are least-squares fitted to the `D(P) = C - k·P` model. The resulting vector `C` is converted to arcseconds (using the focal length and sensor pixel size), then projected onto the 3 collimation screws at 120° to get a sign and an amplitude per screw.
@@ -136,7 +150,7 @@ The collimation analysis publishes its own annotated image (the main image stays
 
 And for the whole field:
 - A bullseye (dashed rings) centered on the image, using the same tolerance thresholds as the quality light
-- A line connecting the image's theoretical center to the computed convergence point
+- A line connecting the image's theoretical center to the computed convergence point — absent if the fit is deemed unreliable (convergence point extrapolated too far outside the frame, a sign of an under-defocused field or too few usable donuts)
 
 #### Before collimation (example)
 
