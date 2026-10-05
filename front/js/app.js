@@ -407,7 +407,18 @@ function renderContentNow() {
   dockedViewEl.innerHTML = "";
 
   const isModule = isModuleView();
-  panelLayerEl.classList.toggle("hidden", !isModule);
+  // #panel-layer stays visible regardless of isModule now (Gilles,
+  // 2026-10-06: "sur la home, on doit pouvoir ouvrir les logs (sans
+  // selection du module) ==> la il ne se passe rien") - the persistent
+  // log panel (views.js's renderLogPanel(), panels.js's own
+  // `persistent:true`) lives inside #panel-layer and survives
+  // Panels.clear() by design, but hiding its whole ANCESTOR container
+  // whenever a docked view (Home/Controller/Files/Logs) was active made
+  // it invisible and unclickable there regardless. Safe to leave it
+  // always on: #panel-layer itself is pointer-events:none (panels.css),
+  // so it doesn't block anything over empty space, and Panels.clear()
+  // (above) already wipes every non-persistent (per-module) panel on
+  // every call to this function, docked view or not.
   dockedViewEl.classList.toggle("hidden", isModule);
   // #quicknav's own visibility follows the module view directly, not
   // whether it has nav entries to show — the actions zone (params) is

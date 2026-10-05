@@ -30,7 +30,12 @@
   <div id="app">
     <div id="canvas">
       <div id="bg-layer"></div>
-      <div id="panel-layer" class="hidden"></div>
+      <!-- Always visible now (app.js's renderContentNow() no longer
+           toggles a "hidden" class on it) - pointer-events:none
+           (panels.css) when empty, and hosts the persistent log panel
+           (views.js's renderLogPanel()) regardless of which view is
+           active, module or docked. -->
+      <div id="panel-layer"></div>
       <div id="docked-view" class="hidden"></div>
     </div>
     <nav id="modbar" class="glass"></nav>

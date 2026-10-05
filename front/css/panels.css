@@ -255,6 +255,18 @@
 #sky-canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; }
 #sky-canvas.dragging { cursor: grabbing; }
 #panel-layer, #docked-view { position: absolute; inset: 0; overflow: auto; }
+/* #panel-layer now stays visible even over a docked view (Home/Controller/
+   Files/Logs - see app.js's renderContentNow(), Gilles, 2026-10-06: "on
+   doit pouvoir ouvrir les logs sans selection du module"), so its own
+   stacking order against #docked-view now actually matters for the first
+   time - it used to simply come first in DOM order with #docked-view
+   right after it, which put the docked view's own content (e.g. Home's
+   cards) ON TOP of any panel (Gilles, same day, next: "elle est
+   inutilisable: cachee derriere les vignettes"). Explicit z-index fixes
+   that regardless of DOM order - harmless to #docked-view's own
+   clickability since #panel-layer itself stays pointer-events:none
+   (below), only an actual .panel-float opts back into being interactive. */
+#panel-layer { z-index: 5; }
 /* #modbar floats fixed over the canvas (top:12px, ~56px-tall buttons, 8px
    padding - see above), so anything docked at inset:0 starts right behind
    it. Floating panels already dodge this by hand (every template's own
