@@ -17,6 +17,7 @@ import * as navigator_ from "./navigator.js";
 import * as inspector from "./inspector.js";
 import * as polar from "./polar.js";
 import * as parkmanager from "./parkmanager.js";
+import * as monitor from "./monitor.js";
 
 export const templates = {
   guider,
@@ -26,4 +27,5 @@ export const templates = {
   inspector,
   polar,
   parkmanager,
+  monitor,
 };

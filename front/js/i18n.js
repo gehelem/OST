@@ -218,6 +218,14 @@ const STRINGS = {
   "guider.pulse": { en: "Pulse", fr: "Impulsion", de: "Impuls", it: "Impulso", es: "Impulso" },
   "guider.snr": { en: "SNR", fr: "RSB", de: "SNR", it: "SNR", es: "SNR" },
 
+  // ---- templates/monitor.js --------------------------------------------------
+  "monitor.graph": { en: "Session graph", fr: "Graphique de session", de: "Sitzungsdiagramm", it: "Grafico sessione", es: "Gráfico de sesión" },
+  "monitor.status": { en: "Status", fr: "Statut", de: "Status", it: "Stato", es: "Estado" },
+  "monitor.rms": { en: "Guide RMS", fr: "RMS guidage", de: "Guiding-RMS", it: "RMS guida", es: "RMS de guiado" },
+  "monitor.snr": { en: "SNR", fr: "RSB", de: "SNR", it: "SNR", es: "SNR" },
+  "monitor.imageHfr": { en: "Image HFR", fr: "HFR image", de: "Bild-HFR", it: "HFR immagine", es: "HFR de imagen" },
+  "monitor.focusHfr": { en: "Focus HFR", fr: "HFR focus", de: "Fokus-HFR", it: "HFR fuoco", es: "HFR de enfoque" },
+
   // ---- sky-engine.js: Sun/Moon/planet labels drawn on the sky dome --------
   "sky.sun": { en: "Sun", fr: "Soleil", de: "Sonne", it: "Sole", es: "Sol" },
   "sky.moon": { en: "Moon", fr: "Lune", de: "Mond", it: "Luna", es: "Luna" },
