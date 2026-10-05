@@ -771,16 +771,24 @@ export function renderLogPanel(client, initialModule) {
     return !filter.module || filter.module === LOG_MODULE_ALL || entry.c === filter.module;
   }
   function rebuildRows(logs) {
-    const atBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 24;
+    // Gilles, 2026-10-06: "la fenetre de logs (partout sur tous les
+    // modules) doit afficher le dernier message en premier, sinon on est
+    // oblige de scroller pour voir les trucs recents" - newest first
+    // (reversed from the wire's own append order, same as renderLogs()'s
+    // full-page Logs view already does), and the "stay pinned so new
+    // entries remain visible without having to re-scroll" check flips
+    // from atBottom to atTop to match: new rows now land at the TOP, not
+    // the bottom.
+    const atTop = list.scrollTop < 24;
     list.innerHTML = "";
-    for (const entry of (logs || []).filter(passes)) {
+    for (const entry of (logs || []).filter(passes).slice().reverse()) {
       list.appendChild(el("div", { class: "log-panel-row log-" + (LOG_LEVELS[entry.l] || "info") }, [
         el("span", { class: "log-panel-time", text: String(entry.d || "").replace(/^.*[ T]/, "").slice(0, 8) }),
         el("span", { class: "log-panel-src", text: entry.c || "" }),
         el("span", { class: "log-panel-msg", text: entry.t || "" }),
       ]));
     }
-    if (atBottom) list.scrollTop = list.scrollHeight;
+    if (atTop) list.scrollTop = 0;
   }
 
   // Module options: every module that has actually logged something (built
