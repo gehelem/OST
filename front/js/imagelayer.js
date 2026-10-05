@@ -64,7 +64,7 @@ export function showBackgroundImage(client, moduleName, propName, elName) {
 
   const unsub = client.subscribe(client.topics.property(moduleName, propName), (prop) => {
     const src = jpegSrc(prop && prop.elements && prop.elements[elName]);
-    if (src) { img.src = src; lastSrc = src; }
+    if (src) { img.src = src; lastSrc = src; refreshImageViewer(src); }
   });
 
   return {
@@ -103,7 +103,14 @@ function buildViewer() {
     ty = (vh - ih * scale) / 2;
     apply();
   }
-  img.addEventListener("load", fit);
+  // A live refresh() swap below (new frame, same image) must NOT reset the
+  // user's own zoom/pan the way opening a genuinely different image
+  // should — suppressFit skips exactly one upcoming `load` for that case.
+  let suppressFit = false;
+  img.addEventListener("load", () => {
+    if (suppressFit) { suppressFit = false; return; }
+    fit();
+  });
 
   stage.addEventListener("wheel", (ev) => {
     ev.preventDefault();
@@ -141,11 +148,21 @@ function buildViewer() {
   close.addEventListener("click", hide);
   root.addEventListener("mousedown", (ev) => { if (ev.target === root) hide(); });
 
+  // Identity used by refresh() below to decide "is this the same image,
+  // just a newer frame" — the path without the cache-busting `?t=` query,
+  // same convention every subscribed src in this file already follows.
+  let currentBase = null;
   return {
     open(src) {
       root.hidden = false;
       document.addEventListener("keydown", onKey);
+      currentBase = src.split("?")[0];
       if (img.src !== src) img.src = src; else fit();
+    },
+    refresh(src) {
+      if (root.hidden || src.split("?")[0] !== currentBase) return;
+      suppressFit = true;
+      img.src = src;
     },
   };
 }
@@ -154,6 +171,21 @@ export function openImageViewer(src) {
   if (!src) return;
   if (!viewerCtl) viewerCtl = buildViewer();
   viewerCtl.open(src);
+}
+
+/** Pushes a freshly-updated src to the shared fullscreen viewer IF it's
+ * currently open and showing this same image (same path, ignoring the
+ * cache-busting `?t=`) — a no-op otherwise (viewer closed, or open on a
+ * different image). Every live-subscribed caller in this file (the module
+ * background, the map/alternates grids below) calls this right after
+ * updating its own thumbnail/background `src`, so a viewer left open
+ * during a running Loop keeps showing the latest frame instead of
+ * freezing on whichever one it was opened on — Gilles, 2026-10-05: "ces
+ * images sont prevues pour s'actualiser ... il faut qu'elles se
+ * rechargent automatiquement, et aussi celles qui sont en plein ecran". */
+export function refreshImageViewer(src) {
+  if (!viewerCtl || !src) return;
+  viewerCtl.refresh(src);
 }
 
 function elValue(prop, elName) {
@@ -367,6 +399,7 @@ export function buildImageAlternatesPanel(client, moduleName, propName, elName) 
       const img = el("img", { class: "img-alternate-thumb", src, alt: "" });
       img.addEventListener("click", () => openImageViewer(src));
       wrap.appendChild(img);
+      refreshImageViewer(src);
     }
   });
   wrap._dispose = unsub;
@@ -404,6 +437,7 @@ export function buildImageGridPanel(client, moduleName, items) {
       src = path ? buildMediaUrl(getMediaBaseUrl(), path) + "?t=" + Date.now() : null;
       img.src = src || "";
       tile.classList.toggle("img-grid-tile-empty", !src);
+      if (src) refreshImageViewer(src);
     });
     wrap.appendChild(tile);
     return unsub;
