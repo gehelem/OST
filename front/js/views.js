@@ -353,6 +353,65 @@ function buildHomeCard(client, name, onSelect, onReorder) {
   return { node: card, dispose: () => disposers.forEach((d) => d()) };
 }
 
+// Gilles, 2026-10-06: "ajoute une vignette 'en dur' (qui ne correspond pas
+// a un module) avec les donnees systeme ('server load') et fais un truc
+// joli avec des spinners" - reuses controllerData()'s own systemwatcher
+// data (same source as renderController()'s "Server load" section above,
+// just a compact dashboard-card version of it instead of the full table).
+// A real determinate ring per percentage figure (RAM, each disk) - same
+// conic-gradient recipe as render.js's own "prg" spinner type
+// (components.css's .prg-ring*, reused here directly rather than
+// reinvented), just bigger (.home-ring). CPU load averages don't have a
+// clean 0-100 denominator without knowing the core count (which
+// systemwatcher doesn't report) - shown as plain numbers instead of a
+// ring that would misrepresent them.
+function ringGauge(pct, caption) {
+  const p = Math.max(0, Math.min(100, pct || 0));
+  return el("div", { class: "home-ring-item" }, [
+    el("div", { class: "prg-ring-wrap home-ring" }, [
+      el("div", { class: "prg-ring", style: `--pct:${p}` }),
+      el("span", { class: "prg-ring-value", text: Math.round(p) + "%" }),
+    ]),
+    el("div", { class: "muted small home-ring-caption", text: caption }),
+  ]);
+}
+
+const HOME_SYSTEM_ID = "__system";
+
+// Gilles, 2026-10-06, right after this card shipped: "je ne peux pas
+// drag/drop cette vignette !!" - it's "en dur" (not a real module) but
+// still expected to move around like every other one. Same handle/
+// startCardDrag wiring as buildHomeCard, with HOME_SYSTEM_ID standing in
+// for a module name - onReorder/orderedModuleNames (below) don't care
+// what the ids mean, any string works, so no special-casing needed there
+// beyond seeding it into the id list renderHome() builds cards from.
+function buildSystemCard(client, onReorder) {
+  const handle = icon("drag_indicator", { small: true });
+  handle.classList.add("home-card-handle");
+  handle.title = t("views.homeDragHint");
+  handle.addEventListener("click", (ev) => ev.stopPropagation());
+  const body = el("div", { class: "home-system-body" });
+  const card = el("div", { class: "home-card home-card-system" }, [
+    el("div", { class: "home-card-header" }, [handle, icon("dns"), el("span", { class: "home-card-title", text: t("views.serverLoad") })]),
+    body,
+  ]);
+  card.dataset.moduleName = HOME_SYSTEM_ID;
+  handle.addEventListener("mousedown", (ev) => startCardDrag(card, HOME_SYSTEM_ID, ev, onReorder));
+  handle.addEventListener("touchstart", (ev) => startCardDrag(card, HOME_SYSTEM_ID, ev, onReorder), { passive: false });
+  const unsub = client.subscribe(client.topics.controllerData(), (cd) => {
+    body.innerHTML = "";
+    const sw = cd && cd.systemwatcher;
+    if (!sw) { body.appendChild(el("div", { class: "muted small", text: t("views.homeGeneric") })); return; }
+    const rings = el("div", { class: "home-ring-row" });
+    if (sw.ram) rings.appendChild(ringGauge((sw.ram.used_mb / sw.ram.total_mb) * 100, t("views.ramLabel")));
+    for (const d of (sw.disks || []).slice(0, 2)) rings.appendChild(ringGauge((d.used_gb / d.total_gb) * 100, d.mountpoint));
+    if (rings.children.length) body.appendChild(rings);
+    if (sw.cpu) body.appendChild(el("div", { class: "home-card-row" }, [el("span", { class: "muted small", text: t("views.cpuLabel") }), el("span", { class: "mono", text: `${sw.cpu.load_1m} / ${sw.cpu.load_5m} / ${sw.cpu.load_15m}` })]));
+    for (const temp of sw.temperatures || []) body.appendChild(el("div", { class: "home-card-row" }, [el("span", { class: "muted small", text: temp.type }), el("span", { class: "mono", text: `${temp.temp_c.toFixed(1)} °C` })]));
+  });
+  return { node: card, dispose: unsub };
+}
+
 // Gilles, 2026-10-06: "ajoute la possibilite de deplacer les vignettes +
 // position remanente" - same idea as OstErix's own home page (localStorage
 // key "ost-home-card-order", source read directly), just this client's own
@@ -393,18 +452,19 @@ export function renderHome(client, onSelect) {
     rebuild();
   }
 
+  // The "en dur" system card (Gilles, 2026-10-06) takes part in the exact
+  // same ordered id list as real module names - HOME_SYSTEM_ID is just
+  // another entry orderedModuleNames() sorts/persists like any other
+  // (Gilles, right after it first shipped fixed in place: "je ne peux pas
+  // drag/drop cette vignette !!").
   let cardDisposers = [];
   function rebuild() {
     cardDisposers.forEach((d) => d());
     cardDisposers = [];
     grid.innerHTML = "";
-    const names = orderedModuleNames(client.get(client.topics.modules()));
-    if (!names.length) {
-      grid.appendChild(el("div", { class: "muted", text: t("views.noModuleLoaded") }));
-      return;
-    }
-    for (const name of names) {
-      const { node, dispose } = buildHomeCard(client, name, onSelect, onReorder);
+    const ids = orderedModuleNames([HOME_SYSTEM_ID, ...client.get(client.topics.modules())]);
+    for (const id of ids) {
+      const { node, dispose } = id === HOME_SYSTEM_ID ? buildSystemCard(client, onReorder) : buildHomeCard(client, id, onSelect, onReorder);
       cardDisposers.push(dispose);
       grid.appendChild(node);
     }

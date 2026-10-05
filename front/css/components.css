@@ -175,6 +175,17 @@ input[type="range"]::-moz-range-thumb {
    accent already used for the active modbar/quicknav button. */
 .home-card.drop-before { box-shadow: inset 3px 0 0 var(--accent); }
 .home-card.drop-after { box-shadow: inset -3px 0 0 var(--accent); }
+/* Gilles, 2026-10-06: "ajoute une vignette 'en dur' (qui ne correspond pas
+   a un module) avec les donnees systeme ('server load') et fais un truc
+   joli avec des spinners" - a fixed, non-draggable, non-clickable (no
+   module to open) card, always first (views.js's renderHome()), not part
+   of the reorderable set at all. */
+.home-card-system { cursor: default; }
+.home-card-system:hover { border-color: var(--border); box-shadow: var(--shadow-panel); }
+.home-system-body { display: flex; flex-direction: column; gap: var(--space-2); }
+.home-ring-row { display: flex; gap: var(--space-3); }
+.home-ring-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.home-ring-caption { max-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
 
 /* --------------------------------------------------------- status dots */
 .status-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 2px; flex-shrink: 0; box-shadow: 0 0 0 3px transparent; transition: box-shadow 0.2s ease; }
@@ -341,6 +352,11 @@ input[type="range"]::-moz-range-thumb {
   transition: background 0.25s ease;
 }
 .prg-ring-value { position: relative; font-size: 8.5px; font-weight: 600; font-family: var(--font-mono); color: var(--text-muted); }
+/* Bigger size modifier for the Home dashboard's system card (views.js's
+   ringGauge()) - same ring, just scaled up to read as a dashboard gauge
+   rather than an inline per-row indicator. */
+.prg-ring-wrap.home-ring { width: 56px; height: 56px; }
+.home-ring .prg-ring-value { font-size: 14px; }
 
 .img-elt .preview-img { max-width: 340px; max-height: 250px; border-radius: var(--radius-sm); display: block; border: 1px solid var(--border); }
 .preview-video { max-width: 340px; border-radius: var(--radius-sm); }
