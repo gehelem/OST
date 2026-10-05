@@ -336,6 +336,11 @@ input[type="range"]::-moz-range-thumb {
    (crops to a fixed ratio, never stretches/distorts either way). */
 .home-img-grid { min-width: 0; gap: 4px; }
 .home-img-grid .img-grid-label { display: none; }
+/* Gilles, 2026-10-06: "la vignette home du monitor avec le graphe
+   'session graph' sans les labels de serie" - a chart embedded directly
+   in a plain card's body (not via the focus/guider multi-column path, see
+   .home-card-column.gd-chart above), same compact height. */
+.home-embedded-chart { height: 107px; }
 
 .elt-table { width: 100%; border-collapse: collapse; }
 .elt-row td { padding: 6px 4px; vertical-align: middle; border-top: 1px solid var(--border-subtle); }

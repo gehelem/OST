@@ -24,6 +24,9 @@ import { jpegSrc, openImageViewer, refreshImageViewer, buildImageGridPanel } fro
 // own "maps" panel already uses (Gilles, 2026-10-06: "sur inspector ajoute
 // les 4 images de controle en vignettes toutes petites").
 import { MAP_ITEMS as INSPECTOR_MAP_ITEMS } from "./templates/inspector.js";
+// monitor's own "Session graph" (Gilles, 2026-10-06: "la vignette home du
+// monitor avec le graphe 'session graph' sans les labels de serie").
+import { buildMonitorGraphPanel } from "./templates/monitor.js";
 
 // Shared by renderLogs() (the full-page Logs system view) and
 // renderLogPanel() (the always-on floating one, below) - index == the
@@ -425,6 +428,20 @@ function buildHomeCard(client, name, onSelect, onReorder) {
     grid.addEventListener("click", (ev) => ev.stopPropagation());
     body.appendChild(grid);
     disposers.push(grid._dispose);
+    return { node: card, dispose: () => disposers.forEach((d) => d()) };
+  }
+
+  // Gilles, 2026-10-06: "la vignette home du monitor avec le graphe
+  // 'session graph' sans les labels de serie" - the module's own chart
+  // (buildMonitorGraphPanel), compact (no legend), filling this plain
+  // card's normal body instead of growing it into a multi-column one.
+  if (template === "monitor") {
+    body.classList.remove("muted", "small");
+    body.innerHTML = "";
+    const chart = buildMonitorGraphPanel(client, name, { compact: true });
+    chart.classList.add("home-embedded-chart");
+    body.appendChild(chart);
+    disposers.push(chart._dispose);
     return { node: card, dispose: () => disposers.forEach((d) => d()) };
   }
 

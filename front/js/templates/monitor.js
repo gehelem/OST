@@ -142,8 +142,14 @@ function buildMonitorStatusPanel(client, moduleName) {
  * property (same fine-grained-topic pattern as guider.js's/focus.js's own
  * charts — grid row updates arrive on this topic, not on topics.module()).
  * Returns a node with `_dispose` set, ready for scaffold.js's own
- * `track()`. */
-function buildMonitorGraphPanel(client, moduleName) {
+ * `track()`. Exported too — reused as-is by views.js's Home dashboard
+ * (Gilles, 2026-10-06: "la vignette home du monitor avec le graphe
+ * 'session graph' sans les labels de serie"). `opts.compact` drops the
+ * legend (the module's own "Session graph" panel keeps it, doesn't pass
+ * opts), same convention guider.js's/focus.js's own charts already use
+ * for their Home-only compact variant. */
+export function buildMonitorGraphPanel(client, moduleName, opts) {
+  const compact = !!(opts && opts.compact);
   const wrap = el("div", { class: "gd-chart" });
   const canvas = el("canvas");
   wrap.appendChild(canvas);
@@ -162,7 +168,7 @@ function buildMonitorGraphPanel(client, moduleName) {
           responsive: true, maintainAspectRatio: false, animation: false,
           interaction: { mode: "nearest", intersect: false, axis: "x" },
           plugins: {
-            legend: { position: "bottom", labels: { color: grey, boxWidth: 14, boxHeight: 10, font: { size: 10 } } },
+            legend: { display: !compact, position: "bottom", labels: { color: grey, boxWidth: 14, boxHeight: 10, font: { size: 10 } } },
             tooltip: {
               mode: "nearest", intersect: false,
               callbacks: { title: (items) => items.length ? new Date(items[0].parsed.x).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }) : "" },
