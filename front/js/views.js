@@ -209,9 +209,18 @@ function stackedColumn(...builders) {
   };
 }
 
+// Gilles, 2026-10-06: "la place occupee par les graphes est trop
+// importante - essaie de ne pas afficher libelles DEC/RA sur drift et
+// (Drift(RA) etc etc sur le guidegraphe" - opts.compact (templates/
+// guider.js's own doc comment on each function) drops the legend/axis
+// titles, Home-only; the module's own panels still pass nothing and keep
+// them.
 const HOME_HORIZONTAL_BUILDERS = {
   focus: [buildResultsBoxes, buildFocusCurvePanel],
-  guider: [buildCompactRms, stackedColumn(buildGuidingChartPanel, buildDriftChartPanel)],
+  guider: [buildCompactRms, stackedColumn(
+    (client, name) => buildGuidingChartPanel(client, name, { compact: true }),
+    (client, name) => buildDriftChartPanel(client, name, { compact: true }),
+  )],
 };
 
 // Same touches[0]-or-clientX/Y split as panels.js's own pointXY() - not

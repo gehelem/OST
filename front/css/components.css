@@ -149,14 +149,18 @@ input[type="range"]::-moz-range-thumb {
 .rms-compact-sub { display: flex; gap: var(--space-3); }
 .rms-compact-item { display: flex; flex-direction: column; gap: 2px; }
 .home-card-stack { display: flex; flex-direction: column; gap: var(--space-2); }
-.home-card-stack .gd-chart { height: 130px; }
+/* Gilles, 2026-10-06: "la place occupee par les graphes est trop
+   importante" - shrunk further (130px to 110px) once opts.compact
+   (templates/guider.js) dropped the legend/axis titles that used to need
+   that extra room. */
+.home-card-stack .gd-chart { height: 110px; }
 /* flex-basis sets HEIGHT here (main axis is vertical in a column-direction
    flex container, see .home-card-stack above) - the square chart still
    needs its WIDTH pinned too (that's what drove its own height via
    maintainAspectRatio:1, components.css's own comment on gd-chart-square
    above), which a column container's default align-items:stretch would
    otherwise expand to the full column width again. */
-.home-card-stack .gd-chart-square { flex: 0 0 130px; width: 130px; align-self: center; }
+.home-card-stack .gd-chart-square { flex: 0 0 110px; width: 110px; align-self: center; }
 /* Gilles, 2026-10-06: "ajoute la possibilite de deplacer les vignettes +
    position remanente" - a small drag handle in the header (views.js's
    buildHomeCard), not the whole card, so a plain click elsewhere still

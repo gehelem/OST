@@ -127,8 +127,14 @@ function guidingChartData(prop) {
  * `_dispose` set, ready for the caller's track(). */
 // Exported too — reused as-is (same chart, just placed in a bigger card)
 // by views.js's Home dashboard (Gilles, 2026-10-05: "mets les graphes
-// correspondants" on the bigger focus/guider home cards).
-export function buildGuidingChartPanel(client, moduleName) {
+// correspondants" on the bigger focus/guider home cards). `opts.compact`
+// (Gilles, 2026-10-06, Home specifically: "la place occupee par les
+// graphes est trop importante - essaie de ne pas afficher ... Drift(RA)
+// etc etc sur le guidegraphe") drops the legend and the three Y axis
+// titles - the module's own "Guiding graph" panel keeps them (doesn't
+// pass opts), only Home asks for the tighter version.
+export function buildGuidingChartPanel(client, moduleName, opts) {
+  const compact = !!(opts && opts.compact);
   const wrap = el("div", { class: "gd-chart" });
   const canvas = el("canvas");
   wrap.appendChild(canvas);
@@ -149,24 +155,24 @@ export function buildGuidingChartPanel(client, moduleName) {
           responsive: true, maintainAspectRatio: false, animation: false,
           interaction: { mode: "index", intersect: false },
           plugins: {
-            legend: { position: "bottom", labels: { color: grey, boxWidth: 14, boxHeight: 10, font: { size: 10 } } },
+            legend: { display: !compact, position: "bottom", labels: { color: grey, boxWidth: 14, boxHeight: 10, font: { size: 10 } } },
             tooltip: { mode: "index", intersect: false },
           },
           scales: {
             x: { ticks: { color: grey, maxRotation: 0, autoSkip: true, maxTicksLimit: 10, font: { size: 9 } }, grid },
             yDrive: {
               type: "linear", position: "left", min: lim && lim.drive.min, max: lim && lim.drive.max,
-              title: { display: true, text: t("guider.drift"), color: grey, font: { size: 10 } },
+              title: { display: !compact, text: t("guider.drift"), color: grey, font: { size: 10 } },
               ticks: { color: grey, font: { size: 9 }, maxTicksLimit: 8 }, grid,
             },
             yPulse: {
               type: "linear", position: "right", min: lim && lim.pulse.min, max: lim && lim.pulse.max,
-              title: { display: true, text: t("guider.pulse"), color: grey, font: { size: 10 } },
+              title: { display: !compact, text: t("guider.pulse"), color: grey, font: { size: 10 } },
               ticks: { color: grey, font: { size: 9 }, maxTicksLimit: 6 }, grid: { drawOnChartArea: false },
             },
             ySNR: {
               type: "linear", position: "right", offset: true, min: 0,
-              title: { display: true, text: t("guider.snr"), color: "#F44336", font: { size: 10 } },
+              title: { display: !compact, text: t("guider.snr"), color: "#F44336", font: { size: 10 } },
               ticks: { color: "#F44336", font: { size: 9 }, maxTicksLimit: 5 }, grid: { drawOnChartArea: false },
             },
           },
@@ -227,8 +233,11 @@ function driftLimit(points) {
 
 // Exported too — reused as-is by views.js's Home dashboard (Gilles,
 // 2026-10-05: "Guide : rms/guidegraph/drift", same chart as the module's
-// own "Drift" panel).
-export function buildDriftChartPanel(client, moduleName) {
+// own "Drift" panel). `opts.compact` (Gilles, 2026-10-06, Home
+// specifically: "essaie de ne pas afficher libelles DEC/RA sur drift")
+// drops the X/Y axis titles - the module's own "Drift" panel keeps them.
+export function buildDriftChartPanel(client, moduleName, opts) {
+  const compact = !!(opts && opts.compact);
   const wrap = el("div", { class: "gd-chart gd-chart-square" });
   const canvas = el("canvas");
   wrap.appendChild(canvas);
@@ -249,8 +258,8 @@ export function buildDriftChartPanel(client, moduleName) {
           responsive: true, maintainAspectRatio: true, aspectRatio: 1, animation: false,
           plugins: { legend: { display: false } },
           scales: {
-            x: { type: "linear", min: -L, max: L, title: { display: true, text: (prop.elements[gp.X] && prop.elements[gp.X].label) || gp.X || "RA", color: grey, font: { size: 10 } }, ticks: { color: grey, font: { size: 9 } }, grid },
-            y: { min: -L, max: L, title: { display: true, text: (prop.elements[gp.Y] && prop.elements[gp.Y].label) || gp.Y || "DEC", color: grey, font: { size: 10 } }, ticks: { color: grey, font: { size: 9 } }, grid },
+            x: { type: "linear", min: -L, max: L, title: { display: !compact, text: (prop.elements[gp.X] && prop.elements[gp.X].label) || gp.X || "RA", color: grey, font: { size: 10 } }, ticks: { color: grey, font: { size: 9 } }, grid },
+            y: { min: -L, max: L, title: { display: !compact, text: (prop.elements[gp.Y] && prop.elements[gp.Y].label) || gp.Y || "DEC", color: grey, font: { size: 10 } }, ticks: { color: grey, font: { size: 9 } }, grid },
           },
         },
         plugins: [refCircles],
