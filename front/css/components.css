@@ -197,6 +197,18 @@ input[type="range"]::-moz-range-thumb {
 .img-alternate-thumb { width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: zoom-in; display: block; }
 .img-alternate-thumb:hover { border-color: var(--accent-dim); }
 
+/* imagelayer.js's buildImageGridPanel() - one panel for N separate image
+ * properties (inspector's own HFR/shape/collimation/corners maps) instead
+ * of N tiny floating ones - each tile a bit bigger than .img-alternates'
+ * own (these carry real diagnostic detail, not just a quick visual
+ * cross-check). */
+.img-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-3); min-width: 320px; }
+.img-grid-tile { display: flex; flex-direction: column; gap: var(--space-1); }
+.img-grid-thumb { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: zoom-in; display: block; background: var(--bg-elevated); }
+.img-grid-thumb:hover { border-color: var(--accent-dim); }
+.img-grid-tile-empty .img-grid-thumb { cursor: default; }
+.img-grid-label { font-size: 11px; color: var(--text-muted); text-align: center; }
+
 .elt-table { width: 100%; border-collapse: collapse; }
 .elt-row td { padding: 6px 4px; vertical-align: middle; border-top: 1px solid var(--border-subtle); }
 .elt-row:first-child td { border-top: none; }

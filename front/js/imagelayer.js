@@ -373,6 +373,45 @@ export function buildImageAlternatesPanel(client, moduleName, propName, elName) 
   return wrap;
 }
 
+// ------------------------------------------------------- multi-image grid
+/** Grid of labeled thumbnails, one per *separate* image property (not one
+ * element's own `alternates` — see buildImageAlternatesPanel() above for
+ * that case) — e.g. inspector's own HFR/shape/collimation/corners maps,
+ * each its own "img" property. One panel instead of N small ones, each
+ * thumbnail click opens the shared fullscreen viewer — Gilles, 2026-10-05,
+ * on the previous one-tiny-floating-panel-per-map layout: "je cherche une
+ * facon ergonomique d'afficher les 4 autres, autrement que dans ces
+ * petites fenetres", then picking the 2x2 grid-of-clickable-thumbnails
+ * option over a tabbed single-image-at-a-time alternative — a grid keeps
+ * all 4 comparable at a glance, which matters for correlating e.g. a
+ * hotspot in the HFR map with the shape map at the same field position.
+ *
+ * `items`: `[{propName, elName, label}, ...]` — `label` is a fallback,
+ * the server's own property label (once the dump arrives) always wins.
+ */
+export function buildImageGridPanel(client, moduleName, items) {
+  const wrap = el("div", { class: "img-grid" });
+  const tiles = items.map((item) => {
+    const label = el("div", { class: "img-grid-label", text: item.label || item.propName });
+    const img = el("img", { class: "img-grid-thumb", alt: "" });
+    let src = null;
+    img.addEventListener("click", () => { if (src) openImageViewer(src); });
+    const tile = el("div", { class: "img-grid-tile" }, [img, label]);
+    const unsub = client.subscribe(client.topics.property(moduleName, item.propName), (prop) => {
+      if (prop && prop.label) label.textContent = prop.label;
+      const v = elValue(prop, item.elName);
+      const path = v.urljpeg || v.urlthumbnail;
+      src = path ? buildMediaUrl(getMediaBaseUrl(), path) + "?t=" + Date.now() : null;
+      img.src = src || "";
+      tile.classList.toggle("img-grid-tile-empty", !src);
+    });
+    wrap.appendChild(tile);
+    return unsub;
+  });
+  wrap._dispose = () => { for (const unsub of tiles) unsub(); };
+  return wrap;
+}
+
 /**
  * The full "a module has an image" block a template wires in one call:
  * background + a small quick-stats panel + a deeper stats/histogram panel

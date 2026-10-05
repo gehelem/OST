@@ -28,11 +28,11 @@ import { t } from "../i18n.js";
 
 /**
  * `panelSpecs`: array of `{ id, title?, x, y, w, extra?, icon?, iconOnly?,
- * framed? }` — `id` is both the panel id and the property name passed to
- * renderProperty(); `extra`, if given, is a list of further property names
- * appended into the SAME panel body (see guider's own
- * values+calibrationvalues pairing); `icon`/`iconOnly`, if given, are
- * passed straight through to the quicknav entry (views.js's own
+ * framed?, custom?, customProps? }` — `id` is both the panel id and the
+ * property name passed to renderProperty(); `extra`, if given, is a list
+ * of further property names appended into the SAME panel body (see
+ * guider's own values+calibrationvalues pairing); `icon`/`iconOnly`, if
+ * given, are passed straight through to the quicknav entry (views.js's own
  * renderQuickNav(), same fields renderActionsPanel()'s "actions" button
  * already uses — e.g. sequencer.js's own "sequence" entry, Gilles,
  * 2026-10-03: "bouton 'sequence' => icone seulement = 'list'"); `framed:
@@ -43,6 +43,18 @@ import { t } from "../i18n.js";
  * A spec whose `id` isn't actually one of the module's properties is
  * silently skipped (safe to list one "just in case" across similar
  * modules).
+ *
+ * `custom: (client, moduleName) => Node`, if given, replaces the default
+ * `renderProperty(spec.id)` body entirely — for the rare panel that needs
+ * real bespoke rendering (e.g. inspector.js's own 4-map grid, see
+ * imagelayer.js's buildImageGridPanel()) without promoting the whole
+ * template to a hand-written one like focus.js/guider.js. `spec.id` is
+ * then just a logical panel id, not a real property name, so list every
+ * real property the custom renderer actually covers in `customProps`
+ * (excluded from the "Other" catch-all below, same as `extra`) — the
+ * panel is shown as soon as any one of them exists, since there's no
+ * single `spec.id` property to gate on. `spec.title` is required in this
+ * case (no `mod.properties[spec.id].label` to fall back on).
  *
  * `imagePos`: optional `{x,y,w}` override for where the image/image-stats
  * panels default to (they'd otherwise land wherever a panelSpec also put
@@ -93,7 +105,9 @@ export function buildScaffoldTemplate(panelSpecs, imagePos, opts) {
       for (const spec of panelSpecs) {
         known.add(spec.id);
         for (const extra of spec.extra || []) known.add(extra);
-        if (!has(spec.id)) continue;
+        for (const p of spec.customProps || []) known.add(p);
+        const exists = spec.custom ? (spec.customProps || []).some(has) : has(spec.id);
+        if (!exists) continue;
         // spec.title, when a template gives one (e.g. focus.js's "Focus
         // curve"), is an i18n.js *key*, not literal text - panelSpecs
         // arrays are built once at module-import time (see focus.js/
@@ -102,11 +116,15 @@ export function buildScaffoldTemplate(panelSpecs, imagePos, opts) {
         // event, including the one a language change triggers) is what
         // keeps it reactive instead of frozen at whatever language was
         // current on import.
-        const title = (spec.title && t(spec.title)) || mod.properties[spec.id].label || spec.id;
+        const title = (spec.title && t(spec.title)) || (!spec.custom && mod.properties[spec.id].label) || spec.id;
         const b = Panels.make({ id: spec.id, title, x: spec.x, y: spec.y, w: spec.w });
-        b.appendChild(track(renderProperty(client, moduleName, spec.id, { framed: spec.framed !== false })));
-        for (const extra of spec.extra || []) {
-          if (has(extra)) b.appendChild(track(renderProperty(client, moduleName, extra)));
+        if (spec.custom) {
+          b.appendChild(track(spec.custom(client, moduleName)));
+        } else {
+          b.appendChild(track(renderProperty(client, moduleName, spec.id, { framed: spec.framed !== false })));
+          for (const extra of spec.extra || []) {
+            if (has(extra)) b.appendChild(track(renderProperty(client, moduleName, extra)));
+          }
         }
         quickNavEntries.push({ id: spec.id, label: title, icon: spec.icon, iconOnly: spec.iconOnly });
       }

@@ -196,6 +196,9 @@ const STRINGS = {
   "focus.focusCurve": { en: "Focus curve", fr: "Courbe de mise au point", de: "Fokuskurve", it: "Curva di messa a fuoco", es: "Curva de enfoque" },
   "focus.tilt": { en: "Tilt", fr: "Tilt", de: "Tilt", it: "Tilt", es: "Tilt" },
 
+  // ---- templates/inspector.js -----------------------------------------------
+  "inspector.maps": { en: "Analysis maps", fr: "Cartes d'analyse", de: "Analysekarten", it: "Mappe di analisi", es: "Mapas de análisis" },
+
   // ---- templates/guider.js -------------------------------------------------
   "guider.sessionValues": { en: "Session values", fr: "Valeurs de la session", de: "Sitzungswerte", it: "Valori della sessione", es: "Valores de la sesión" },
   "guider.guiding": { en: "Guiding", fr: "Guidage", de: "Nachführung", it: "Guida", es: "Guiado" },

@@ -8,8 +8,10 @@
 // analyzing), correction (collimation vector: cx/cy/amplitude/
 // convergencex/convergencey/quality), screws (screw1/2/3), stars
 // (hasGrid - detected star list), hfr/shape/collim/corners (each a single
-// "img" element - one of the inspector's own diagnostic maps) - plus the
-// generic imager's own image and actions.
+// "img" element - one of the inspector's own diagnostic maps, merged into
+// one "maps" grid panel below rather than 4 separate ones, see that
+// panelSpec's own comment) - plus the generic imager's own image and
+// actions.
 //
 // Rooster's own inspector.component.html combines analysis + a single
 // element each from parameters/focusparams into one card via its own
@@ -34,6 +36,22 @@
 // this template doesn't control.
 
 import { buildScaffoldTemplate } from "./scaffold.js";
+import { buildImageGridPanel } from "../imagelayer.js";
+
+// hfr/shape/collim/corners used to each get their own small panel (4
+// extra floating windows, each barely big enough to read the map inside)
+// — merged into one 2x2 grid of clickable thumbnails instead, Gilles,
+// 2026-10-05, after a real "Shoot" run: "je cherche une facon ergonomique
+// d'afficher les 4 autres [cartes], autrement que dans ces petites
+// fenetres" — picked over a tabbed one-at-a-time alternative specifically
+// so all 4 stay comparable at a glance (see imagelayer.js's own
+// buildImageGridPanel() doc comment for the full reasoning).
+const MAP_ITEMS = [
+  { propName: "hfr", elName: "image", label: "HFR map" },
+  { propName: "shape", elName: "image", label: "Shape map" },
+  { propName: "collim", elName: "image", label: "Collimation map" },
+  { propName: "corners", elName: "image", label: "Corners map" },
+];
 
 export const mount = buildScaffoldTemplate([
   { id: "analysis", x: 20, y: 400, w: 300 },
@@ -44,8 +62,9 @@ export const mount = buildScaffoldTemplate([
   { id: "states", x: 620, y: 210, w: 260 },
   { id: "correction", x: 620, y: 449, w: 260 },
   { id: "stars", x: 620, y: 791, w: 260 },
-  { id: "hfr", x: 900, y: 92, w: 220 },
-  { id: "collim", x: 900, y: 540, w: 220 },
-  { id: "shape", x: 1140, y: 92, w: 220 },
-  { id: "corners", x: 1140, y: 540, w: 220 },
+  {
+    id: "maps", title: "inspector.maps", x: 900, y: 92, w: 460,
+    customProps: ["hfr", "shape", "collim", "corners"],
+    custom: (client, moduleName) => buildImageGridPanel(client, moduleName, MAP_ITEMS),
+  },
 ], { x: 1380, y: 92, w: 260 });
