@@ -125,7 +125,10 @@ function guidingChartData(prop) {
  * on this topic, never on topics.module(), so this must not depend on the
  * template's own per-module rebuild to stay live). Returns a node with
  * `_dispose` set, ready for the caller's track(). */
-function buildGuidingChartPanel(client, moduleName) {
+// Exported too — reused as-is (same chart, just placed in a bigger card)
+// by views.js's Home dashboard (Gilles, 2026-10-05: "mets les graphes
+// correspondants" on the bigger focus/guider home cards).
+export function buildGuidingChartPanel(client, moduleName) {
   const wrap = el("div", { class: "gd-chart" });
   const canvas = el("canvas");
   wrap.appendChild(canvas);

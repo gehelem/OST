@@ -9,6 +9,11 @@
 import { el, icon, iconButton, moduleIcon, statusDot, updateStatusDot } from "./dom.js";
 import { togglePanel, isPanelVisible, make as makePanel } from "./panels.js";
 import { t } from "./i18n.js";
+// Reused as-is on the Home dashboard's bigger focus/guider cards (Gilles,
+// 2026-10-05: "mets les graphes correspondants") - same chart the module's
+// own panel already shows, see renderHome() below.
+import { buildFocusCurvePanel } from "./templates/focus.js";
+import { buildGuidingChartPanel } from "./templates/guider.js";
 
 // Shared by renderLogs() (the full-page Logs system view) and
 // renderLogPanel() (the always-on floating one, below) - index == the
@@ -158,6 +163,13 @@ export function renderSystemViews(activeKey, onSelect) {
 // GlobalDatastore, ...) falls back to a plain "click to open" card, same
 // as Rooster's own default case for any template without a custom widget.
 const HOME_METRIC_PROPERTY = { focus: "results", guider: "values", sequencer: "progress", navigator: "mountposition" };
+// Gilles, 2026-10-05: "vise sur des vignettes plus grosses au moins pour
+// focus et guider, et mets les graphes correspondants dessus" - the two
+// templates that already have a real Chart.js panel of their own (focus's
+// V-curve, guider's PHD2-style drift/pulse/RMS/SNR chart) get that same
+// chart embedded here too, in a card spanning more of the grid (.home-card-big,
+// see components.css) instead of just the plain metric row every other
+// card gets.
 
 function homeCardMetrics(template, prop) {
   const e = prop && prop.elements;
@@ -184,15 +196,20 @@ function homeCardMetrics(template, prop) {
   }
 }
 
+const HOME_CHART_BUILDER = { focus: buildFocusCurvePanel, guider: buildGuidingChartPanel };
+
 function buildHomeCard(client, name, onSelect) {
   const mod = client.get(client.topics.module(name));
   const template = mod && mod.infos.template;
   const label = (mod && (mod.infos.modulelabel || mod.infos.label)) || name;
+  const chartBuilder = HOME_CHART_BUILDER[template];
 
   const dot = statusDot(0);
   dot.classList.add("hidden");
   const body = el("div", { class: "home-card-body muted small", text: t("views.homeGeneric") });
-  const card = el("div", { class: "home-card", title: t("views.homeGeneric"), onclick: () => onSelect(name) }, [
+  const card = el("div", {
+    class: "home-card" + (chartBuilder ? " home-card-big" : ""), title: t("views.homeGeneric"), onclick: () => onSelect(name),
+  }, [
     el("div", { class: "home-card-header" }, [dot, icon(moduleIcon(mod)), el("span", { class: "home-card-title", text: label })]),
     body,
   ]);
@@ -214,6 +231,17 @@ function buildHomeCard(client, name, onSelect) {
       if (!rows.length) { body.textContent = t("views.homeGeneric"); return; }
       for (const [k, v] of rows) body.appendChild(el("div", { class: "home-card-row" }, [el("span", { class: "muted small", text: k }), el("span", { class: "mono", text: v })]));
     }));
+  }
+
+  // Same chart the module's own panel shows (buildFocusCurvePanel/
+  // buildGuidingChartPanel are self-subscribed, fine-grained-topic, and
+  // already return a node with its own `_dispose` - just folded into this
+  // card's own disposer list rather than reinventing that wiring here.
+  if (chartBuilder) {
+    const chartNode = chartBuilder(client, name);
+    chartNode.classList.add("home-card-chart");
+    card.appendChild(chartNode);
+    disposers.push(chartNode._dispose);
   }
 
   return { node: card, dispose: () => disposers.forEach((d) => d()) };
