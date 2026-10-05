@@ -309,23 +309,37 @@ function pulseAxisRow(axisLabel, leftVal, rightVal, leftName, rightName, maxVal)
   return row;
 }
 
-// Just the RMS boxes (rmsRA/rmsDEC/rmsTotal), self-subscribed on its own —
-// exported for views.js's Home dashboard (Gilles, 2026-10-05: "Guide :
-// rms/guidegraph/drift", three separate columns, not the fuller
-// buildValuesPanel below with its pulse bars/cal quality too).
-export function buildRmsBoxes(client, moduleName) {
-  const wrap = el("div", { class: "value-row" });
+// Compact RMS display, self-subscribed on its own — exported for views.js's
+// Home dashboard. Replaced the three equal value-boxes it started as
+// (Gilles, 2026-10-05: "Guide: rms/guidegraph/drift") once the card went
+// from three columns to two (Gilles, 2026-10-06: "tu lui fais occuper 3
+// zones, passe a deux en mettant le RMS sous cette forme: en haut RMS
+// total / en bas en plus petit RMS RA et DEC") - Total keeps the familiar
+// bordered .value-box look, RA/DEC drop to a small label/value pair below
+// it instead of matching boxes of their own, both to read as secondary
+// figures and to keep this column narrow (views.js gives it a fixed width,
+// not an equal flex share, see components.css).
+export function buildCompactRms(client, moduleName) {
+  const wrap = el("div", { class: "rms-compact" });
   const unsub = client.subscribe(client.topics.property(moduleName, "values"), (prop) => {
     wrap.innerHTML = "";
     if (!prop) return;
     const e = prop.elements;
-    for (const key of ["rmsRA", "rmsDEC", "rmsTotal"]) {
-      if (!e[key]) continue;
+    if (e.rmsTotal) {
       wrap.appendChild(el("div", { class: "value-box" }, [
-        el("div", { class: "value-box-label", text: e[key].label || key }),
-        el("div", { class: "value-box-number", text: (e[key].value || 0).toFixed(2) }),
+        el("div", { class: "value-box-label", text: e.rmsTotal.label || "RMS Total" }),
+        el("div", { class: "value-box-number", text: (e.rmsTotal.value || 0).toFixed(2) }),
       ]));
     }
+    const sub = el("div", { class: "rms-compact-sub" });
+    for (const key of ["rmsRA", "rmsDEC"]) {
+      if (!e[key]) continue;
+      sub.appendChild(el("div", { class: "rms-compact-item" }, [
+        el("span", { class: "muted small", text: e[key].label || key }),
+        el("span", { class: "mono small", text: (e[key].value || 0).toFixed(2) }),
+      ]));
+    }
+    wrap.appendChild(sub);
   });
   wrap._dispose = unsub;
   return wrap;

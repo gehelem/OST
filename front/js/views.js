@@ -14,7 +14,7 @@ import { t } from "./i18n.js";
 // Guide: rms/guidegraph/drift") - the module's own panel-building
 // functions, not reinvented here, see renderHome() below.
 import { buildResultsBoxes, buildFocusCurvePanel } from "./templates/focus.js";
-import { buildRmsBoxes, buildGuidingChartPanel, buildDriftChartPanel } from "./templates/guider.js";
+import { buildCompactRms, buildGuidingChartPanel, buildDriftChartPanel } from "./templates/guider.js";
 
 // Shared by renderLogs() (the full-page Logs system view) and
 // renderLogPanel() (the always-on floating one, below) - index == the
@@ -190,10 +190,28 @@ function homeCardMetrics(template, prop) {
 // Every builder is one of the module's own bespoke panel-builders, reused
 // as-is (self-subscribed, returns a node with its own `_dispose`) rather
 // than reinvented here — same "no duplicated chart/figure logic" approach
-// the previous (stacked) version already established.
+// the previous (stacked) version already established. guider's own entry
+// dropped from 3 columns to 2 (Gilles, 2026-10-06: "tu lui fais occuper 3
+// zones, passe a deux") - the compact RMS block (buildCompactRms) plus the
+// two charts folded into one stacked column via stackedColumn() below,
+// instead of each chart getting its own full column.
+function stackedColumn(...builders) {
+  return (client, moduleName) => {
+    const wrap = el("div", { class: "home-card-stack" });
+    const disposers = [];
+    for (const build of builders) {
+      const node = build(client, moduleName);
+      wrap.appendChild(node);
+      disposers.push(node._dispose);
+    }
+    wrap._dispose = () => disposers.forEach((d) => d());
+    return wrap;
+  };
+}
+
 const HOME_HORIZONTAL_BUILDERS = {
   focus: [buildResultsBoxes, buildFocusCurvePanel],
-  guider: [buildRmsBoxes, buildGuidingChartPanel, buildDriftChartPanel],
+  guider: [buildCompactRms, stackedColumn(buildGuidingChartPanel, buildDriftChartPanel)],
 };
 
 // Same touches[0]-or-clientX/Y split as panels.js's own pointXY() - not

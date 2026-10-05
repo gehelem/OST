@@ -138,6 +138,25 @@ input[type="range"]::-moz-range-thumb {
    underneath). Give it a fixed, already-square-sized width instead of
    fighting Chart.js's own inline height with CSS specificity. */
 .home-card-column.gd-chart-square { flex: 0 0 160px; }
+/* Gilles, 2026-10-06: "tu lui fais occuper 3 zones, passe a deux en
+   mettant le RMS sous cette forme: en haut RMS total / en bas en plus
+   petit RMS RA et DEC" - guider's Home card drops from 3 columns to 2:
+   a narrow compact-RMS column (buildCompactRms, templates/guider.js) next
+   to a column stacking both charts (views.js's stackedColumn()) instead
+   of each chart getting its own full column. */
+.home-card-column.rms-compact { flex: 0 0 130px; }
+.rms-compact { display: flex; flex-direction: column; gap: var(--space-2); }
+.rms-compact-sub { display: flex; gap: var(--space-3); }
+.rms-compact-item { display: flex; flex-direction: column; gap: 2px; }
+.home-card-stack { display: flex; flex-direction: column; gap: var(--space-2); }
+.home-card-stack .gd-chart { height: 130px; }
+/* flex-basis sets HEIGHT here (main axis is vertical in a column-direction
+   flex container, see .home-card-stack above) - the square chart still
+   needs its WIDTH pinned too (that's what drove its own height via
+   maintainAspectRatio:1, components.css's own comment on gd-chart-square
+   above), which a column container's default align-items:stretch would
+   otherwise expand to the full column width again. */
+.home-card-stack .gd-chart-square { flex: 0 0 130px; width: 130px; align-self: center; }
 /* Gilles, 2026-10-06: "ajoute la possibilite de deplacer les vignettes +
    position remanente" - a small drag handle in the header (views.js's
    buildHomeCard), not the whole card, so a plain click elsewhere still
