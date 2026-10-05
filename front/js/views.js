@@ -10,10 +10,11 @@ import { el, icon, iconButton, moduleIcon, statusDot, updateStatusDot } from "./
 import { togglePanel, isPanelVisible, make as makePanel } from "./panels.js";
 import { t } from "./i18n.js";
 // Reused as-is on the Home dashboard's bigger focus/guider cards (Gilles,
-// 2026-10-05: "mets les graphes correspondants") - same chart the module's
-// own panel already shows, see renderHome() below.
-import { buildFocusCurvePanel } from "./templates/focus.js";
-import { buildGuidingChartPanel } from "./templates/guider.js";
+// 2026-10-05: "mets les graphes correspondants" then "Focus: values/curve /
+// Guide: rms/guidegraph/drift") - the module's own panel-building
+// functions, not reinvented here, see renderHome() below.
+import { buildResultsBoxes, buildFocusCurvePanel } from "./templates/focus.js";
+import { buildRmsBoxes, buildGuidingChartPanel, buildDriftChartPanel } from "./templates/guider.js";
 
 // Shared by renderLogs() (the full-page Logs system view) and
 // renderLogPanel() (the always-on floating one, below) - index == the
@@ -156,30 +157,16 @@ export function renderSystemViews(activeKey, onSelect) {
 // own src/app/pages/home/home.component.ts (read directly): one card per
 // loaded module, status dot + icon + label in the header, a handful of
 // read-only key figures in the body, click anywhere on the card to open
-// that module. Scaled down from Rooster's version on purpose - no embedded
-// live Chart.js mini-graphs here (just the current figures), and only the
-// templates ostcore already has bespoke panels for get a dedicated metric
-// row; everything else (inspector, polar, parkmanager, allsky, planner,
-// GlobalDatastore, ...) falls back to a plain "click to open" card, same
-// as Rooster's own default case for any template without a custom widget.
-const HOME_METRIC_PROPERTY = { focus: "results", guider: "values", sequencer: "progress", navigator: "mountposition" };
-// Gilles, 2026-10-05: "vise sur des vignettes plus grosses au moins pour
-// focus et guider, et mets les graphes correspondants dessus" - the two
-// templates that already have a real Chart.js panel of their own (focus's
-// V-curve, guider's PHD2-style drift/pulse/RMS/SNR chart) get that same
-// chart embedded here too, in a card spanning more of the grid (.home-card-big,
-// see components.css) instead of just the plain metric row every other
-// card gets.
+// that module. Everything but focus/guider stays a plain metric row or,
+// lacking even that, a "click to open" card — same as Rooster's own
+// default case for any template without a custom widget.
+const HOME_METRIC_PROPERTY = { sequencer: "progress", navigator: "mountposition" };
 
 function homeCardMetrics(template, prop) {
   const e = prop && prop.elements;
   if (!e) return [];
   const num = (v, d) => (typeof v === "number" ? v.toFixed(d == null ? 2 : d) : "—");
   switch (template) {
-    case "focus":
-      return [[t("views.homeHfr"), num(e.hfr && e.hfr.value)], [t("views.homePosition"), num(e.pos && e.pos.value, 0)]];
-    case "guider":
-      return [["RMS RA", num(e.rmsRA && e.rmsRA.value)], ["RMS DEC", num(e.rmsDEC && e.rmsDEC.value)], ["RMS Total", num(e.rmsTotal && e.rmsTotal.value)]];
     case "sequencer": {
       // "prg" elements wrap their actual value one level deeper than
       // float/int ones (e.global = {type:"prg", value:{value, dynlabel},
@@ -196,23 +183,31 @@ function homeCardMetrics(template, prop) {
   }
 }
 
-const HOME_CHART_BUILDER = { focus: buildFocusCurvePanel, guider: buildGuidingChartPanel };
+// Gilles, 2026-10-05: "fais plutot des presentations en mode horizontal pour
+// guider et focus / Focus: values/curve / Guide: rms/guidegraph/drift" —
+// each entry lays out that many columns side by side (.home-card-row-layout,
+// components.css) instead of the plain metric row every other card gets.
+// Every builder is one of the module's own bespoke panel-builders, reused
+// as-is (self-subscribed, returns a node with its own `_dispose`) rather
+// than reinvented here — same "no duplicated chart/figure logic" approach
+// the previous (stacked) version already established.
+const HOME_HORIZONTAL_BUILDERS = {
+  focus: [buildResultsBoxes, buildFocusCurvePanel],
+  guider: [buildRmsBoxes, buildGuidingChartPanel, buildDriftChartPanel],
+};
 
 function buildHomeCard(client, name, onSelect) {
   const mod = client.get(client.topics.module(name));
   const template = mod && mod.infos.template;
   const label = (mod && (mod.infos.modulelabel || mod.infos.label)) || name;
-  const chartBuilder = HOME_CHART_BUILDER[template];
+  const columnBuilders = HOME_HORIZONTAL_BUILDERS[template];
 
   const dot = statusDot(0);
   dot.classList.add("hidden");
-  const body = el("div", { class: "home-card-body muted small", text: t("views.homeGeneric") });
+  const header = el("div", { class: "home-card-header" }, [dot, icon(moduleIcon(mod)), el("span", { class: "home-card-title", text: label })]);
   const card = el("div", {
-    class: "home-card" + (chartBuilder ? " home-card-big" : ""), title: t("views.homeGeneric"), onclick: () => onSelect(name),
-  }, [
-    el("div", { class: "home-card-header" }, [dot, icon(moduleIcon(mod)), el("span", { class: "home-card-title", text: label })]),
-    body,
-  ]);
+    class: "home-card" + (columnBuilders ? ` home-card-big home-card-cols-${columnBuilders.length}` : ""), title: t("views.homeGeneric"), onclick: () => onSelect(name),
+  }, [header]);
 
   const disposers = [];
   disposers.push(client.subscribe(client.topics.property(name, "signals"), (prop) => {
@@ -221,6 +216,22 @@ function buildHomeCard(client, name, onSelect) {
     if (state) updateStatusDot(dot, state.value);
   }));
 
+  if (columnBuilders) {
+    // Side-by-side columns (results/RMS boxes + chart(s)), each the
+    // module's own panel-building function.
+    const row = el("div", { class: "home-card-columns" });
+    for (const build of columnBuilders) {
+      const node = build(client, name);
+      node.classList.add("home-card-column");
+      row.appendChild(node);
+      disposers.push(node._dispose);
+    }
+    card.appendChild(row);
+    return { node: card, dispose: () => disposers.forEach((d) => d()) };
+  }
+
+  const body = el("div", { class: "home-card-body muted small", text: t("views.homeGeneric") });
+  card.appendChild(body);
   const metricProp = HOME_METRIC_PROPERTY[template];
   if (metricProp) {
     disposers.push(client.subscribe(client.topics.property(name, metricProp), (prop) => {
@@ -231,17 +242,6 @@ function buildHomeCard(client, name, onSelect) {
       if (!rows.length) { body.textContent = t("views.homeGeneric"); return; }
       for (const [k, v] of rows) body.appendChild(el("div", { class: "home-card-row" }, [el("span", { class: "muted small", text: k }), el("span", { class: "mono", text: v })]));
     }));
-  }
-
-  // Same chart the module's own panel shows (buildFocusCurvePanel/
-  // buildGuidingChartPanel are self-subscribed, fine-grained-topic, and
-  // already return a node with its own `_dispose` - just folded into this
-  // card's own disposer list rather than reinventing that wiring here.
-  if (chartBuilder) {
-    const chartNode = chartBuilder(client, name);
-    chartNode.classList.add("home-card-chart");
-    card.appendChild(chartNode);
-    disposers.push(chartNode._dispose);
   }
 
   return { node: card, dispose: () => disposers.forEach((d) => d()) };

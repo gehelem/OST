@@ -225,7 +225,10 @@ function driftLimit(points) {
   return Math.max(1, Math.ceil(m * 1.2 * 10) / 10);
 }
 
-function buildDriftChartPanel(client, moduleName) {
+// Exported too — reused as-is by views.js's Home dashboard (Gilles,
+// 2026-10-05: "Guide : rms/guidegraph/drift", same chart as the module's
+// own "Drift" panel).
+export function buildDriftChartPanel(client, moduleName) {
   const wrap = el("div", { class: "gd-chart gd-chart-square" });
   const canvas = el("canvas");
   wrap.appendChild(canvas);
@@ -304,6 +307,28 @@ function pulseAxisRow(axisLabel, leftVal, rightVal, leftName, rightName, maxVal)
   if (frac >= 0) { fill.style.left = "50%"; fill.style.width = (frac * 50) + "%"; }
   else { fill.style.left = (50 + frac * 50) + "%"; fill.style.width = (-frac * 50) + "%"; }
   return row;
+}
+
+// Just the RMS boxes (rmsRA/rmsDEC/rmsTotal), self-subscribed on its own —
+// exported for views.js's Home dashboard (Gilles, 2026-10-05: "Guide :
+// rms/guidegraph/drift", three separate columns, not the fuller
+// buildValuesPanel below with its pulse bars/cal quality too).
+export function buildRmsBoxes(client, moduleName) {
+  const wrap = el("div", { class: "value-row" });
+  const unsub = client.subscribe(client.topics.property(moduleName, "values"), (prop) => {
+    wrap.innerHTML = "";
+    if (!prop) return;
+    const e = prop.elements;
+    for (const key of ["rmsRA", "rmsDEC", "rmsTotal"]) {
+      if (!e[key]) continue;
+      wrap.appendChild(el("div", { class: "value-box" }, [
+        el("div", { class: "value-box-label", text: e[key].label || key }),
+        el("div", { class: "value-box-number", text: (e[key].value || 0).toFixed(2) }),
+      ]));
+    }
+  });
+  wrap._dispose = unsub;
+  return wrap;
 }
 
 function buildValuesPanel(client, moduleName) {

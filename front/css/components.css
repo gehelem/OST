@@ -112,13 +112,21 @@ input[type="range"]::-moz-range-thumb {
 .home-card-title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .home-card-body { display: flex; flex-direction: column; gap: 2px; }
 .home-card-row { display: flex; justify-content: space-between; gap: var(--space-2); font-size: 13px; }
-/* Gilles, 2026-10-05: "vise sur des vignettes plus grosses au moins pour
-   focus et guider, et mets les graphes correspondants dessus" - the two
-   templates that embed their own chart (views.js's HOME_CHART_BUILDER) get
-   a wider card and the chart's own gd-chart component scaled down from its
-   full-panel height (280px, components.css above) to card size. */
-.home-card-big { grid-column: span 2; min-width: 420px; }
-.home-card-chart.gd-chart { height: 170px; margin-top: var(--space-2); }
+/* Gilles, 2026-10-05: "fais plutot des presentations en mode horizontal pour
+   guider et focus / Focus: values/curve / Guide: rms/guidegraph/drift" -
+   focus/guider cards (views.js's HOME_HORIZONTAL_BUILDERS) lay their
+   figures/charts out as side-by-side columns instead of the plain metric
+   row every other card gets, in a card wide enough to fit them (2 columns
+   for focus, 3 for guider — home-card-cols-N picks the span/min-width). */
+.home-card-big { min-width: 420px; }
+.home-card-cols-2 { grid-column: span 2; }
+.home-card-cols-3 { grid-column: span 3; min-width: 680px; }
+.home-card-columns { display: flex; gap: var(--space-3); align-items: flex-start; }
+.home-card-column { flex: 1 1 0; min-width: 0; }
+/* The chart's own gd-chart component, scaled down from its full-panel
+   height (280px, components.css above) to column size. */
+.home-card-column.gd-chart { height: 160px; }
+.home-card-column.value-row { margin-bottom: 0; }
 
 /* --------------------------------------------------------- status dots */
 .status-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 2px; flex-shrink: 0; box-shadow: 0 0 0 3px transparent; transition: box-shadow 0.2s ease; }

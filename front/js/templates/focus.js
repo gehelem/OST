@@ -183,7 +183,9 @@ export function buildFocusCurvePanel(client, moduleName) {
  * guider pour afficher ... HFR et position" (guider.js's own
  * buildValuesPanel() RMS row). Self-subscribed to the "results" property,
  * same fine-grained-topic pattern as the other bespoke panels here. */
-function buildResultsBoxes(client, moduleName) {
+// Exported too — reused as-is by views.js's Home dashboard (Gilles,
+// 2026-10-05: "Focus : values/curve").
+export function buildResultsBoxes(client, moduleName) {
   const wrap = el("div", { class: "value-row" });
   const unsub = client.subscribe(client.topics.property(moduleName, "results"), (prop) => {
     wrap.innerHTML = "";
