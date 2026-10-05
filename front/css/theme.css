@@ -3,10 +3,14 @@
  * Design language: adapted from ostnoctua's themes.css (glass panels, a
  * cyan "night-vision-friendly" accent, generous use of translucent
  * surfaces) — but re-tuned for a conventional sidebar+content app instead
- * of floating panels over a sky canvas, and reduced to the two themes the
- * client-pattern.en.md dark-mode rule actually requires: dark (default)
- * and light. Every color used anywhere in UI3 must be one of these
- * variables — no hardcoded colors in component CSS.
+ * of floating panels over a sky canvas. Three themes: dark (default,
+ * cyan accent), light, and "red" (Gilles, 2026-10-05: "identique au
+ * sombre, mais avec nuances rouges plutot que vertes" — a real
+ * astronomer's night-vision screen, same dark structure as the default
+ * theme with every accent-ish color shifted into the red family instead
+ * of green/cyan, so as little non-red light as possible reaches the eye
+ * during an observing session). Every color used anywhere in UI3 must be
+ * one of these variables — no hardcoded colors in component CSS.
  */
 
 :root {
@@ -143,4 +147,42 @@
   --shadow-panel: 0 6px 20px rgba(20, 30, 40, 0.10);
   --shadow-pop: 0 16px 40px rgba(20, 30, 40, 0.18);
   --shadow-glow: 0 0 0 1px var(--accent-subtle), 0 0 14px rgba(var(--accent-rgb), 0.12);
+}
+
+/* "Red" night-vision theme — same dark surfaces/text/structure as the
+ * default :root theme above (deliberately NOT redefined here, per
+ * Gilles's own "identique au sombre"), only the accent (cyan -> red) and
+ * the "ok" status color (green -> a duller red, since a real green pixel
+ * is exactly the kind of light this theme exists to avoid) are
+ * overridden. --busy/--warn/--orange/--error were already amber/red, not
+ * green, so they're left as-is — distinguishing "ok" from them by
+ * saturation/brightness within the red family rather than by hue, same
+ * as the dark theme already distinguishes its own status colors. Every
+ * accent-derived rgba() below had to be restated too (components.css
+ * reads several of these as hand-written rgba(R,G,B,alpha) literals, not
+ * a calc() off --accent-rgb) — --shadow-glow doesn't need restating
+ * since it already composes var(--accent-subtle)/var(--accent-rgb), so it
+ * picks up the new values on its own. */
+[data-theme="red"] {
+  color-scheme: dark;
+
+  --bg-hover: rgba(255, 69, 58, 0.07);
+  --bg-active: rgba(255, 69, 58, 0.14);
+
+  --accent: #ff453a;
+  --accent-rgb: 255, 69, 58;
+  --accent-strong: #ff7a70;
+  --accent-dim: rgba(255, 69, 58, 0.45);
+  --accent-subtle: rgba(255, 69, 58, 0.16);
+  --accent-faint: rgba(255, 69, 58, 0.08);
+  --on-accent: #2a0a08;
+
+  --border-subtle: rgba(255, 69, 58, 0.08);
+  --border-strong: rgba(255, 69, 58, 0.32);
+  --border-active: #ff453a;
+
+  --ok: #a8524a;
+  --ok-rgb: 168, 82, 74;
+
+  --btn-success: #a8524a;
 }

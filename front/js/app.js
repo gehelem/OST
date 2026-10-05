@@ -161,24 +161,32 @@ mediaUrlInput.value = normalizeMediaUrl((hist[0] && hist[0].mediaUrl) || default
 setMediaBaseUrl(mediaUrlInput.value);
 
 // ---- theme -----------------------------------------------------------
-// Manual dark/light toggle, persisted — client-pattern.en.md's dark-mode
+// Manual light/dark/red cycle, persisted — client-pattern.en.md's dark-mode
 // recommendation is honored by *always* having a fully dark default and a
 // complete light alternative (css/theme.css), never by forcing one on the
 // user; see also base rule carried over from the frontend CLAUDE.md
-// ("CSS variables only, never hardcoded colors").
+// ("CSS variables only, never hardcoded colors"). "red" (Gilles,
+// 2026-10-05: "identique au sombre, mais avec nuances rouges plutot que
+// vertes") is a real night-vision screen for an observing session — same
+// dark structure as "dark", red accent instead of cyan/green, see
+// css/theme.css's own [data-theme="red"] block.
+const THEMES = ["light", "dark", "red"];
+const THEME_ICON = { light: "wb_sunny", dark: "brightness_2", red: "nightlight" };
+const THEME_NEXT_TITLE = { light: "Switch to dark theme", dark: "Switch to red (night-vision) theme", red: "Switch to light theme" };
 
 function applyTheme(t) {
   document.documentElement.setAttribute("data-theme", t);
   themeToggle.innerHTML = "";
-  themeToggle.appendChild(icon(t === "light" ? "wb_sunny" : "brightness_2"));
-  themeToggle.title = t === "light" ? "Switch to dark theme" : "Switch to light theme";
+  themeToggle.appendChild(icon(THEME_ICON[t] || THEME_ICON.dark));
+  themeToggle.title = THEME_NEXT_TITLE[t] || THEME_NEXT_TITLE.dark;
 }
 const themeStored = localStorage.getItem("ostcore-ui3.theme") || "dark";
-applyTheme(themeStored);
+applyTheme(THEMES.includes(themeStored) ? themeStored : "dark");
 themeToggle.addEventListener("click", () => {
-  const cur = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
-  applyTheme(cur);
-  localStorage.setItem("ostcore-ui3.theme", cur);
+  const cur = document.documentElement.getAttribute("data-theme");
+  const next = THEMES[(THEMES.indexOf(cur) + 1) % THEMES.length];
+  applyTheme(next);
+  localStorage.setItem("ostcore-ui3.theme", next);
 });
 
 // ---- UI zoom -----------------------------------------------------------
