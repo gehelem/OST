@@ -143,9 +143,12 @@ input[type="range"]::-moz-range-thumb {
    160px-equal-share bug, just at a bigger size this time - both width AND
    height need to be pinned up front, not just width). Gilles, 2026-10-06:
    "fait prendre plus de place au graphe de drift ... en faisant occupe 3
-   zones a la vignette" - its own full column again, bigger than its very
-   first 160px pass. */
-.home-card-column.gd-chart-square { flex: 0 0 220px; height: 220px; }
+   zones a la vignette" gave it its own full column, then: "il est
+   toujours trop haut ce graphe de drift: il faut que son cote corresponde
+   a la hauteur du graphe de guidage" - square, side matching the
+   guidegraph column's own height (.gd-chart above) instead of an
+   independent, taller size. */
+.home-card-column.gd-chart-square { flex: 0 0 107px; height: 107px; }
 /* Gilles, 2026-10-06: "tu lui fais occuper 3 zones, passe a deux en
    mettant le RMS sous cette forme: en haut RMS total / en bas en plus
    petit RMS RA et DEC" - a narrow compact-RMS column (buildCompactRms,
