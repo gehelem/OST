@@ -8,7 +8,7 @@
 
 import { createClient, deriveDefaultUrls, normalizeMediaUrl } from "../core/index.js";
 import { renderModuleView, buildParamsPanel, setMediaBaseUrl, setDialogRoot, setQuickNavRoot, getDisableTemplates } from "./render.js";
-import { renderModbar, renderSystemViews, renderController, renderFiles, renderLogs, renderLogin, renderLogPanel } from "./views.js";
+import { renderModbar, renderSystemViews, renderHome, renderController, renderFiles, renderLogs, renderLogin, renderLogPanel } from "./views.js";
 import { el, icon, iconButton } from "./dom.js";
 import * as Panels from "./panels.js";
 import { setBgLayer } from "./imagelayer.js";
@@ -256,7 +256,7 @@ zoomSliderEl.addEventListener("input", () => {
 // already uses — reused here rather than inventing a second modal pattern.
 
 function isModuleView() {
-  return activeView && activeView !== "__controller" && activeView !== "__files" && activeView !== "__logs";
+  return activeView && activeView !== "__home" && activeView !== "__controller" && activeView !== "__files" && activeView !== "__logs";
 }
 
 function updateParamsToggle() {
@@ -438,7 +438,8 @@ function renderContentNow() {
   }
 
   let result;
-  if (activeView === "__controller") result = renderController(client);
+  if (activeView === "__home") result = renderHome(client, selectView);
+  else if (activeView === "__controller") result = renderController(client);
   else if (activeView === "__files") result = renderFiles(client, mediaUrlInput.value);
   else result = renderLogs(client);
   dockedViewEl.appendChild(result.node);
@@ -541,8 +542,8 @@ client.subscribe(client.topics.session(), (session) => {
     // no saved view at all, e.g. the very first visit) falls back to
     // Controller, same as before this existed.
     const last = loadLastView();
-    const stillThere = last === "__controller" || last === "__files" || last === "__logs" || client.get(client.topics.modules()).includes(last);
-    selectView(stillThere ? last : "__controller");
+    const stillThere = last === "__home" || last === "__controller" || last === "__files" || last === "__logs" || client.get(client.topics.modules()).includes(last);
+    selectView(stillThere ? last : "__home");
   }
 });
 

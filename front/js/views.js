@@ -34,6 +34,18 @@ export function renderModbar(client, activeKey, onSelect) {
   const bar = document.createDocumentFragment();
   const names = client.get(client.topics.modules());
   const disposers = [];
+  // "Home" dashboard - Gilles, 2026-10-05: "une home en premier dans la
+  // liste des modules [...] inspire toi de osterix qui a une telle page".
+  // Not a real backend module (no entry in `names`, no "signals" to
+  // subscribe to), but it belongs IN the modbar itself, first position,
+  // same look as a module button - unlike Controller/Files/Logs which are
+  // this client's own chrome and live in the settings dropdown instead
+  // (see renderSystemViews above). "__home" follows that same sentinel
+  // naming convention for app.js's activeView.
+  bar.appendChild(el("button", {
+    class: "mod-btn" + (activeKey === "__home" ? " active" : ""), title: t("views.home"),
+    onclick: () => onSelect("__home"),
+  }, [icon("home"), el("span", { class: "mod-btn-label", text: t("views.home") })]));
   for (const name of names) {
     const mod = client.get(client.topics.module(name));
     const label = (mod && (mod.infos.modulelabel || mod.infos.label)) || name;
@@ -128,6 +140,115 @@ export function renderSystemViews(activeKey, onSelect) {
     nav.appendChild(btn);
   }
   return nav;
+}
+
+// ---- home dashboard -------------------------------------------------------
+// Gilles, 2026-10-05: "une home en premier dans la liste des modules [...]
+// doit montrer une fenetre par module, si je clique dessus ca ouvre le
+// module en question [...] inspire toi de osterix qui a une telle page
+// [...] les apercus ne permettent pas de faire de mise a jour directement
+// mais donnent les infos utiles de chaque module". Modeled on OstErix's
+// own src/app/pages/home/home.component.ts (read directly): one card per
+// loaded module, status dot + icon + label in the header, a handful of
+// read-only key figures in the body, click anywhere on the card to open
+// that module. Scaled down from Rooster's version on purpose - no embedded
+// live Chart.js mini-graphs here (just the current figures), and only the
+// templates ostcore already has bespoke panels for get a dedicated metric
+// row; everything else (inspector, polar, parkmanager, allsky, planner,
+// GlobalDatastore, ...) falls back to a plain "click to open" card, same
+// as Rooster's own default case for any template without a custom widget.
+const HOME_METRIC_PROPERTY = { focus: "results", guider: "values", sequencer: "progress", navigator: "mountposition" };
+
+function homeCardMetrics(template, prop) {
+  const e = prop && prop.elements;
+  if (!e) return [];
+  const num = (v, d) => (typeof v === "number" ? v.toFixed(d == null ? 2 : d) : "—");
+  switch (template) {
+    case "focus":
+      return [[t("views.homeHfr"), num(e.hfr && e.hfr.value)], [t("views.homePosition"), num(e.pos && e.pos.value, 0)]];
+    case "guider":
+      return [["RMS RA", num(e.rmsRA && e.rmsRA.value)], ["RMS DEC", num(e.rmsDEC && e.rmsDEC.value)], ["RMS Total", num(e.rmsTotal && e.rmsTotal.value)]];
+    case "sequencer": {
+      // "prg" elements wrap their actual value one level deeper than
+      // float/int ones (e.global = {type:"prg", value:{value, dynlabel},
+      // ...} — see render.js's own renderProperty() "prg" branch, which
+      // reads element.value.dynlabel/.value the same way) - caught live,
+      // a flat e.global.dynlabel read NaN'd Math.round(e.global.value||0).
+      const g = e.global && e.global.value;
+      return g ? [[t("views.homeProgress"), g.dynlabel || Math.round(g.value || 0) + "%"]] : [];
+    }
+    case "navigator":
+      return [["RA", num(e.RA && e.RA.value, 3)], ["DEC", num(e.DEC && e.DEC.value, 3)]];
+    default:
+      return [];
+  }
+}
+
+function buildHomeCard(client, name, onSelect) {
+  const mod = client.get(client.topics.module(name));
+  const template = mod && mod.infos.template;
+  const label = (mod && (mod.infos.modulelabel || mod.infos.label)) || name;
+
+  const dot = statusDot(0);
+  dot.classList.add("hidden");
+  const body = el("div", { class: "home-card-body muted small", text: t("views.homeGeneric") });
+  const card = el("div", { class: "home-card", title: t("views.homeGeneric"), onclick: () => onSelect(name) }, [
+    el("div", { class: "home-card-header" }, [dot, icon(moduleIcon(mod)), el("span", { class: "home-card-title", text: label })]),
+    body,
+  ]);
+
+  const disposers = [];
+  disposers.push(client.subscribe(client.topics.property(name, "signals"), (prop) => {
+    const state = prop && prop.elements && prop.elements.state;
+    dot.classList.toggle("hidden", !state);
+    if (state) updateStatusDot(dot, state.value);
+  }));
+
+  const metricProp = HOME_METRIC_PROPERTY[template];
+  if (metricProp) {
+    disposers.push(client.subscribe(client.topics.property(name, metricProp), (prop) => {
+      const rows = homeCardMetrics(template, prop);
+      body.classList.toggle("muted", !rows.length);
+      body.classList.toggle("small", !rows.length);
+      body.innerHTML = "";
+      if (!rows.length) { body.textContent = t("views.homeGeneric"); return; }
+      for (const [k, v] of rows) body.appendChild(el("div", { class: "home-card-row" }, [el("span", { class: "muted small", text: k }), el("span", { class: "mono", text: v })]));
+    }));
+  }
+
+  return { node: card, dispose: () => disposers.forEach((d) => d()) };
+}
+
+export function renderHome(client, onSelect) {
+  const root = el("div", { class: "home-view" });
+  root.appendChild(el("h2", null, [icon("home"), el("span", { text: " " + t("views.home") })]));
+  const grid = el("div", { class: "home-grid" });
+  root.appendChild(grid);
+
+  let cardDisposers = [];
+  function rebuild() {
+    cardDisposers.forEach((d) => d());
+    cardDisposers = [];
+    grid.innerHTML = "";
+    const names = client.get(client.topics.modules());
+    if (!names.length) {
+      grid.appendChild(el("div", { class: "muted", text: t("views.noModuleLoaded") }));
+      return;
+    }
+    for (const name of names) {
+      const { node, dispose } = buildHomeCard(client, name, onSelect);
+      cardDisposers.push(dispose);
+      grid.appendChild(node);
+    }
+  }
+  rebuild();
+  // Only the module SET (add/remove/profile swap, which can change
+  // infos.template) needs a full rebuild - each card's own figures stay
+  // live through its own metric-property subscription above, same
+  // division of labour as renderModbar()'s per-module "signals" dot.
+  const unsubModules = client.subscribe(client.topics.modules(), rebuild);
+
+  return { node: root, dispose: () => { unsubModules(); cardDisposers.forEach((d) => d()); } };
 }
 
 export function renderLogin(client, onDone) {

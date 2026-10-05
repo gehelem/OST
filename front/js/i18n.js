@@ -152,6 +152,14 @@ const STRINGS = {
   "views.current": { en: " (current)", fr: " (actuelle)", de: " (aktuell)", it: " (attuale)", es: " (actual)" },
   "views.moduleCountSuffix": { en: "module(s)", fr: "module(s)", de: "Modul(e)", it: "modulo/i", es: "módulo(s)" },
 
+  // ---- views.js: home dashboard (one read-only card per loaded module) ---
+  "views.home": { en: "Home", fr: "Accueil", de: "Start", it: "Home", es: "Inicio" },
+  "views.noModuleLoaded": { en: "No module loaded.", fr: "Aucun module chargé.", de: "Kein Modul geladen.", it: "Nessun modulo caricato.", es: "No hay ningún módulo cargado." },
+  "views.homeGeneric": { en: "Click to open", fr: "Cliquer pour ouvrir", de: "Zum Öffnen klicken", it: "Clicca per aprire", es: "Clic para abrir" },
+  "views.homeHfr": { en: "HFR", fr: "HFR", de: "HFR", it: "HFR", es: "HFR" },
+  "views.homePosition": { en: "Position", fr: "Position", de: "Position", it: "Posizione", es: "Posición" },
+  "views.homeProgress": { en: "Progress", fr: "Progression", de: "Fortschritt", it: "Avanzamento", es: "Progreso" },
+
   // ---- templates/navigator.js: the planetarium screen ---------------------
   "navigator.tapToSelect": { en: "Tap a star or object on the sky to select it.", fr: "Touchez une étoile ou un objet du ciel pour le sélectionner.", de: "Tippen Sie auf einen Stern oder ein Objekt am Himmel, um es auszuwählen.", it: "Tocca una stella o un oggetto del cielo per selezionarlo.", es: "Toque una estrella u objeto del cielo para seleccionarlo." },
   "navigator.goto": { en: "GOTO", fr: "GOTO", de: "GOTO", it: "GOTO", es: "GOTO" },
