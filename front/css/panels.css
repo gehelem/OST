@@ -255,7 +255,16 @@
 #sky-canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; }
 #sky-canvas.dragging { cursor: grabbing; }
 #panel-layer, #docked-view { position: absolute; inset: 0; overflow: auto; }
-#docked-view { padding: var(--space-5); }
+/* #modbar floats fixed over the canvas (top:12px, ~56px-tall buttons, 8px
+   padding - see above), so anything docked at inset:0 starts right behind
+   it. Floating panels already dodge this by hand (every template's own
+   Panels.make() call uses y:92 or more for its top row) - #docked-view
+   (Controller/Files/Logs/the Home dashboard/the connect screen) needs the
+   same top clearance, just reserved once here instead of per-view. Gilles,
+   2026-10-06, caught on the Home dashboard: "la position par defaut des
+   vignettes positionne les premieres sous la barre de menu general :
+   interdit". */
+#docked-view { padding: var(--space-5); padding-top: 92px; }
 #docked-view > * { max-width: 1180px; margin: 0 auto; }
 #panel-layer.hidden, #docked-view.hidden { display: none; }
 /* #panel-layer fills the whole canvas even where no panel actually sits,

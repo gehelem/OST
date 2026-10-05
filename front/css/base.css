@@ -90,5 +90,5 @@ a { color: var(--accent); }
 
 @media (max-width: 760px) {
   #modbar { max-width: calc(100vw - 24px); }
-  #docked-view { padding: var(--space-3); }
+  #docked-view { padding: var(--space-3); padding-top: 92px; }
 }
