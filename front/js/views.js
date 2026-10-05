@@ -165,23 +165,14 @@ export function renderSystemViews(activeKey, onSelect) {
 // that module. Everything but focus/guider stays a plain metric row or,
 // lacking even that, a "click to open" card — same as Rooster's own
 // default case for any template without a custom widget.
-// sequencer used to be in here too (a plain "Progress 0%" text row) until
-// it got its own ring gauge instead (Gilles, 2026-10-06: "fais moi un truc
-// joli qui ne prend pas trop de place" - see buildHomeCard's own
-// template === "sequencer" branch below).
-const HOME_METRIC_PROPERTY = { navigator: "mountposition" };
-
-function homeCardMetrics(template, prop) {
-  const e = prop && prop.elements;
-  if (!e) return [];
-  const num = (v, d) => (typeof v === "number" ? v.toFixed(d == null ? 2 : d) : "—");
-  switch (template) {
-    case "navigator":
-      return [["RA", num(e.RA && e.RA.value, 3)], ["DEC", num(e.DEC && e.DEC.value, 3)]];
-    default:
-      return [];
-  }
-}
+// sequencer and navigator used to share a generic "plain metric row"
+// mechanism here (HOME_METRIC_PROPERTY/homeCardMetrics) until each needed
+// something its single-property shape couldn't give it - sequencer got its
+// own ring gauge (Gilles, 2026-10-06: "fais moi un truc joli qui ne prend
+// pas trop de place"), navigator a second property (target) alongside
+// mountposition. Removed once nothing used it any more rather than left
+// as a never-taken dead branch - see buildHomeCard's own
+// template === "sequencer"/"navigator" branches below for both.
 
 // Gilles, 2026-10-05: "fais plutot des presentations en mode horizontal pour
 // guider et focus / Focus: values/curve / Guide: rms/guidegraph/drift" —
@@ -409,16 +400,40 @@ function buildHomeCard(client, name, onSelect, onReorder) {
     return { node: card, dispose: () => disposers.forEach((d) => d()) };
   }
 
-  const metricProp = HOME_METRIC_PROPERTY[template];
-  if (metricProp) {
-    disposers.push(client.subscribe(client.topics.property(name, metricProp), (prop) => {
-      const rows = homeCardMetrics(template, prop);
-      body.classList.toggle("muted", !rows.length);
-      body.classList.toggle("small", !rows.length);
-      body.innerHTML = "";
-      if (!rows.length) { body.textContent = t("views.homeGeneric"); return; }
-      for (const [k, v] of rows) body.appendChild(el("div", { class: "home-card-row" }, [el("span", { class: "muted small", text: k }), el("span", { class: "mono", text: v })]));
+  // Gilles, 2026-10-06: "sur la vignette navigator tu peux ajouter le nom
+  // de la cible" - a second property (target.targetname) alongside
+  // mountposition's own RA/DEC, so each needs its own subscription/slot
+  // that doesn't get wiped out by the other updating independently (same
+  // split-slots approach as sequencer's ring vs. thumbnail above).
+  if (template === "navigator") {
+    body.classList.remove("muted", "small");
+    body.innerHTML = "";
+    const targetRow = el("div");
+    const posRows = el("div");
+    body.appendChild(targetRow);
+    body.appendChild(posRows);
+
+    disposers.push(client.subscribe(client.topics.property(name, "target"), (prop) => {
+      const e = prop && prop.elements;
+      const tn = e && e.targetname && e.targetname.value;
+      targetRow.innerHTML = "";
+      if (tn) {
+        targetRow.appendChild(el("div", { class: "home-card-row" }, [
+          el("span", { class: "muted small", text: e.targetname.label || t("views.homeTarget") }),
+          el("span", { class: "mono", text: tn }),
+        ]));
+      }
     }));
+    disposers.push(client.subscribe(client.topics.property(name, "mountposition"), (prop) => {
+      const e = prop && prop.elements;
+      posRows.innerHTML = "";
+      if (!e) return;
+      const num = (v, d) => (typeof v === "number" ? v.toFixed(d) : "—");
+      posRows.appendChild(el("div", { class: "home-card-row" }, [el("span", { class: "muted small", text: (e.RA && e.RA.label) || "RA" }), el("span", { class: "mono", text: num(e.RA && e.RA.value, 3) })]));
+      posRows.appendChild(el("div", { class: "home-card-row" }, [el("span", { class: "muted small", text: (e.DEC && e.DEC.label) || "DEC" }), el("span", { class: "mono", text: num(e.DEC && e.DEC.value, 3) })]));
+    }));
+
+    return { node: card, dispose: () => disposers.forEach((d) => d()) };
   }
 
   return { node: card, dispose: () => disposers.forEach((d) => d()) };
