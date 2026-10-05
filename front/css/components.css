@@ -103,6 +103,7 @@ input[type="range"]::-moz-range-thumb {
  * card size since each one also carries a few key figures. */
 .home-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-3); }
 .home-card {
+  position: relative;
   background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
   padding: var(--space-3); cursor: pointer; box-shadow: var(--shadow-panel);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -127,6 +128,33 @@ input[type="range"]::-moz-range-thumb {
    height (280px, components.css above) to column size. */
 .home-card-column.gd-chart { height: 160px; }
 .home-card-column.value-row { margin-bottom: 0; }
+/* The drift chart is square (Chart.js maintainAspectRatio:true,
+   aspectRatio:1) - it sets its own canvas height from ITS OWN WIDTH via an
+   inline style, which beats the plain height:160px above (inline always
+   outranks a class selector). Left at flex:1's equal share of the row
+   (~230px wide in a 3-column card) it rendered ~217px tall, taller than
+   its own card, overflowing into - and intercepting clicks/drags on - the
+   row of cards below (caught live: a real drag never reached the handle
+   underneath). Give it a fixed, already-square-sized width instead of
+   fighting Chart.js's own inline height with CSS specificity. */
+.home-card-column.gd-chart-square { flex: 0 0 160px; }
+/* Gilles, 2026-10-06: "ajoute la possibilite de deplacer les vignettes +
+   position remanente" - a small drag handle in the header (views.js's
+   buildHomeCard), not the whole card, so a plain click elsewhere still
+   opens the module; dragging dims the card being moved. */
+.home-card-handle { cursor: grab; color: var(--text-dim); touch-action: none; }
+.home-card-handle:active { cursor: grabbing; }
+/* Follows the cursor in real time while dragging (views.js's own
+   transform: translate(), same visible-feedback idea as panels.js's
+   startDrag() moving a floating panel with the mouse) - z-index so it
+   visibly lifts above whichever card it's currently passing over, no
+   transition on transform itself so it tracks the pointer immediately. */
+.home-card.dragging { z-index: 50; cursor: grabbing; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45); transition: none; }
+/* Which side of the card currently under the pointer the dragged card
+   would land on (views.js's startCardDrag) - a plain colored edge, same
+   accent already used for the active modbar/quicknav button. */
+.home-card.drop-before { box-shadow: inset 3px 0 0 var(--accent); }
+.home-card.drop-after { box-shadow: inset -3px 0 0 var(--accent); }
 
 /* --------------------------------------------------------- status dots */
 .status-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 2px; flex-shrink: 0; box-shadow: 0 0 0 3px transparent; transition: box-shadow 0.2s ease; }

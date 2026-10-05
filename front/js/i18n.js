@@ -159,6 +159,7 @@ const STRINGS = {
   "views.homeHfr": { en: "HFR", fr: "HFR", de: "HFR", it: "HFR", es: "HFR" },
   "views.homePosition": { en: "Position", fr: "Position", de: "Position", it: "Posizione", es: "Posición" },
   "views.homeProgress": { en: "Progress", fr: "Progression", de: "Fortschritt", it: "Avanzamento", es: "Progreso" },
+  "views.homeDragHint": { en: "Drag to reorder", fr: "Glisser pour réorganiser", de: "Ziehen zum Anordnen", it: "Trascina per riordinare", es: "Arrastrar para reordenar" },
 
   // ---- templates/navigator.js: the planetarium screen ---------------------
   "navigator.tapToSelect": { en: "Tap a star or object on the sky to select it.", fr: "Touchez une étoile ou un objet du ciel pour le sélectionner.", de: "Tippen Sie auf einen Stern oder ein Objekt am Himmel, um es auszuwählen.", it: "Tocca una stella o un oggetto del cielo per selezionarlo.", es: "Toque una estrella u objeto del cielo para seleccionarlo." },

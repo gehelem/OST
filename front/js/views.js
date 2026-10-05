@@ -196,7 +196,81 @@ const HOME_HORIZONTAL_BUILDERS = {
   guider: [buildRmsBoxes, buildGuidingChartPanel, buildDriftChartPanel],
 };
 
-function buildHomeCard(client, name, onSelect) {
+// Same touches[0]-or-clientX/Y split as panels.js's own pointXY() - not
+// imported from there (it isn't exported, and this is two lines) but the
+// same reasoning: a MouseEvent and a TouchEvent carry the pointer
+// differently, callers below shouldn't have to care which one they got.
+function pointXY(ev) {
+  const touch = ev.touches && ev.touches[0];
+  return touch ? { x: touch.clientX, y: touch.clientY } : { x: ev.clientX, y: ev.clientY };
+}
+
+// Manual mouse+touch drag for card reordering - see buildHomeCard's own
+// comment on why this isn't native HTML5 drag-and-drop. Tracks the pointer
+// with document-level move/up listeners (panels.js's startDrag() pattern),
+// highlights whichever other card it is currently over (drop-before/
+// drop-after, components.css), and hands the actual reorder off to
+// onReorder(draggedName, targetName, insertAfter) once released over one -
+// the drop decision reads back whatever the live pointer tracking already
+// settled on, same as panels.js's own up() reads the panel's own
+// already-updated style.left/top rather than re-deriving anything from the
+// release event itself.
+function startCardDrag(card, name, ev, onReorder) {
+  ev.preventDefault();
+  const start = pointXY(ev);
+  card.classList.add("dragging");
+  // pointer-events:none while dragging so elementFromPoint below can "see
+  // through" the dragged card itself to whatever's underneath it once it's
+  // translated on top of a neighbour - without this, hovering a card onto
+  // another one would keep hitting itself, never the card underneath.
+  card.style.pointerEvents = "none";
+  let dropTarget = null;
+  let dropAfter = false;
+  const clearMark = () => { if (dropTarget) dropTarget.classList.remove("drop-before", "drop-after"); };
+  const move = (e) => {
+    const p = pointXY(e);
+    // Gilles, 2026-10-06: "on a deja des fenetres drag/drop qui marchent
+    // tres bien, t'es encore en train de me reinventer la poudre pour
+    // rien" - panels.js's own startDrag() visibly moves the panel WITH
+    // the cursor in real time; the previous version of this only dimmed
+    // the card and left it sitting in place, with nothing at all tracking
+    // the pointer - looked completely dead even though the reorder logic
+    // underneath was already working. Same real-time-follow feedback here.
+    card.style.transform = `translate(${p.x - start.x}px, ${p.y - start.y}px)`;
+    const hit = document.elementFromPoint(p.x, p.y);
+    const target = hit && hit.closest(".home-card");
+    if (target !== dropTarget) clearMark();
+    if (target && target !== card) {
+      const rect = target.getBoundingClientRect();
+      dropAfter = p.x - rect.left > rect.width / 2;
+      target.classList.toggle("drop-before", !dropAfter);
+      target.classList.toggle("drop-after", dropAfter);
+      dropTarget = target;
+    } else {
+      dropTarget = null;
+    }
+    if (e.touches) e.preventDefault(); // stop the page itself from scrolling under the drag
+  };
+  const up = () => {
+    document.removeEventListener("mousemove", move);
+    document.removeEventListener("mouseup", up);
+    document.removeEventListener("touchmove", move);
+    document.removeEventListener("touchend", up);
+    document.removeEventListener("touchcancel", up);
+    card.classList.remove("dragging");
+    card.style.pointerEvents = "";
+    card.style.transform = "";
+    clearMark();
+    if (dropTarget) onReorder(name, dropTarget.dataset.moduleName, dropAfter);
+  };
+  document.addEventListener("mousemove", move);
+  document.addEventListener("mouseup", up);
+  document.addEventListener("touchmove", move, { passive: false });
+  document.addEventListener("touchend", up);
+  document.addEventListener("touchcancel", up);
+}
+
+function buildHomeCard(client, name, onSelect, onReorder) {
   const mod = client.get(client.topics.module(name));
   const template = mod && mod.infos.template;
   const label = (mod && (mod.infos.modulelabel || mod.infos.label)) || name;
@@ -204,10 +278,30 @@ function buildHomeCard(client, name, onSelect) {
 
   const dot = statusDot(0);
   dot.classList.add("hidden");
-  const header = el("div", { class: "home-card-header" }, [dot, icon(moduleIcon(mod)), el("span", { class: "home-card-title", text: label })]);
+  // Drag handle (Gilles, 2026-10-06: "ajoute la possibilite de deplacer les
+  // vignettes + position remanente"). Deliberately NOT native HTML5
+  // drag-and-drop (draggable=true/dragstart/dragover/drop) - this exact
+  // codebase already hit that wall once, panels.js's own startDrag(), on
+  // this project's own floating panels: "sur smartphone je ne peux pas
+  // deplacer les fenetres" - a touch's mousedown/mousemove (and, same
+  // story, native HTML5 DnD) aren't reliably delivered by mobile/touch
+  // browsers at all. Caught again here the same way: native DnD "worked"
+  // under Playwright's own synthetic/CDP-driven mouse, but Gilles still
+  // couldn't drag for real. Same fix as panels.js: a manual
+  // mouse+touch pointer handler (startCardDrag below), not the browser's
+  // own drag semantics. stopPropagation on a plain click so tapping the
+  // handle without dragging doesn't also fire the card's onclick.
+  const handle = icon("drag_indicator", { small: true });
+  handle.classList.add("home-card-handle");
+  handle.title = t("views.homeDragHint");
+  handle.addEventListener("click", (ev) => ev.stopPropagation());
+  const header = el("div", { class: "home-card-header" }, [handle, dot, icon(moduleIcon(mod)), el("span", { class: "home-card-title", text: label })]);
   const card = el("div", {
     class: "home-card" + (columnBuilders ? ` home-card-big home-card-cols-${columnBuilders.length}` : ""), title: t("views.homeGeneric"), onclick: () => onSelect(name),
   }, [header]);
+  card.dataset.moduleName = name;
+  handle.addEventListener("mousedown", (ev) => startCardDrag(card, name, ev, onReorder));
+  handle.addEventListener("touchstart", (ev) => startCardDrag(card, name, ev, onReorder), { passive: false });
 
   const disposers = [];
   disposers.push(client.subscribe(client.topics.property(name, "signals"), (prop) => {
@@ -247,29 +341,64 @@ function buildHomeCard(client, name, onSelect) {
   return { node: card, dispose: () => disposers.forEach((d) => d()) };
 }
 
+// Gilles, 2026-10-06: "ajoute la possibilite de deplacer les vignettes +
+// position remanente" - same idea as OstErix's own home page (localStorage
+// key "ost-home-card-order", source read directly), just this client's own
+// key-naming convention (LOG_FILTER_KEY above). Modules never in the
+// saved order (not yet dragged, or loaded since) keep the datastore's own
+// relative order, appended after every module the saved order does cover.
+const HOME_ORDER_KEY = "ostcore-ui3:home:order";
+function loadHomeOrder() {
+  try { return JSON.parse(localStorage.getItem(HOME_ORDER_KEY)) || []; } catch (e) { return []; }
+}
+function saveHomeOrder(order) {
+  try { localStorage.setItem(HOME_ORDER_KEY, JSON.stringify(order)); } catch (e) { /* ignore */ }
+}
+function orderedModuleNames(names) {
+  const saved = loadHomeOrder();
+  const known = names.filter((n) => saved.includes(n)).sort((a, b) => saved.indexOf(a) - saved.indexOf(b));
+  const rest = names.filter((n) => !saved.includes(n));
+  return [...known, ...rest];
+}
+
 export function renderHome(client, onSelect) {
   const root = el("div", { class: "home-view" });
   root.appendChild(el("h2", null, [icon("home"), el("span", { text: " " + t("views.home") })]));
   const grid = el("div", { class: "home-grid" });
   root.appendChild(grid);
 
+  // Reorder on drop (startCardDrag's own callback, see buildHomeCard) -
+  // reads the currently-displayed card list straight from the DOM (grid's
+  // own children), so it's always exactly what's on screen right now
+  // regardless of any async timing, rather than a separately-tracked array.
+  function onReorder(draggedName, targetName, insertAfter) {
+    if (draggedName === targetName) return;
+    const order = [...grid.querySelectorAll(".home-card")].map((c) => c.dataset.moduleName).filter((n) => n !== draggedName);
+    let idx = order.indexOf(targetName);
+    if (insertAfter) idx += 1;
+    order.splice(idx, 0, draggedName);
+    saveHomeOrder(order);
+    rebuild();
+  }
+
   let cardDisposers = [];
   function rebuild() {
     cardDisposers.forEach((d) => d());
     cardDisposers = [];
     grid.innerHTML = "";
-    const names = client.get(client.topics.modules());
+    const names = orderedModuleNames(client.get(client.topics.modules()));
     if (!names.length) {
       grid.appendChild(el("div", { class: "muted", text: t("views.noModuleLoaded") }));
       return;
     }
     for (const name of names) {
-      const { node, dispose } = buildHomeCard(client, name, onSelect);
+      const { node, dispose } = buildHomeCard(client, name, onSelect, onReorder);
       cardDisposers.push(dispose);
       grid.appendChild(node);
     }
   }
   rebuild();
+
   // Only the module SET (add/remove/profile swap, which can change
   // infos.template) needs a full rebuild - each card's own figures stay
   // live through its own metric-property subscription above, same
