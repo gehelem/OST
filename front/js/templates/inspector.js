@@ -46,7 +46,10 @@ import { buildImageGridPanel } from "../imagelayer.js";
 // fenetres" — picked over a tabbed one-at-a-time alternative specifically
 // so all 4 stay comparable at a glance (see imagelayer.js's own
 // buildImageGridPanel() doc comment for the full reasoning).
-const MAP_ITEMS = [
+// Exported too — reused as-is (same 4 properties) by views.js's Home
+// dashboard, Gilles, 2026-10-06: "sur inspector ajoute les 4 images de
+// controle en vignettes toutes petites".
+export const MAP_ITEMS = [
   { propName: "hfr", elName: "image", label: "HFR map" },
   { propName: "shape", elName: "image", label: "Shape map" },
   { propName: "collim", elName: "image", label: "Collimation map" },

@@ -19,7 +19,11 @@ import { buildCompactRms, buildGuidingChartPanel, buildDriftChartPanel } from ".
 // 2026-10-06: "ajoute une 'toute petite' vignette de la derniere image
 // prise") - same urljpeg/urlthumbnail resolution showBackgroundImage()
 // itself uses, not reinvented here.
-import { jpegSrc, openImageViewer, refreshImageViewer } from "./imagelayer.js";
+import { jpegSrc, openImageViewer, refreshImageViewer, buildImageGridPanel } from "./imagelayer.js";
+// Inspector's own 4 control maps (hfr/shape/collim/corners), same list its
+// own "maps" panel already uses (Gilles, 2026-10-06: "sur inspector ajoute
+// les 4 images de controle en vignettes toutes petites").
+import { MAP_ITEMS as INSPECTOR_MAP_ITEMS } from "./templates/inspector.js";
 
 // Shared by renderLogs() (the full-page Logs system view) and
 // renderLogPanel() (the always-on floating one, below) - index == the
@@ -397,6 +401,30 @@ function buildHomeCard(client, name, onSelect, onReorder) {
       if (src) { thumb.src = src; lastThumbSrc = src; refreshImageViewer(src); }
     }));
 
+    return { node: card, dispose: () => disposers.forEach((d) => d()) };
+  }
+
+  // Gilles, 2026-10-06: "sur inspector ajoute les 4 images de controle en
+  // vignettes toutes petites (2x2 qui doivent tenir dans la zone
+  // actuelle, sans stretch)" - the module's own "maps" panel
+  // (buildImageGridPanel, same 4 properties/MAP_ITEMS), just scaled down
+  // (.home-img-grid, components.css) to fit this plain card's normal
+  // size instead of a wide floating panel - no cols-N/home-card-big
+  // treatment here, unlike focus/guider, since the request was to fit
+  // the CURRENT card area, not grow it.
+  if (template === "inspector") {
+    body.classList.remove("muted", "small");
+    body.innerHTML = "";
+    const grid = buildImageGridPanel(client, name, INSPECTOR_MAP_ITEMS);
+    grid.classList.add("home-img-grid");
+    // buildImageGridPanel's own thumbnail click (openImageViewer) has
+    // nothing to stopPropagation against in its usual home (a floating
+    // panel with no ancestor click handler) - here it bubbles straight
+    // into the card's own onclick (navigate to the module), opening the
+    // viewer AND navigating away at once. Caught live.
+    grid.addEventListener("click", (ev) => ev.stopPropagation());
+    body.appendChild(grid);
+    disposers.push(grid._dispose);
     return { node: card, dispose: () => disposers.forEach((d) => d()) };
   }
 

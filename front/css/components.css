@@ -312,6 +312,16 @@ input[type="range"]::-moz-range-thumb {
 .img-grid-thumb:hover { border-color: var(--accent-dim); }
 .img-grid-tile-empty .img-grid-thumb { cursor: default; }
 .img-grid-label { font-size: 11px; color: var(--text-muted); text-align: center; }
+/* Gilles, 2026-10-06: "sur inspector ajoute les 4 images de controle en
+   vignettes toutes petites (2x2 qui doivent tenir dans la zone actuelle,
+   sans stretch)" - the same .img-grid component (views.js's buildHomeCard,
+   template === "inspector"), shrunk to fit a plain Home card instead of
+   its own wide floating panel: no forced min-width, a tighter gap, and no
+   per-tile label (redundant with the card's own header, and there's no
+   room for it at this size) - the thumbnail itself keeps object-fit:cover
+   (crops to a fixed ratio, never stretches/distorts either way). */
+.home-img-grid { min-width: 0; gap: 4px; }
+.home-img-grid .img-grid-label { display: none; }
 
 .elt-table { width: 100%; border-collapse: collapse; }
 .elt-row td { padding: 6px 4px; vertical-align: middle; border-top: 1px solid var(--border-subtle); }
