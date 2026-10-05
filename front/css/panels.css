@@ -239,11 +239,14 @@
    never stretched or cropped), click opens the fullscreen viewer. Ported
    from ostnoctua's own #on-bg/#on-bg-img (Gilles, 2026-09-29: "affiche
    l'image derriere en ecran de fond, comme dans ostnoctua") — see
-   js/imagelayer.js. Fixed near-black regardless of theme, same as
-   ostnoctua: astro imagery reads wrong against a light theme's own
-   background. */
+   js/imagelayer.js. Letterbox bars follow the theme (same var(--bg) as
+   #canvas itself, so they blend into it rather than reading as a boxed-in
+   image) — was fixed near-black regardless of theme until Gilles caught
+   it looking wrong in the light theme, 2026-10-05: "il y a deux zones
+   noires ajoutees de part et d'autre de l'image, il faudrait qu'elles
+   soient claires sur le theme clair". */
 #bg-layer { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
-#bg-layer.img-active { background: #05070c; }
+#bg-layer.img-active { background: var(--bg); }
 #bg-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; opacity: 0.92; cursor: zoom-in; }
 /* Sky-dome view (templates/navigator.js, js/sky-engine.js) — same shared
    #bg-layer, a <canvas> instead of an <img>. Deep space black regardless
