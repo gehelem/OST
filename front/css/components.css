@@ -186,6 +186,20 @@ input[type="range"]::-moz-range-thumb {
 .home-ring-row { display: flex; gap: var(--space-3); }
 .home-ring-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .home-ring-caption { max-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
+/* Gilles, 2026-10-06, sequencer's Home card: "ajoute le 'remaining time'
+   et un progress bar pour l'exposition en cours" - the shared prg-bar-*
+   component (above) defaults to a fixed 160px, sized for an inline table
+   cell; full width reads better in a card. */
+.home-bar-full { width: 100%; margin-top: 2px; }
+.home-exposure-bar { display: flex; flex-direction: column; gap: 2px; margin-top: 4px; }
+/* Gilles, 2026-10-06: "ajoute une 'toute petite' vignette de la derniere
+   image prise (apres/a droite du spinner de 'global progress'), pas plus
+   haut)", then: "ajuste la hauteur de l'image avec la hauteur du 'global
+   progress', mais sa largeur doit etre naturelle (sans stretch)" - a
+   fixed width alongside the fixed height forced object-fit:cover to crop
+   every frame into a square regardless of its real aspect ratio; height
+   alone, width left auto, scales it proportionally instead. */
+.home-seq-thumb { height: 56px; width: auto; border-radius: var(--radius-sm); cursor: zoom-in; flex-shrink: 0; border: 1px solid var(--border); }
 
 /* --------------------------------------------------------- status dots */
 .status-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 2px; flex-shrink: 0; box-shadow: 0 0 0 3px transparent; transition: box-shadow 0.2s ease; }

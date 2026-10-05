@@ -35,7 +35,11 @@ if (window.Chart && window.Chart.registerables) {
 let bgLayer = null;
 export function setBgLayer(node) { bgLayer = node; }
 
-function jpegSrc(elDef) {
+// Exported too — reused by views.js's Home dashboard (sequencer's own
+// "last shot" mini thumbnail, next to its progress ring) rather than
+// duplicating this same urljpeg/urlthumbnail-fallback + cache-busting
+// logic there.
+export function jpegSrc(elDef) {
   const v = elDef && elDef.value;
   const path = v && (v.urljpeg || v.urlthumbnail);
   if (!path) return null;

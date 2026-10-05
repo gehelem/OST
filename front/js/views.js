@@ -15,6 +15,11 @@ import { t } from "./i18n.js";
 // functions, not reinvented here, see renderHome() below.
 import { buildResultsBoxes, buildFocusCurvePanel } from "./templates/focus.js";
 import { buildCompactRms, buildGuidingChartPanel, buildDriftChartPanel } from "./templates/guider.js";
+// Sequencer's own "last shot" mini thumbnail on its Home card (Gilles,
+// 2026-10-06: "ajoute une 'toute petite' vignette de la derniere image
+// prise") - same urljpeg/urlthumbnail resolution showBackgroundImage()
+// itself uses, not reinvented here.
+import { jpegSrc, openImageViewer, refreshImageViewer } from "./imagelayer.js";
 
 // Shared by renderLogs() (the full-page Logs system view) and
 // renderLogPanel() (the always-on floating one, below) - index == the
@@ -160,22 +165,17 @@ export function renderSystemViews(activeKey, onSelect) {
 // that module. Everything but focus/guider stays a plain metric row or,
 // lacking even that, a "click to open" card — same as Rooster's own
 // default case for any template without a custom widget.
-const HOME_METRIC_PROPERTY = { sequencer: "progress", navigator: "mountposition" };
+// sequencer used to be in here too (a plain "Progress 0%" text row) until
+// it got its own ring gauge instead (Gilles, 2026-10-06: "fais moi un truc
+// joli qui ne prend pas trop de place" - see buildHomeCard's own
+// template === "sequencer" branch below).
+const HOME_METRIC_PROPERTY = { navigator: "mountposition" };
 
 function homeCardMetrics(template, prop) {
   const e = prop && prop.elements;
   if (!e) return [];
   const num = (v, d) => (typeof v === "number" ? v.toFixed(d == null ? 2 : d) : "—");
   switch (template) {
-    case "sequencer": {
-      // "prg" elements wrap their actual value one level deeper than
-      // float/int ones (e.global = {type:"prg", value:{value, dynlabel},
-      // ...} — see render.js's own renderProperty() "prg" branch, which
-      // reads element.value.dynlabel/.value the same way) - caught live,
-      // a flat e.global.dynlabel read NaN'd Math.round(e.global.value||0).
-      const g = e.global && e.global.value;
-      return g ? [[t("views.homeProgress"), g.dynlabel || Math.round(g.value || 0) + "%"]] : [];
-    }
     case "navigator":
       return [["RA", num(e.RA && e.RA.value, 3)], ["DEC", num(e.DEC && e.DEC.value, 3)]];
     default:
@@ -338,6 +338,77 @@ function buildHomeCard(client, name, onSelect, onReorder) {
 
   const body = el("div", { class: "home-card-body muted small", text: t("views.homeGeneric") });
   card.appendChild(body);
+
+  // Gilles, 2026-10-06: "affiche sur la vignette sequencer l'avancement,
+  // fais moi un truc joli qui ne prend pas trop de place" - the same
+  // compact ring gauge the system card's own RAM/disk figures use
+  // (ringGauge, same conic-gradient "prg" spinner recipe), instead of the
+  // generic plain-text row every other template without a bespoke widget
+  // gets below.
+  if (template === "sequencer") {
+    body.classList.remove("muted", "small");
+    body.innerHTML = "";
+    // The ring (rebuilt on every "progress" update, via ringSlot below)
+    // and the last-shot thumbnail (updated independently, its own "image"
+    // subscription - a different property entirely) sit side by side in
+    // the same row - Gilles, 2026-10-06: "ajoute une 'toute petite'
+    // vignette de la derniere image prise (apres/a droite du spinner de
+    // 'global progress'), pas plus haut)". A plain img.src swap rather
+    // than rebuilding it each time keeps it independent of the ring's own
+    // update cadence.
+    const row = el("div", { class: "home-ring-row" });
+    const ringSlot = el("div", { class: "muted small", text: t("views.homeGeneric") });
+    const thumb = el("img", { class: "home-seq-thumb hidden", alt: "" });
+    let lastThumbSrc = null;
+    thumb.addEventListener("click", (ev) => { ev.stopPropagation(); if (lastThumbSrc) openImageViewer(lastThumbSrc); });
+    row.appendChild(ringSlot);
+    row.appendChild(thumb);
+    body.appendChild(row);
+    const extra = el("div");
+    body.appendChild(extra);
+
+    disposers.push(client.subscribe(client.topics.property(name, "progress"), (prop) => {
+      const e = prop && prop.elements;
+      const g = e && e.global && e.global.value;
+      ringSlot.innerHTML = "";
+      extra.innerHTML = "";
+      if (!g) { ringSlot.classList.add("muted", "small"); ringSlot.textContent = t("views.homeGeneric"); return; }
+      ringSlot.classList.remove("muted", "small");
+      ringSlot.appendChild(ringGauge(g.value, g.dynlabel || t("views.homeProgress")));
+      // Gilles, 2026-10-06, right after the ring-only version shipped:
+      // "bah ? tu n'as mis que le global: ajoute le 'remaining time' et un
+      // progress bar pour l'exposition en cours" - theoreticalremaining is
+      // a plain string field (server-formatted duration, not a "prg"), the
+      // current exposure gets its own compact bar (prg-bar-*, same
+      // component render.js's own non-ring prg type already uses, just
+      // narrower here to fit the card).
+      if (e.theoreticalremaining && e.theoreticalremaining.value) {
+        extra.appendChild(el("div", { class: "home-card-row" }, [
+          el("span", { class: "muted small", text: e.theoreticalremaining.label || t("views.homeRemaining") }),
+          el("span", { class: "mono", text: e.theoreticalremaining.value }),
+        ]));
+      }
+      const exposure = e.exposure && e.exposure.value;
+      if (exposure) {
+        const pct = Math.max(0, Math.min(100, exposure.value || 0));
+        const bar = el("div", { class: "home-exposure-bar" }, [
+          el("div", { class: "muted small", text: e.exposure.label || t("views.homeExposure") }),
+          el("div", { class: "prg-bar-outer home-bar-full" }, [el("div", { class: "prg-bar-inner", style: `width:${pct}%` })]),
+        ]);
+        if (exposure.dynlabel) bar.appendChild(el("div", { class: "muted small", text: exposure.dynlabel }));
+        extra.appendChild(bar);
+      }
+    }));
+
+    disposers.push(client.subscribe(client.topics.property(name, "image"), (prop) => {
+      const src = jpegSrc(prop && prop.elements && prop.elements.image);
+      thumb.classList.toggle("hidden", !src);
+      if (src) { thumb.src = src; lastThumbSrc = src; refreshImageViewer(src); }
+    }));
+
+    return { node: card, dispose: () => disposers.forEach((d) => d()) };
+  }
+
   const metricProp = HOME_METRIC_PROPERTY[template];
   if (metricProp) {
     disposers.push(client.subscribe(client.topics.property(name, metricProp), (prop) => {

@@ -159,6 +159,8 @@ const STRINGS = {
   "views.homeHfr": { en: "HFR", fr: "HFR", de: "HFR", it: "HFR", es: "HFR" },
   "views.homePosition": { en: "Position", fr: "Position", de: "Position", it: "Posizione", es: "Posición" },
   "views.homeProgress": { en: "Progress", fr: "Progression", de: "Fortschritt", it: "Avanzamento", es: "Progreso" },
+  "views.homeRemaining": { en: "Remaining", fr: "Restant", de: "Verbleibend", it: "Rimanente", es: "Restante" },
+  "views.homeExposure": { en: "Exposure", fr: "Exposition", de: "Belichtung", it: "Esposizione", es: "Exposición" },
   "views.homeDragHint": { en: "Drag to reorder", fr: "Glisser pour réorganiser", de: "Ziehen zum Anordnen", it: "Trascina per riordinare", es: "Arrastrar para reordenar" },
 
   // ---- templates/navigator.js: the planetarium screen ---------------------
