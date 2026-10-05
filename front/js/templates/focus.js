@@ -129,8 +129,13 @@ function focusCurveDatasets(prop) {
  * ready for the caller's track(). */
 // Exported too — reused as-is (same chart, just placed in a bigger card)
 // by views.js's Home dashboard (Gilles, 2026-10-05: "mets les graphes
-// correspondants" on the bigger focus/guider home cards).
-export function buildFocusCurvePanel(client, moduleName) {
+// correspondants" on the bigger focus/guider home cards). `opts.compact`
+// (Gilles, 2026-10-06, Home specifically: "enleve la legende 'focuser
+// position' et les valeurs sur l'echelle") drops the X axis title and the
+// tick numbers on both axes - the module's own "Focus curve" panel keeps
+// them (doesn't pass opts), only Home asks for the tighter version.
+export function buildFocusCurvePanel(client, moduleName, opts) {
+  const compact = !!(opts && opts.compact);
   const wrap = el("div", { class: "gd-chart" });
   const canvas = el("canvas");
   wrap.appendChild(canvas);
@@ -153,13 +158,13 @@ export function buildFocusCurvePanel(client, moduleName) {
           scales: {
             x: {
               type: "linear",
-              title: { display: true, text: xLabel, color: grey, font: { size: 10 } },
-              ticks: { color: grey, font: { size: 9 } }, grid,
+              title: { display: !compact, text: xLabel, color: grey, font: { size: 10 } },
+              ticks: { display: !compact, color: grey, font: { size: 9 } }, grid,
             },
             y: {
               beginAtZero: false,
               title: { display: true, text: yLabel, color: grey, font: { size: 10 } },
-              ticks: { color: grey, font: { size: 9 } }, grid,
+              ticks: { display: !compact, color: grey, font: { size: 9 } }, grid,
             },
           },
         },

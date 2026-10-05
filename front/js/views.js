@@ -191,36 +191,21 @@ function homeCardMetrics(template, prop) {
 // as-is (self-subscribed, returns a node with its own `_dispose`) rather
 // than reinvented here — same "no duplicated chart/figure logic" approach
 // the previous (stacked) version already established. guider's own entry
-// dropped from 3 columns to 2 (Gilles, 2026-10-06: "tu lui fais occuper 3
-// zones, passe a deux") - the compact RMS block (buildCompactRms) plus the
-// two charts folded into one stacked column via stackedColumn() below,
-// instead of each chart getting its own full column.
-function stackedColumn(...builders) {
-  return (client, moduleName) => {
-    const wrap = el("div", { class: "home-card-stack" });
-    const disposers = [];
-    for (const build of builders) {
-      const node = build(client, moduleName);
-      wrap.appendChild(node);
-      disposers.push(node._dispose);
-    }
-    wrap._dispose = () => disposers.forEach((d) => d());
-    return wrap;
-  };
-}
-
-// Gilles, 2026-10-06: "la place occupee par les graphes est trop
-// importante - essaie de ne pas afficher libelles DEC/RA sur drift et
-// (Drift(RA) etc etc sur le guidegraphe" - opts.compact (templates/
-// guider.js's own doc comment on each function) drops the legend/axis
-// titles, Home-only; the module's own panels still pass nothing and keep
-// them.
+// went 3 columns -> 2 (Gilles, 2026-10-06: "tu lui fais occuper 3 zones,
+// passe a deux" then "limiter ... a 2 paves ... 2/3 pour guidegraphe et
+// 1/3 pour drift sur un pave") -> back to 3 (Gilles, 2026-10-06, next:
+// "fait prendre plus de place au graphe de drift du guidage, en faisant
+// occupe 3 zones a la vignette") once splitting one zone 2:1 left drift
+// too small to read - each chart gets its own full column again, drift's
+// own column just wider than its original equal share (components.css's
+// .home-card-column.gd-chart-square).
 const HOME_HORIZONTAL_BUILDERS = {
-  focus: [buildResultsBoxes, buildFocusCurvePanel],
-  guider: [buildCompactRms, stackedColumn(
+  focus: [buildResultsBoxes, (client, name) => buildFocusCurvePanel(client, name, { compact: true })],
+  guider: [
+    buildCompactRms,
     (client, name) => buildGuidingChartPanel(client, name, { compact: true }),
     (client, name) => buildDriftChartPanel(client, name, { compact: true }),
-  )],
+  ],
 };
 
 // Same touches[0]-or-clientX/Y split as panels.js's own pointXY() - not

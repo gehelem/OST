@@ -125,42 +125,36 @@ input[type="range"]::-moz-range-thumb {
 .home-card-columns { display: flex; gap: var(--space-3); align-items: flex-start; }
 .home-card-column { flex: 1 1 0; min-width: 0; }
 /* The chart's own gd-chart component, scaled down from its full-panel
-   height (280px, components.css above) to column size. */
-.home-card-column.gd-chart { height: 160px; }
+   height (280px, components.css above) to column size. Gilles, 2026-10-06:
+   "diminue de 1/3 la hauteur du graphe de focus sur la vignette" -
+   160px to ~107px; shared by guider's own guidegraph column too, which
+   wants roughly the same height. */
+.home-card-column.gd-chart { height: 107px; }
 .home-card-column.value-row { margin-bottom: 0; }
 /* The drift chart is square (Chart.js maintainAspectRatio:true,
    aspectRatio:1) - it sets its own canvas height from ITS OWN WIDTH via an
-   inline style, which beats the plain height:160px above (inline always
-   outranks a class selector). Left at flex:1's equal share of the row
-   (~230px wide in a 3-column card) it rendered ~217px tall, taller than
-   its own card, overflowing into - and intercepting clicks/drags on - the
-   row of cards below (caught live: a real drag never reached the handle
-   underneath). Give it a fixed, already-square-sized width instead of
-   fighting Chart.js's own inline height with CSS specificity. */
-.home-card-column.gd-chart-square { flex: 0 0 160px; }
+   inline style, written asynchronously (Chart.js's own responsive resize,
+   not necessarily in the same synchronous layout pass the browser used to
+   size this flex column) - a flex-basis alone gives the grid/flex layout
+   nothing to reserve height for UNTIL that later resize lands, so the
+   card's own box was still only as tall as its shortest column when
+   measured, with the canvas quietly overflowing past its bottom into the
+   row below (caught live again: same overflow class as the original
+   160px-equal-share bug, just at a bigger size this time - both width AND
+   height need to be pinned up front, not just width). Gilles, 2026-10-06:
+   "fait prendre plus de place au graphe de drift ... en faisant occupe 3
+   zones a la vignette" - its own full column again, bigger than its very
+   first 160px pass. */
+.home-card-column.gd-chart-square { flex: 0 0 220px; height: 220px; }
 /* Gilles, 2026-10-06: "tu lui fais occuper 3 zones, passe a deux en
    mettant le RMS sous cette forme: en haut RMS total / en bas en plus
-   petit RMS RA et DEC" - guider's Home card drops from 3 columns to 2:
-   a narrow compact-RMS column (buildCompactRms, templates/guider.js) next
-   to a column stacking both charts (views.js's stackedColumn()) instead
-   of each chart getting its own full column. */
+   petit RMS RA et DEC" - a narrow compact-RMS column (buildCompactRms,
+   templates/guider.js), unaffected by the 2-vs-3-column back and forth
+   since on both the charts next to it just get their own column(s). */
 .home-card-column.rms-compact { flex: 0 0 130px; }
 .rms-compact { display: flex; flex-direction: column; gap: var(--space-2); }
 .rms-compact-sub { display: flex; gap: var(--space-3); }
 .rms-compact-item { display: flex; flex-direction: column; gap: 2px; }
-.home-card-stack { display: flex; flex-direction: column; gap: var(--space-2); }
-/* Gilles, 2026-10-06: "la place occupee par les graphes est trop
-   importante" - shrunk further (130px to 110px) once opts.compact
-   (templates/guider.js) dropped the legend/axis titles that used to need
-   that extra room. */
-.home-card-stack .gd-chart { height: 110px; }
-/* flex-basis sets HEIGHT here (main axis is vertical in a column-direction
-   flex container, see .home-card-stack above) - the square chart still
-   needs its WIDTH pinned too (that's what drove its own height via
-   maintainAspectRatio:1, components.css's own comment on gd-chart-square
-   above), which a column container's default align-items:stretch would
-   otherwise expand to the full column width again. */
-.home-card-stack .gd-chart-square { flex: 0 0 110px; width: 110px; align-self: center; }
 /* Gilles, 2026-10-06: "ajoute la possibilite de deplacer les vignettes +
    position remanente" - a small drag handle in the header (views.js's
    buildHomeCard), not the whole card, so a plain click elsewhere still

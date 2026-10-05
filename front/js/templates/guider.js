@@ -131,8 +131,11 @@ function guidingChartData(prop) {
 // (Gilles, 2026-10-06, Home specifically: "la place occupee par les
 // graphes est trop importante - essaie de ne pas afficher ... Drift(RA)
 // etc etc sur le guidegraphe") drops the legend and the three Y axis
-// titles - the module's own "Guiding graph" panel keeps them (doesn't
-// pass opts), only Home asks for the tighter version.
+// titles, and (Gilles, same day, next request: "enleve les echelles de
+// pulse et SNR") the yPulse/ySNR scales entirely (axis line + ticks, not
+// just their titles) - yDrive keeps its own ticks, only Pulse/SNR go. The
+// module's own "Guiding graph" panel keeps all of it (doesn't pass opts),
+// only Home asks for the tighter version.
 export function buildGuidingChartPanel(client, moduleName, opts) {
   const compact = !!(opts && opts.compact);
   const wrap = el("div", { class: "gd-chart" });
@@ -159,18 +162,23 @@ export function buildGuidingChartPanel(client, moduleName, opts) {
             tooltip: { mode: "index", intersect: false },
           },
           scales: {
-            x: { ticks: { color: grey, maxRotation: 0, autoSkip: true, maxTicksLimit: 10, font: { size: 9 } }, grid },
+            // Gilles, 2026-10-06: "enleve les libelles de l'horodatage sur
+            // le graphe de guidage, on y voit rien" - the timestamps
+            // crowded/overlapped illegibly at this card's compact width.
+            x: { ticks: { display: !compact, color: grey, maxRotation: 0, autoSkip: true, maxTicksLimit: 10, font: { size: 9 } }, grid },
             yDrive: {
               type: "linear", position: "left", min: lim && lim.drive.min, max: lim && lim.drive.max,
               title: { display: !compact, text: t("guider.drift"), color: grey, font: { size: 10 } },
               ticks: { color: grey, font: { size: 9 }, maxTicksLimit: 8 }, grid,
             },
             yPulse: {
+              display: !compact,
               type: "linear", position: "right", min: lim && lim.pulse.min, max: lim && lim.pulse.max,
               title: { display: !compact, text: t("guider.pulse"), color: grey, font: { size: 10 } },
               ticks: { color: grey, font: { size: 9 }, maxTicksLimit: 6 }, grid: { drawOnChartArea: false },
             },
             ySNR: {
+              display: !compact,
               type: "linear", position: "right", offset: true, min: 0,
               title: { display: !compact, text: t("guider.snr"), color: "#F44336", font: { size: 10 } },
               ticks: { color: "#F44336", font: { size: 9 }, maxTicksLimit: 5 }, grid: { drawOnChartArea: false },
