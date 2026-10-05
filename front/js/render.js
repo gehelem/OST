@@ -200,15 +200,33 @@ function buildEditControl(client, moduleName, el_, elName, buffer, opts) {
     if (el_.slider === 1 || el_.slider === 2) {
       const wrap = el("span", { class: "slider-wrap" });
       const range = el("input", { type: "range", min: el_.min, max: el_.max, step: el_.step || (type === "float" ? 0.1 : 1), value: buffer[elName] });
-      const out = el("span", { class: "slider-val", text: String(buffer[elName]) });
+      // SliderAndValue (common.h: "Slider with adjacent numeric input") — a
+      // real editable field, not a read-only number display next to the
+      // slider, so a value the slider's own step can't reach (e.g. a 0.05s
+      // exposure on a slider stepping by 0.1) can still be typed by hand —
+      // Gilles, 2026-10-05: "parms.exposure je n'ai que le slider et si je
+      // veux mettre 0.05 ce n'est pas possible". Synced both ways with the
+      // range below; its own step stays as permissive as the plain
+      // (non-slider) number input further down, independent of the
+      // range's own coarser dragging granularity.
+      let numInput = null;
       range.addEventListener("input", () => {
         const v = type === "int" ? parseInt(range.value, 10) : parseFloat(range.value);
         buffer[elName] = v;
-        out.textContent = String(v);
+        if (numInput) numInput.value = v;
         if (opts && opts.onChange) opts.onChange();
       });
       wrap.appendChild(range);
-      if (el_.slider === 2) wrap.appendChild(out);
+      if (el_.slider === 2) {
+        numInput = el("input", { type: "number", class: "slider-val-input", min: el_.min, max: el_.max, step: el_.step || (type === "float" ? "any" : 1), value: buffer[elName] });
+        numInput.addEventListener("change", () => {
+          const v = numInput.value === "" ? null : (type === "int" ? parseInt(numInput.value, 10) : parseFloat(numInput.value));
+          buffer[elName] = v;
+          if (v != null) range.value = v;
+          if (opts && opts.onChange) opts.onChange();
+        });
+        wrap.appendChild(numInput);
+      }
       return wrap;
     }
     const input = el("input", { type: "number", class: "field-input", min: el_.min, max: el_.max, step: el_.step || (type === "float" ? "any" : 1), value: buffer[elName] });

@@ -69,7 +69,14 @@ input[type="range"]::-moz-range-thumb {
   width: 14px; height: 14px; border-radius: 50%; background: var(--accent);
   border: 2px solid var(--bg-panel); box-shadow: 0 0 0 1px var(--accent-dim); cursor: pointer;
 }
-.slider-val { min-width: 3em; text-align: right; color: var(--accent); font-family: var(--font-mono); font-size: 12px; }
+/* Editable sibling of the slider itself (SliderAndValue) - small enough to
+ * sit next to the range input, not a full-width .field-input. */
+.slider-val-input {
+  width: 4.5em; text-align: right; color: var(--accent); font-family: var(--font-mono); font-size: 12px;
+  background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 2px 4px;
+}
+.slider-val-input:focus { outline: none; border-color: var(--accent-dim); }
 
 /* --------------------------------------------------------------- pills */
 /* Connection status itself now lives in panels.css's #conn-widget
