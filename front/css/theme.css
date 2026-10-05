@@ -151,18 +151,24 @@
 
 /* "Red" night-vision theme — same dark surfaces/text/structure as the
  * default :root theme above (deliberately NOT redefined here, per
- * Gilles's own "identique au sombre"), only the accent (cyan -> red) and
- * the "ok" status color (green -> a duller red, since a real green pixel
- * is exactly the kind of light this theme exists to avoid) are
- * overridden. --busy/--warn/--orange/--error were already amber/red, not
- * green, so they're left as-is — distinguishing "ok" from them by
- * saturation/brightness within the red family rather than by hue, same
- * as the dark theme already distinguishes its own status colors. Every
- * accent-derived rgba() below had to be restated too (components.css
- * reads several of these as hand-written rgba(R,G,B,alpha) literals, not
- * a calc() off --accent-rgb) — --shadow-glow doesn't need restating
- * since it already composes var(--accent-subtle)/var(--accent-rgb), so it
- * picks up the new values on its own. */
+ * Gilles's own "identique au sombre"), only the accent (cyan -> red) is
+ * overridden. --ok used to turn into a duller red here too (a real green
+ * pixel being exactly the kind of light this theme exists to avoid), but
+ * that conflated two different jobs one token was doing - Gilles,
+ * 2026-10-06, catching it on the Home dashboard's status dots showing red
+ * for a module that's actually fine: "vert pour le statut c'est vert pour
+ * le statut, quel que soit le theme" - status color meaning (green=ok,
+ * amber=busy, red=error) has to stay theme-independent everywhere it's
+ * used (dots, value-box accents, ...), or a reader can mistake "fine" for
+ * "broken" at a glance. --ok now falls through to :root's own green
+ * unchanged, same as --busy/--warn/--orange/--error already did (never
+ * green to begin with, so never needed overriding here in the first
+ * place). Every accent-derived rgba() below had to be restated too
+ * (components.css reads several of these as hand-written
+ * rgba(R,G,B,alpha) literals, not a calc() off --accent-rgb) —
+ * --shadow-glow doesn't need restating since it already composes
+ * var(--accent-subtle)/var(--accent-rgb), so it picks up the new values
+ * on its own. */
 [data-theme="red"] {
   color-scheme: dark;
 
@@ -180,9 +186,4 @@
   --border-subtle: rgba(255, 69, 58, 0.08);
   --border-strong: rgba(255, 69, 58, 0.32);
   --border-active: #ff453a;
-
-  --ok: #a8524a;
-  --ok-rgb: 168, 82, 74;
-
-  --btn-success: #a8524a;
 }
