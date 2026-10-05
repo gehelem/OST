@@ -464,6 +464,51 @@ function buildHomeCard(client, name, onSelect, onReorder) {
     return { node: card, dispose: () => disposers.forEach((d) => d()) };
   }
 
+  // Gilles, 2026-10-06: "sur la vignette planner tu peux afficher la
+  // valeur courante de la target (name/RA/DEC) sans aller chercher sur la
+  // grille" - "planning" is planner's own grid property (hasGrid:true,
+  // one row per planned object: object/ra/dec/profile/progress - confirmed
+  // live against the real server, not guessed), no separate "current
+  // target" property of its own. The active row is whichever one's own
+  // "progress" dynlabel names an in-progress step (planner.cpp's real
+  // setDynLabel() calls: "Checking visibility"/"Slewing"/"Shooting" while
+  // working a line, "Queued" before it and "Finished"/"Cancelled"/
+  // "Failed: ..."/"Skipped: ..." once resolved) - picks the first match,
+  // same order the grid itself processes lines in.
+  const PLANNER_ACTIVE_STATES = new Set(["Checking visibility", "Slewing", "Shooting"]);
+  if (template === "planner") {
+    disposers.push(client.subscribe(client.topics.property(name, "planning"), (prop) => {
+      const rows = (prop && prop.rows) || [];
+      const active = rows.find((r) => r.progress && PLANNER_ACTIVE_STATES.has(r.progress.dynlabel));
+      body.classList.toggle("muted", !active);
+      body.classList.toggle("small", !active);
+      body.innerHTML = "";
+      if (!active) { body.textContent = t("views.homeGeneric"); return; }
+      const num = (v, d) => (typeof v === "number" ? v.toFixed(d) : "—");
+      const e = prop.elements;
+      // Gilles, 2026-10-06, after two earlier attempts ("ca prend trop de
+      // place" on a 3-row version, then "c'est moche" on a ring+name row
+      // above a RA/DEC row): "l'affichage doit etre separe en deux
+      // parties: a gauche nom objet puis RA/DEC en dessous, a droite
+      // spinner sur deux lignes" - two side-by-side columns instead of
+      // stacked rows: left column (name, then RA/DEC folded into one row
+      // via rms-compact-sub/-item, same compact pair guider's RMS boxes
+      // use), right column just the ring, vertically centered against the
+      // left column's own two-line height.
+      const left = el("div", { class: "home-planner-left" });
+      left.appendChild(el("div", { class: "mono home-ring-object", text: active.object }));
+      const posRow = el("div", { class: "rms-compact-sub" });
+      posRow.appendChild(el("div", { class: "rms-compact-item" }, [el("span", { class: "muted small", text: (e.ra && e.ra.label) || "RA" }), el("span", { class: "mono", text: num(active.ra, 3) })]));
+      posRow.appendChild(el("div", { class: "rms-compact-item" }, [el("span", { class: "muted small", text: (e.dec && e.dec.label) || "DEC" }), el("span", { class: "mono", text: num(active.dec, 3) })]));
+      left.appendChild(posRow);
+      const row = el("div", { class: "home-planner-row" });
+      row.appendChild(left);
+      row.appendChild(ringGauge(active.progress.value, active.progress.dynlabel || t("views.homeProgress")));
+      body.appendChild(row);
+    }));
+    return { node: card, dispose: () => disposers.forEach((d) => d()) };
+  }
+
   return { node: card, dispose: () => disposers.forEach((d) => d()) };
 }
 
