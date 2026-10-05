@@ -210,6 +210,41 @@ export function buildResultsBoxes(client, moduleName) {
   return wrap;
 }
 
+// Home-dashboard-only variant (Gilles, 2026-10-06: "garde le HFR tel
+// quel, mais diminue l'importance du 'focus final position', mets le en
+// tout petit en dessous de HFR, et donne la place gagnee au graphique") -
+// HFR keeps the same bordered .value-box buildResultsBoxes above already
+// gives it, position drops to a small label/value pair below it instead
+// of a matching box of its own, both to read as secondary and to free up
+// width for the curve chart next to it (views.js gives this column a
+// smaller flex share than before, see components.css).
+export function buildCompactFocusResult(client, moduleName) {
+  const wrap = el("div", { class: "focus-compact-result" });
+  const unsub = client.subscribe(client.topics.property(moduleName, "results"), (prop) => {
+    wrap.innerHTML = "";
+    if (!prop) return;
+    const e = prop.elements;
+    if (e.hfr) {
+      wrap.appendChild(el("div", { class: "value-box" }, [
+        el("div", { class: "value-box-label", text: e.hfr.label || "hfr" }),
+        el("div", { class: "value-box-number", text: (e.hfr.value || 0).toFixed(2) }),
+      ]));
+    }
+    if (e.pos) {
+      // Gilles, 2026-10-06: "'focuser final position' c'est trop long -
+      // mets juste 'position'" - a local, Home-only override instead of
+      // the server's own full label (which stays as-is everywhere else,
+      // e.g. buildResultsBoxes' matching box on the module's own panel).
+      wrap.appendChild(el("div", { class: "home-card-row" }, [
+        el("span", { class: "muted small", text: t("views.homePosition") }),
+        el("span", { class: "mono small", text: (e.pos.value || 0).toFixed(2) }),
+      ]));
+    }
+  });
+  wrap._dispose = unsub;
+  return wrap;
+}
+
 export function mount(client, moduleName) {
   Panels.setScope(moduleName);
   Panels.clear();

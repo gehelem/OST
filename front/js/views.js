@@ -13,7 +13,7 @@ import { t } from "./i18n.js";
 // 2026-10-05: "mets les graphes correspondants" then "Focus: values/curve /
 // Guide: rms/guidegraph/drift") - the module's own panel-building
 // functions, not reinvented here, see renderHome() below.
-import { buildResultsBoxes, buildFocusCurvePanel } from "./templates/focus.js";
+import { buildCompactFocusResult, buildFocusCurvePanel } from "./templates/focus.js";
 import { buildCompactRms, buildGuidingChartPanel, buildDriftChartPanel } from "./templates/guider.js";
 // Sequencer's own "last shot" mini thumbnail on its Home card (Gilles,
 // 2026-10-06: "ajoute une 'toute petite' vignette de la derniere image
@@ -195,7 +195,7 @@ export function renderSystemViews(activeKey, onSelect) {
 // own column just wider than its original equal share (components.css's
 // .home-card-column.gd-chart-square).
 const HOME_HORIZONTAL_BUILDERS = {
-  focus: [buildResultsBoxes, (client, name) => buildFocusCurvePanel(client, name, { compact: true })],
+  focus: [buildCompactFocusResult, (client, name) => buildFocusCurvePanel(client, name, { compact: true })],
   guider: [
     buildCompactRms,
     (client, name) => buildGuidingChartPanel(client, name, { compact: true }),

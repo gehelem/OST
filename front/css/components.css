@@ -158,6 +158,13 @@ input[type="range"]::-moz-range-thumb {
 .rms-compact { display: flex; flex-direction: column; gap: var(--space-2); }
 .rms-compact-sub { display: flex; gap: var(--space-3); }
 .rms-compact-item { display: flex; flex-direction: column; gap: 2px; }
+/* Gilles, 2026-10-06: "sur la vignette du focus garde le HFR tel quel,
+   mais diminue l'importance du 'focus final position', mets le en tout
+   petit en dessous de HFR, et donne la place gagnee au graphique" - a
+   narrow fixed-width column (same idea as rms-compact above) so the
+   curve chart's own column (default flex:1) picks up the freed-up width. */
+.home-card-column.focus-compact-result { flex: 0 0 110px; }
+.focus-compact-result { display: flex; flex-direction: column; gap: var(--space-2); }
 /* Gilles, 2026-10-06: "ajoute la possibilite de deplacer les vignettes +
    position remanente" - a small drag handle in the header (views.js's
    buildHomeCard), not the whole card, so a plain click elsewhere still
