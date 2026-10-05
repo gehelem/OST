@@ -547,8 +547,11 @@ function orderedModuleNames(names) {
 }
 
 export function renderHome(client, onSelect) {
+  // Gilles, 2026-10-06: "sur cette page home, il ne sert a rien d'afficher
+  // 'home' avec son icone" - no redundant "Home" heading here; the
+  // modbar's own "Home" button is already highlighted active, that's
+  // enough to tell a visitor where they are.
   const root = el("div", { class: "home-view" });
-  root.appendChild(el("h2", null, [icon("home"), el("span", { text: " " + t("views.home") })]));
   const grid = el("div", { class: "home-grid" });
   root.appendChild(grid);
 
