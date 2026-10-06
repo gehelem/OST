@@ -17,10 +17,12 @@
 // panel with the picked object's info + GOTO/Add-to-planner buttons - same
 // interaction language as the rest of this app, no context menu anywhere.
 //
-// Still not wired in this pass: search/results (text search still only
-// reachable via the generic "Other" catch-all panel), the visibility bar /
-// time-scrub control (engine already accepts an arbitrary getTime(), just
-// nothing drives it yet), the horizon/terrestrial and camera-field views.
+// Still not wired: search/results (text search still only reachable via
+// the generic "Other" catch-all panel), the horizon/terrestrial and
+// camera-field views. The visibility bar / time-scrub control (Gilles,
+// 2026-10-02) IS wired since then - see buildTimeNavPanel()/
+// buildSelectionPanel()'s own per-object altitude arc further down - this
+// comment just hadn't been updated when that landed.
 //
 // Real property names confirmed against src/modules/navigator/navigator.json
 // / libs/indimodule.cpp's defineMeAsNavigator()/giveMeALocation(): search,
