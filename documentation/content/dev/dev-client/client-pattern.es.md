@@ -1,12 +1,12 @@
 ---
 title: Principios de arquitectura del cliente
-weight: 50
+weight: 10
 description: "Cómo estructurar un cliente OST: datastore único, escritura únicamente vía WS"
 ---
 
 Esta página describe **cómo debe estructurarse un cliente**, no el formato
 de los mensajes intercambiados (ver [Modelo de datos]({{% relref "structure.es.md" %}})
-y las páginas anteriores para eso).
+y las páginas siguientes para eso).
 
 ## Principio: un datastore único posee la verdad
 
@@ -32,6 +32,20 @@ el envío de un mensaje al servidor (`SV`/`SA` — ver
 local **solo cambia como respuesta**, cuando el servidor responde con la
 actualización confirmada. El cliente nunca da por hecho el resultado.
 {{% /notice %}}
+
+## Principio: ninguna dependencia de internet
+
+Un servidor OST suele ejecutarse en una red local aislada — un observatorio remoto sin acceso a internet es un despliegue normal, no un caso extremo. Un cliente debe funcionar correctamente en esa situación: **cualquier recurso que necesite debe ir incluido con el propio cliente**, no obtenerse de un CDN u otro servicio externo en tiempo de ejecución.
+
+Esto afecta directamente al renderizado de iconos: [`preicon1`/`preicon2`/`posticon1`/`posticon2`/`preicon`/`posticon`]({{% relref "structure.es.md" %}}) dan un *nombre* de icono de Google Fonts (Material Icons), no una URL — un cliente debe incluir localmente la fuente/los glifos de iconos (vendorizados, autoalojados, o empaquetados en la compilación) en vez de cargar la hoja de estilos del CDN de Google, que deja de funcionar silenciosamente en el momento en que no hay ruta hacia internet.
+
+Lo mismo aplica a cualquier otra cosa que un cliente pudiera verse tentado a traer de un CDN: un framework JS, una librería de gráficos, una fuente web para la propia interfaz. Si el cliente lo necesita para funcionar, va incluido con el cliente.
+
+## Recomendación firme: soportar al menos un tema oscuro y uno claro
+
+Los clientes OST se usan habitualmente junto al ocular o junto al telescopio, de noche — una interfaz a brillo total, con fondo blanco, no es ahí solo un desajuste de estilo, arruina activamente la visión nocturna del operador. Un cliente debe ofrecer **como mínimo tanto un tema oscuro como uno claro**, sin fijar uno u otro de forma rígida.
+
+Esto no forma parte del protocolo de comunicación — nada de esto se impone ni es siquiera visible del lado del servidor — pero es una recomendación firme para cualquier cosa pensada para usarse en sesiones reales de astrofotografía, no solo como demo o como herramienta de pruebas de escritorio.
 
 ## Dump completo vs actualizaciones parciales
 
@@ -98,6 +112,74 @@ renderiza con una clave estable por propiedad. Como resultado, la UI
 de las propiedades no afectadas nunca se ve perturbada, sin importar
 la velocidad a la que otra propiedad se actualice en otro lugar.
 {{% /notice %}}
+
+## Plantillas: pantallas por tipo de módulo con repliegue genérico
+
+Cada instancia de módulo puede anunciar `infos.template` (ver [Modelo
+de datos]({{% relref "structure.es.md" %}})) — una cadena que nombra
+su tipo (`"focus"`, `"guider"`, `"sequencer"`...). Es solo indicativo,
+y **puede estar ausente**.
+
+{{% notice style="tip" title="Plantilla ausente = la pantalla por defecto" %}}
+Un cliente que gestiona pantallas dedicadas por plantilla debe tratar
+un `infos.template` ausente (o no reconocido) exactamente como el
+valor literal `"default"` — no como un error. Rooster procede así con
+un pequeño registro que asocia un nombre de plantilla en minúsculas a
+un componente de pantalla, con repliegue a su pantalla genérica/por
+defecto cuando el nombre está ausente o no figura en el registro:
+```
+template = infos.template?.toLowerCase() || "default"
+screen = registry[template] ?? registry["default"]
+```
+Esto es lo que permite a un cliente seguir siendo plenamente funcional
+ante un tipo de módulo que nunca ha visto — un módulo nuevo o de
+terceros siempre se muestra mediante la pantalla genérica — a la vez
+que ofrece una pantalla cuidada y dedicada para los tipos de módulo
+que merecen la inversión.
+
+La pantalla `"default"` no es un repliegue mínimo simbólico: para
+algunos tipos de módulo es la **única** pantalla que tendrán jamás, así
+que debe renderizar todo lo que una propiedad/elemento genérico puede
+llevar — estado, `hint`, pre/posticonos, cuadrículas, gráficos, LOV,
+todo — no solo los valores. Una pantalla dedicada por plantilla puede
+ser más selectiva (ocultar campos, reorganizar el diseño), pero la
+pantalla por defecto no debería hacer desaparecer información
+silenciosamente solo porque nadie ha escrito aún una pantalla dedicada
+para ese módulo.
+{{% /notice %}}
+
+{{% notice style="tip" title="Recomendado: un único componente de renderizado de propiedad, reutilizado en todas partes" %}}
+No obligatorio, pero muy recomendable: construir un componente
+**único**, responsable de renderizar una propiedad (o un elemento) —
+gestionando `directedit`, `permission`, los tres ámbitos de LOV, las
+reglas de grupo bool, `autoupdate`, las cuadrículas, los gráficos — y
+hacer que **todas** las pantallas lo usen para sus propiedades
+individuales, incluidas las pantallas dedicadas por plantilla, no solo
+el repliegue genérico.
+
+La alternativa — cada pantalla reimplementando su propio renderizado
+de campos — duplica cada matiz del formato de intercambio por toda la
+base de código, y una corrección o una nueva capacidad del backend
+solo llega a las pantallas que alguien recuerda actualizar. Las
+pantallas dedicadas de Rooster (`GuiderComponent`, `FocusComponent`...)
+tienen su propia disposición, pero delegan cada propiedad individual
+al mismo componente de propiedad genérico que usa la pantalla de
+repliegue — una corrección hecha una sola vez ahí (por ejemplo,
+gestionar correctamente un grupo de interruptores exclusivos) se
+aplica automáticamente en todas partes, pantallas dedicadas incluidas.
+{{% /notice %}}
+
+## Formularios de propiedad: `SA`, obligatorio para `directedit: false`
+
+Más allá del `SV` campo a campo, una propiedad editable necesita un **camino de formulario**: una pantalla que liste todos sus elementos editables a la vez, enviados juntos vía [`SA`]({{% relref "client-messages.es.md" %}}#sa).
+
+{{% notice style="warning" title="No opcional para un elemento con `directedit: false`" %}}
+`SV` es rechazado por el backend para cualquier elemento con `directedit: false` (ver [Modelo de datos]({{% relref "structure.es.md" %}})). `SA` es la **única** forma de actualizar jamás ese elemento — un cliente sin camino de formulario simplemente no puede escribir en ese elemento, por bien construido que esté el resto de su interfaz.
+{{% /notice %}}
+
+Solo los elementos **editables** pertenecen a este formulario — los tipos de solo visualización (`img`, `video`, `light`, `prg`, `message`) se renderizan, nunca se envían; hay que excluirlos por completo del payload en lugar de enviarles un valor sin sentido.
+
+La misma forma de "enviar un conjunto de elementos a la vez" se reutiliza en la creación de línea de cuadrícula ([`GC`]({{% relref "client-messages.es.md" %}}#gc)) y su actualización ([`GU`]({{% relref "client-messages.es.md" %}}#gu)) — ambas toman un mapa `e` exactamente igual que `SA`. Vale la pena construir **un único** componente de formulario reutilizable que sirva tanto al formulario de propiedad simple como al diálogo de creación de fila de cuadrícula y al de edición de fila — en lugar de tres implementaciones separadas de esencialmente la misma lógica ("renderizar elementos editables, recoger sus valores"). Es lo que hace Rooster.
 
 ## Heartbeat
 

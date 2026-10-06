@@ -5390,6 +5390,2838 @@
             <source>Use guiding</source>
             <translation type="unfinished">Use guiding</translation>
         </message>
-    </context>
+        <message>
+        <source>System watch started, interval: %1s</source>
+        <translation>System watch started, interval: %1s</translation>
+    </message>
+    <message>
+        <source>Float value</source>
+        <translation>Float value</translation>
+    </message>
+    <message>
+        <source>String value</source>
+        <translation>String value</translation>
+    </message>
+    <message>
+        <source>Automatically trigger focus when the filter changes, including the first line of the sequence (no focus has happened yet since the module started) — and skips it if the last focus already matches the current filter</source>
+        <translation>Automatically trigger focus when the filter changes, including the first line of the sequence (no focus has happened yet since the module started) — and skips it if the last focus already matches the current filter</translation>
+    </message>
+    <message>
+        <source>Profile to load on the focus module before requesting autofocus; leave empty to keep whatever profile is currently loaded there</source>
+        <translation>Profile to load on the focus module before requesting autofocus; leave empty to keep whatever profile is currently loaded there</translation>
+    </message>
+    <message>
+        <source>Focus profile to load</source>
+        <translation>Focus profile to load</translation>
+    </message>
+    <message>
+        <source>Focus profile</source>
+        <translation>Focus profile</translation>
+    </message>
+    <message>
+        <source>Focus profile per filter</source>
+        <translation>Focus profile per filter</translation>
+    </message>
+    <message>
+        <source>Request camera cooling to the target temperature before starting the sequence, and wait until it is reached</source>
+        <translation>Request camera cooling to the target temperature before starting the sequence, and wait until it is reached</translation>
+    </message>
+    <message>
+        <source>Enable camera cooling</source>
+        <translation>Enable camera cooling</translation>
+    </message>
+    <message>
+        <source>Frame type for every line of this sequence</source>
+        <translation>Frame type for every line of this sequence</translation>
+    </message>
+    <message>
+        <source>Camera gain for every line of this sequence</source>
+        <translation>Camera gain for every line of this sequence</translation>
+    </message>
+    <message>
+        <source>Camera offset for every line of this sequence</source>
+        <translation>Camera offset for every line of this sequence</translation>
+    </message>
+    <message>
+        <source>Sensor target temperature in °C; the sequence waits until this is reached before starting</source>
+        <translation>Sensor target temperature in °C; the sequence waits until this is reached before starting</translation>
+    </message>
+    <message>
+        <source>Target temperature (°C)</source>
+        <translation>Target temperature (°C)</translation>
+    </message>
+    <message>
+        <source>Sequence parameters</source>
+        <translation>Sequence parameters</translation>
+    </message>
+    <message>
+        <source>Average time spent waiting for autofocus, since this module was loaded</source>
+        <translation>Average time spent waiting for autofocus, since this module was loaded</translation>
+    </message>
+    <message>
+        <source>Average focus duration</source>
+        <translation>Average focus duration</translation>
+    </message>
+    <message>
+        <source>Average time spent waiting for the guider to start, since this module was loaded</source>
+        <translation>Average time spent waiting for the guider to start, since this module was loaded</translation>
+    </message>
+    <message>
+        <source>Average guide-start duration</source>
+        <translation>Average guide-start duration</translation>
+    </message>
+    <message>
+        <source>Sequence (shots)</source>
+        <translation>Sequence (shots)</translation>
+    </message>
+    <message>
+        <source>Wall-clock time since the sequence was started, reset to zero at each start</source>
+        <translation>Wall-clock time since the sequence was started, reset to zero at each start</translation>
+    </message>
+    <message>
+        <source>Real elapsed duration</source>
+        <translation>Real elapsed duration</translation>
+    </message>
+    <message>
+        <source>Theoretical total duration minus the time already accounted for by completed/in-progress shots</source>
+        <translation>Theoretical total duration minus the time already accounted for by completed/in-progress shots</translation>
+    </message>
+    <message>
+        <source>Theoretical remaining duration</source>
+        <translation>Theoretical remaining duration</translation>
+    </message>
+    <message>
+        <source>Sum of count x exposure over every line of the grid, recalculated whenever the grid changes</source>
+        <translation>Sum of count x exposure over every line of the grid, recalculated whenever the grid changes</translation>
+    </message>
+    <message>
+        <source>Theoretical total duration</source>
+        <translation>Theoretical total duration</translation>
+    </message>
+    <message>
+        <source>Sequence (time)</source>
+        <translation>Sequence (time)</translation>
+    </message>
+    <message>
+        <source>Requesting camera cooling to %1°C</source>
+        <translation>Requesting camera cooling to %1°C</translation>
+    </message>
+    <message>
+        <source>Camera temperature reached</source>
+        <translation>Camera temperature reached</translation>
+    </message>
+    <message>
+        <source>Set filter to %1</source>
+        <translation>Set filter to %1</translation>
+    </message>
+    <message>
+        <source>Requesting autofocus from %1</source>
+        <translation>Requesting autofocus from %1</translation>
+    </message>
+    <message>
+        <source>Start focus</source>
+        <translation>Start focus</translation>
+    </message>
+    <message>
+        <source>Moving to start position - backlash %1</source>
+        <translation>Moving to start position - backlash %1</translation>
+    </message>
+    <message>
+        <source>Moving to start position %1</source>
+        <translation>Moving to start position %1</translation>
+    </message>
+    <message>
+        <source>Exposure %1</source>
+        <translation>Exposure %1</translation>
+    </message>
+    <message>
+        <source>%1 stars found - HFR: %2</source>
+        <translation>%1 stars found - HFR: %2</translation>
+    </message>
+    <message>
+        <source>Moving to position  1 %1</source>
+        <translation>Moving to position  1 %1</translation>
+    </message>
+    <message>
+        <source>Moving to position 2 %1</source>
+        <translation>Moving to position 2 %1</translation>
+    </message>
+    <message>
+        <source>Polynomial fit reliability (bad / 0.95 / good / 0.99 / excellent)  : R²=%1</source>
+        <translation>Polynomial fit reliability (bad / 0.95 / good / 0.99 / excellent)  : R²=%1</translation>
+    </message>
+    <message>
+        <source>Moving to best position %1</source>
+        <translation>Moving to best position %1</translation>
+    </message>
+    <message>
+        <source>Tilt heatmap saved (range: %1 - %2 steps)</source>
+        <translation>Tilt heatmap saved (range: %1 - %2 steps)</translation>
+    </message>
+    <message>
+        <source>Global tilt plane: gradX=%1 steps/zone  gradY=%2 steps/zone</source>
+        <translation>Global tilt plane: gradX=%1 steps/zone  gradY=%2 steps/zone</translation>
+    </message>
+    <message>
+        <source>Focus completed</source>
+        <translation>Focus completed</translation>
+    </message>
+    <message>
+        <source>Changing filter from %1 to %2</source>
+        <translation>Changing filter from %1 to %2</translation>
+    </message>
+    <message>
+        <source>Target must stay above this elevation for the whole estimated sequence duration, otherwise the line is skipped</source>
+        <translation>Target must stay above this elevation for the whole estimated sequence duration, otherwise the line is skipped</translation>
+    </message>
+    <message>
+        <source>Minimum elevation (°)</source>
+        <translation>Minimum elevation (°)</translation>
+    </message>
+    <message>
+        <source>Moon avoidance only applies when the moon&apos;s illuminated fraction is above this percentage</source>
+        <translation>Moon avoidance only applies when the moon&apos;s illuminated fraction is above this percentage</translation>
+    </message>
+    <message>
+        <source>Moon illumination threshold (%)</source>
+        <translation>Moon illumination threshold (%)</translation>
+    </message>
+    <message>
+        <source>Rejected only if the target is closer than this AND the moon illumination exceeds the threshold above</source>
+        <translation>Rejected only if the target is closer than this AND the moon illumination exceeds the threshold above</translation>
+    </message>
+    <message>
+        <source>Moon separation threshold (°)</source>
+        <translation>Moon separation threshold (°)</translation>
+    </message>
+    <message>
+        <source>Visibility constraints</source>
+        <translation>Visibility constraints</translation>
+    </message>
+    <message>
+        <source>Checking visibility for target %1</source>
+        <translation>Checking visibility for target %1</translation>
+    </message>
+    <message>
+        <source>Skipping target %1: %2</source>
+        <translation>Skipping target %1: %2</translation>
+    </message>
+    <message>
+        <source>A line that fails the visibility/moon check this many times is marked Failed and is no longer retried</source>
+        <translation>A line that fails the visibility/moon check this many times is marked Failed and is no longer retried</translation>
+    </message>
+    <message>
+        <source>Max retries before giving up</source>
+        <translation>Max retries before giving up</translation>
+    </message>
+    <message>
+        <source>Skipping target %1 (attempt %2/%3): %4</source>
+        <translation>Skipping target %1 (attempt %2/%3): %4</translation>
+    </message>
+    <message>
+        <source>%1 - Can&apos;t fetch line %2 &gt;= %3</source>
+        <translation>%1 - Can&apos;t fetch line %2 &gt;= %3</translation>
+    </message>
+    <message>
+        <source>Sequence aborted</source>
+        <translation>Sequence aborted</translation>
+    </message>
+    <message>
+        <source>Sequence for target %1 was cancelled - moving on</source>
+        <translation>Sequence for target %1 was cancelled - moving on</translation>
+    </message>
+    <message>
+        <source>Offset correction : dRA %1arcs dDEC %2arcs</source>
+        <translation>Offset correction : dRA %1arcs dDEC %2arcs</translation>
+    </message>
+    <message>
+        <source>Centering successful after 4 iteration(s) - within tolerance</source>
+        <translation>Centering successful after 4 iteration(s) - within tolerance</translation>
+    </message>
+    <message>
+        <source>Giving up on target %1 after %2 attempts: %3</source>
+        <translation>Giving up on target %1 after %2 attempts: %3</translation>
+    </message>
+    <message>
+        <source>ValueBool - property %1 : element %2 not found</source>
+        <translation>ValueBool - property %1 : element %2 not found</translation>
+    </message>
+    <message>
+        <source>Adaptive estimate, adjusted automatically after each DEC direction reversal - set an initial guess if you know it, otherwise leave at 0 and let it learn</source>
+        <translation>Adaptive estimate, adjusted automatically after each DEC direction reversal - set an initial guess if you know it, otherwise leave at 0 and let it learn</translation>
+    </message>
+    <message>
+        <source>Current compensation (ms)</source>
+        <translation>Current compensation (ms)</translation>
+    </message>
+    <message>
+        <source>Add an adaptive extra pulse whenever the DEC guide direction reverses, to take up mechanical backlash before the real correction takes effect</source>
+        <translation>Add an adaptive extra pulse whenever the DEC guide direction reverses, to take up mechanical backlash before the real correction takes effect</translation>
+    </message>
+    <message>
+        <source>Maximum compensation (ms)</source>
+        <translation>Maximum compensation (ms)</translation>
+    </message>
+    <message>
+        <source>Minimum compensation (ms)</source>
+        <translation>Minimum compensation (ms)</translation>
+    </message>
+    <message>
+        <source>How much the estimate is nudged up or down after each reversal, based on measured over/undershoot</source>
+        <translation>How much the estimate is nudged up or down after each reversal, based on measured over/undershoot</translation>
+    </message>
+    <message>
+        <source>Adjustment step (ms)</source>
+        <translation>Adjustment step (ms)</translation>
+    </message>
+    <message>
+        <source>DEC backlash compensation</source>
+        <translation>DEC backlash compensation</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=18.6, DEC=38.8, Pier=West</source>
+        <translation>Mount position: RA=18.6, DEC=38.8, Pier=West</translation>
+    </message>
+    <message>
+        <source>Calibration %1 - step %2/%3</source>
+        <translation>Calibration %1 - step %2/%3</translation>
+    </message>
+    <message>
+        <source>West calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3&quot;)</source>
+        <translation>West calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3&quot;)</translation>
+    </message>
+    <message>
+        <source>East calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3&quot;)</source>
+        <translation>East calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3&quot;)</translation>
+    </message>
+    <message>
+        <source>North calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3&quot;)</source>
+        <translation>North calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3&quot;)</translation>
+    </message>
+    <message>
+        <source>South calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3&quot;)</source>
+        <translation>South calibration complete: %1 ms/px (%2 ms/arcsec, drift=%3&quot;)</translation>
+    </message>
+    <message>
+        <source>DEC compensation applied: DEC=%1° factor=%2</source>
+        <translation>DEC compensation applied: DEC=%1° factor=%2</translation>
+    </message>
+    <message>
+        <source>DEC direction reversed to %1 - adding %2ms backlash compensation (current estimate)</source>
+        <translation>DEC direction reversed to %1 - adding %2ms backlash compensation (current estimate)</translation>
+    </message>
+    <message>
+        <source>DEC backlash compensation: expected %1px reduction, got %2px -&gt; now %3ms</source>
+        <translation>DEC backlash compensation: expected %1px reduction, got %2px -&gt; now %3ms</translation>
+    </message>
+    <message>
+        <source>Extra pulse sent before the North pass and before the South pass, to take up mechanical backlash so the timed calibration pulses aren&apos;t partially wasted engaging the gears</source>
+        <translation>Extra pulse sent before the North pass and before the South pass, to take up mechanical backlash so the timed calibration pulses aren&apos;t partially wasted engaging the gears</translation>
+    </message>
+    <message>
+        <source>DEC backlash kick (ms)</source>
+        <translation>DEC backlash kick (ms)</translation>
+    </message>
+    <message>
+        <source>Sending %1ms DEC backlash kick before the %2 calibration pass</source>
+        <translation>Sending %1ms DEC backlash kick before the %2 calibration pass</translation>
+    </message>
+    <message>
+        <source>Can&apos;t compare current image with reference  - Abort</source>
+        <translation>Can&apos;t compare current image with reference  - Abort</translation>
+    </message>
+    <message>
+        <source>SetFocalLength failed %1 %2 %3</source>
+        <translation>SetFocalLength failed %1 %2 %3</translation>
+    </message>
+    <message>
+        <source>Go extra</source>
+        <translation>Go extra</translation>
+    </message>
+    <message>
+        <source>Go home</source>
+        <translation>Go home</translation>
+    </message>
+    <message>
+        <source>Go intra</source>
+        <translation>Go intra</translation>
+    </message>
+    <message>
+        <source>Amplitude (arcsec)</source>
+        <translation>Amplitude (arcsec)</translation>
+    </message>
+    <message>
+        <source>Convergence point x (px)</source>
+        <translation>Convergence point x (px)</translation>
+    </message>
+    <message>
+        <source>Convergence point y (px)</source>
+        <translation>Convergence point y (px)</translation>
+    </message>
+    <message>
+        <source>C.x (px)</source>
+        <translation>C.x (px)</translation>
+    </message>
+    <message>
+        <source>C.y (px)</source>
+        <translation>C.y (px)</translation>
+    </message>
+    <message>
+        <source>Quality</source>
+        <translation>Quality</translation>
+    </message>
+    <message>
+        <source>Collimation vector</source>
+        <translation>Collimation vector</translation>
+    </message>
+    <message>
+        <source>Focuser offset (steps)</source>
+        <translation>Focuser offset (steps)</translation>
+    </message>
+    <message>
+        <source>Slew speed (initial pointing)</source>
+        <translation>Slew speed (initial pointing)</translation>
+    </message>
+    <message>
+        <source>Defocus parameters</source>
+        <translation>Defocus parameters</translation>
+    </message>
+    <message>
+        <source>Screw 1 (turns, + = tighten)</source>
+        <translation>Screw 1 (turns, + = tighten)</translation>
+    </message>
+    <message>
+        <source>Screw 2 (turns, + = tighten)</source>
+        <translation>Screw 2 (turns, + = tighten)</translation>
+    </message>
+    <message>
+        <source>Screw 3 (turns, + = tighten)</source>
+        <translation>Screw 3 (turns, + = tighten)</translation>
+    </message>
+    <message>
+        <source>Screw corrections</source>
+        <translation>Screw corrections</translation>
+    </message>
+    <message>
+        <source>Deformation X (px)</source>
+        <translation>Deformation X (px)</translation>
+    </message>
+    <message>
+        <source>Deformation Y (px)</source>
+        <translation>Deformation Y (px)</translation>
+    </message>
+    <message>
+        <source>X (px)</source>
+        <translation>X (px)</translation>
+    </message>
+    <message>
+        <source>Y (px)</source>
+        <translation>Y (px)</translation>
+    </message>
+    <message>
+        <source>Detected stars</source>
+        <translation>Detected stars</translation>
+    </message>
+    <message>
+        <source>Analyzing</source>
+        <translation>Analyzing</translation>
+    </message>
+    <message>
+        <source>Collimator::analyzeFrame not implemented yet</source>
+        <translation>Collimator::analyzeFrame not implemented yet</translation>
+    </message>
+    <message>
+        <source>Polynomial fit unreliable (R²=%1 &lt; %2) - using measured minimum</source>
+        <translation>Polynomial fit unreliable (R²=%1 &lt; %2) - using measured minimum</translation>
+    </message>
+    <message>
+        <source>Falling back to measured minimum position %1</source>
+        <translation>Falling back to measured minimum position %1</translation>
+    </message>
+    <message>
+        <source>Collimator analysis</source>
+        <translation>Collimator analysis</translation>
+    </message>
+    <message>
+        <source>Inspector analysis</source>
+        <translation>Inspector analysis</translation>
+    </message>
+    <message>
+        <source>Collimation map</source>
+        <translation>Collimation map</translation>
+    </message>
+    <message>
+        <source>Set home</source>
+        <translation>Set home</translation>
+    </message>
+    <message>
+        <source>Home defined</source>
+        <translation>Home defined</translation>
+    </message>
+    <message>
+        <source>Home position (steps)</source>
+        <translation>Home position (steps)</translation>
+    </message>
+    <message>
+        <source>Focuser home</source>
+        <translation>Focuser home</translation>
+    </message>
+    <message>
+        <source>goHome - home undefined, use &apos;Set home&apos; first</source>
+        <translation>goHome - home undefined, use &apos;Set home&apos; first</translation>
+    </message>
+    <message>
+        <source>setHome - focuser home set to %1</source>
+        <translation>setHome - focuser home set to %1</translation>
+    </message>
+    <message>
+        <source>Analysis selection</source>
+        <translation>Analysis selection</translation>
+    </message>
+    <message>
+        <source>Bit depth</source>
+        <translation>Bit depth</translation>
+    </message>
+    <message>
+        <source>setCaptureFormat - %1 has no %2 capture format, keeping current</source>
+        <translation>setCaptureFormat - %1 has no %2 capture format, keeping current</translation>
+    </message>
+    <message>
+        <source>When the star field can&apos;t be correlated with the reference, the guide frame is skipped (no pulse); guiding is aborted only after this many in a row</source>
+        <translation>When the star field can&apos;t be correlated with the reference, the guide frame is skipped (no pulse); guiding is aborted only after this many in a row</translation>
+    </message>
+    <message>
+        <source>Max consecutive lost frames</source>
+        <translation>Max consecutive lost frames</translation>
+    </message>
+    <message>
+        <source>Failed to connect camera device</source>
+        <translation>Failed to connect camera device</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.0, DEC=90.0, Pier=East</source>
+        <translation>Mount position: RA=12.0, DEC=90.0, Pier=East</translation>
+    </message>
+    <message>
+        <source>Calibration: lost star correlation - abort</source>
+        <translation>Calibration: lost star correlation - abort</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=0.1, DEC=90.0, Pier=West</source>
+        <translation>Mount position: RA=0.1, DEC=90.0, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.1, DEC=90.0, Pier=East</source>
+        <translation>Mount position: RA=12.1, DEC=90.0, Pier=East</translation>
+    </message>
+    <message>
+        <source>Search radius when matching a reference star to the current frame. Larger tolerates more centroid noise / small field rotation; the sub-pixel refit tightens it afterwards.</source>
+        <translation>Search radius when matching a reference star to the current frame. Larger tolerates more centroid noise / small field rotation; the sub-pixel refit tightens it afterwards.</translation>
+    </message>
+    <message>
+        <source>Star match gate (px)</source>
+        <translation>Star match gate (px)</translation>
+    </message>
+    <message>
+        <source>Cap on the brightest stars taken from each frame for matching</source>
+        <translation>Cap on the brightest stars taken from each frame for matching</translation>
+    </message>
+    <message>
+        <source>Max stars used</source>
+        <translation>Max stars used</translation>
+    </message>
+    <message>
+        <source>Fewest reference stars that must be recovered in the current frame for the drift measurement to be trusted</source>
+        <translation>Fewest reference stars that must be recovered in the current frame for the drift measurement to be trusted</translation>
+    </message>
+    <message>
+        <source>Min matched stars</source>
+        <translation>Min matched stars</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=0.2, DEC=90.0, Pier=West</source>
+        <translation>Mount position: RA=0.2, DEC=90.0, Pier=West</translation>
+    </message>
+    <message>
+        <source>Calibration match: d=(%1,%2)px  matched %3/%4  rms=%5px</source>
+        <translation>Calibration match: d=(%1,%2)px  matched %3/%4  rms=%5px</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=13.8, DEC=46.0, Pier=East</source>
+        <translation>Mount position: RA=13.8, DEC=46.0, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=13.8, DEC=45.9, Pier=East</source>
+        <translation>Mount position: RA=13.8, DEC=45.9, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=16.1, DEC=8.0, Pier=East</source>
+        <translation>Mount position: RA=16.1, DEC=8.0, Pier=East</translation>
+    </message>
+    <message>
+        <source>Test aid only. Rotates the reference star field 180 deg at guide start so meridian-flip / reverse-correction handling can be exercised against the CCD Simulator (which never rotates its own field). Leave OFF in real use.</source>
+        <translation>Test aid only. Rotates the reference star field 180 deg at guide start so meridian-flip / reverse-correction handling can be exercised against the CCD Simulator (which never rotates its own field). Leave OFF in real use.</translation>
+    </message>
+    <message>
+        <source>SIM: fake meridian flip</source>
+        <translation>SIM: fake meridian flip</translation>
+    </message>
+    <message>
+        <source>Abort if the camera or mount stops responding for this long (exposure, pulse, frame reset, star extraction). 0 disables the watchdog.</source>
+        <translation>Abort if the camera or mount stops responding for this long (exposure, pulse, frame reset, star extraction). 0 disables the watchdog.</translation>
+    </message>
+    <message>
+        <source>Hardware timeout (s)</source>
+        <translation>Hardware timeout (s)</translation>
+    </message>
+    <message>
+        <source>SIM: reference field rotated 180 deg (meridian-flip test aid)</source>
+        <translation>SIM: reference field rotated 180 deg (meridian-flip test aid)</translation>
+    </message>
+    <message>
+        <source>No star correlation with reference (%1/%2) - skipping frame [ref=%3 cur=%4 matched=%5]</source>
+        <translation>No star correlation with reference (%1/%2) - skipping frame [ref=%3 cur=%4 matched=%5]</translation>
+    </message>
+    <message>
+        <source>Test aid only. Adds 180 deg to the calibration angle at guide start (the effect a real meridian flip has on the drift-&gt;RA/DEC mapping), so reverse-correction handling can be exercised against the CCD Simulator, which never rotates its own field. With this ON, stable guiding should require revRA AND revDE both ON. Leave OFF in real use.</source>
+        <translation>Test aid only. Adds 180 deg to the calibration angle at guide start (the effect a real meridian flip has on the drift-&gt;RA/DEC mapping), so reverse-correction handling can be exercised against the CCD Simulator, which never rotates its own field. With this ON, stable guiding should require revRA AND revDE both ON. Leave OFF in real use.</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=4.1, DEC=6.1, Pier=East</source>
+        <translation>Mount position: RA=4.1, DEC=6.1, Pier=East</translation>
+    </message>
+    <message>
+        <source>West pass: mean increment (ref-cur) = (%1,%2) px  -&gt; ccdOrientation = %3 deg</source>
+        <translation>West pass: mean increment (ref-cur) = (%1,%2) px  -&gt; ccdOrientation = %3 deg</translation>
+    </message>
+    <message>
+        <source>Guide start: ccdOrientation=%1 deg  revRA=%2 revDE=%3</source>
+        <translation>Guide start: ccdOrientation=%1 deg  revRA=%2 revDE=%3</translation>
+    </message>
+    <message>
+        <source>Guide: dxy(ref-cur)=(%1,%2)px  drift RA/DE=(%3,%4)px  matched=%5</source>
+        <translation>Guide: dxy(ref-cur)=(%1,%2)px  drift RA/DE=(%3,%4)px  matched=%5</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=6.5, DEC=5.0, Pier=West</source>
+        <translation>Mount position: RA=6.5, DEC=5.0, Pier=West</translation>
+    </message>
+    <message>
+        <source>SIM: calibration angle rotated 180 deg (meridian-flip test aid) - expect to need revRA+revDE</source>
+        <translation>SIM: calibration angle rotated 180 deg (meridian-flip test aid) - expect to need revRA+revDE</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=4.3, DEC=4.8, Pier=East</source>
+        <translation>Mount position: RA=4.3, DEC=4.8, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=4.3, DEC=4.9, Pier=East</source>
+        <translation>Mount position: RA=4.3, DEC=4.9, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=7.1, DEC=10.4, Pier=West</source>
+        <translation>Mount position: RA=7.1, DEC=10.4, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=4.4, DEC=4.9, Pier=East</source>
+        <translation>Mount position: RA=4.4, DEC=4.9, Pier=East</translation>
+    </message>
+    <message>
+        <source>Rate used for guiding - North/South combined</source>
+        <translation>Rate used for guiding - North/South combined</translation>
+    </message>
+    <message>
+        <source>DEC rate (ms/px)</source>
+        <translation>DEC rate (ms/px)</translation>
+    </message>
+    <message>
+        <source>raw N (ms/px, diag)</source>
+        <translation>raw N (ms/px, diag)</translation>
+    </message>
+    <message>
+        <source>Rate used for guiding - West/East combined, background drift removed</source>
+        <translation>Rate used for guiding - West/East combined, background drift removed</translation>
+    </message>
+    <message>
+        <source>RA rate (ms/px)</source>
+        <translation>RA rate (ms/px)</translation>
+    </message>
+    <message>
+        <source>%1 pass: increment (ref-cur)=(%2,%3)px  raw %4 ms/px (drift=%5&quot;)</source>
+        <translation>%1 pass: increment (ref-cur)=(%2,%3)px  raw %4 ms/px (drift=%5&quot;)</translation>
+    </message>
+    <message>
+        <source>Calibration: RA %1 ms/px, DEC %2 ms/px, angle %3 deg (RA %4 / DE %5), background drift (%6,%7) px/frame</source>
+        <translation>Calibration: RA %1 ms/px, DEC %2 ms/px, angle %3 deg (RA %4 / DE %5), background drift (%6,%7) px/frame</translation>
+    </message>
+    <message>
+        <source>DEC compensation applied: DEC=%1 deg factor=%2</source>
+        <translation>DEC compensation applied: DEC=%1 deg factor=%2</translation>
+    </message>
+    <message>
+        <source>RA compensation factor: %1 (cos(%2 deg))</source>
+        <translation>RA compensation factor: %1 (cos(%2 deg))</translation>
+    </message>
+    <message>
+        <source>Guide rates: RA=%1 ms/px (compensated %2), DEC=%3 ms/px</source>
+        <translation>Guide rates: RA=%1 ms/px (compensated %2), DEC=%3 ms/px</translation>
+    </message>
+    <message>
+        <source>Watchdog: no hardware response for %1 s - aborting</source>
+        <translation>Watchdog: no hardware response for %1 s - aborting</translation>
+    </message>
+    <message>
+        <source>Calibration is rejected if the constant background drift (tracking / polar-alignment error) exceeds this fraction of the pulse displacement. A high value here usually means the mount is poorly polar-aligned. 0 disables the check.</source>
+        <translation>Calibration is rejected if the constant background drift (tracking / polar-alignment error) exceeds this fraction of the pulse displacement. A high value here usually means the mount is poorly polar-aligned. 0 disables the check.</translation>
+    </message>
+    <message>
+        <source>Max background drift ratio</source>
+        <translation>Max background drift ratio</translation>
+    </message>
+    <message>
+        <source>How many times to restart calibration when it is rejected for poor quality before giving up</source>
+        <translation>How many times to restart calibration when it is rejected for poor quality before giving up</translation>
+    </message>
+    <message>
+        <source>Calibration retries</source>
+        <translation>Calibration retries</translation>
+    </message>
+    <message>
+        <source>green = clean, orange = usable but background drift is significant, red = rejected (poor polar alignment)</source>
+        <translation>green = clean, orange = usable but background drift is significant, red = rejected (poor polar alignment)</translation>
+    </message>
+    <message>
+        <source>Calibration quality</source>
+        <translation>Calibration quality</translation>
+    </message>
+    <message>
+        <source>Same as RA integral gain, for the DEC axis. 0 = pure proportional.</source>
+        <translation>Same as RA integral gain, for the DEC axis. 0 = pure proportional.</translation>
+    </message>
+    <message>
+        <source>DEC integral gain</source>
+        <translation>DEC integral gain</translation>
+    </message>
+    <message>
+        <source>Anti-windup: the integral accumulator is clamped to this magnitude (pixels). 0 disables the clamp.</source>
+        <translation>Anti-windup: the integral accumulator is clamped to this magnitude (pixels). 0 disables the clamp.</translation>
+    </message>
+    <message>
+        <source>Integral clamp (px)</source>
+        <translation>Integral clamp (px)</translation>
+    </message>
+    <message>
+        <source>Gain on the accumulated RA residual. A true integrator nulls the steady-state lag a proportional-only controller leaves against a constant drift (tracking / polar-alignment error). 0 = pure proportional. Too high oscillates.</source>
+        <translation>Gain on the accumulated RA residual. A true integrator nulls the steady-state lag a proportional-only controller leaves against a constant drift (tracking / polar-alignment error). 0 = pure proportional. Too high oscillates.</translation>
+    </message>
+    <message>
+        <source>RA integral gain</source>
+        <translation>RA integral gain</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=4.4, DEC=4.5, Pier=East</source>
+        <translation>Mount position: RA=4.4, DEC=4.5, Pier=East</translation>
+    </message>
+    <message>
+        <source>Calibration: RA %1 ms/px, DEC %2 ms/px, angle %3 deg (RA %4 / DE %5), background drift (%6,%7) px/frame, drift ratio %8</source>
+        <translation>Calibration: RA %1 ms/px, DEC %2 ms/px, angle %3 deg (RA %4 / DE %5), background drift (%6,%7) px/frame, drift ratio %8</translation>
+    </message>
+    <message>
+        <source>Guide: dxy(ref-cur)=(%1,%2)px  drift RA/DE=(%3,%4)px  I=(%5,%6)  matched=%7</source>
+        <translation>Guide: dxy(ref-cur)=(%1,%2)px  drift RA/DE=(%3,%4)px  I=(%5,%6)  matched=%7</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=4.4, DEC=4.4, Pier=East</source>
+        <translation>Mount position: RA=4.4, DEC=4.4, Pier=East</translation>
+    </message>
+    <message>
+        <source>Dither requested - will apply on next guide frame</source>
+        <translation>Dither requested - will apply on next guide frame</translation>
+    </message>
+    <message>
+        <source>Dithering: RA=3.6 px DEC=3.1 px -&gt; pulseN=821 pulseS=0 pulseE=0 pulseW=975 ms</source>
+        <translation>Dithering: RA=3.6 px DEC=3.1 px -&gt; pulseN=821 pulseS=0 pulseE=0 pulseW=975 ms</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=6.2, DEC=16.1, Pier=East</source>
+        <translation>Mount position: RA=6.2, DEC=16.1, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=16.7, DEC=36.4, Pier=West</source>
+        <translation>Mount position: RA=16.7, DEC=36.4, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=11.0, DEC=5.6, Pier=West</source>
+        <translation>Mount position: RA=11.0, DEC=5.6, Pier=West</translation>
+    </message>
+    <message>
+        <source>A1 test: RA rate %1 ms/px measured at calDEC=%2 deg -&gt; stored /cos = %3 (as coded) vs *cos = %4 (candidate fix)</source>
+        <translation>A1 test: RA rate %1 ms/px measured at calDEC=%2 deg -&gt; stored /cos = %3 (as coded) vs *cos = %4 (candidate fix)</translation>
+    </message>
+    <message>
+        <source>A1 test: calDEC=%1 curDEC=%2 | R_meas=%3 ms/px | RA rate used(code)=%4 | RA rate expected=%5 | code/expected=%6</source>
+        <translation>A1 test: calDEC=%1 curDEC=%2 | R_meas=%3 ms/px | RA rate used(code)=%4 | RA rate expected=%5 | code/expected=%6</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=10.9, DEC=5.7, Pier=West</source>
+        <translation>Mount position: RA=10.9, DEC=5.7, Pier=West</translation>
+    </message>
+    <message>
+        <source>DEC normalisation: RA rate %1 ms/px at calDEC=%2 deg -&gt; equatorial %3 ms/px (factor %4)</source>
+        <translation>DEC normalisation: RA rate %1 ms/px at calDEC=%2 deg -&gt; equatorial %3 ms/px (factor %4)</translation>
+    </message>
+    <message>
+        <source>RA compensation factor: 1/%1 (1/cos(%2 deg))</source>
+        <translation>RA compensation factor: 1/%1 (1/cos(%2 deg))</translation>
+    </message>
+    <message>
+        <source>Guide rates: RA equatorial=%1 ms/px -&gt; at curDEC %2 ms/px  |  DEC=%3 ms/px  (calDEC=%4)</source>
+        <translation>Guide rates: RA equatorial=%1 ms/px -&gt; at curDEC %2 ms/px  |  DEC=%3 ms/px  (calDEC=%4)</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=11.3, DEC=7.7, Pier=West</source>
+        <translation>Mount position: RA=11.3, DEC=7.7, Pier=West</translation>
+    </message>
+    <message>
+        <source>B2 test: rot(RAaxis)=(%1,%2) [want (+-%3,~0)]  rot(DECaxis)=(%4,%5) [want (~0,+-%6)]</source>
+        <translation>B2 test: rot(RAaxis)=(%1,%2) [want (+-%3,~0)]  rot(DECaxis)=(%4,%5) [want (~0,+-%6)]</translation>
+    </message>
+    <message>
+        <source>B2 test: RA-DEC axis separation=%1 deg (want +-90)  RA-axis DEC-leak=%2%%  DEC-axis RA-leak=%3%%</source>
+        <translation>B2 test: RA-DEC axis separation=%1 deg (want +-90)  RA-axis DEC-leak=%2%%  DEC-axis RA-leak=%3%%</translation>
+    </message>
+    <message>
+        <source>Abort calibration if the star drifts further than this fraction of the smaller frame dimension from its start, before it leaves the sensor. 0 disables.</source>
+        <translation>Abort calibration if the star drifts further than this fraction of the smaller frame dimension from its start, before it leaves the sensor. 0 disables.</translation>
+    </message>
+    <message>
+        <source>Max star excursion</source>
+        <translation>Max star excursion</translation>
+    </message>
+    <message>
+        <source>First guide frame: settling, no correction (drift = (%1,%2) px)</source>
+        <translation>First guide frame: settling, no correction (drift = (%1,%2) px)</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=11.3, DEC=7.6, Pier=West</source>
+        <translation>Mount position: RA=11.3, DEC=7.6, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=11.3, DEC=7.5, Pier=West</source>
+        <translation>Mount position: RA=11.3, DEC=7.5, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=11.3, DEC=1.7, Pier=West</source>
+        <translation>Mount position: RA=11.3, DEC=1.7, Pier=West</translation>
+    </message>
+    <message>
+        <source>Lost star correlation for %1 consecutive frames - Abort</source>
+        <translation>Lost star correlation for %1 consecutive frames - Abort</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=11.3, DEC=9.1, Pier=West</source>
+        <translation>Mount position: RA=11.3, DEC=9.1, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=11.2, DEC=4.3, Pier=West</source>
+        <translation>Mount position: RA=11.2, DEC=4.3, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=11.2, DEC=3.7, Pier=West</source>
+        <translation>Mount position: RA=11.2, DEC=3.7, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=11.2, DEC=2.4, Pier=West</source>
+        <translation>Mount position: RA=11.2, DEC=2.4, Pier=West</translation>
+    </message>
+    <message>
+        <source>SetFocalLength failed, invalid diameter %1</source>
+        <translation>SetFocalLength failed, invalid diameter %1</translation>
+    </message>
+    <message>
+        <source>BlindPEC: calibration only</source>
+        <translation>BlindPEC: calibration only</translation>
+    </message>
+    <message>
+        <source>Could not read mount ALT (refraction rate correction unavailable)</source>
+        <translation>Could not read mount ALT (refraction rate correction unavailable)</translation>
+    </message>
+    <message>
+        <source>Could not read mount GUIDE_RATE - assuming %1x sidereal</source>
+        <translation>Could not read mount GUIDE_RATE - assuming %1x sidereal</translation>
+    </message>
+    <message>
+        <source>Phase: gain calibration (%1 x %2 ms W pulses)</source>
+        <translation>Phase: gain calibration (%1 x %2 ms W pulses)</translation>
+    </message>
+    <message>
+        <source>Aborting BlindPEC</source>
+        <translation>Aborting BlindPEC</translation>
+    </message>
+    <message>
+        <source>BlindPEC aborted</source>
+        <translation>BlindPEC aborted</translation>
+    </message>
+    <message>
+        <source>BlindPEC: calibrate + guide</source>
+        <translation>BlindPEC: calibrate + guide</translation>
+    </message>
+    <message>
+        <source>prop &lt;- %1/%2 state=%3</source>
+        <translation>prop &lt;- %1/%2 state=%3</translation>
+    </message>
+    <message>
+        <source>SM: RequestFrameReset</source>
+        <translation>SM: RequestFrameReset</translation>
+    </message>
+    <message>
+        <source>SM: WaitFrameReset</source>
+        <translation>SM: WaitFrameReset</translation>
+    </message>
+    <message>
+        <source>FrameResetDone (CCD_FRAME_RESET -&gt; IPS_OK)</source>
+        <translation>FrameResetDone (CCD_FRAME_RESET -&gt; IPS_OK)</translation>
+    </message>
+    <message>
+        <source>SM: RequestExposure exp=%1s gain=%2 offset=%3</source>
+        <translation>SM: RequestExposure exp=%1s gain=%2 offset=%3</translation>
+    </message>
+    <message>
+        <source>SM: WaitExposure</source>
+        <translation>SM: WaitExposure</translation>
+    </message>
+    <message>
+        <source>FrameResetDone (fallback timer)</source>
+        <translation>FrameResetDone (fallback timer)</translation>
+    </message>
+    <message>
+        <source>W pulse sent during gain calibration; must move the image by a clearly measurable amount</source>
+        <translation>W pulse sent during gain calibration; must move the image by a clearly measurable amount</translation>
+    </message>
+    <message>
+        <source>Gain-cal pulse (ms)</source>
+        <translation>Gain-cal pulse (ms)</translation>
+    </message>
+    <message>
+        <source>Gain-cal pulses</source>
+        <translation>Gain-cal pulses</translation>
+    </message>
+    <message>
+        <source>ms of W/E guide pulse per px of image displacement</source>
+        <translation>ms of W/E guide pulse per px of image displacement</translation>
+    </message>
+    <message>
+        <source>Gain (ms/px)</source>
+        <translation>Gain (ms/px)</translation>
+    </message>
+    <message>
+        <source>image speed for perfect sidereal tracking; refined online (adaptive)</source>
+        <translation>image speed for perfect sidereal tracking; refined online (adaptive)</translation>
+    </message>
+    <message>
+        <source>Target rate (px/s)</source>
+        <translation>Target rate (px/s)</translation>
+    </message>
+    <message>
+        <source>display only; needs the mount guide rate to be known</source>
+        <translation>display only; needs the mount guide rate to be known</translation>
+    </message>
+    <message>
+        <source>Scale (arcsec/px)</source>
+        <translation>Scale (arcsec/px)</translation>
+    </message>
+    <message>
+        <source>Mount guide rate (x sidereal)</source>
+        <translation>Mount guide rate (x sidereal)</translation>
+    </message>
+    <message>
+        <source>flip the sense of the RA correction (set at commissioning)</source>
+        <translation>flip the sense of the RA correction (set at commissioning)</translation>
+    </message>
+    <message>
+        <source>Microscope</source>
+        <translation>Microscope</translation>
+    </message>
+    <message>
+        <source>online correction of the target rate V from the residual ramp. 0 = fixed V. Small = slow, stable</source>
+        <translation>online correction of the target rate V from the residual ramp. 0 = fixed V. Small = slow, stable</translation>
+    </message>
+    <message>
+        <source>V adaptation gain</source>
+        <translation>V adaptation gain</translation>
+    </message>
+    <message>
+        <source>frames measured but not corrected right after a pulse, to skip the mechanical transient</source>
+        <translation>frames measured but not corrected right after a pulse, to skip the mechanical transient</translation>
+    </message>
+    <message>
+        <source>Blank frames after a pulse</source>
+        <translation>Blank frames after a pulse</translation>
+    </message>
+    <message>
+        <source>RA-only dither (DEC component of a sequencer dither request is a no-op here)</source>
+        <translation>RA-only dither (DEC component of a sequencer dither request is a no-op here)</translation>
+    </message>
+    <message>
+        <source>guiding is aborted after this many untrusted frames in a row</source>
+        <translation>guiding is aborted after this many untrusted frames in a row</translation>
+    </message>
+    <message>
+        <source>Max consecutive bad frames</source>
+        <translation>Max consecutive bad frames</translation>
+    </message>
+    <message>
+        <source>reject a frame whose move since the last accepted one exceeds this (vibration / glitch)</source>
+        <translation>reject a frame whose move since the last accepted one exceeds this (vibration / glitch)</translation>
+    </message>
+    <message>
+        <source>Max step (px)</source>
+        <translation>Max step (px)</translation>
+    </message>
+    <message>
+        <source>Min correlation response</source>
+        <translation>Min correlation response</translation>
+    </message>
+    <message>
+        <source>re-drop the correlation anchor once the running shift exceeds this fraction of half the frame</source>
+        <translation>re-drop the correlation anchor once the running shift exceeds this fraction of half the frame</translation>
+    </message>
+    <message>
+        <source>Re-anchor fraction</source>
+        <translation>Re-anchor fraction</translation>
+    </message>
+    <message>
+        <source>RMS over x frames</source>
+        <translation>RMS over x frames</translation>
+    </message>
+    <message>
+        <source>track-only frames used to fit the target rate V before guiding starts</source>
+        <translation>track-only frames used to fit the target rate V before guiding starts</translation>
+    </message>
+    <message>
+        <source>Characterization frames</source>
+        <translation>Characterization frames</translation>
+    </message>
+    <message>
+        <source>abort if the camera or mount stops responding for this long. 0 disables</source>
+        <translation>abort if the camera or mount stops responding for this long. 0 disables</translation>
+    </message>
+    <message>
+        <source>Cross axis</source>
+        <translation>Cross axis</translation>
+    </message>
+    <message>
+        <source>Response</source>
+        <translation>Response</translation>
+    </message>
+    <message>
+        <source>integral gain (px.s). Nulls a steady offset a P-only law would leave; 0 = pure P</source>
+        <translation>integral gain (px.s). Nulls a steady offset a P-only law would leave; 0 = pure P</translation>
+    </message>
+    <message>
+        <source>proportional gain on the residual (px -&gt; px of correction)</source>
+        <translation>proportional gain on the residual (px -&gt; px of correction)</translation>
+    </message>
+    <message>
+        <source>Control law</source>
+        <translation>Control law</translation>
+    </message>
+    <message>
+        <source>displacement on the image axis orthogonal to RA; should stay near 0 (health signal: CD slip / tilt)</source>
+        <translation>displacement on the image axis orthogonal to RA; should stay near 0 (health signal: CD slip / tilt)</translation>
+    </message>
+    <message>
+        <source>Cross-axis (px)</source>
+        <translation>Cross-axis (px)</translation>
+    </message>
+    <message>
+        <source>p - V.t on the RA axis: the periodic error plus what is left of the tracking drift</source>
+        <translation>p - V.t on the RA axis: the periodic error plus what is left of the tracking drift</translation>
+    </message>
+    <message>
+        <source>Residual (px)</source>
+        <translation>Residual (px)</translation>
+    </message>
+    <message>
+        <source>phaseCorrelate peak sharpness; low = frame not trusted</source>
+        <translation>phaseCorrelate peak sharpness; low = frame not trusted</translation>
+    </message>
+    <message>
+        <source>Correlation response</source>
+        <translation>Correlation response</translation>
+    </message>
+    <message>
+        <source>newBLOB: dev=%1 expecting=%2</source>
+        <translation>newBLOB: dev=%1 expecting=%2</translation>
+    </message>
+    <message>
+        <source>frame received: %1x%2 bpp=%3 ch=%4</source>
+        <translation>frame received: %1x%2 bpp=%3 ch=%4</translation>
+    </message>
+    <message>
+        <source>SM: Measure %1x%2 -&gt; ok=%3 resp=%4 x=%5 y=%6 step=(%7,%8)%9</source>
+        <translation>SM: Measure %1x%2 -&gt; ok=%3 resp=%4 x=%5 y=%6 step=(%7,%8)%9</translation>
+    </message>
+    <message>
+        <source>SM: Compute (phase %1)</source>
+        <translation>SM: Compute (phase %1)</translation>
+    </message>
+    <message>
+        <source>SM: RequestPulses E=%1 W=%2 ms</source>
+        <translation>SM: RequestPulses E=%1 W=%2 ms</translation>
+    </message>
+    <message>
+        <source>SM: WaitPulses</source>
+        <translation>SM: WaitPulses</translation>
+    </message>
+    <message>
+        <source>PulsesDone (TELESCOPE_TIMED_GUIDE_WE -&gt; IPS_IDLE)</source>
+        <translation>PulsesDone (TELESCOPE_TIMED_GUIDE_WE -&gt; IPS_IDLE)</translation>
+    </message>
+    <message>
+        <source>Gain cal %1/%2: pulse %3 ms -&gt; moved %4 px</source>
+        <translation>Gain cal %1/%2: pulse %3 ms -&gt; moved %4 px</translation>
+    </message>
+    <message>
+        <source>Gain: G = %1 ms/px | seed V = %2 px/s | scale = %3 arcsec/px (guideRate %4x)</source>
+        <translation>Gain: G = %1 ms/px | seed V = %2 px/s | scale = %3 arcsec/px (guideRate %4x)</translation>
+    </message>
+    <message>
+        <source>Characterization done over %1 frames -&gt; V = %2 px/s (%3 arcsec/s)</source>
+        <translation>Characterization done over %1 frames -&gt; V = %2 px/s (%3 arcsec/s)</translation>
+    </message>
+    <message>
+        <source>BlindPEC: calibration complete</source>
+        <translation>BlindPEC: calibration complete</translation>
+    </message>
+    <message>
+        <source>Phase: characterization (%1 frames), gain G = %2 ms/px (loaded)</source>
+        <translation>Phase: characterization (%1 frames), gain G = %2 ms/px (loaded)</translation>
+    </message>
+    <message>
+        <source>Untrusted frame (%1/%2, response %3) - skipping</source>
+        <translation>Untrusted frame (%1/%2, response %3) - skipping</translation>
+    </message>
+    <message>
+        <source>step 2: W/E pulse length; must move the image by a clearly measurable amount</source>
+        <translation>step 2: W/E pulse length; must move the image by a clearly measurable amount</translation>
+    </message>
+    <message>
+        <source>step 2 sends this many W pulses and this many E pulses, alternating</source>
+        <translation>step 2 sends this many W pulses and this many E pulses, alternating</translation>
+    </message>
+    <message>
+        <source>Gain-cal pulses per direction</source>
+        <translation>Gain-cal pulses per direction</translation>
+    </message>
+    <message>
+        <source>step 1: observe the free-run sidereal drift for this long (mount tracking, no pulses) to get the RA axis direction and rate. A rough value needs a few tens of s; a clean one needs &gt;= one worm period</source>
+        <translation>step 1: observe the free-run sidereal drift for this long (mount tracking, no pulses) to get the RA axis direction and rate. A rough value needs a few tens of s; a clean one needs &gt;= one worm period</translation>
+    </message>
+    <message>
+        <source>Characterization duration (s)</source>
+        <translation>Characterization duration (s)</translation>
+    </message>
+    <message>
+        <source>manual override: flip the sense of the RA correction (normally wdir handles it)</source>
+        <translation>manual override: flip the sense of the RA correction (normally wdir handles it)</translation>
+    </message>
+    <message>
+        <source>direction of the RA axis in the microscope image, from the free-run sidereal drift</source>
+        <translation>direction of the RA axis in the microscope image, from the free-run sidereal drift</translation>
+    </message>
+    <message>
+        <source>RA axis angle (deg)</source>
+        <translation>RA axis angle (deg)</translation>
+    </message>
+    <message>
+        <source>sign of a West pulse&apos;s effect along +theta (+1 or -1), from gain calibration</source>
+        <translation>sign of a West pulse&apos;s effect along +theta (+1 or -1), from gain calibration</translation>
+    </message>
+    <message>
+        <source>W pulse sign</source>
+        <translation>W pulse sign</translation>
+    </message>
+    <message>
+        <source>anti-windup: the integral accumulator is clamped to this magnitude. 0 -&gt; default 50</source>
+        <translation>anti-windup: the integral accumulator is clamped to this magnitude. 0 -&gt; default 50</translation>
+    </message>
+    <message>
+        <source>Phase: characterization (free-run drift, %1 s) - mount must be tracking sidereal</source>
+        <translation>Phase: characterization (free-run drift, %1 s) - mount must be tracking sidereal</translation>
+    </message>
+    <message>
+        <source>Characterize: %1 frames, %2 s / %3 s, xy=(%4,%5) px</source>
+        <translation>Characterize: %1 frames, %2 s / %3 s, xy=(%4,%5) px</translation>
+    </message>
+    <message>
+        <source>Characterization: %1 frames over %2 s, image moved %3 px -&gt; theta=%4 deg, V=%5 px/s (%6 arcsec/s)</source>
+        <translation>Characterization: %1 frames over %2 s, image moved %3 px -&gt; theta=%4 deg, V=%5 px/s (%6 arcsec/s)</translation>
+    </message>
+    <message>
+        <source>Phase: gain calibration (%1 W + %1 E pulses of %2 ms, drift removed with V)</source>
+        <translation>Phase: gain calibration (%1 W + %1 E pulses of %2 ms, drift removed with V)</translation>
+    </message>
+    <message>
+        <source>Gain cal %1/%2: %3 %4 ms -&gt; %5 px (raw %6, drift -%7)</source>
+        <translation>Gain cal %1/%2: %3 %4 ms -&gt; %5 px (raw %6, drift -%7)</translation>
+    </message>
+    <message>
+        <source>Gain: G=%1 ms/px | wDir=%2 | W=%3 E=%4 px/pulse | asym %5%% | scale %6 arcsec/px (rate %7x)</source>
+        <translation>Gain: G=%1 ms/px | wDir=%2 | W=%3 E=%4 px/pulse | asym %5%% | scale %6 arcsec/px (rate %7x)</translation>
+    </message>
+    <message>
+        <source>Gain calibration: W and E effects differ by %1%% - possible backlash or a wrong V. Guiding may be rough.</source>
+        <translation>Gain calibration: W and E effects differ by %1%% - possible backlash or a wrong V. Guiding may be rough.</translation>
+    </message>
+    <message>
+        <source>Phase: guiding (theta=%1 deg, V=%2 px/s, G=%3 ms/px, wDir=%4)</source>
+        <translation>Phase: guiding (theta=%1 deg, V=%2 px/s, G=%3 ms/px, wDir=%4)</translation>
+    </message>
+    <message>
+        <source>BlindPEC: stopping (calibration done)</source>
+        <translation>BlindPEC: stopping (calibration done)</translation>
+    </message>
+    <message>
+        <source>BlindPEC calibration done</source>
+        <translation>BlindPEC calibration done</translation>
+    </message>
+    <message>
+        <source>BlindPEC: guide (reusing stored gain G=%1 ms/px)</source>
+        <translation>BlindPEC: guide (reusing stored gain G=%1 ms/px)</translation>
+    </message>
+    <message>
+        <source>Reusing stored gain G=%1 ms/px, wDir=%2 - skipping gain calibration</source>
+        <translation>Reusing stored gain G=%1 ms/px, wDir=%2 - skipping gain calibration</translation>
+    </message>
+    <message>
+        <source>BlindPEC: calibration data cleared - a full calibrate is required before guiding</source>
+        <translation>BlindPEC: calibration data cleared - a full calibrate is required before guiding</translation>
+    </message>
+    <message>
+        <source>Lost the surface for %1 consecutive frames - abort</source>
+        <translation>Lost the surface for %1 consecutive frames - abort</translation>
+    </message>
+    <message>
+        <source>Characterization: %1 frames over %2 s, image moved %3 px -&gt; theta=%4 deg, V=%5 px/s, scale=%6 arcsec/px</source>
+        <translation>Characterization: %1 frames over %2 s, image moved %3 px -&gt; theta=%4 deg, V=%5 px/s, scale=%6 arcsec/px</translation>
+    </message>
+    <message>
+        <source>Gain: G=%1 ms/px | wDir=%2 | W=%3 E=%4 px/pulse | asym %5%%</source>
+        <translation>Gain: G=%1 ms/px | wDir=%2 | W=%3 E=%4 px/pulse | asym %5%%</translation>
+    </message>
+    <message>
+        <source>Gain cross-check: measured %1 px/pulse vs %2 expected at guide rate %3x (%4%% off)</source>
+        <translation>Gain cross-check: measured %1 px/pulse vs %2 expected at guide rate %3x (%4%% off)</translation>
+    </message>
+    <message>
+        <source>sidereal_rate / V from step 1 (15.041 arcsec/s divided by the measured drift px/s). Independent of the microscope optics</source>
+        <translation>sidereal_rate / V from step 1 (15.041 arcsec/s divided by the measured drift px/s). Independent of the microscope optics</translation>
+    </message>
+    <message>
+        <source>print a numeric guiding summary (p, residual, cross, V, pulse, I, rms) every N frames. 0 = off</source>
+        <translation>print a numeric guiding summary (p, residual, cross, V, pulse, I, rms) every N frames. 0 = off</translation>
+    </message>
+    <message>
+        <source>Guide log every N frames</source>
+        <translation>Guide log every N frames</translation>
+    </message>
+    <message>
+        <source>Characterization: %1 frames / %2 s | moved %3 px (dx=%4 dy=%5) | theta=%6 deg | V=%7 px/s | scale=%8 arcsec/px</source>
+        <translation>Characterization: %1 frames / %2 s | moved %3 px (dx=%4 dy=%5) | theta=%6 deg | V=%7 px/s | scale=%8 arcsec/px</translation>
+    </message>
+    <message>
+        <source>Characterization fit residual: along-axis %1 px (%2 arcsec, ~PE swing over the window), perpendicular %3 px (%4 arcsec, should be small)</source>
+        <translation>Characterization fit residual: along-axis %1 px (%2 arcsec, ~PE swing over the window), perpendicular %3 px (%4 arcsec, should be small)</translation>
+    </message>
+    <message>
+        <source>Gain: G=%1 ms/px | wDir=%2 | W=%3 +-%4 px  E=%5 +-%6 px  (per %7 ms pulse) | asym %8%%</source>
+        <translation>Gain: G=%1 ms/px | wDir=%2 | W=%3 +-%4 px  E=%5 +-%6 px  (per %7 ms pulse) | asym %8%%</translation>
+    </message>
+    <message>
+        <source>guide #%1 t=%2s | p=%3 dp=%4 px | resid=%5 px (%6&quot;) cross=%7 px (%8&quot;) | V=%9 px/s | u=%10 pulse=%11 ms | I=%12 | rms=%13&quot; resp=%14</source>
+        <translation>guide #%1 t=%2s | p=%3 dp=%4 px | resid=%5 px (%6&quot;) cross=%7 px (%8&quot;) | V=%9 px/s | u=%10 pulse=%11 ms | I=%12 | rms=%13&quot; resp=%14</translation>
+    </message>
+    <message>
+        <source>online correction of the target rate V from a sustained residual (~60 s time constant). 0 = fixed V (recommended for now - the adaptive law is still crude). Keep small if enabled</source>
+        <translation>online correction of the target rate V from a sustained residual (~60 s time constant). 0 = fixed V (recommended for now - the adaptive law is still crude). Keep small if enabled</translation>
+    </message>
+    <message>
+        <source>proportional gain on the residual. kp=1 tries to fully null the error in one pulse (deadbeat) and rings given the ~1-2 s loop period; use 0.3-0.6</source>
+        <translation>proportional gain on the residual. kp=1 tries to fully null the error in one pulse (deadbeat) and rings given the ~1-2 s loop period; use 0.3-0.6</translation>
+    </message>
+    <message>
+        <source>guide #%1 t=%2s dt=%3 | p=%4 sp=%5 dp=%6 | resid=%7 px (%8&quot;) cross=%9 px | V=%10 | u=%11 pulse=%12 ms | I=%13 | rms=%14&quot; resp=%15</source>
+        <translation>guide #%1 t=%2s dt=%3 | p=%4 sp=%5 dp=%6 | resid=%7 px (%8&quot;) cross=%9 px | V=%10 | u=%11 pulse=%12 ms | I=%13 | rms=%14&quot; resp=%15</translation>
+    </message>
+    <message>
+        <source>PI on the target rate: V += alphaV * residual_px each frame, clamped to +-20% of the characterized V. Corrects a V biased by a too-short characterization. 0 = fixed V. 0.002-0.02 typical</source>
+        <translation>PI on the target rate: V += alphaV * residual_px each frame, clamped to +-20% of the characterized V. Corrects a V biased by a too-short characterization. 0 = fixed V. 0.002-0.02 typical</translation>
+    </message>
+    <message>
+        <source>derivative gain. Leave at 0: on a slow (~2 fps) noisy loop the D term mostly amplifies measurement noise</source>
+        <translation>derivative gain. Leave at 0: on a slow (~2 fps) noisy loop the D term mostly amplifies measurement noise</translation>
+    </message>
+    <message>
+        <source>BlindPEC: guide, reusing stored gain G=%1 ms/px</source>
+        <translation>BlindPEC: guide, reusing stored gain G=%1 ms/px</translation>
+    </message>
+    <message>
+        <source>step 1: observe the free-run sidereal drift for this long (mount tracking, no pulses) to get the RA axis direction and rate. A rough value needs a few tens of s; a clean one (and a real PE measurement) needs &gt;= one worm period</source>
+        <translation>step 1: observe the free-run sidereal drift for this long (mount tracking, no pulses) to get the RA axis direction and rate. A rough value needs a few tens of s; a clean one (and a real PE measurement) needs &gt;= one worm period</translation>
+    </message>
+    <message>
+        <source>run step 1 alone: measure the free-run drift + periodic error over &apos;chardur&apos; seconds, log the PE peak-to-peak and a decimated PE curve, then stop. Set chardur &gt;= one worm period</source>
+        <translation>run step 1 alone: measure the free-run drift + periodic error over &apos;chardur&apos; seconds, log the PE peak-to-peak and a decimated PE curve, then stop. Set chardur &gt;= one worm period</translation>
+    </message>
+    <message>
+        <source>Observe only (no gain cal, no guiding)</source>
+        <translation>Observe only (no gain cal, no guiding)</translation>
+    </message>
+    <message>
+        <source>Periodic error over the window: peak-to-peak %1 px (%2 arcsec), RMS %3 px (%4 arcsec) | perpendicular RMS %5 px (%6 arcsec, should be small)</source>
+        <translation>Periodic error over the window: peak-to-peak %1 px (%2 arcsec), RMS %3 px (%4 arcsec) | perpendicular RMS %5 px (%6 arcsec, should be small)</translation>
+    </message>
+    <message>
+        <source>PE  t=%1 s  along=%2 arcsec  (%3 px)</source>
+        <translation>PE  t=%1 s  along=%2 arcsec  (%3 px)</translation>
+    </message>
+    <message>
+        <source>PE  t=%1 s  along=%2 arcsec  (%3 px)  sfrac=%4</source>
+        <translation>PE  t=%1 s  along=%2 arcsec  (%3 px)  sfrac=%4</translation>
+    </message>
+    <message>
+        <source>guide #%1 t=%2s dt=%3 | p=%4 sp=%5 dp=%6 | resid=%7 px (%8&quot;) cross=%9 | sfrac=%10 | V=%11 | u=%12 pulse=%13 ms | I=%14 | rms=%15&quot; resp=%16</source>
+        <translation>guide #%1 t=%2s dt=%3 | p=%4 sp=%5 dp=%6 | resid=%7 px (%8&quot;) cross=%9 | sfrac=%10 | V=%11 | u=%12 pulse=%13 ms | I=%14 | rms=%15&quot; resp=%16</translation>
+    </message>
+    <message>
+        <source>refine the sub-pixel shift with findTransformECC (interpolation-based, low pixel-locking) instead of the raw phaseCorrelate centroid. Off = phaseCorrelate only (fast, but strong pixel-locking)</source>
+        <translation>refine the sub-pixel shift with findTransformECC (interpolation-based, low pixel-locking) instead of the raw phaseCorrelate centroid. Off = phaseCorrelate only (fast, but strong pixel-locking)</translation>
+    </message>
+    <message>
+        <source>ECC sub-pixel refinement</source>
+        <translation>ECC sub-pixel refinement</translation>
+    </message>
+    <message>
+        <source>reject a frame below this. With ECC refinement it is the ECC coefficient (0-1); ~0.3 is a reasonable floor</source>
+        <translation>reject a frame below this. With ECC refinement it is the ECC coefficient (0-1); ~0.3 is a reasonable floor</translation>
+    </message>
+    <message>
+        <source>Gaussian blur applied before registration. Widens the correlation peak and cuts pixel-locking (peak-locking) bias. 0 = off, 0.8-1.5 typical</source>
+        <translation>Gaussian blur applied before registration. Widens the correlation peak and cuts pixel-locking (peak-locking) bias. 0 = off, 0.8-1.5 typical</translation>
+    </message>
+    <message>
+        <source>Pre-correlation blur (px sigma)</source>
+        <translation>Pre-correlation blur (px sigma)</translation>
+    </message>
+    <message>
+        <source>calibration step 1: observe the free-run sidereal drift for this long (mount tracking, no pulses) to get the RA axis angle, rate and scale - all geometric, stored and reused until the microscope is moved. Set &gt;= one worm period for a clean V and a real PE measurement</source>
+        <translation>calibration step 1: observe the free-run sidereal drift for this long (mount tracking, no pulses) to get the RA axis angle, rate and scale - all geometric, stored and reused until the microscope is moved. Set &gt;= one worm period for a clean V and a real PE measurement</translation>
+    </message>
+    <message>
+        <source>BlindPEC: no stored calibration - characterize + gain + guide</source>
+        <translation>BlindPEC: no stored calibration - characterize + gain + guide</translation>
+    </message>
+    <message>
+        <source>BlindPEC: guide, using stored calibration (theta=%1 deg, V=%2 px/s, scale=%3 arcsec/px, G=%4 ms/px)</source>
+        <translation>BlindPEC: guide, using stored calibration (theta=%1 deg, V=%2 px/s, scale=%3 arcsec/px, G=%4 ms/px)</translation>
+    </message>
+    <message>
+        <source>convergence threshold on the correlation coefficient. Smaller = finer sub-pixel, more iterations. 1e-4 .. 1e-6</source>
+        <translation>convergence threshold on the correlation coefficient. Smaller = finer sub-pixel, more iterations. 1e-4 .. 1e-6</translation>
+    </message>
+    <message>
+        <source>ECC convergence eps</source>
+        <translation>ECC convergence eps</translation>
+    </message>
+    <message>
+        <source>size of the Gaussian ECC applies to images and gradients each iteration (forced odd). Larger = smoother gradients, less pixel-locking, slightly less sharp. Stacks with preblur</source>
+        <translation>size of the Gaussian ECC applies to images and gradients each iteration (forced odd). Larger = smoother gradients, less pixel-locking, slightly less sharp. Stacks with preblur</translation>
+    </message>
+    <message>
+        <source>ECC internal blur kernel</source>
+        <translation>ECC internal blur kernel</translation>
+    </message>
+    <message>
+        <source>Gauss-Newton iterations cap. Seeded from the coarse shift so it converges in ~5-15; 60 is a safe ceiling. Lower if the frame rate suffers</source>
+        <translation>Gauss-Newton iterations cap. Seeded from the coarse shift so it converges in ~5-15; 60 is a safe ceiling. Lower if the frame rate suffers</translation>
+    </message>
+    <message>
+        <source>ECC max iterations</source>
+        <translation>ECC max iterations</translation>
+    </message>
+    <message>
+        <source>refine the sub-pixel shift with findTransformECC (interpolation-based, low pixel-locking) after a coarse phaseCorrelate. Off = phaseCorrelate centroid only (fast, strong pixel-locking)</source>
+        <translation>refine the sub-pixel shift with findTransformECC (interpolation-based, low pixel-locking) after a coarse phaseCorrelate. Off = phaseCorrelate centroid only (fast, strong pixel-locking)</translation>
+    </message>
+    <message>
+        <source>reject a frame below this. With ECC on it is the ECC coefficient (0-1); ~0.3-0.5 is a reasonable floor once you know the typical range</source>
+        <translation>reject a frame below this. With ECC on it is the ECC coefficient (0-1); ~0.3-0.5 is a reasonable floor once you know the typical range</translation>
+    </message>
+    <message>
+        <source>Gaussian blur applied to both frames before registration. Widens the correlation peak and cuts pixel-locking (peak-locking) bias. 0 = off; 0.8-1.5 typical. THE main anti-pixel-locking knob</source>
+        <translation>Gaussian blur applied to both frames before registration. Widens the correlation peak and cuts pixel-locking (peak-locking) bias. 0 = off; 0.8-1.5 typical. THE main anti-pixel-locking knob</translation>
+    </message>
+    <message>
+        <source>re-drop the reference anchor once the running shift exceeds this fraction of half the frame. Smaller = higher overlap / response, more re-anchor events</source>
+        <translation>re-drop the reference anchor once the running shift exceeds this fraction of half the frame. Smaller = higher overlap / response, more re-anchor events</translation>
+    </message>
+    <message>
+        <source>Image measurement (correlation / sub-pixel)</source>
+        <translation>Image measurement (correlation / sub-pixel)</translation>
+    </message>
+    <message>
+        <source>guide #%1 t=%2s dt=%3%4 | p=%5 sp=%6 dp=%7 | resid=%8 px (%9&quot;) cross=%10 | sfrac=%11 | V=%12 | u=%13 pulse=%14 ms | I=%15 | rms=%16&quot; resp=%17</source>
+        <translation>guide #%1 t=%2s dt=%3%4 | p=%5 sp=%6 dp=%7 | resid=%8 px (%9&quot;) cross=%10 | sfrac=%11 | V=%12 | u=%13 pulse=%14 ms | I=%15 | rms=%16&quot; resp=%17</translation>
+    </message>
+    <message>
+        <source>once, at the first anchor: probe the estimator&apos;s residual pixel-locking bias with Fourier-shifted copies of the anchor, fit it, and subtract it from every shift. Targets exactly the frame-to-frame yo-yo. Adds ~1-2 s to the first frame</source>
+        <translation>once, at the first anchor: probe the estimator&apos;s residual pixel-locking bias with Fourier-shifted copies of the anchor, fit it, and subtract it from every shift. Targets exactly the frame-to-frame yo-yo. Adds ~1-2 s to the first frame</translation>
+    </message>
+    <message>
+        <source>Pixel-locking S-curve correction</source>
+        <translation>Pixel-locking S-curve correction</translation>
+    </message>
+    <message>
+        <source>harmonics in the S-curve fit. The 1-hump-per-pixel term dominates; 2-3 is plenty</source>
+        <translation>harmonics in the S-curve fit. The 1-hump-per-pixel term dominates; 2-3 is plenty</translation>
+    </message>
+    <message>
+        <source>S-curve harmonics</source>
+        <translation>S-curve harmonics</translation>
+    </message>
+    <message>
+        <source>number of fractional-shift probes per axis for the S-curve fit. More = smoother curve, longer one-time calibration</source>
+        <translation>number of fractional-shift probes per axis for the S-curve fit. More = smoother curve, longer one-time calibration</translation>
+    </message>
+    <message>
+        <source>S-curve samples / axis</source>
+        <translation>S-curve samples / axis</translation>
+    </message>
+    <message>
+        <source>Pixel-locking S-curve calibrated: peak-to-peak X=%1 px (%2 arcsec), Y=%3 px - now subtracted from every shift</source>
+        <translation>Pixel-locking S-curve calibrated: peak-to-peak X=%1 px (%2 arcsec), Y=%3 px - now subtracted from every shift</translation>
+    </message>
+    <message>
+        <source>reject a frame whose normalised cross-correlation with the anchor at the found shift is below this. Estimator-independent (0-1). A good textured surface gives 0.8-0.97; 0.5 is a safe floor</source>
+        <translation>reject a frame whose normalised cross-correlation with the anchor at the found shift is below this. Estimator-independent (0-1). A good textured surface gives 0.8-0.97; 0.5 is a safe floor</translation>
+    </message>
+    <message>
+        <source>Min correlation (NCC)</source>
+        <translation>Min correlation (NCC)</translation>
+    </message>
+    <message>
+        <source>BlindPEC: calibration (characterize + gain)</source>
+        <translation>BlindPEC: calibration (characterize + gain)</translation>
+    </message>
+    <message>
+        <source>Pixel-locking S-curve calibrated: peak-to-peak X=%1 px, Y=%2 px - now subtracted from every shift</source>
+        <translation>Pixel-locking S-curve calibrated: peak-to-peak X=%1 px, Y=%2 px - now subtracted from every shift</translation>
+    </message>
+    <message>
+        <source>BlindPEC: observe-only run complete (no gain calibration, no guiding)</source>
+        <translation>BlindPEC: observe-only run complete (no gain calibration, no guiding)</translation>
+    </message>
+    <message>
+        <source>Characterize: frame not trusted (NCC %1 &lt; %2, step (%3,%4) px) - %5 rejected so far</source>
+        <translation>Characterize: frame not trusted (NCC %1 &lt; %2, step (%3,%4) px) - %5 rejected so far</translation>
+    </message>
+    <message>
+        <source>Characterization: %1 frames kept / %2 rejected / %3 s | moved %4 px (dx=%5 dy=%6) | theta=%7 deg | V=%8 px/s | scale=%9 arcsec/px</source>
+        <translation>Characterization: %1 frames kept / %2 rejected / %3 s | moved %4 px (dx=%5 dy=%6) | theta=%7 deg | V=%8 px/s | scale=%9 arcsec/px</translation>
+    </message>
+    <message>
+        <source>Centering successful after 3 iteration(s) - within tolerance</source>
+        <translation>Centering successful after 3 iteration(s) - within tolerance</translation>
+    </message>
+    <message>
+        <source>Optics &apos;%1&apos; not found in GlobalDatastore</source>
+        <translation>Optics &apos;%1&apos; not found in GlobalDatastore</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=16.7, DEC=36.1, Pier=West</source>
+        <translation>Mount position: RA=16.7, DEC=36.1, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=16.7, DEC=36.2, Pier=West</source>
+        <translation>Mount position: RA=16.7, DEC=36.2, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=5.6, DEC=4.7, Pier=East</source>
+        <translation>Mount position: RA=5.6, DEC=4.7, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount device missing</source>
+        <translation>Mount device missing</translation>
+    </message>
+    <message>
+        <source>Dome device missing</source>
+        <translation>Dome device missing</translation>
+    </message>
+    <message>
+        <source>File</source>
+        <translation>File</translation>
+    </message>
+    <message>
+        <source>Size (KB)</source>
+        <translation>Size (KB)</translation>
+    </message>
+    <message>
+        <source>Archived sessions</source>
+        <translation>Archived sessions</translation>
+    </message>
+    <message>
+        <source>Key</source>
+        <translation>Key</translation>
+    </message>
+    <message>
+        <source>Timestamp</source>
+        <translation>Timestamp</translation>
+    </message>
+    <message>
+        <source>Int 1</source>
+        <translation>Int 1</translation>
+    </message>
+    <message>
+        <source>Int 2</source>
+        <translation>Int 2</translation>
+    </message>
+    <message>
+        <source>Int 3</source>
+        <translation>Int 3</translation>
+    </message>
+    <message>
+        <source>Mean</source>
+        <translation>Mean</translation>
+    </message>
+    <message>
+        <source>Min</source>
+        <translation>Min</translation>
+    </message>
+    <message>
+        <source>Median</source>
+        <translation>Median</translation>
+    </message>
+    <message>
+        <source>Std dev</source>
+        <translation>Std dev</translation>
+    </message>
+    <message>
+        <source>Float 6</source>
+        <translation>Float 6</translation>
+    </message>
+    <message>
+        <source>Float 7</source>
+        <translation>Float 7</translation>
+    </message>
+    <message>
+        <source>Float 8</source>
+        <translation>Float 8</translation>
+    </message>
+    <message>
+        <source>String 1</source>
+        <translation>String 1</translation>
+    </message>
+    <message>
+        <source>String 2</source>
+        <translation>String 2</translation>
+    </message>
+    <message>
+        <source>String 3</source>
+        <translation>String 3</translation>
+    </message>
+    <message>
+        <source>Events</source>
+        <translation>Events</translation>
+    </message>
+    <message>
+        <source>View filter</source>
+        <translation>View filter</translation>
+    </message>
+    <message>
+        <source>Automatically start a new session when the module loads</source>
+        <translation>Automatically start a new session when the module loads</translation>
+    </message>
+    <message>
+        <source>Auto-start on load</source>
+        <translation>Auto-start on load</translation>
+    </message>
+    <message>
+        <source>Maximum number of rows to store</source>
+        <translation>Maximum number of rows to store</translation>
+    </message>
+    <message>
+        <source>Max rows</source>
+        <translation>Max rows</translation>
+    </message>
+    <message>
+        <source>Number of guideRMS samples to average before recording an event</source>
+        <translation>Number of guideRMS samples to average before recording an event</translation>
+    </message>
+    <message>
+        <source>Monitor sampling</source>
+        <translation>Monitor sampling</translation>
+    </message>
+    <message>
+        <source>Focus module instance to monitor</source>
+        <translation>Focus module instance to monitor</translation>
+    </message>
+    <message>
+        <source>Focus instance</source>
+        <translation>Focus instance</translation>
+    </message>
+    <message>
+        <source>Guider module instance to monitor</source>
+        <translation>Guider module instance to monitor</translation>
+    </message>
+    <message>
+        <source>Guider instance</source>
+        <translation>Guider instance</translation>
+    </message>
+    <message>
+        <source>Inspector module instance to monitor</source>
+        <translation>Inspector module instance to monitor</translation>
+    </message>
+    <message>
+        <source>Inspector instance</source>
+        <translation>Inspector instance</translation>
+    </message>
+    <message>
+        <source>Navigator module instance to monitor</source>
+        <translation>Navigator module instance to monitor</translation>
+    </message>
+    <message>
+        <source>Park manager module instance to monitor</source>
+        <translation>Park manager module instance to monitor</translation>
+    </message>
+    <message>
+        <source>Park manager instance</source>
+        <translation>Park manager instance</translation>
+    </message>
+    <message>
+        <source>Planner module instance to monitor</source>
+        <translation>Planner module instance to monitor</translation>
+    </message>
+    <message>
+        <source>Polar module instance to monitor</source>
+        <translation>Polar module instance to monitor</translation>
+    </message>
+    <message>
+        <source>Polar instance</source>
+        <translation>Polar instance</translation>
+    </message>
+    <message>
+        <source>Sequencer module instance to monitor</source>
+        <translation>Sequencer module instance to monitor</translation>
+    </message>
+    <message>
+        <source>Sequencer instance</source>
+        <translation>Sequencer instance</translation>
+    </message>
+    <message>
+        <source>Monitored modules</source>
+        <translation>Monitored modules</translation>
+    </message>
+    <message>
+        <source>Indi server is not connected</source>
+        <translation>Indi server is not connected</translation>
+    </message>
+    <message>
+        <source>%1 - Indi server is not connected</source>
+        <translation>%1 - Indi server is not connected</translation>
+    </message>
+    <message>
+        <source>%1 - Couldn&apos;t find CONNECTION switch for %2</source>
+        <translation>%1 - Couldn&apos;t find CONNECTION switch for %2</translation>
+    </message>
+    <message>
+        <source>Camera rejected the exposure (CCD_EXPOSURE -&gt; ALERT). Check the camera driver in the INDI panel: capture format, resolution, auto-exposure. Aborting.</source>
+        <translation>Camera rejected the exposure (CCD_EXPOSURE -&gt; ALERT). Check the camera driver in the INDI panel: capture format, resolution, auto-exposure. Aborting.</translation>
+    </message>
+    <message>
+        <source>sub-pixel shift by upsampled-DFT cross-correlation (Guizar-Sicairos): no interpolation, no pixel-locking, deterministic, no start-up calibration. ON = ignores eccrefine/scurve. OFF = legacy phaseCorrelate + ECC + S-curve</source>
+        <translation>sub-pixel shift by upsampled-DFT cross-correlation (Guizar-Sicairos): no interpolation, no pixel-locking, deterministic, no start-up calibration. ON = ignores eccrefine/scurve. OFF = legacy phaseCorrelate + ECC + S-curve</translation>
+    </message>
+    <message>
+        <source>Upsampled-DFT sub-pixel</source>
+        <translation>Upsampled-DFT sub-pixel</translation>
+    </message>
+    <message>
+        <source>local zoom resolution = 1/kappa px (50 -&gt; 0.02 px, well under the noise). CPU cost grows ~kappa^2; 50 is a good default, 100 if a Pi-class CPU keeps up</source>
+        <translation>local zoom resolution = 1/kappa px (50 -&gt; 0.02 px, well under the noise). CPU cost grows ~kappa^2; 50 is a good default, 100 if a Pi-class CPU keeps up</translation>
+    </message>
+    <message>
+        <source>DFT upsample factor (kappa)</source>
+        <translation>DFT upsample factor (kappa)</translation>
+    </message>
+    <message>
+        <source>Characterize: %1 frames, %2 s / %3 s (%4 s/frame, meas %5 ms)</source>
+        <translation>Characterize: %1 frames, %2 s / %3 s (%4 s/frame, meas %5 ms)</translation>
+    </message>
+    <message>
+        <source>guide #%1 t=%2s dt=%3s meas=%4ms%5 | resid=%6 px (%7&quot;) | sfrac=%8 | u=%9 pulse=%10 ms | I=%11 | rms=%12&quot; resp=%13</source>
+        <translation>guide #%1 t=%2s dt=%3s meas=%4ms%5 | resid=%6 px (%7&quot;) | sfrac=%8 | u=%9 pulse=%10 ms | I=%11 | rms=%12&quot; resp=%13</translation>
+    </message>
+    <message>
+        <source>guide #%1 t=%2s dt=%3s meas=%4ms%5 | resid=%6 px (%7&quot;) | sfrac=%8 | eR=%9 px/s | u=%10 pulse=%11 ms | I=%12 | rms=%13&quot; resp=%14</source>
+        <translation>guide #%1 t=%2s dt=%3s meas=%4ms%5 | resid=%6 px (%7&quot;) | sfrac=%8 | eR=%9 px/s | u=%10 pulse=%11 ms | I=%12 | rms=%13&quot; resp=%14</translation>
+    </message>
+    <message>
+        <source>PHD2 GuideLog: %1</source>
+        <translation>PHD2 GuideLog: %1</translation>
+    </message>
+    <message>
+        <source>BlindPEC already running - ignoring %1</source>
+        <translation>BlindPEC already running - ignoring %1</translation>
+    </message>
+    <message>
+        <source>guide #%1 t=%2s dt=%3s meas=%4ms%5 | resid=%6 px (%7&quot;) | sfrac=%8 | eR=%9 px/s lead=%10s | u=%11 pulse=%12 ms | I=%13 | rms=%14&quot; resp=%15</source>
+        <translation>guide #%1 t=%2s dt=%3s meas=%4ms%5 | resid=%6 px (%7&quot;) | sfrac=%8 | eR=%9 px/s lead=%10s | u=%11 pulse=%12 ms | I=%13 | rms=%14&quot; resp=%15</translation>
+    </message>
+    <message>
+        <source>Fit vertex %1 outside measured range [%2, %3] - using measured minimum</source>
+        <translation>Fit vertex %1 outside measured range [%2, %3] - using measured minimum</translation>
+    </message>
+    <message>
+        <source>Driver Debug</source>
+        <translation>Driver Debug</translation>
+    </message>
+    <message>
+        <source>Errors</source>
+        <translation>Errors</translation>
+    </message>
+    <message>
+        <source>Alignment Subsystem</source>
+        <translation>Alignment Subsystem</translation>
+    </message>
+    <message>
+        <source>Messages</source>
+        <translation>Messages</translation>
+    </message>
+    <message>
+        <source>Warnings</source>
+        <translation>Warnings</translation>
+    </message>
+    <message>
+        <source>Debug Levels</source>
+        <translation>Debug Levels</translation>
+    </message>
+    <message>
+        <source>Logging Levels</source>
+        <translation>Logging Levels</translation>
+    </message>
+    <message>
+        <source>To Client</source>
+        <translation>To Client</translation>
+    </message>
+    <message>
+        <source>To Log File</source>
+        <translation>To Log File</translation>
+    </message>
+    <message>
+        <source>Log Output</source>
+        <translation>Log Output</translation>
+    </message>
+    <message>
+        <source>16-bit</source>
+        <translation>16-bit</translation>
+    </message>
+    <message>
+        <source>8-bit</source>
+        <translation>8-bit</translation>
+    </message>
+    <message>
+        <source>Stream Depth</source>
+        <translation>Stream Depth</translation>
+    </message>
+    <message>
+        <source>Ha</source>
+        <translation>Ha</translation>
+    </message>
+    <message>
+        <source>Add entries at end of set</source>
+        <translation>Add entries at end of set</translation>
+    </message>
+    <message>
+        <source>Delete all the entries in the set</source>
+        <translation>Delete all the entries in the set</translation>
+    </message>
+    <message>
+        <source>Delete entry at current index</source>
+        <translation>Delete entry at current index</translation>
+    </message>
+    <message>
+        <source>Overwrite entry at current index</source>
+        <translation>Overwrite entry at current index</translation>
+    </message>
+    <message>
+        <source>Insert entries at current index</source>
+        <translation>Insert entries at current index</translation>
+    </message>
+    <message>
+        <source>Load the alignment database from local storage</source>
+        <translation>Load the alignment database from local storage</translation>
+    </message>
+    <message>
+        <source>Read the entry at the current pointer</source>
+        <translation>Read the entry at the current pointer</translation>
+    </message>
+    <message>
+        <source>Increment the pointer before reading the entry</source>
+        <translation>Increment the pointer before reading the entry</translation>
+    </message>
+    <message>
+        <source>Save the alignment database to local storage</source>
+        <translation>Save the alignment database to local storage</translation>
+    </message>
+    <message>
+        <source>Action to take</source>
+        <translation>Action to take</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Execute the action</source>
+        <translation>Execute the action</translation>
+    </message>
+    <message>
+        <source>Pointer</source>
+        <translation>Pointer</translation>
+    </message>
+    <message>
+        <source>Current Set</source>
+        <translation>Current Set</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Size</translation>
+    </message>
+    <message>
+        <source>Declination (dd:mm:ss)</source>
+        <translation>Declination (dd:mm:ss)</translation>
+    </message>
+    <message>
+        <source>Observation Julian date</source>
+        <translation>Observation Julian date</translation>
+    </message>
+    <message>
+        <source>Right Ascension (hh:mm:ss)</source>
+        <translation>Right Ascension (hh:mm:ss)</translation>
+    </message>
+    <message>
+        <source>Telescope direction vector x</source>
+        <translation>Telescope direction vector x</translation>
+    </message>
+    <message>
+        <source>Telescope direction vector y</source>
+        <translation>Telescope direction vector y</translation>
+    </message>
+    <message>
+        <source>Telescope direction vector z</source>
+        <translation>Telescope direction vector z</translation>
+    </message>
+    <message>
+        <source>Mandatory sync point numeric fields</source>
+        <translation>Mandatory sync point numeric fields</translation>
+    </message>
+    <message>
+        <source>Private binary data</source>
+        <translation>Private binary data</translation>
+    </message>
+    <message>
+        <source>Optional sync point binary data</source>
+        <translation>Optional sync point binary data</translation>
+    </message>
+    <message>
+        <source>Alignment Subsystem Active</source>
+        <translation>Alignment Subsystem Active</translation>
+    </message>
+    <message>
+        <source>Activate alignment subsystem</source>
+        <translation>Activate alignment subsystem</translation>
+    </message>
+    <message>
+        <source>Inbuilt Math Plugin</source>
+        <translation>Inbuilt Math Plugin</translation>
+    </message>
+    <message>
+        <source>Nearest Math Plugin</source>
+        <translation>Nearest Math Plugin</translation>
+    </message>
+    <message>
+        <source>SPK Math Plugin</source>
+        <translation>SPK Math Plugin</translation>
+    </message>
+    <message>
+        <source>SVD Math Plugin</source>
+        <translation>SVD Math Plugin</translation>
+    </message>
+    <message>
+        <source>Math Plugins</source>
+        <translation>Math Plugins</translation>
+    </message>
+    <message>
+        <source>(Re)Initialise Plugin</source>
+        <translation>(Re)Initialise Plugin</translation>
+    </message>
+    <message>
+        <source>True Pointing</source>
+        <translation>True Pointing</translation>
+    </message>
+    <message>
+        <source>Cone (CH) &apos;</source>
+        <translation>Cone (CH) &apos;</translation>
+    </message>
+    <message>
+        <source>Dec Zero (ID) &apos;</source>
+        <translation>Dec Zero (ID) &apos;</translation>
+    </message>
+    <message>
+        <source>Ha Zero (IH) &apos;</source>
+        <translation>Ha Zero (IH) &apos;</translation>
+    </message>
+    <message>
+        <source>Pole Azm (MA) &apos;</source>
+        <translation>Pole Azm (MA) &apos;</translation>
+    </message>
+    <message>
+        <source>Pole elev (ME) &apos;</source>
+        <translation>Pole elev (ME) &apos;</translation>
+    </message>
+    <message>
+        <source>Ha/Dec (NP) &apos;</source>
+        <translation>Ha/Dec (NP) &apos;</translation>
+    </message>
+    <message>
+        <source>Retrieve GPS data</source>
+        <translation>Retrieve GPS data</translation>
+    </message>
+    <message>
+        <source>Basemodule::onExternalEventBase - element %1-%2 requires SA (directedit=false)</source>
+        <translation>Basemodule::onExternalEventBase - element %1-%2 requires SA (directedit=false)</translation>
+    </message>
+    <message>
+        <source>updateSearchList more than %1 objects found, limiting result to %2</source>
+        <translation>updateSearchList more than %1 objects found, limiting result to %2</translation>
+    </message>
+    <message>
+        <source>Centering successful after 5 iteration(s) - within tolerance</source>
+        <translation>Centering successful after 5 iteration(s) - within tolerance</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=18.1, DEC=-23.0, Pier=East</source>
+        <translation>Mount position: RA=18.1, DEC=-23.0, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=17.9, DEC=-28.1, Pier=East</source>
+        <translation>Mount position: RA=17.9, DEC=-28.1, Pier=East</translation>
+    </message>
+    <message>
+        <source>OST starting up, ladies and gentlemen, squeeze your ALZ !</source>
+        <translation>OST starting up, ladies and gentlemen, squeeze your ALZ !</translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>    *******    ******** **********</source>
+        <translation>    *******    ******** **********</translation>
+    </message>
+    <message>
+        <source>   **/////**  **////// /////**/// </source>
+        <translation>   **/////**  **////// /////**/// </translation>
+    </message>
+    <message>
+        <source>  **     //**/**           /**    </source>
+        <translation>  **     //**/**           /**    </translation>
+    </message>
+    <message>
+        <source> /**      /**/*********    /**    </source>
+        <translation> /**      /**/*********    /**    </translation>
+    </message>
+    <message>
+        <source> /**      /**////////**    /**    </source>
+        <translation> /**      /**////////**    /**    </translation>
+    </message>
+    <message>
+        <source> //**     **        /**    /**    </source>
+        <translation> //**     **        /**    /**    </translation>
+    </message>
+    <message>
+        <source>  //*******   ********     /**    </source>
+        <translation>  //*******   ********     /**    </translation>
+    </message>
+    <message>
+        <source>   ///////   ////////      //     </source>
+        <translation>   ///////   ////////      //     </translation>
+    </message>
+    <message>
+        <source>Check available modules in /usr/lib</source>
+        <translation>Check available modules in /usr/lib</translation>
+    </message>
+    <message>
+        <source>Check available modules in /usr/lib/x86_64-linux-gnu/qt6/plugins</source>
+        <translation>Check available modules in /usr/lib/x86_64-linux-gnu/qt6/plugins</translation>
+    </message>
+    <message>
+        <source>Check available modules in /home/gilles/claude/OST/OST/buildqt6</source>
+        <translation>Check available modules in /home/gilles/claude/OST/OST/buildqt6</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostallsky</source>
+        <translation>found library /home/gilles/claude/OST/OST/buildqt6/libostallsky</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostblindpec</source>
+        <translation>found library /home/gilles/claude/OST/OST/buildqt6/libostblindpec</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostcollimator</source>
+        <translation>found library /home/gilles/claude/OST/OST/buildqt6/libostcollimator</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostdummy</source>
+        <translation>found library /home/gilles/claude/OST/OST/buildqt6/libostdummy</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostfocus</source>
+        <translation>found library /home/gilles/claude/OST/OST/buildqt6/libostfocus</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostguider</source>
+        <translation>found library /home/gilles/claude/OST/OST/buildqt6/libostguider</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostindipanel</source>
+        <translation>found library /home/gilles/claude/OST/OST/buildqt6/libostindipanel</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostinspector</source>
+        <translation>found library /home/gilles/claude/OST/OST/buildqt6/libostinspector</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostmeteo</source>
+        <translation>found library /home/gilles/claude/OST/OST/buildqt6/libostmeteo</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostmonitor</source>
+        <translation>found library /home/gilles/claude/OST/OST/buildqt6/libostmonitor</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostnavigator</source>
+        <translation>found library /home/gilles/claude/OST/OST/buildqt6/libostnavigator</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostparkmanager</source>
+        <translation>found library /home/gilles/claude/OST/OST/buildqt6/libostparkmanager</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostplanner</source>
+        <translation>found library /home/gilles/claude/OST/OST/buildqt6/libostplanner</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostpolar</source>
+        <translation>found library /home/gilles/claude/OST/OST/buildqt6/libostpolar</translation>
+    </message>
+    <message>
+        <source>found library /home/gilles/claude/OST/OST/buildqt6/libostsequencer</source>
+        <translation>found library /home/gilles/claude/OST/OST/buildqt6/libostsequencer</translation>
+    </message>
+    <message>
+        <source>Scanning INDI drivers in /usr/share/indi</source>
+        <translation>Scanning INDI drivers in /usr/share/indi</translation>
+    </message>
+    <message>
+        <source>Found 424 INDI drivers</source>
+        <translation>Found 424 INDI drivers</translation>
+    </message>
+    <message>
+        <source>Reusing orphaned indiserver (PID 8097)</source>
+        <translation>Reusing orphaned indiserver (PID 8097)</translation>
+    </message>
+    <message>
+        <source>Recovered active driver: Weather Simulator (indi_simulator_weather)</source>
+        <translation>Recovered active driver: Weather Simulator (indi_simulator_weather)</translation>
+    </message>
+    <message>
+        <source>Recovered active driver: GPS Simulator (indi_simulator_gps)</source>
+        <translation>Recovered active driver: GPS Simulator (indi_simulator_gps)</translation>
+    </message>
+    <message>
+        <source>Recovered active driver: Dome Simulator (indi_simulator_dome)</source>
+        <translation>Recovered active driver: Dome Simulator (indi_simulator_dome)</translation>
+    </message>
+    <message>
+        <source>Recovered active driver: Guide Simulator (indi_simulator_guide)</source>
+        <translation>Recovered active driver: Guide Simulator (indi_simulator_guide)</translation>
+    </message>
+    <message>
+        <source>Recovered active driver: Focuser Simulator (indi_simulator_focus)</source>
+        <translation>Recovered active driver: Focuser Simulator (indi_simulator_focus)</translation>
+    </message>
+    <message>
+        <source>Recovered active driver: Filter Simulator (indi_simulator_wheel)</source>
+        <translation>Recovered active driver: Filter Simulator (indi_simulator_wheel)</translation>
+    </message>
+    <message>
+        <source>Recovered active driver: CCD Simulator (indi_simulator_ccd)</source>
+        <translation>Recovered active driver: CCD Simulator (indi_simulator_ccd)</translation>
+    </message>
+    <message>
+        <source>Recovered active driver: Telescope Simulator (indi_simulator_telescope)</source>
+        <translation>Recovered active driver: Telescope Simulator (indi_simulator_telescope)</translation>
+    </message>
+    <message>
+        <source>8 active INDI driver(s) recovered</source>
+        <translation>8 active INDI driver(s) recovered</translation>
+    </message>
+    <message>
+        <source>Driver already active, skipping: indi_simulator_ccd</source>
+        <translation>Driver already active, skipping: indi_simulator_ccd</translation>
+    </message>
+    <message>
+        <source>Driver already active, skipping: indi_simulator_dome</source>
+        <translation>Driver already active, skipping: indi_simulator_dome</translation>
+    </message>
+    <message>
+        <source>Driver already active, skipping: indi_simulator_wheel</source>
+        <translation>Driver already active, skipping: indi_simulator_wheel</translation>
+    </message>
+    <message>
+        <source>Driver already active, skipping: indi_simulator_focus</source>
+        <translation>Driver already active, skipping: indi_simulator_focus</translation>
+    </message>
+    <message>
+        <source>Driver already active, skipping: indi_simulator_gps</source>
+        <translation>Driver already active, skipping: indi_simulator_gps</translation>
+    </message>
+    <message>
+        <source>Driver already active, skipping: indi_simulator_guide</source>
+        <translation>Driver already active, skipping: indi_simulator_guide</translation>
+    </message>
+    <message>
+        <source>Driver already active, skipping: indi_simulator_telescope</source>
+        <translation>Driver already active, skipping: indi_simulator_telescope</translation>
+    </message>
+    <message>
+        <source>Driver already active, skipping: indi_simulator_weather</source>
+        <translation>Driver already active, skipping: indi_simulator_weather</translation>
+    </message>
+    <message>
+        <source>%1 - Loading device conf for %2</source>
+        <translation>%1 - Loading device conf for %2</translation>
+    </message>
+    <message>
+        <source>listOfValues references a controller-wide LOV (optics, shared across all modules), listOfValuesIsExternal marks it as such</source>
+        <translation>listOfValues references a controller-wide LOV (optics, shared across all modules), listOfValuesIsExternal marks it as such</translation>
+    </message>
+    <message>
+        <source>Global to the controller</source>
+        <translation>Global to the controller</translation>
+    </message>
+    <message>
+        <source>listOfValues is an inline array of pairs, not shared with any other element</source>
+        <translation>listOfValues is an inline array of pairs, not shared with any other element</translation>
+    </message>
+    <message>
+        <source>Local to this element</source>
+        <translation>Local to this element</translation>
+    </message>
+    <message>
+        <source>listOfValues references a key in this module&apos;s own globallov section (dummylov)</source>
+        <translation>listOfValues references a key in this module&apos;s own globallov section (dummylov)</translation>
+    </message>
+    <message>
+        <source>Global to this module</source>
+        <translation>Global to this module</translation>
+    </message>
+    <message>
+        <source>LOV scopes (local / module / controller)</source>
+        <translation>LOV scopes (local / module / controller)</translation>
+    </message>
+    <message>
+        <source>Load all catalogs     =Y</source>
+        <translation>Load all catalogs     =Y</translation>
+    </message>
+    <message>
+        <source>GlobalDatastore cannot be killed</source>
+        <translation>GlobalDatastore cannot be killed</translation>
+    </message>
+    <message>
+        <source>saveDbConfiguration - ERROR SQL = %1</source>
+        <translation>saveDbConfiguration - ERROR SQL = %1</translation>
+    </message>
+    <message>
+        <source>saveDbConfiguration - ERROR : %1</source>
+        <translation>saveDbConfiguration - ERROR : %1</translation>
+    </message>
+    <message>
+        <source>Save configuration %1 failed</source>
+        <translation>Save configuration %1 failed</translation>
+    </message>
+    <message>
+        <source>DEBUG OnFileWatcherEvent call #%1 pEvent=%2</source>
+        <translation>DEBUG OnFileWatcherEvent call #%1 pEvent=%2</translation>
+    </message>
+    <message>
+        <source>loadedModules-focus</source>
+        <translation>loadedModules-focus</translation>
+    </message>
+    <message>
+        <source>loadedModules-guider</source>
+        <translation>loadedModules-guider</translation>
+    </message>
+    <message>
+        <source>loadedModules-inspector</source>
+        <translation>loadedModules-inspector</translation>
+    </message>
+    <message>
+        <source>loadedModules-navigator</source>
+        <translation>loadedModules-navigator</translation>
+    </message>
+    <message>
+        <source>loadedModules-planner</source>
+        <translation>loadedModules-planner</translation>
+    </message>
+    <message>
+        <source>loadedModules-polar</source>
+        <translation>loadedModules-polar</translation>
+    </message>
+    <message>
+        <source>loadedModules-sequencer</source>
+        <translation>loadedModules-sequencer</translation>
+    </message>
+    <message>
+        <source>profiles-Focus</source>
+        <translation>profiles-Focus</translation>
+    </message>
+    <message>
+        <source>profiles-GlobalDatastore</source>
+        <translation>profiles-GlobalDatastore</translation>
+    </message>
+    <message>
+        <source>profiles-Guider</source>
+        <translation>profiles-Guider</translation>
+    </message>
+    <message>
+        <source>profiles-Inspector</source>
+        <translation>profiles-Inspector</translation>
+    </message>
+    <message>
+        <source>profiles-Navigator</source>
+        <translation>profiles-Navigator</translation>
+    </message>
+    <message>
+        <source>profiles-Parkmanager</source>
+        <translation>profiles-Parkmanager</translation>
+    </message>
+    <message>
+        <source>profiles-Planner</source>
+        <translation>profiles-Planner</translation>
+    </message>
+    <message>
+        <source>profiles-Polar</source>
+        <translation>profiles-Polar</translation>
+    </message>
+    <message>
+        <source>profiles-Sequencer</source>
+        <translation>profiles-Sequencer</translation>
+    </message>
+    <message>
+        <source>libostcollimator Cannot load library /home/gilles/claude/OST/OST/buildqt6/libostcollimator: (/home/gilles/claude/OST/OST/buildqt6/libostcollimator.so: undefined symbol: _ZThn256_N10IndiModule9newDeviceEN4INDI10BaseDeviceE)</source>
+        <translation>libostcollimator Cannot load library /home/gilles/claude/OST/OST/buildqt6/libostcollimator: (/home/gilles/claude/OST/OST/buildqt6/libostcollimator.so: undefined symbol: _ZThn256_N10IndiModule9newDeviceEN4INDI10BaseDeviceE)</translation>
+    </message>
+    <message>
+        <source>family-focus</source>
+        <translation>family-focus</translation>
+    </message>
+    <message>
+        <source>family-guiding</source>
+        <translation>family-guiding</translation>
+    </message>
+    <message>
+        <source>loadedModules-dummy</source>
+        <translation>loadedModules-dummy</translation>
+    </message>
+    <message>
+        <source>loadedModules-indipanel</source>
+        <translation>loadedModules-indipanel</translation>
+    </message>
+    <message>
+        <source>Requesting focus profile %1 on %2</source>
+        <translation>Requesting focus profile %1 on %2</translation>
+    </message>
+    <message>
+        <source>Sequence error</source>
+        <translation>Sequence error</translation>
+    </message>
+    <message>
+        <source>Sequence error - cause: %1</source>
+        <translation>Sequence error - cause: %1</translation>
+    </message>
+    <message>
+        <source>Slave event from %1: ev=%2 prp=%3 elt=%4 data=%5</source>
+        <translation>Slave event from %1: ev=%2 prp=%3 elt=%4 data=%5</translation>
+    </message>
+    <message>
+        <source>Focus signals: o=%1 s=%2 sd=%3 Focusing=%4</source>
+        <translation>Focus signals: o=%1 s=%2 sd=%3 Focusing=%4</translation>
+    </message>
+    <message>
+        <source>Focus signals after : o=%1 s=%2 sd=%3 Focusing=%4</source>
+        <translation>Focus signals after : o=%1 s=%2 sd=%3 Focusing=%4</translation>
+    </message>
+    <message>
+        <source>Starting guider on %1</source>
+        <translation>Starting guider on %1</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=17.7, DEC=-32.8, Pier=East</source>
+        <translation>Mount position: RA=17.7, DEC=-32.8, Pier=East</translation>
+    </message>
+    <message>
+        <source>Guider resumed after focus</source>
+        <translation>Guider resumed after focus</translation>
+    </message>
+    <message>
+        <source>Waiting %1 s for guiding to settle</source>
+        <translation>Waiting %1 s for guiding to settle</translation>
+    </message>
+    <message>
+        <source>Guiding settle complete</source>
+        <translation>Guiding settle complete</translation>
+    </message>
+    <message>
+        <source>Guider stopped unexpectedly</source>
+        <translation>Guider stopped unexpectedly</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.9, DEC=55.8, Pier=East</source>
+        <translation>Mount position: RA=12.9, DEC=55.8, Pier=East</translation>
+    </message>
+    <message>
+        <source>Suspending guiding on %1</source>
+        <translation>Suspending guiding on %1</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.9, DEC=55.7, Pier=East</source>
+        <translation>Mount position: RA=12.9, DEC=55.7, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.9, DEC=55.6, Pier=East</source>
+        <translation>Mount position: RA=12.9, DEC=55.6, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.9, DEC=55.4, Pier=East</source>
+        <translation>Mount position: RA=12.9, DEC=55.4, Pier=East</translation>
+    </message>
+    <message>
+        <source>loadedFamilies-focus</source>
+        <translation>loadedFamilies-focus</translation>
+    </message>
+    <message>
+        <source>loadedFamilies-guiding</source>
+        <translation>loadedFamilies-guiding</translation>
+    </message>
+    <message>
+        <source>loadedModules-blindpec</source>
+        <translation>loadedModules-blindpec</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.9, DEC=55.3, Pier=East</source>
+        <translation>Mount position: RA=12.9, DEC=55.3, Pier=East</translation>
+    </message>
+    <message>
+        <source>Calibration quality poor: background drift is %1x the pulse signal (limit %2) - check the mount&apos;s polar alignment</source>
+        <translation>Calibration quality poor: background drift is %1x the pulse signal (limit %2) - check the mount&apos;s polar alignment</translation>
+    </message>
+    <message>
+        <source>Retrying calibration (%1/%2)</source>
+        <translation>Retrying calibration (%1/%2)</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=13.9, DEC=54.3, Pier=West</source>
+        <translation>Mount position: RA=13.9, DEC=54.3, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.9, DEC=54.6, Pier=East</source>
+        <translation>Mount position: RA=12.9, DEC=54.6, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.9, DEC=54.4, Pier=East</source>
+        <translation>Mount position: RA=12.9, DEC=54.4, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.9, DEC=54.3, Pier=East</source>
+        <translation>Mount position: RA=12.9, DEC=54.3, Pier=East</translation>
+    </message>
+    <message>
+        <source>HFR %1 exceeds threshold %2 — refocusing</source>
+        <translation>HFR %1 exceeds threshold %2 — refocusing</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.9, DEC=54.2, Pier=East</source>
+        <translation>Mount position: RA=12.9, DEC=54.2, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.9, DEC=54.1, Pier=East</source>
+        <translation>Mount position: RA=12.9, DEC=54.1, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.9, DEC=54.0, Pier=East</source>
+        <translation>Mount position: RA=12.9, DEC=54.0, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.9, DEC=53.9, Pier=East</source>
+        <translation>Mount position: RA=12.9, DEC=53.9, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.9, DEC=53.8, Pier=East</source>
+        <translation>Mount position: RA=12.9, DEC=53.8, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.9, DEC=53.7, Pier=East</source>
+        <translation>Mount position: RA=12.9, DEC=53.7, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.9, DEC=53.6, Pier=East</source>
+        <translation>Mount position: RA=12.9, DEC=53.6, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=11.1, DEC=61.6, Pier=East</source>
+        <translation>Mount position: RA=11.1, DEC=61.6, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=11.1, DEC=61.5, Pier=East</source>
+        <translation>Mount position: RA=11.1, DEC=61.5, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=11.1, DEC=61.4, Pier=East</source>
+        <translation>Mount position: RA=11.1, DEC=61.4, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=11.1, DEC=61.3, Pier=East</source>
+        <translation>Mount position: RA=11.1, DEC=61.3, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.3, DEC=56.9, Pier=East</source>
+        <translation>Mount position: RA=12.3, DEC=56.9, Pier=East</translation>
+    </message>
+    <message>
+        <source>Guider stopped — resetting calibration and restarting</source>
+        <translation>Guider stopped — resetting calibration and restarting</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.3, DEC=56.8, Pier=East</source>
+        <translation>Mount position: RA=12.3, DEC=56.8, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.3, DEC=56.6, Pier=East</source>
+        <translation>Mount position: RA=12.3, DEC=56.6, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.3, DEC=56.5, Pier=East</source>
+        <translation>Mount position: RA=12.3, DEC=56.5, Pier=East</translation>
+    </message>
+    <message>
+        <source>Session reached max rows limit (%1), archiving and starting new session</source>
+        <translation>Session reached max rows limit (%1), archiving and starting new session</translation>
+    </message>
+    <message>
+        <source>loadedModules-monitor</source>
+        <translation>loadedModules-monitor</translation>
+    </message>
+    <message>
+        <source>profiles-Monitor</source>
+        <translation>profiles-Monitor</translation>
+    </message>
+    <message>
+        <source>Focus module reported done, but sequencer isn&apos;t in Focusing (ignored)</source>
+        <translation>Focus module reported done, but sequencer isn&apos;t in Focusing (ignored)</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.9, DEC=60.3, Pier=East</source>
+        <translation>Mount position: RA=12.9, DEC=60.3, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.8, DEC=56.5, Pier=West</source>
+        <translation>Mount position: RA=12.8, DEC=56.5, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=12.7, DEC=56.5, Pier=West</source>
+        <translation>Mount position: RA=12.7, DEC=56.5, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=11.1, DEC=62.5, Pier=East</source>
+        <translation>Mount position: RA=11.1, DEC=62.5, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=11.2, DEC=62.9, Pier=East</source>
+        <translation>Mount position: RA=11.2, DEC=62.9, Pier=East</translation>
+    </message>
+    <message>
+        <source>indiserver started (PID 1529995)</source>
+        <translation>indiserver started (PID 1529995)</translation>
+    </message>
+    <message>
+        <source>indiserver FIFO ready</source>
+        <translation>indiserver FIFO ready</translation>
+    </message>
+    <message>
+        <source>Sent start command for driver: indi_simulator_ccd</source>
+        <translation>Sent start command for driver: indi_simulator_ccd</translation>
+    </message>
+    <message>
+        <source>Sent start command for driver: indi_simulator_dome</source>
+        <translation>Sent start command for driver: indi_simulator_dome</translation>
+    </message>
+    <message>
+        <source>Sent start command for driver: indi_simulator_wheel</source>
+        <translation>Sent start command for driver: indi_simulator_wheel</translation>
+    </message>
+    <message>
+        <source>Sent start command for driver: indi_simulator_focus</source>
+        <translation>Sent start command for driver: indi_simulator_focus</translation>
+    </message>
+    <message>
+        <source>Sent start command for driver: indi_simulator_gps</source>
+        <translation>Sent start command for driver: indi_simulator_gps</translation>
+    </message>
+    <message>
+        <source>Sent start command for driver: indi_simulator_guide</source>
+        <translation>Sent start command for driver: indi_simulator_guide</translation>
+    </message>
+    <message>
+        <source>Sent start command for driver: indi_simulator_telescope</source>
+        <translation>Sent start command for driver: indi_simulator_telescope</translation>
+    </message>
+    <message>
+        <source>Sent start command for driver: indi_simulator_weather</source>
+        <translation>Sent start command for driver: indi_simulator_weather</translation>
+    </message>
+    <message>
+        <source>[indiserver] 2026-09-30T21:20:20: startup: /usr/bin/indiserver -f /tmp/ostserverIndiFIFO -m 1000</source>
+        <translation>[indiserver] 2026-09-30T21:20:20: startup: /usr/bin/indiserver -f /tmp/ostserverIndiFIFO -m 1000</translation>
+    </message>
+    <message>
+        <source>[indiserver] 2026-09-30T21:20:20: Driver indi_simulator_telescope: Primary Axis: TrackRate 1, trackingRateDegSec 15.041067 arcsec</source>
+        <translation>[indiserver] 2026-09-30T21:20:20: Driver indi_simulator_telescope: Primary Axis: TrackRate 1, trackingRateDegSec 15.041067 arcsec</translation>
+    </message>
+    <message>
+        <source>[indiserver] 2026-09-30T21:20:20: Driver indi_simulator_telescope: Secondary Axis: TrackRate 0, trackingRateDegSec 0.000000 arcsec</source>
+        <translation>[indiserver] 2026-09-30T21:20:20: Driver indi_simulator_telescope: Secondary Axis: TrackRate 0, trackingRateDegSec 0.000000 arcsec</translation>
+    </message>
+    <message>
+        <source>[indiserver] 2026-09-30T21:20:20: Driver indi_simulator_telescope: EnumeratePlugins - found plugin SVD Math Plugin</source>
+        <translation>[indiserver] 2026-09-30T21:20:20: Driver indi_simulator_telescope: EnumeratePlugins - found plugin SVD Math Plugin</translation>
+    </message>
+    <message>
+        <source>[indiserver] 2026-09-30T21:20:20: Driver indi_simulator_telescope: EnumeratePlugins - found plugin Nearest Math Plugin</source>
+        <translation>[indiserver] 2026-09-30T21:20:20: Driver indi_simulator_telescope: EnumeratePlugins - found plugin Nearest Math Plugin</translation>
+    </message>
+    <message>
+        <source>[indiserver] 2026-09-30T21:20:20: Driver indi_simulator_telescope: EnumeratePlugins - found plugin SPK Math Plugin</source>
+        <translation>[indiserver] 2026-09-30T21:20:20: Driver indi_simulator_telescope: EnumeratePlugins - found plugin SPK Math Plugin</translation>
+    </message>
+    <message>
+        <source>Starting goto with centering: max 5 iterations, tolerance 300.0&quot;</source>
+        <translation>Starting goto with centering: max 5 iterations, tolerance 300.0&quot;</translation>
+    </message>
+    <message>
+        <source>Starting goto with centering: max 5 iterations, tolerance 95.0&quot;</source>
+        <translation>Starting goto with centering: max 5 iterations, tolerance 95.0&quot;</translation>
+    </message>
+    <message>
+        <source>Starting goto with centering: max 5 iterations, tolerance 60.0&quot;</source>
+        <translation>Starting goto with centering: max 5 iterations, tolerance 60.0&quot;</translation>
+    </message>
+    <message>
+        <source>Reusing orphaned indiserver (PID 1529995)</source>
+        <translation>Reusing orphaned indiserver (PID 1529995)</translation>
+    </message>
+    <message>
+        <source>getGrants - Invalid credentials - %1-%2</source>
+        <translation>getGrants - Invalid credentials - %1-%2</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=8.7, DEC=19.6, Pier=East</source>
+        <translation>Mount position: RA=8.7, DEC=19.6, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=8.7, DEC=19.5, Pier=East</source>
+        <translation>Mount position: RA=8.7, DEC=19.5, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=8.7, DEC=19.3, Pier=East</source>
+        <translation>Mount position: RA=8.7, DEC=19.3, Pier=East</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=8.7, DEC=19.2, Pier=East</source>
+        <translation>Mount position: RA=8.7, DEC=19.2, Pier=East</translation>
+    </message>
+    <message>
+        <source>Orientation</source>
+        <translation>Orientation</translation>
+    </message>
+    <message>
+        <source>SMInit</source>
+        <translation>SMInit</translation>
+    </message>
+    <message>
+        <source>%1 - %2 not connected, trying to connect</source>
+        <translation>%1 - %2 not connected, trying to connect</translation>
+    </message>
+    <message>
+        <source>Observer position: lat=%1 lon=%2</source>
+        <translation>Observer position: lat=%1 lon=%2</translation>
+    </message>
+    <message>
+        <source>SMRequestFrameReset</source>
+        <translation>SMRequestFrameReset</translation>
+    </message>
+    <message>
+        <source>FrameResetDone</source>
+        <translation>FrameResetDone</translation>
+    </message>
+    <message>
+        <source>SMRequestExposure</source>
+        <translation>SMRequestExposure</translation>
+    </message>
+    <message>
+        <source>SMFindStars</source>
+        <translation>SMFindStars</translation>
+    </message>
+    <message>
+        <source>SEP finished</source>
+        <translation>SEP finished</translation>
+    </message>
+    <message>
+        <source>SMCompute</source>
+        <translation>SMCompute</translation>
+    </message>
+    <message>
+        <source>ra0=%1</source>
+        <translation>ra0=%1</translation>
+    </message>
+    <message>
+        <source>de0=%1</source>
+        <translation>de0=%1</translation>
+    </message>
+    <message>
+        <source>SMRequestMove</source>
+        <translation>SMRequestMove</translation>
+    </message>
+    <message>
+        <source>SMRequestMove oldRA=%1 newRA=%2</source>
+        <translation>SMRequestMove oldRA=%1 newRA=%2</translation>
+    </message>
+    <message>
+        <source>ra1=%1</source>
+        <translation>ra1=%1</translation>
+    </message>
+    <message>
+        <source>de1=%1</source>
+        <translation>de1=%1</translation>
+    </message>
+    <message>
+        <source>ra2=%1</source>
+        <translation>ra2=%1</translation>
+    </message>
+    <message>
+        <source>de2=%1</source>
+        <translation>de2=%1</translation>
+    </message>
+    <message>
+        <source>SMComputeFinal</source>
+        <translation>SMComputeFinal</translation>
+    </message>
+    <message>
+        <source>azAlt0: az=%1 alt=%2</source>
+        <translation>azAlt0: az=%1 alt=%2</translation>
+    </message>
+    <message>
+        <source>azAlt1: az=%1 alt=%2</source>
+        <translation>azAlt1: az=%1 alt=%2</translation>
+    </message>
+    <message>
+        <source>azAlt2: az=%1 alt=%2</source>
+        <translation>azAlt2: az=%1 alt=%2</translation>
+    </message>
+    <message>
+        <source>axis azAlt: az=%1 alt=%2</source>
+        <translation>axis azAlt: az=%1 alt=%2</translation>
+    </message>
+    <message>
+        <source>Correction reference: refAz=%1 refAlt=%2</source>
+        <translation>Correction reference: refAz=%1 refAlt=%2</translation>
+    </message>
+    <message>
+        <source>SMCorrCompute</source>
+        <translation>SMCorrCompute</translation>
+    </message>
+    <message>
+        <source>Correction loop: dAz=%1 dAlt=%2 remainAz=%3 remainAlt=%4</source>
+        <translation>Correction loop: dAz=%1 dAlt=%2 remainAz=%3 remainAlt=%4</translation>
+    </message>
+    <message>
+        <source>loadedModules-parkmanager</source>
+        <translation>loadedModules-parkmanager</translation>
+    </message>
+    <message>
+        <source>Solver failed to find a solution</source>
+        <translation>Solver failed to find a solution</translation>
+    </message>
+    <message>
+        <source>Cannot start driver indi_simulator_ccd: FIFO not available (No such device or address)</source>
+        <translation>Cannot start driver indi_simulator_ccd: FIFO not available (No such device or address)</translation>
+    </message>
+    <message>
+        <source>Cannot start driver indi_simulator_dome: FIFO not available (No such device or address)</source>
+        <translation>Cannot start driver indi_simulator_dome: FIFO not available (No such device or address)</translation>
+    </message>
+    <message>
+        <source>Cannot start driver indi_simulator_wheel: FIFO not available (No such device or address)</source>
+        <translation>Cannot start driver indi_simulator_wheel: FIFO not available (No such device or address)</translation>
+    </message>
+    <message>
+        <source>Cannot start driver indi_simulator_focus: FIFO not available (No such device or address)</source>
+        <translation>Cannot start driver indi_simulator_focus: FIFO not available (No such device or address)</translation>
+    </message>
+    <message>
+        <source>Cannot start driver indi_simulator_gps: FIFO not available (No such device or address)</source>
+        <translation>Cannot start driver indi_simulator_gps: FIFO not available (No such device or address)</translation>
+    </message>
+    <message>
+        <source>Cannot start driver indi_simulator_guide: FIFO not available (No such device or address)</source>
+        <translation>Cannot start driver indi_simulator_guide: FIFO not available (No such device or address)</translation>
+    </message>
+    <message>
+        <source>Cannot start driver indi_simulator_telescope: FIFO not available (No such device or address)</source>
+        <translation>Cannot start driver indi_simulator_telescope: FIFO not available (No such device or address)</translation>
+    </message>
+    <message>
+        <source>Cannot start driver indi_simulator_weather: FIFO not available (No such device or address)</source>
+        <translation>Cannot start driver indi_simulator_weather: FIFO not available (No such device or address)</translation>
+    </message>
+    <message>
+        <source>Dome device configured but DOME_SHUTTER not available yet, skipping</source>
+        <translation>Dome device configured but DOME_SHUTTER not available yet, skipping</translation>
+    </message>
+    <message>
+        <source>Dome device configured but DOME_PARK not available yet, skipping</source>
+        <translation>Dome device configured but DOME_PARK not available yet, skipping</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=7.2, DEC=90.0, Pier=East</source>
+        <translation>Mount position: RA=7.2, DEC=90.0, Pier=East</translation>
+    </message>
+    <message>
+        <source>Calibration failed: still poor after %1 retries - Abort. Fix the mount&apos;s polar alignment.</source>
+        <translation>Calibration failed: still poor after %1 retries - Abort. Fix the mount&apos;s polar alignment.</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=14.3, DEC=19.0, Pier=West</source>
+        <translation>Mount position: RA=14.3, DEC=19.0, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=14.2, DEC=22.4, Pier=West</source>
+        <translation>Mount position: RA=14.2, DEC=22.4, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=14.2, DEC=22.3, Pier=West</source>
+        <translation>Mount position: RA=14.2, DEC=22.3, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=14.2, DEC=22.2, Pier=West</source>
+        <translation>Mount position: RA=14.2, DEC=22.2, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=14.2, DEC=22.1, Pier=West</source>
+        <translation>Mount position: RA=14.2, DEC=22.1, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=14.2, DEC=22.0, Pier=West</source>
+        <translation>Mount position: RA=14.2, DEC=22.0, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=14.2, DEC=21.9, Pier=West</source>
+        <translation>Mount position: RA=14.2, DEC=21.9, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=14.2, DEC=21.8, Pier=West</source>
+        <translation>Mount position: RA=14.2, DEC=21.8, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount position: RA=14.2, DEC=21.7, Pier=West</source>
+        <translation>Mount position: RA=14.2, DEC=21.7, Pier=West</translation>
+    </message>
+    <message>
+        <source>Mount device configured but EQUATORIAL_EOD_COORD not available yet, skipping</source>
+        <translation>Mount device configured but EQUATORIAL_EOD_COORD not available yet, skipping</translation>
+    </message>
+    <message>
+        <source>Mount device configured but TELESCOPE_TRACK_STATE not available yet, skipping</source>
+        <translation>Mount device configured but TELESCOPE_TRACK_STATE not available yet, skipping</translation>
+    </message>
+    <message>
+        <source>Mount device configured but TELESCOPE_PARK not available yet, skipping</source>
+        <translation>Mount device configured but TELESCOPE_PARK not available yet, skipping</translation>
+    </message>
+    <message>
+        <source>Detection locality (frame size / N, higher = more local)</source>
+        <translation>Detection locality (frame size / N, higher = more local)</translation>
+    </message>
+    <message>
+        <source>Max candidate size (% of frame)</source>
+        <translation>Max candidate size (% of frame)</translation>
+    </message>
+    <message>
+        <source>Min. std dev to analyze (ADU)</source>
+        <translation>Min. std dev to analyze (ADU)</translation>
+    </message>
+    <message>
+        <source>Min. candidate radius (pixels)</source>
+        <translation>Min. candidate radius (pixels)</translation>
+    </message>
+    <message>
+        <source>Detection sensitivity margin (0-255, lower = more sensitive)</source>
+        <translation>Detection sensitivity margin (0-255, lower = more sensitive)</translation>
+    </message>
+    <message>
+        <source>minimum flux a secondary peak inside one detection must have (as a percentage of the total) before SEP splits it into a separate star - native default is 0.5%, so a single defocused/donut-shaped star (uneven ring, secondary shadow) is very easily counted as several. Raise this to stop that</source>
+        <translation>minimum flux a secondary peak inside one detection must have (as a percentage of the total) before SEP splits it into a separate star - native default is 0.5%, so a single defocused/donut-shaped star (uneven ring, secondary shadow) is very easily counted as several. Raise this to stop that</translation>
+    </message>
+    <message>
+        <source>Deblend contrast (%)</source>
+        <translation>Deblend contrast (%)</translation>
+    </message>
+    <message>
+        <source>minimum pixel area for a star detection, smaller ones are ignored - native default is 10, small enough that a single noise speck can pass</source>
+        <translation>minimum pixel area for a star detection, smaller ones are ignored - native default is 10, small enough that a single noise speck can pass</translation>
+    </message>
+    <message>
+        <source>Min. detection area (px)</source>
+        <translation>Min. detection area (px)</translation>
+    </message>
+    <message>
+        <source>rejects detections smaller than this radius - native default is 3.5px</source>
+        <translation>rejects detections smaller than this radius - native default is 3.5px</translation>
+    </message>
+    <message>
+        <source>Min. star radius (px)</source>
+        <translation>Min. star radius (px)</translation>
+    </message>
+    <message>
+        <source>star extraction (StellarSolver/SEP) detection threshold, in multiples of the background noise - native default is 2, very permissive (lots of noise false positives on a real sensor). Raise if the focus V-curve picks up far more &apos;stars&apos; than are actually in the frame</source>
+        <translation>star extraction (StellarSolver/SEP) detection threshold, in multiples of the background noise - native default is 2, very permissive (lots of noise false positives on a real sensor). Raise if the focus V-curve picks up far more &apos;stars&apos; than are actually in the frame</translation>
+    </message>
+    <message>
+        <source>Detection threshold (sigma)</source>
+        <translation>Detection threshold (sigma)</translation>
+    </message>
+</context>
 </TS>
 

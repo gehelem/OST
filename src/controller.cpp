@@ -207,6 +207,7 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     QVariantMap r;
     dbmanager->getDbProfiles(r);
     updateControllerData("profiles", r);
+    updateProfilesLovs(r);
 
     if (mSystemWatchInterval > 0)
     {
@@ -298,16 +299,43 @@ bool Controller::loadModule(QString lib, QString label, QString profile)
 
     mod->onAfterInit();
     wshandler->onModuleEvent(OST::EvType::aa, QVariant(), nullptr, nullptr, nullptr, mod);
-    // This is redundant with global data, these lovs can (must? => yes) be managed at frontend level
-    //QString lovname = "loadedModules-" + lowerlib;
-    //if (!getControllerLovs().contains(lovname))
-    //{
-    //    OST::LovString* ls = new OST::LovString(lovname);
-    //    createControllerLov(lovname, ls);
-    //}
-    //OST::LovString* ls = static_cast<OST::LovString*>(getControllerLovs()[lovname]);
-    //if (!ls->contains(lovname)) ls->lovAdd(name, name);
 
+    // Keyed by module TYPE (the library name, e.g. libostfocus -> "focus"),
+    // NOT infos.template: a template is only a display hint ("use this
+    // rendering"), entirely optional and orthogonal to what a module
+    // actually is - two different libraries can share one generic template
+    // (e.g. anything using "default"), and grouping "loaded modules" by
+    // template would wrongly merge them. Gilles, 2026-09-26, catching this
+    // exact conflation: "on est tombe dans un piege qui casse tout ...
+    // c'est sur cette clef [le type] qu'on doit enregistrer les profils ...
+    // et pas du template !!!". lowerlib is already the module type here.
+    QString lovname = "loadedModules-" + lowerlib;
+    if (!mControllerLovs.contains(lovname))
+    {
+        OST::LovString* ls = new OST::LovString(lovname);
+        createControllerLov(lovname, ls);
+    }
+    OST::LovString* ls = static_cast<OST::LovString*>(mControllerLovs[lovname]);
+    if (!ls->contains(name)) ls->lovAdd(name, name);
+
+    // One "family-<name>" lov per family the module declared for itself at
+    // init (Basemodule::declareFamily(), called from e.g. IndiModule's
+    // defineMeAsGuider()) - lets another module's slot pick any loaded
+    // module with a given capability, not just a given type (Gilles,
+    // 2026-09-26: Sequencer should be able to use a BlindPEC instance as
+    // its guiding slave exactly like a Guider one, since both declare
+    // family "guiding").
+    for (const QString &family : mod->getFamilies())
+    {
+        QString flovname = "loadedFamilies-" + family;
+        if (!mControllerLovs.contains(flovname))
+        {
+            OST::LovString* fls = new OST::LovString(flovname);
+            createControllerLov(flovname, fls);
+        }
+        OST::LovString* fls = static_cast<OST::LovString*>(mControllerLovs[flovname]);
+        if (!fls->contains(name)) fls->lovAdd(name, name);
+    }
 
     return true;
 
@@ -433,6 +461,33 @@ bool Controller::deleteControllerLov(const QString &lovName)
     return true;
 }
 
+// Builds/refreshes one "profiles-<Type>" controller lov per key of `r`
+// (the same QVariantMap already used for controllerdata.profiles, see both
+// call sites) — <Type> keeps the exact case DBManager::getDbProfiles()
+// returns (the module class name), matching every real listOfValues
+// reference (e.g. sequencer.json's "profiles-Focus") and Rooster's own
+// rebuildGlobalLovs(). Previously never implemented server-side at all —
+// controllerdata.profiles carried the data, but no client-facing lov
+// exposed it generically.
+void Controller::updateProfilesLovs(const QVariantMap &r)
+{
+    for (QVariantMap::const_iterator iter = r.begin(); iter != r.end(); ++iter)
+    {
+        QString lovname = "profiles-" + iter.key();
+        if (!mControllerLovs.contains(lovname))
+        {
+            OST::LovString* ls = new OST::LovString(lovname);
+            createControllerLov(lovname, ls);
+        }
+        OST::LovString* ls = static_cast<OST::LovString*>(mControllerLovs[lovname]);
+        ls->lovClear();
+        for (const QVariant &name : iter.value().toList())
+        {
+            ls->lovAdd(name.toString(), name.toString());
+        }
+    }
+}
+
 void Controller::onControllerLovChanged()
 {
     OST::LovBase* lov = qobject_cast<OST::LovBase*>(sender());
@@ -451,6 +506,7 @@ void Controller::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase*
         QVariantMap r;
         dbmanager->getDbProfiles(r);
         updateControllerData("profiles", r);
+        updateProfilesLovs(r);
     }
 
     /* dispatch event to other modules */
@@ -576,10 +632,23 @@ void Controller::onExternalEvent(OST::ExtEvent event)
             {
                 if (m->getModuleName() == n)
                 {
-                    // This is redundant with global data, these lovs can (must? => yes) be managed at frontend level
-                    //QString lovname = "loadedModules-" + m->getClassName().toLower();
-                    //OST::LovString* ls = static_cast<OST::LovString*>(getControllerLovs()[lovname]);
-                    //ls->lovDel(n);
+                    // Module TYPE (library name), not infos.template - see
+                    // the matching note in loadModule() above.
+                    QString lovname = "loadedModules-" + m->getClassName().toLower();
+                    if (mControllerLovs.contains(lovname))
+                    {
+                        OST::LovString* ls = static_cast<OST::LovString*>(mControllerLovs[lovname]);
+                        if (ls->contains(n)) ls->lovDel(n);
+                    }
+                    for (const QString &family : m->getFamilies())
+                    {
+                        QString flovname = "loadedFamilies-" + family;
+                        if (mControllerLovs.contains(flovname))
+                        {
+                            OST::LovString* fls = static_cast<OST::LovString*>(mControllerLovs[flovname]);
+                            if (fls->contains(n)) fls->lovDel(n);
+                        }
+                    }
                     m->killMe();
                 };
             }
@@ -608,13 +677,19 @@ void Controller::onExternalEvent(OST::ExtEvent event)
                 logError("Controller::onExternalEvent - folder %1 is outside the webroot", {event.data["folder"].toString()});
                 return;
             }
-            for ( const auto &d : mFileWatcher.directories() )
+            // The webroot itself stays watched permanently (folder tree
+            // visibility is global, see OnFileWatcherEvent) - only the
+            // previously selected folder's own watch, if different, is
+            // swapped out for the newly selected one.
+            if (mSelectedFolder != canonicalWebroot && mFileWatcher.directories().contains(mSelectedFolder))
             {
-                mFileWatcher.removePath(d);
+                mFileWatcher.removePath(mSelectedFolder);
             }
-            mSelectedFolder = canonicalRequested;
-            mFileWatcher.addPath(mSelectedFolder);
-            OnFileWatcherEvent(QString());
+            if (canonicalRequested != canonicalWebroot && !mFileWatcher.directories().contains(canonicalRequested))
+            {
+                mFileWatcher.addPath(canonicalRequested);
+            }
+            selectFolder(canonicalRequested);
             return;
         }
         case OST::ExtEvType::YA:
@@ -1125,14 +1200,39 @@ void Controller::queryActiveIndiDrivers()
     mLogger->info(QString::number(_activeIndiDrivers.size()) + " active INDI driver(s) recovered");
     updateControllerData("indiactivedrivers", activeIndiDriversToVariant());
 }
+void Controller::selectFolder(const QString &folder)
+{
+    // A folder selection is not a filesystem mutation: nothing was added or
+    // removed on disk, only what the client is watching changed. Rebuild the
+    // file list of the newly selected folder from scratch and replace it as a
+    // whole (one "files" uc), instead of routing it through OnFileWatcherEvent's
+    // diff logic, which would treat every file of the new folder as "added" and
+    // every file of the old one as "removed" (a flood of af/df events entirely
+    // redundant with the uc replacement that follows them). The folder tree
+    // itself (ad/dd, "folders") is unaffected by a selection change and is not
+    // rescanned/resent here.
+    mSelectedFolder = folder;
+    QStringList files;
+    QDirIterator itFiles(mSelectedFolder, QDir::Files);
+    while (itFiles.hasNext())
+    {
+        QString d = itFiles.next();
+        d.replace(_webroot, "");
+        files.append(d);
+    }
+    mFilesList = files;
+    mControllerData["files"] = mFilesList;
+    wshandler->onControllerEvent(OST::EvType::uc, "files", QVariant(mFilesList), nullptr);
+}
 void Controller::OnFileWatcherEvent(const QString &pEvent)
 {
-    QStringList files;
+    // Folder tree: always a full recursive rescan of the whole webroot,
+    // regardless of which watched path (webroot itself or the currently
+    // selected folder) raised the signal. Folder visibility is global by
+    // design: a client browsing one branch still has to learn about folders
+    // appearing or disappearing in another one, so this cannot be scoped to
+    // pEvent the way the files scan below is.
     QStringList folders;
-    QDir dir(_webroot);
-    QDirIterator it(_webroot, QDirIterator::Subdirectories);
-
-    //check existing folders
     QDirIterator itFolders(_webroot, QDirIterator::Subdirectories);
     while (itFolders.hasNext())
     {
@@ -1149,66 +1249,80 @@ void Controller::OnFileWatcherEvent(const QString &pEvent)
             }
         }
     }
-    //check existing files
-    QDirIterator itFiles(mSelectedFolder, QDirIterator::NoIteratorFlags);
-    while (itFiles.hasNext())
-    {
-        QString d = itFiles.next();
-        d.replace(_webroot, "");
-        if (!d.endsWith("/.") && !d.endsWith("/..") && !folders.contains(d))
-        {
-            files.append(d);
-        }
-    }
 
-    // compare to already known folders
+    // A single real filesystem change can raise more than one directoryChanged
+    // signal (the OS/Qt watcher is not deduplicated upstream). Track whether
+    // this pass actually found a difference and skip a broadcast when it
+    // didn't, instead of resending the same list on every spurious extra
+    // signal - folders and files are tracked separately so a files-only
+    // change doesn't also resend the (unchanged) folder list, and vice versa.
+    bool foldersChanged = false;
     for (const auto &i : folders)
     {
         if (!mFoldersList.contains(i) )
         {
-            wshandler->processFileEvent("folderadd", QStringList(i));
+            wshandler->processFileEvent("ad", i);
             mFoldersList.append(i);
-            //mFileWatcher.addPath(_webroot + i);
+            foldersChanged = true;
         }
     }
-    for (const auto &i : mFoldersList)
+    for (const auto &i : QStringList(mFoldersList))    // iterate a copy: mFoldersList is mutated below
     {
         if (!folders.contains(i) )
         {
-            wshandler->processFileEvent("folderdel", QStringList(i));
+            wshandler->processFileEvent("dd", i);
             mFoldersList.removeOne(i);
-            //mFileWatcher.removePath(_webroot + i);
+            foldersChanged = true;
         }
     }
+    if (foldersChanged)
+    {
+        mControllerData["folders"] = mFoldersList;
+        wshandler->onControllerEvent(OST::EvType::uc, "folders", QVariant(mFoldersList), nullptr);
+    }
 
-    // compare to already known files
+    // Files: only the selected folder's content is watched and broadcast. If
+    // the change that raised this signal isn't the selected folder itself
+    // (e.g. it's the permanent webroot watch catching a folder appearing
+    // elsewhere), there is nothing to do here.
+    if (pEvent != mSelectedFolder)
+    {
+        return;
+    }
+
+    QStringList files;
+    QDirIterator itFiles(mSelectedFolder, QDir::Files);
+    while (itFiles.hasNext())
+    {
+        QString d = itFiles.next();
+        d.replace(_webroot, "");
+        files.append(d);
+    }
+
+    bool filesChanged = false;
     for (const auto &i : files)
     {
         if (!mFilesList.contains(i) )
         {
-            wshandler->processFileEvent("fileadd", QStringList(i));
+            wshandler->processFileEvent("af", i);
             mFilesList.append(i);
+            filesChanged = true;
         }
     }
-    for (const auto &i : mFilesList)
+    for (const auto &i : QStringList(mFilesList))    // iterate a copy: mFilesList is mutated below
     {
         if (!files.contains(i) )
         {
-            wshandler->processFileEvent("filedel", QStringList(i));
+            wshandler->processFileEvent("df", i);
             mFilesList.removeOne(i);
+            filesChanged = true;
         }
     }
-    mControllerData["files"] = mFilesList;
-    mControllerData["folders"] = mFoldersList;
-
-    wshandler->onControllerEvent(OST::EvType::uc, "files", QVariant(mFilesList), nullptr);
-    wshandler->onControllerEvent(OST::EvType::uc, "folders", QVariant(mFoldersList), nullptr);
-    QVariantMap r;
-    dbmanager->getDbProfiles(r);
-    wshandler->onControllerEvent(OST::EvType::uc, "profiles", r, nullptr);
-    updateControllerData("profiles", r);
-
-
+    if (filesChanged)
+    {
+        mControllerData["files"] = mFilesList;
+        wshandler->onControllerEvent(OST::EvType::uc, "files", QVariant(mFilesList), nullptr);
+    }
 }
 void Controller::OnFileChangeEvent(const QString &pEvent)
 {

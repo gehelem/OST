@@ -1,12 +1,12 @@
 ---
 title: Grundsätze der Client-Architektur
-weight: 50
+weight: 10
 description: "Wie ein OST-Client strukturiert sein sollte: ein einziger Datastore, Schreibzugriffe nur über WS"
 ---
 
 Diese Seite beschreibt **wie ein Client strukturiert sein sollte**, nicht das
 Format der ausgetauschten Nachrichten (siehe [Datenmodell]({{% relref "structure.de.md" %}})
-und die vorherigen Seiten dafür).
+und die folgenden Seiten dafür).
 
 ## Grundsatz: ein einziger Datastore hält die Wahrheit
 
@@ -33,6 +33,20 @@ Nachricht an den Server aus (`SV`/`SA` — siehe
 Datastore **ändert sich erst als Reaktion darauf**, sobald der Server mit dem
 bestätigten Update antwortet. Der Client nimmt das Ergebnis niemals vorweg.
 {{% /notice %}}
+
+## Grundsatz: keine Internet-Abhängigkeit
+
+Ein OST-Server läuft häufig in einem isolierten lokalen Netzwerk — ein entlegener Observatoriumsstandort ohne Weg zum öffentlichen Internet ist ein normales Einsatzszenario, kein Randfall. Ein Client muss dort korrekt funktionieren: **jede benötigte Ressource muss mit dem Client selbst ausgeliefert werden**, nicht zur Laufzeit von einem CDN oder einem anderen externen Dienst geladen werden.
+
+Das betrifft direkt das Rendering der Icons: [`preicon1`/`preicon2`/`posticon1`/`posticon2`/`preicon`/`posticon`]({{% relref "structure.de.md" %}}) liefern einen Google-Fonts-Icon-*Namen* (Material Icons), keine URL — ein Client muss die Icon-Schrift/Glyphen lokal mitliefern (vendored, selbst gehostet oder beim Build gebündelt), statt das CDN-Stylesheet von Google zu laden, das in dem Moment stillschweigend versagt, in dem keine Route ins öffentliche Internet mehr besteht.
+
+Dasselbe gilt für alles andere, was ein Client versucht sein könnte, von einem CDN zu laden: ein JS-Framework, eine Diagramm-Bibliothek, eine Web-Schriftart für die UI selbst. Wenn der Client es zum Laufen braucht, wird es mit ausgeliefert.
+
+## Starke Empfehlung: mindestens ein dunkles und ein helles Theme unterstützen
+
+OST-Clients werden häufig am Okular oder neben einem Teleskop genutzt, nachts — eine UI mit voller Helligkeit und weißem Hintergrund ist dort nicht nur ein stilistischer Missgriff, sie ruiniert aktiv die Nachtsicht des Anwenders. Ein Client sollte **mindestens sowohl ein dunkles als auch ein helles Theme** anbieten, statt eines der beiden fest zu verdrahten.
+
+Das ist nicht Teil des Wire-Protokolls — nichts davon wird serverseitig erzwungen oder ist dort überhaupt sichtbar —, aber es ist eine starke Empfehlung für alles, was für echte Astrofotografie-Sessions gedacht ist, nicht nur als Demo oder Schreibtisch-Testwerkzeug.
 
 ## Vollständiger Dump vs. teilweise Updates
 
@@ -97,6 +111,76 @@ stabilen Schlüssel pro Property gerendert. Dadurch wird die UI nicht
 betroffener Properties niemals gestört, egal wie schnell sich eine
 andere Property anderswo aktualisiert.
 {{% /notice %}}
+
+## Templates: Bildschirme pro Modultyp mit generischem Fallback
+
+Jede Modulinstanz kann `infos.template` angeben (siehe
+[Datenmodell]({{% relref "structure.de.md" %}})) — eine Zeichenkette,
+die ihren Typ benennt (`"focus"`, `"guider"`, `"sequencer"` ...). Das
+ist nur ein Hinweis, und er **darf fehlen**.
+
+{{% notice style="tip" title="Fehlendes Template = der Standardbildschirm" %}}
+Ein Client, der eigene Bildschirme pro Template unterstützt, sollte ein
+fehlendes (oder unbekanntes) `infos.template` genauso behandeln wie den
+wörtlichen Wert `"default"` — nicht als Fehler. Rooster macht das mit
+einer kleinen Registry, die einen kleingeschriebenen Template-Namen auf
+eine Bildschirm-Komponente abbildet, mit Rückfall auf den
+generischen/Standard-Bildschirm, wenn der Name fehlt oder nicht in der
+Registry steht:
+```
+template = infos.template?.toLowerCase() || "default"
+screen = registry[template] ?? registry["default"]
+```
+Dadurch bleibt ein Client auch gegenüber einem Modultyp voll
+funktionsfähig, den er noch nie gesehen hat — ein neues oder
+Drittanbieter-Modul wird immer über den generischen Bildschirm
+dargestellt —, während er trotzdem einen ausgefeilten, zweckgebundenen
+Bildschirm für die Modultypen bieten kann, in die es sich lohnt zu
+investieren.
+
+Der `"default"`-Bildschirm ist kein rein symbolischer Minimal-Fallback:
+er ist für manche Modultypen der **einzige** Bildschirm, den sie je
+bekommen, und muss deshalb alles rendern, was eine generische
+Property/Element tragen kann — Status, `hint`, Prä-/Posticons, Grids,
+Graphen, LOVs, alles — nicht nur Werte. Ein eigener Bildschirm pro
+Template darf kuratierter sein (Felder ausblenden, Layout
+umorganisieren), aber der Standard-Bildschirm sollte keine
+Information stillschweigend fallen lassen, nur weil noch niemand einen
+eigenen Bildschirm für dieses Modul geschrieben hat.
+{{% /notice %}}
+
+{{% notice style="tip" title="Empfehlung: eine einzige, überall wiederverwendete Property-Rendering-Komponente" %}}
+Nicht verpflichtend, aber sehr lohnenswert: eine **einzige** Komponente
+bauen, die für das Rendering einer Property (oder eines Elements)
+zuständig ist — `directedit`, `permission`, die drei LOV-Geltungsbereiche,
+Bool-Gruppenregeln, `autoupdate`, Grids, Graphen behandelt — und diese
+Komponente von **jedem** Bildschirm für einzelne Properties verwenden
+lassen, auch von eigenen Bildschirmen pro Template, nicht nur vom
+generischen Fallback.
+
+Die Alternative — jeder Bildschirm implementiert sein eigenes
+Feld-Rendering neu — verdoppelt jede Nuance des Wire-Formats über die
+gesamte Codebasis hinweg, und ein Fix oder eine neue Backend-Fähigkeit
+erreicht nur die Bildschirme, an die jemand denkt, sie zu aktualisieren.
+Roosters eigene Bildschirme (`GuiderComponent`, `FocusComponent` ...)
+rendern ihr eigenes Layout, delegieren aber jede einzelne Property an
+dieselbe generische Property-Komponente, die auch der Fallback-Bildschirm
+verwendet — ein Fix, der dort einmal gemacht wird (z. B. eine exklusive
+Switch-Gruppe korrekt zu behandeln), wirkt automatisch überall,
+eigene Bildschirme eingeschlossen.
+{{% /notice %}}
+
+## Property-Formulare: `SA`, verpflichtend bei `directedit: false`
+
+Über das feldweise `SV` hinaus braucht eine editierbare Property einen **Formular-Pfad**: einen Bildschirm, der alle ihre editierbaren Elemente auf einmal auflistet und zusammen über [`SA`]({{% relref "client-messages.de.md" %}}#sa) sendet.
+
+{{% notice style="warning" title="Nicht optional bei einem Element mit `directedit: false`" %}}
+`SV` wird vom Backend für jedes Element mit `directedit: false` abgelehnt (siehe [Datenmodell]({{% relref "structure.de.md" %}})). `SA` ist der **einzige** Weg, ein solches Element jemals zu aktualisieren — ein Client ohne Formular-Pfad kann auf dieses Element schlicht nicht schreiben, egal wie gut der Rest seiner UI ist.
+{{% /notice %}}
+
+Nur **editierbare** Elemente gehören in dieses Formular — reine Anzeige-Typen (`img`, `video`, `light`, `prg`, `message`) werden gerendert, nie gesendet; sie sollten ganz aus dem Payload weggelassen werden, statt ihnen einen bedeutungslosen Wert zu geben.
+
+Dieselbe „mehrere Elemente auf einmal senden"-Form wird auch von der Grid-Zeilen-Erstellung ([`GC`]({{% relref "client-messages.de.md" %}}#gc)) und -Aktualisierung ([`GU`]({{% relref "client-messages.de.md" %}}#gu)) verwendet — beide nehmen eine `e`-Map genau wie `SA`. Es lohnt sich, **eine** wiederverwendbare Formular-Komponente zu bauen, die sowohl das reine Property-Formular als auch den Grid-Zeile-erstellen- und den Grid-Zeile-bearbeiten-Dialog bedient, statt drei getrennte Implementierungen derselben Logik („editierbare Elemente rendern, ihre Werte sammeln"). Rooster macht das so.
 
 ## Heartbeat
 

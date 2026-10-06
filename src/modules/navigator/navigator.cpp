@@ -9,6 +9,22 @@ static void atomicSaveJpeg(const QImage &img, const QString &finalPath)
         ::rename(tmp.toLocal8Bit().constData(), finalPath.toLocal8Bit().constData());
 }
 
+// RA is circular (0-24h) - a naive subtraction of two RA values lands near
+// +/-24h whenever they straddle the 0h/24h boundary, even though the true
+// angular separation between them is tiny. Wraps into (-12h, +12h] so "how
+// far, and which way" is always the shortest path around the circle -
+// Gilles, 2026-10-01: caught via a centering log showing "dRA 24.006794arcs"
+// at a 60arcsec tolerance (still triggering a correction loop) - the "24"
+// shape of that number, not "arcs" at all despite the label (see
+// checkCentering()/correctOffset() below), was the giveaway of an unwrapped
+// full-turn artifact hiding a real ~24 arcsec separation.
+static double wrapRaHoursDelta(double deltaHours)
+{
+    while (deltaHours > 12.0) deltaHours -= 24.0;
+    while (deltaHours <= -12.0) deltaHours += 24.0;
+    return deltaHours;
+}
+
 Navigator *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
     Navigator *basemodule = new Navigator(name, label, profile, availableModuleLibs);
@@ -93,28 +109,6 @@ void Navigator::onExternalEvent(OST::ExtEvent event)
         {
             getProperty(event.prpkey)->setState(OST::Ok, true);
             addTargeToPlanner();
-        }
-    }
-
-    if (event.ev == OST::ExtEvType::SV && event.prpkey == "popcat")
-    {
-        if (event.eltkey == "go")
-        {
-            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
-            {
-                getProperty(event.prpkey)->setState(OST::Busy, true);
-                QString catlg = getString("popcat", "catlg");
-                // "catlg" is the LOV key (e.g. "messier"), matching the resource
-                // filename; the catalog name stored in CATALOGS uses the LOV's
-                // display label (e.g. "Messier") - using the raw key here caused
-                // duplicate catalogs under a different case (issue #225).
-                QString catalogName = getEltString("popcat", "catlg")->getLov().value(catlg, catlg);
-                /* we should avoid this, and do this in a different thread. We'll see later */
-                populateCatalog(":" + catlg + ".txt", catalogName);
-                getProperty(event.prpkey)->setState(OST::Ok, true);
-                getEltBool(event.prpkey, event.eltkey)->setValue(false, true);
-            }
-
         }
     }
 
@@ -414,14 +408,28 @@ void Navigator::OnSucessSolve()
         return;
     }
     // Get solved coordinates
-    double solvedRA = stellarSolver.getSolution().ra * 24 / 360;
-    double solvedDEC = stellarSolver.getSolution().dec;
+    auto solution = stellarSolver.getSolution();
+    double solvedRA = solution.ra * 24 / 360;
+    double solvedDEC = solution.dec;
     // Update image with solve data
     OST::ImgData dta = pImage->ImgStats();
     dta.mUrlJpeg = getModuleName() + ".jpeg";
     dta.solverRA = solvedRA;
     dta.solverDE = solvedDEC;
     dta.isSolved = true;
+    // Orientation/pixel scale/field size straight from the actual solve -
+    // needed by any client-side sky-rendering (e.g. a planetarium view's
+    // camera field-of-view overlay), previously computed here but never
+    // propagated onto the wire (see notes/NOTES-frontend-ostcore-planetarium.md).
+    dta.solverOrientation = solution.orientation;
+    dta.solverPixscale = solution.pixscale;
+    dta.solverFieldWidth = solution.fieldWidth;
+    dta.solverFieldHeight = solution.fieldHeight;
+    // Nominal sampling (optic + camera pixel size, see getSampling()) is
+    // independent of the solve outcome - refreshed here too since this is
+    // already the "new image data" update point, same as every other
+    // per-image stat.
+    dta.sampling = getSampling();
     getEltImg("image", "image")->setValue(dta, true);
 
     mCurrentIteration++;
@@ -549,9 +557,13 @@ void Navigator::convertSelection(void)
 
 bool Navigator::checkCentering(double solvedRA, double solvedDEC, double targetRA, double targetDEC)
 {
-    // Calculate angular distance in arcseconds
-    //double deltaRA = (solvedRA * 360 / 24 - targetRA * 360 / 24) * cos(solvedDEC * M_PI / 180.0) * 3600;
-    double deltaRA = (solvedRA * 360 / 24 - targetRA * 360 / 24) * 3600;
+    // Calculate angular distance in arcseconds. RA delta wrapped to its
+    // shortest-path form first (wrapRaHoursDelta()'s own doc comment) -
+    // without it, a target near the 0h/24h RA boundary would compute as
+    // ~24h/~360deg away from a solve a few arcsec off, permanently failing
+    // this check no matter how well centered the mount actually is.
+    //double deltaRA = wrapRaHoursDelta(solvedRA - targetRA) * 15 * cos(solvedDEC * M_PI / 180.0) * 3600;
+    double deltaRA = wrapRaHoursDelta(solvedRA - targetRA) * 15 * 3600;
     double deltaDEC = (solvedDEC - targetDEC) * 3600 ;
 
     // Total angular distance in arcseconds
@@ -564,11 +576,22 @@ bool Navigator::checkCentering(double solvedRA, double solvedDEC, double targetR
 
 void Navigator::correctOffset(double solvedRA, double solvedDEC)
 {
-    // Calculate correction offset
-    //double deltaRA = (solvedRA  - mTargetRA) * cos(solvedDEC * M_PI / 180.0);
-    double deltaRA = solvedRA  - mTargetRA;
+    // Calculate correction offset (RA in hours, DEC in degrees - the same
+    // units EQUATORIAL_EOD_COORD's own widgets use below, so the correction
+    // applies directly with no further conversion). RA wrapped to its
+    // shortest-path form (wrapRaHoursDelta()'s own doc comment) - without
+    // it, straddling the 0h/24h boundary would both log a nonsensical
+    // ~24h-shaped "correction" and, worse, actually apply it, slewing the
+    // mount nearly a full turn away instead of nudging it by the real,
+    // tiny amount.
+    //double deltaRA = wrapRaHoursDelta(solvedRA - mTargetRA) * cos(solvedDEC * M_PI / 180.0);
+    double deltaRA = wrapRaHoursDelta(solvedRA - mTargetRA);
     double deltaDEC = solvedDEC - mTargetDEC;
-    logInfo("Offset correction : dRA %1arcs dDEC %2arcs", {deltaRA, deltaDEC});
+    // Logged in actual arcsec (matching checkCentering()'s own units) -
+    // previously logged as the raw hours/degrees deltas above while still
+    // labelled "arcs", which is what made an unwrapped ~24h RA artifact
+    // read as an innocuous-looking "~24 arcsec" in the log.
+    logInfo("Offset correction : dRA %1arcs dDEC %2arcs", {deltaRA * 15 * 3600, deltaDEC * 3600});
 
     // Get current mount position
     QString mount = getString("devices", "mount");
@@ -590,8 +613,15 @@ void Navigator::correctOffset(double solvedRA, double solvedDEC)
         return;
     }
 
-    // Send corrected position to mount (RA in hours, DEC in degrees)
-    prop.findWidgetByName("RA")->value  = prop.findWidgetByName("RA")->value - deltaRA;
+    // Send corrected position to mount (RA in hours, DEC in degrees). RA
+    // re-wrapped into [0,24) after the subtraction - deltaRA is now at most
+    // 12h in magnitude (wrapRaHoursDelta() above), but the mount's own
+    // current RA minus/plus that can still land just outside [0,24) right
+    // at the boundary.
+    double newRA = prop.findWidgetByName("RA")->value - deltaRA;
+    if (newRA < 0.0) newRA += 24.0;
+    if (newRA >= 24.0) newRA -= 24.0;
+    prop.findWidgetByName("RA")->value  = newRA;
     prop.findWidgetByName("DEC")->value = prop.findWidgetByName("DEC")->value - deltaDEC;
     mWaitingSlew = true;
     sendNewNumber(prop);

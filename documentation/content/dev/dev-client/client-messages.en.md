@@ -1,6 +1,6 @@
 ---
 title: Client → Server Messages
-weight: 30
+weight: 50
 description: "All JSON messages that clients can send to the OST server"
 ---
 
@@ -22,6 +22,7 @@ All client command keys are **UPPERCASE** (e.g. `DU`, `SV`, `SA`, `GC`).
 | [`IL`](#il) | Set language |
 | [`SV`](#sv) | Set single element value |
 | [`SA`](#sa) | Set all element values |
+| [`DP`](#dp) | Request property dump |
 | [`I1`](#i1) | Click property preicon1 |
 | [`I2`](#i2) | Click property preicon2 |
 | [`I3`](#i3) | Click property posticon1 |
@@ -36,11 +37,13 @@ All client command keys are **UPPERCASE** (e.g. `DU`, `SV`, `SA`, `GC`).
 | [`GF`](#gf) | Fetch/select grid line |
 | [`GH`](#gh) | Move grid line up |
 | [`GB`](#gb) | Move grid line down |
+| [`GR`](#gr) | Reset (clear) grid |
 | [`CL`](#cl) | Load a module configuration |
 | [`CS`](#cs) | Save the current configuration |
 | [`FS`](#fs) | Select the watched file folder |
 | [`ML`](#ml) | Load module |
 | [`MK`](#mk) | Kill (unload) module |
+| [`QY`](#qy) | Query a module (inter-module mechanism, not client-facing) |
 | [`YA`](#indi) | Start embedded INDI server |
 | [`YZ`](#indi) | Stop embedded INDI server |
 | [`YL`](#indi) | Load INDI driver |
@@ -179,9 +182,33 @@ An `SA` must include every editable element of the property. If any is missing, 
 
 ---
 
-## Icon actions
+### `DP` — Request property dump {#dp}
 
-Property icons (preicon / posticon) trigger backend actions such as saving a profile, loading a profile, or starting a process. Click events are sent using the following commands.
+Asks the server to resend the full state of one property, as if it had just been (re)loaded — useful to force-refresh a property a client suspects is out of sync, without reloading the whole module. The server replies with an [`ap`]({{% relref "server-messages.en.md" %}}#ap) message for that property alone.
+
+```json
+{
+  "DP": {
+    "m": {
+      "Focus": {
+        "p": {
+          "parameters": {}
+        }
+      }
+    }
+  }
+}
+```
+
+No `e` field: `DP` targets the whole property, not a specific element.
+
+---
+
+## Icon actions {#icon-actions}
+
+`preicon1`/`preicon2`/`posticon1`/`posticon2` (properties) and `preicon`/`posticon` (elements, see [Data model]({{% relref "structure.en.md" %}})) are not decorations: each is a **clickable action**. A non-empty value is the Google Fonts (Material Icons) icon name to render for it; clicking the rendered icon sends the matching command below with **no value or parameter at all** — an empty payload that simply targets the property (or element). What the action actually does server-side (saving a profile, loading a profile, starting a process...) is entirely up to the module; the client's only job is to render the icon and forward the click as-is.
+
+An **empty string means there is no icon in that slot** — nothing to render, and consequently nothing to click or send. Don't render a placeholder or wire up a click handler for an empty icon field.
 
 ### `I1` — Click property preicon1 {#i1}
 
@@ -269,6 +296,10 @@ Same structure as `J1`.
 
 The server replies with an `fl` (profile loaded) message and then sends updated property values.
 
+{{% notice style="note" title="A transient `fc` precedes `fl`" %}}
+The server sends an [`fc`]({{% relref "server-messages.en.md" %}}#fs) (unsaved changes) message immediately before `fl`, as an intermediate step of loading the profile, before the property's values actually change. A client that reacts to `fc` by showing an "unsaved changes" indicator will see it flash on for one message and self-correct once `fl` arrives right after — expected, not a bug.
+{{% /notice %}}
+
 ---
 
 ### `PS` — Save profile {#ps}
@@ -319,8 +350,10 @@ Adds a new row to the grid with the provided element values.
 
 The server replies with a `gc` message confirming the new row index.
 
-{{% notice style="note" title="Base elements update before the grid line does" %}}
-Creating a grid line applies the submitted values to the property's base elements first (each emitting its own `ea`), then appends the row and emits `gc`. If a property shows both its base elements and its grid at the same time (`showElts` and `showGrid` both true — an uncommon combination), a live-rendering client will see the base elements briefly reflect the new row's values before the row itself appears. This is the real datastore state, not a bug — adapt your rendering to it rather than filtering it out, and never poll to work around it.
+{{% notice style="note" title="Just apply each `ea` as it arrives — nothing to reason about" %}}
+Creating a grid line applies the submitted values to the property's base elements first, then appends the row and emits `gc`. This can take more than one `ea` message (one per changed base element, sent one after another — submitting `target`/`exposure`/`count` as above produces three separate `ea` messages before the final `gc`), but a client never needs to know or predict that: the server only ever sends exactly what's needed to keep the client's datastore correct, no more and no less (see [Client Architecture Principles]({{% relref "client-pattern.en.md" %}})). Apply each message exactly as it comes, the same way you always do, and the result is correct regardless of how many messages there were.
+
+The one visible side effect: a property showing both its base elements and its grid at the same time (`showElts` and `showGrid` both true — an uncommon combination) will flicker through these intermediate states before the new row appears. This is the real datastore state, not a bug, and it resolves itself — no need to filter it out or poll to work around it.
 {{% /notice %}}
 
 ---
@@ -439,6 +472,28 @@ Moves the row at index `i` down by one position.
 
 ---
 
+### `GR` — Reset grid {#gr}
+
+Clears the entire grid of a property (all rows removed) — not a single row like `GD`. The server broadcasts [`gr`]({{% relref "server-messages.en.md" %}}#gr) in response.
+
+```json
+{
+  "GR": {
+    "m": {
+      "Sequencer": {
+        "p": {
+          "sequence": {}
+        }
+      }
+    }
+  }
+}
+```
+
+No `i` field: `GR` targets the whole grid, not one row.
+
+---
+
 ## Module lifecycle
 
 ### `CL` — Load a configuration {#cl}
@@ -475,6 +530,23 @@ Requests the server to dynamically load a module. These commands target the cont
 | `label` | Label of this instance; the **module name** is this label without spaces. If a module with that name is already loaded, the request is refused |
 | `profile` | Profile name to load (optional) |
 
+{{% notice style="warning" title="Don't pass a controllerdata.libraries key as-is" %}}
+The keys of `controllerdata.libraries` are already prefixed (`libostfocus`, `libostdummy`...). The server prepends `libost` again unconditionally, so forwarding a key straight through double-prefixes it and fails:
+
+```json
+{ "ML": { "lib": "libostdummy", "label": "MyDummy" } }
+```
+```
+Error loading library MyDummy - Cannot load library libostlibostdummy: cannot open shared object file: No such file or directory
+```
+
+Strip the `libost` prefix from the key first (same transform `profiles`' keying convention relies on, see [Controller data]({{% relref "controller.en.md" %}})):
+
+```json
+{ "ML": { "lib": "dummy", "label": "MyDummy" } }
+```
+{{% /notice %}}
+
 ---
 
 ### `MK` — Kill (unload) module {#mk}
@@ -486,6 +558,35 @@ Requests the server to unload a running module, identified by its name.
 ```
 
 `GlobalDatastore` cannot be unloaded: the request is refused (error message in the logs).
+
+---
+
+## Module query
+
+### `QY` — Query a module {#qy}
+
+{{% notice style="warning" title="Inter-module communication, not a client feature" %}}
+`QY`/`qa` exists primarily so one module can ask another module a question internally (a module calling `Basemodule::otherModuleQuery()`, which goes through this same mechanism). A client can technically send `QY` too — the envelope is identical — but there is no established client-facing use case for it today. It's documented here for completeness, and because it will matter when documenting how to build a module, not as something a client should build a feature around.
+{{% /notice %}}
+
+Generic, per-module request/answer mechanism: ask a module a named question with parameters, get a named answer back via [`qa`]({{% relref "server-messages.en.md" %}}#qa). Which query names a module actually understands (if any) is entirely up to that module — the protocol only defines the envelope. Note the payload has no `p` wrapper: `QY` targets the module itself, not one of its properties.
+
+```json
+{
+  "QY": {
+    "m": {
+      "Sequencer": {
+        "query": "profileduration",
+        "params": { "profile": "default" }
+      }
+    }
+  }
+}
+```
+
+{{% notice style="note" title="Not much to see yet" %}}
+Today only the `Sequencer` module implements a real answer (`profileduration`), used internally by the Planner module. No other shipped module responds meaningfully to any query name yet.
+{{% /notice %}}
 
 ---
 

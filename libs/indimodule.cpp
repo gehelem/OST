@@ -998,6 +998,13 @@ bool IndiModule::refreshDeviceslovs()
 }
 bool IndiModule::defineMeAsFocuser()
 {
+    // "focus" family: only one focuser type exists today, but Sequencer's
+    // slaves.focusmodule (and Monitor's e.focus) already target
+    // "family-focus" rather than "loadedModules-focus" - see sequencer.json/
+    // monitor.json - so any future alternative focuser is pickable the
+    // same way "blindpec" already is for "guiding", with no client-side
+    // change needed.
+    declareFamily("focus");
     giveMeAParms();
     giveMeAState();
     defineMeAsImager();
@@ -1026,6 +1033,11 @@ bool IndiModule::defineMeAsFocuser()
 }
 bool IndiModule::defineMeAsGuider()
 {
+    // "guiding" family: lets any module declaring it (Guider, BlindPEC, ...)
+    // be picked as a generic guiding slave (e.g. Sequencer.slaves.guidermodule,
+    // listOfValues "family-guiding") regardless of its actual type/class -
+    // see Basemodule::declareFamily()'s doc comment.
+    declareFamily("guiding");
     giveMeAParms();
     giveMeAState();
     defineMeAsImager();
@@ -1047,6 +1059,16 @@ bool IndiModule::defineMeAsGuider()
     b->setValue(false, false);
     b->setDirectEdit(true);
     b->setPreIcon("arrows_output");
+    pm->addElt(b);
+    b = new  OST::ElementBool("resetcalibration", "Reset calibration", "guid10", "");
+    b->setValue(false, false);
+    b->setDirectEdit(true);
+    b->setPreIcon("block");
+    pm->addElt(b);
+    b = new  OST::ElementBool("dither", "Dither", "guid11", "");
+    b->setValue(false, false);
+    b->setDirectEdit(true);
+    b->setPreIcon("shuffle");
     pm->addElt(b);
     mIsGuider = true;
     return true;
@@ -1073,6 +1095,28 @@ bool IndiModule::defineMeAsSequencer()
     b->setPreIcon("play_arrow");
     mIsSequencer = true;
     return true;
+}
+bool IndiModule::defineMeAsPlanner()
+{
+    // Single implementation today (Planner), no family declared for that
+    // reason - added purely so its start/stop actions live in one place
+    // like every other slave-facing module's, per Gilles's 2026-09-26
+    // audit ("il faut verifier tous les modules qui ont des esclaves ...
+    // ces commandes doivent etre definies dans les DefineMeAsXXX").
+    giveMeAnActions();
+    giveMeALocation();
+
+    OST::PropertyMulti* pm = getProperty("actions");
+    OST::ElementBool* b = new  OST::ElementBool("start", "Start", "010", "");
+    b->setValue(false, false);
+    b->setDirectEdit(true);
+    pm->addElt(b);
+    b = new  OST::ElementBool("stop", "Stop", "020", "");
+    b->setValue(false, false);
+    b->setDirectEdit(true);
+    pm->addElt(b);
+    mIsPlanner = true;
+    return true;
 
 }
 bool IndiModule::defineMeAsImager()
@@ -1082,7 +1126,7 @@ bool IndiModule::defineMeAsImager()
 
     if (!getStore().contains("image"))
     {
-        OST::PropertyMulti* dynprop = new OST::PropertyMulti("image", "Image", OST::Permission::WriteOnly, "Control",
+        OST::PropertyMulti* dynprop = new OST::PropertyMulti("image", "Image", OST::Permission::ReadOnly, "Control",
                 "", "000Control222", false, false);
         createProperty(dynprop);
     }

@@ -1,6 +1,6 @@
 ---
 title: Mensajes Cliente → Servidor
-weight: 30
+weight: 50
 description: "Todos los mensajes JSON que los clientes pueden enviar al servidor OST"
 ---
 
@@ -22,6 +22,7 @@ Todas las claves de comandos de cliente están en **MAYÚSCULAS** (ej. `DU`, `SV
 | [`IL`](#il) | Cambiar el idioma |
 | [`SV`](#sv) | Enviar el valor de un solo elemento |
 | [`SA`](#sa) | Enviar todos los valores de elementos |
+| [`DP`](#dp) | Solicitar el dump de una propiedad |
 | [`I1`](#i1) | Clic en preicon1 de propiedad |
 | [`I2`](#i2) | Clic en preicon2 de propiedad |
 | [`I3`](#i3) | Clic en posticon1 de propiedad |
@@ -36,11 +37,13 @@ Todas las claves de comandos de cliente están en **MAYÚSCULAS** (ej. `DU`, `SV
 | [`GF`](#gf) | Seleccionar una línea de cuadrícula |
 | [`GH`](#gh) | Subir una línea de cuadrícula |
 | [`GB`](#gb) | Bajar una línea de cuadrícula |
+| [`GR`](#gr) | Restablecer (vaciar) la cuadrícula |
 | [`CL`](#cl) | Cargar una configuración de módulos |
 | [`CS`](#cs) | Guardar la configuración actual |
 | [`FS`](#fs) | Elegir la carpeta de archivos vigilada |
 | [`ML`](#ml) | Cargar un módulo |
 | [`MK`](#mk) | Descargar un módulo |
+| [`QY`](#qy) | Consultar un módulo (mecanismo inter-módulo, no pensado para el cliente) |
 | [`YA`](#indi) | Iniciar el servidor INDI embebido |
 | [`YZ`](#indi) | Detener el servidor INDI embebido |
 | [`YL`](#indi) | Cargar un driver INDI |
@@ -179,9 +182,33 @@ Un `SA` debe incluir todos los elementos editables de la propiedad. Si falta uno
 
 ---
 
-## Acciones sobre los iconos
+### `DP` — Solicitar el dump de una propiedad {#dp}
 
-Los iconos de propiedad (preicon / posticon) desencadenan acciones de backend como el guardado de un perfil, la carga de un perfil o el lanzamiento de un proceso. Los eventos de clic se envían mediante los siguientes comandos.
+Pide al servidor que reenvíe el estado completo de una propiedad, como si acabara de (re)cargarse — útil para forzar la actualización de una propiedad que un cliente sospecha desincronizada, sin recargar todo el módulo. El servidor responde con un mensaje [`ap`]({{% relref "server-messages.es.md" %}}#ap) para esa sola propiedad.
+
+```json
+{
+  "DP": {
+    "m": {
+      "Focus": {
+        "p": {
+          "parameters": {}
+        }
+      }
+    }
+  }
+}
+```
+
+Sin campo `e`: `DP` afecta a toda la propiedad, no a un elemento concreto.
+
+---
+
+## Acciones sobre los iconos {#icon-actions}
+
+`preicon1`/`preicon2`/`posticon1`/`posticon2` (propiedades) y `preicon`/`posticon` (elementos, ver [Modelo de datos]({{% relref "structure.es.md" %}})) no son decoraciones: cada una es una **acción clicable**. Un valor no vacío es el nombre del icono de Google Fonts (Material Icons) a mostrar; al hacer clic en el icono mostrado se envía el comando correspondiente de abajo, **sin ningún valor ni parámetro** — un payload vacío que simplemente apunta a la propiedad (o al elemento). Lo que la acción hace realmente en el servidor (guardar un perfil, cargar un perfil, lanzar un proceso...) depende enteramente del módulo; la única tarea del cliente es mostrar el icono y reenviar el clic tal cual.
+
+Una **cadena vacía significa que no hay ningún icono** en ese lugar — nada que mostrar, y por tanto nada que hacer clic ni que enviar. No mostrar un marcador de posición ni conectar un manejador de clic para un campo de icono vacío.
 
 ### `I1` — Clic en preicon1 de propiedad {#i1}
 
@@ -269,6 +296,10 @@ Misma estructura que `J1`.
 
 El servidor responde con un mensaje `fl` (perfil cargado) y luego envía los valores de propiedades actualizados.
 
+{{% notice style="note" title="Un `fc` transitorio precede a `fl`" %}}
+El servidor envía un mensaje [`fc`]({{% relref "server-messages.es.md" %}}#fs) (modificaciones no guardadas) justo antes de `fl`, como paso intermedio de la carga del perfil, antes de que los valores de la propiedad cambien realmente. Un cliente que reaccione a `fc` mostrando un indicador de "modificaciones no guardadas" lo verá parpadear brevemente y autocorregirse en cuanto llegue `fl` justo después — es lo esperado, no un error.
+{{% /notice %}}
+
 ---
 
 ### `PS` — Guardar un perfil {#ps}
@@ -319,8 +350,10 @@ Añade una nueva línea a la cuadrícula con los valores de elementos proporcion
 
 El servidor responde con un mensaje `gc` confirmando el índice de la nueva línea.
 
-{{% notice style="note" title="Los elementos base se actualizan antes que la línea de la cuadrícula" %}}
-Crear una línea de cuadrícula aplica primero los valores enviados a los elementos base de la propiedad (cada uno emite su propio `ea`), y luego añade la línea y emite `gc`. Si una propiedad muestra a la vez sus elementos base y su cuadrícula (`showElts` y `showGrid` ambos activos — combinación poco habitual), un cliente que renderiza en directo verá brevemente los elementos base reflejar los valores de la nueva línea antes de que la línea misma aparezca. Este es el estado real del datastore, no un error — adapte su renderizado a este comportamiento en lugar de intentar filtrarlo, y sobre todo nunca haga polling para evitarlo.
+{{% notice style="note" title="Aplique cada `ea` tal cual llega — nada que cuestionarse" %}}
+Crear una línea de cuadrícula aplica primero los valores enviados a los elementos base de la propiedad, luego añade la fila y emite `gc`. Esto puede requerir más de un mensaje `ea` (uno por cada elemento base modificado, enviados uno tras otro — enviar `target`/`exposure`/`count` como en el ejemplo de arriba produce tres mensajes `ea` distintos antes del `gc` final), pero un cliente nunca necesita saber ni predecir ese número: el servidor solo envía exactamente lo necesario para mantener correcto el datastore del cliente, ni más ni menos (ver [Principios de arquitectura del cliente]({{% relref "client-pattern.es.md" %}})). Aplique cada mensaje tal como llega, como hace siempre, y el resultado es correcto sea cual sea el número de mensajes recibidos.
+
+El único efecto visible: una propiedad que muestra a la vez sus elementos base y su cuadrícula (`showElts` y `showGrid` ambos activos — combinación poco habitual) parpadeará a través de estos estados intermedios antes de que aparezca la nueva fila. Este es el estado real del datastore, no un error, y se resuelve solo — no hace falta filtrarlo ni hacer polling para evitarlo.
 {{% /notice %}}
 
 ---
@@ -439,6 +472,28 @@ Desplaza la línea en el índice `i` una posición hacia abajo.
 
 ---
 
+### `GR` — Restablecer la cuadrícula {#gr}
+
+Vacía por completo la cuadrícula de una propiedad (todas las filas eliminadas) — no una sola fila como `GD`. El servidor difunde [`gr`]({{% relref "server-messages.es.md" %}}#gr) en respuesta.
+
+```json
+{
+  "GR": {
+    "m": {
+      "Sequencer": {
+        "p": {
+          "sequence": {}
+        }
+      }
+    }
+  }
+}
+```
+
+Sin campo `i`: `GR` afecta a toda la cuadrícula, no a una fila concreta.
+
+---
+
 ## Ciclo de vida de los módulos
 
 ### `CL` — Cargar una configuración {#cl}
@@ -475,6 +530,23 @@ Pide al servidor que cargue dinámicamente un módulo. Estos comandos se dirigen
 | `label` | Etiqueta de esta instancia; el **nombre del módulo** es esa etiqueta sin espacios. Si ya hay cargado un módulo con ese nombre, la petición se rechaza |
 | `profile` | Nombre del perfil a cargar (opcional) |
 
+{{% notice style="warning" title="No pasar tal cual una clave de controllerdata.libraries" %}}
+Las claves de `controllerdata.libraries` ya están prefijadas (`libostfocus`, `libostdummy`...). El servidor vuelve a anteponer `libost` incondicionalmente, así que reenviar una clave tal cual la duplica y falla:
+
+```json
+{ "ML": { "lib": "libostdummy", "label": "MyDummy" } }
+```
+```
+Error loading library MyDummy - Cannot load library libostlibostdummy: cannot open shared object file: No such file or directory
+```
+
+Quitar primero el prefijo `libost` de la clave (misma transformación de la que depende la convención de claves de `profiles`, ver [Datos del controlador]({{% relref "controller.es.md" %}})):
+
+```json
+{ "ML": { "lib": "dummy", "label": "MyDummy" } }
+```
+{{% /notice %}}
+
 ---
 
 ### `MK` — Descargar un módulo {#mk}
@@ -486,6 +558,35 @@ Pide al servidor que descargue un módulo en ejecución, designado por su nombre
 ```
 
 `GlobalDatastore` no puede descargarse: la petición se rechaza (mensaje de error en los logs).
+
+---
+
+## Consultar un módulo
+
+### `QY` — Consultar un módulo {#qy}
+
+{{% notice style="warning" title="Comunicación inter-módulo, no una funcionalidad de cliente" %}}
+`QY`/`qa` existe principalmente para que un módulo pueda hacerle una pregunta a otro módulo internamente (un módulo que llama a `Basemodule::otherModuleQuery()`, que pasa por este mismo mecanismo). Un cliente puede técnicamente enviar `QY` también — el sobre es idéntico — pero hoy no hay ningún caso de uso establecido del lado del cliente. Documentado aquí por exhaustividad, y porque será relevante cuando se documente cómo construir un módulo — no como algo sobre lo que un cliente deba construir una funcionalidad.
+{{% /notice %}}
+
+Mecanismo genérico de consulta/respuesta propio de cada módulo: hacer a un módulo una pregunta con nombre y parámetros, recibir una respuesta con nombre vía [`qa`]({{% relref "server-messages.es.md" %}}#qa). Qué nombres de consulta entiende realmente un módulo (si entiende alguno) depende enteramente de ese módulo — el protocolo solo define el sobre. Nótese: sin envoltorio `p` aquí, `QY` apunta al propio módulo, no a una de sus propiedades.
+
+```json
+{
+  "QY": {
+    "m": {
+      "Sequencer": {
+        "query": "profileduration",
+        "params": { "profile": "default" }
+      }
+    }
+  }
+}
+```
+
+{{% notice style="note" title="Todavía poco que ver" %}}
+Hoy solo el módulo `Sequencer` implementa una respuesta real (`profileduration`), usada internamente por el módulo Planner. Ningún otro módulo incluido responde de forma significativa a ningún nombre de consulta por ahora.
+{{% /notice %}}
 
 ---
 

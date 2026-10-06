@@ -4,6 +4,7 @@
 #include <fileio.h>
 #include <solver.h>
 #include <QScxmlStateMachine>
+#include <QScxmlEvent>
 #include <QElapsedTimer>
 #include <QDateTime>
 
@@ -63,6 +64,10 @@ class MODULE_INIT Sequencer: public IndiModule
         void SMDone();
         void SMAborted();
         void SMError();
+        // Records which of the 9 "target=Error" scxml events actually fired
+        // (connectToEvent, not connectToState - see the constructor) so
+        // SMError() can log a real reason instead of a bare "Sequence error".
+        void SMErrorCause(const QScxmlEvent &event);
 
         // Timer
         void onGuidingSettleTimeout();
@@ -82,6 +87,7 @@ class MODULE_INIT Sequencer: public IndiModule
         QScxmlStateMachine  *pMachine     = nullptr;
         QTimer              *mSettleTimer = nullptr;
         QTimer              *mElapsedTimer = nullptr;
+        QString              mLastErrorCause;
 
         // ── Per-sequence state ──────────────────────────────────────────────
         int     mCurrentLine           = -1;

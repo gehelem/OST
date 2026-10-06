@@ -27,6 +27,15 @@ Basemodule::Basemodule(QString name, QString label, QString profile, QVariantMap
     setMetadata("baseGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
     setMetadata("baseversion", QString::fromStdString(Version::GIT_TAG));
     setMetadata("startdatetime", QDateTime::currentDateTime());
+    // library/classname/families are NOT set here on purpose: getClassName()
+    // relies on metaObject(), which is virtual - called from this base
+    // constructor it can only ever resolve to "Basemodule" itself, never
+    // the real derived class (classic C++ "no virtual dispatch to a
+    // not-yet-constructed derived class" rule). Found live, 2026-09-26:
+    // every module's dumped infos.classname literally said "Basemodule".
+    // These 3 fields are computed on demand instead, at actual dump time
+    // (ModuleJsonDumper), where the object is always fully constructed -
+    // see that file.
     mStatus.ts = QDateTime::currentDateTime();
     mStatus.message = "init";
     mStatus.state = OST::Idle;
@@ -376,6 +385,18 @@ QString Basemodule::getClassName()
 {
     return metaObject()->className();
 }
+void Basemodule::declareFamily(const QString &family)
+{
+    mFamilies.insert(family);
+}
+QStringList Basemodule::getFamilies() const
+{
+    return mFamilies.values();
+}
+bool Basemodule::hasFamily(const QString &family) const
+{
+    return mFamilies.contains(family);
+}
 QString Basemodule::getHelpContent(QString language)
 {
     QString f = ":" + getClassName() + "." + language + ".md";
@@ -393,7 +414,21 @@ QString Basemodule::getHelpContent(QString language)
 
 QVariantMap Basemodule::getModuleInfo(void)
 {
-    return getAllMetadata();
+    // library/classname/families computed on demand, not baked into
+    // mMetadata at construction time - see the constructor's comment on
+    // why (virtual dispatch through metaObject() only resolves to the
+    // real derived class once construction has fully finished). Only
+    // caller today is Controller::checkModules()'s per-library probe,
+    // which calls this right after createmodule() returns - i.e. always
+    // post-construction, so getClassName()/getFamilies() are safe here.
+    // ModuleJsonDumper needs the same 3 fields for a *loaded* instance's
+    // real wire "infos" and does its own equivalent merge (it doesn't go
+    // through this function).
+    QVariantMap info = getAllMetadata();
+    info["library"] = getClassName().toLower();
+    info["classname"] = getClassName();
+    info["families"] = QVariant(getFamilies());
+    return info;
 }
 
 void Basemodule::onDatastoreEvent(OST::EvType evt, QVariant data, OST::ElementBase* elt, OST::PropertyBase* prp,

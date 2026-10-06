@@ -1,6 +1,6 @@
 ---
 title: Controller, GlobalDatastore und Dateien
-weight: 35
+weight: 30
 description: "Was kein gewöhnliches Modul ist: Controller-Daten, Systemlast, Konfigurationen, das Modul GlobalDatastore, Dateisystem"
 ---
 
@@ -16,13 +16,19 @@ Der Controller ist die Komponente des Servers, die die Module lädt und den eing
 | `currentconf` | Name der aktuellen Konfiguration |
 | `banner` | Banner des Servers (Freitext, Option `--banner`) |
 | `git` | Version des Servers: `Gitdate`, `Githash`, `Gitmessage`, `Gittag` |
-| `libraries` | Verfügbare Modulbibliotheken, ein Metadatenobjekt pro Bibliothek |
-| `profiles` | Verfügbare Profile: Objekt `Klassenname des Moduls → Liste von Profilnamen` |
+| `libraries` | Verfügbare Modulbibliotheken, ein Metadatenobjekt pro Bibliothek — Schlüssel sind **mit `libost` präfigiert** (`libostfocus`, `libostdummy`...); das Präfix vor der Übergabe an [`ML`]({{% relref "client-messages.de.md" %}}#ml) entfernen |
+| `profiles` | Verfügbare Profile: Objekt `transformierter Bibliotheksname → Liste von Profilnamen` — siehe die Schlüsselkonvention unten |
 | `indiserver` | `"Y"`, wenn der eingebettete INDI-Server aktiviert ist, sonst `"N"` |
 | `indidrivers` | Katalog der installierten INDI-Treiber: Liste von `{binary, family, label, mdpd}` |
 | `indiactivedrivers` | Aktuell gestartete INDI-Treiber |
 | `systemwatcher` | Serverlast, siehe unten |
 | `files`, `folders` | Kopie von `d.files.files` und `d.files.folders`, siehe [Dateisystem](#fichiers) |
+
+{{% notice style="warning" title="`profiles`-Schlüssel: weder der rohe Bibliotheksname noch `infos.template`" %}}
+`profiles` wird über den **Bibliotheksnamen** des Moduls indiziert (derselbe String, der als `lib` an [`ML`]({{% relref "client-messages.de.md" %}}#ml) übergeben wird, also der Schlüssel in `controllerdata.libraries` ohne das `libost`-Präfix) — allerdings transformiert: **erster Buchstabe groß, der Rest klein** (`"focus"` → `"Focus"`, keine einfache Großschreibung des ersten Buchstabens — ein Bibliotheksname mit einem weiteren Großbuchstaben würde trotzdem eingeebnet, z. B. ein hypothetisches `"myFocus"` → `"Myfocus"`). Dieser Schlüssel ist weder der Instanzname/das Label des Moduls, noch notwendigerweise identisch mit `infos.template` (beide stimmen in der Praxis meist überein, werden aber unabhängig gesetzt, und nichts im Protokoll garantiert eine Übereinstimmung).
+
+Diese Konvention ist sonst nirgends dokumentiert und wird vom Backend nicht erzwungen — sie wurde aus Roosters eigener Lookup-Logik zurückentwickelt. Zwei unabhängige, allein aus dieser Dokumentation gebaute Clients sind darüber gestolpert (eine Profilauswahl, die stillschweigend leer blieb). Wer die verfügbaren Profile eines Moduls nachschlagen will, sollte genau diese Transformation auf den Bibliotheksnamen anwenden, statt zu raten.
+{{% /notice %}}
 
 {{% notice style="warning" title="`uc`: ein Schlüssel pro Nachricht, Wert wird komplett ersetzt" %}}
 Eine `uc`-Nachricht trägt **einen einzigen Schlüssel** von `controllerdata`, und ihr Wert ersetzt den alten **vollständig** (keine Zusammenführung). Ein Client, der nur den ersten Schlüssel des Payloads liest (wie es Rooster tut), ist daher korrekt, solange der Server nur einen Schlüssel pro Nachricht sendet — was heute der Fall ist.
@@ -77,9 +83,23 @@ Eine **Konfiguration** ist eine benannte Menge von Modulen (Bibliothek, Label, P
 
 Die tatsächlich geladenen Module sind die des Dumps (`d.m`); sie erscheinen und verschwinden über [`aa`]({{% relref "server-messages.de.md" %}}#aa) und [`dm`]({{% relref "server-messages.de.md" %}}#dm). Die Konfiguration enthält **niemals** `GlobalDatastore` (siehe unten), das immer vorhanden ist.
 
+{{% notice style="warning" title="Eine Konfiguration enthält stillschweigend die aktiven INDI-Treiber" %}}
+`CS` speichert neben der Modulliste auch die gerade laufenden INDI-Treiber, und `CL` startet sie wieder — das ist aber in `controllerdata.availableconfs` unsichtbar, dessen Form nur Module beschreibt (`{modulelabel, moduletype, profilename}`), niemals Treiber. Ein Client, der einen Konfigurationseditor baut, der nur die Modulliste zeigt/bearbeitet, zeigt nicht das vollständige Bild dessen, was bei `CL` tatsächlich passiert.
+{{% /notice %}}
+
+{{% notice style="note" title="Keine Löschoperation" %}}
+Es gibt keinen Befehl, um eine gespeicherte Konfiguration zu entfernen — `CL` und `CS` sind die einzigen beiden Operationen. Eine Konfiguration, die ein Client nicht mehr will, bleibt dauerhaft in `controllerdata.availableconfs` (sie kann nur unter demselben Namen durch ein weiteres `CS` überschrieben werden).
+{{% /notice %}}
+
 ### INDI-Server und Treiber
 
 Wenn `controllerdata.indiserver` den Wert `"Y"` hat, steuert der Server eine eingebettete INDI-Instanz. Die Befehle [`YA`/`YZ`/`YL`/`YR`/`YS`]({{% relref "client-messages.de.md" %}}#indi) starten und stoppen sie und verwalten die Treiber; `controllerdata.indidrivers` liefert den verfügbaren Katalog und `controllerdata.indiactivedrivers` das, was läuft. `binary` ist der Wert, der als `driver` in `YL`, `YR` und `YS` übergeben wird.
+
+`controllerdata.indidrivers` und `controllerdata.indiactivedrivers` sind beide Listen von Objekten `{binary, family, label}` (`indidrivers` hat zusätzlich `mdpd`, siehe Tabelle oben).
+
+{{% notice style="warning" title="YA/YZ/YL/YR/YS haben keine eigene Bestätigung" %}}
+Keiner dieser Befehle löst eine eigene Bestätigungsnachricht aus. Erfolg oder Misserfolg muss indirekt abgeleitet werden: Auf `YL`/`YR`/`YS` folgt eine `uc`-Aktualisierung von `indiactivedrivers`, die die angeforderte Änderung widerspiegelt (das bestätigt aber nur, dass der Server es *versucht* hat, nicht dass der zugrunde liegende INDI-Treiber tatsächlich hochgefahren ist), während `YA`/`YZ` überhaupt kein `uc` erzeugen — nur `l`-Nachrichten (Log), die für einen Menschen gedacht sind, nicht zum programmatischen Auswerten durch einen Client. `controllerdata.indiserver` selbst spiegelt die Startoption `--indiserver` wider, nicht ob der eingebettete Server gerade tatsächlich läuft.
+{{% /notice %}}
 
 ## Das Modul `GlobalDatastore` {#globaldatastore}
 
@@ -130,36 +150,47 @@ Es gibt weder Paginierung noch Größenbegrenzung: bei einem sehr gefüllten Web
 
 ### Den Ordner wählen: `FS`
 
-[`FS`]({{% relref "client-messages.de.md" %}}#fs) bestimmt den Ordner, dessen Dateiliste man haben möchte. Der Server überwacht immer nur **einen einzigen** Ordner.
+[`FS`]({{% relref "client-messages.de.md" %}}#fs) bestimmt den Ordner, der überwacht und dessen Dateien aufgelistet werden sollen. Der Server überwacht den **Inhalt** immer nur eines **einzigen** Ordners; der Ordnerbaum (`folders`) wird unabhängig davon verfolgt, siehe unten.
 
 {{% notice style="warning" title="Der ausgewählte Ordner gilt global für den Server" %}}
-Es gibt keinen Ordner pro Client: ein `FS` ändert die Dateiliste, die **alle** verbundenen Clients sehen (die untenstehenden Ereignisse werden an alle gesendet). Ein Client sollte es nicht für eine rein „lokale“ Navigation verwenden, wenn andere Clients verbunden sein können.
+Es gibt keinen Ordner pro Client: ein `FS` ändert die Dateiliste, die **alle** verbundenen Clients sehen. Ein Client sollte es nicht für eine rein „lokale“ Navigation verwenden, wenn andere Clients verbunden sein können.
 
-Der Server **validiert den Pfad nicht**: ein nicht existierender Ordner liefert einfach eine leere Liste, ohne Fehler.
+Der Pfad **wird validiert**: das Ziel muss existieren und innerhalb des Webroots liegen (kein Entkommen über `../`). Eine ungültige Anfrage wird serverseitig abgelehnt (protokolliert, kein Zustandswechsel) — sie liefert nicht stillschweigend eine leere Liste.
 {{% /notice %}}
 
-### Aktualisierungen: `evt`
+Ein erfolgreiches `FS` ersetzt die Dateiliste vollständig: der Client erhält eine einzige [`uc`]({{% relref "server-messages.de.md" %}}#uc)-Nachricht `files` mit der kompletten neuen Liste, keinen Strom von `af`/`df` — eine Ordnerauswahl ist keine Änderung am Dateisystem, es wurde tatsächlich nichts hinzugefügt oder entfernt. Es gibt **keine** Nachricht, die den neuen `selectedfolder` selbst ankündigt, der nur im Dump existiert.
 
-Wenn sich der Inhalt des ausgewählten Ordners ändert (Datei erstellt, gelöscht oder umbenannt) oder nach einem `FS`, sendet der Server `evt`-Ereignisse auf oberster Ebene:
+### Ordnerbaum vs. Dateien des ausgewählten Ordners
+
+`folders` (der gesamte rekursive Baum) und `files` (der Inhalt des ausgewählten Ordners) haben unterschiedliche Reichweiten:
+
+| | Reichweite | Live-Aktualisierungen |
+|---|---|---|
+| `folders` / `ad` / `dd` | **Der gesamte Webroot**, rekursiv — unabhängig von der aktuellen Auswahl | Immer, unabhängig von der aktuellen `FS`-Auswahl |
+| `files` / `af` / `df` | **Nur der ausgewählte Ordner** | Nur für Änderungen am Ordner, den das letzte `FS` ausgewählt hat |
+
+Ein Ordner, der irgendwo im Webroot erstellt oder gelöscht wird, wird live über `ad`/`dd` gemeldet, auch wenn kein Client ihn gerade ausgewählt hat. Eine Datei wird nur über `af`/`df` gemeldet, wenn sie den Ordner betrifft, den das `FS` eines Clients zuletzt ausgewählt hat — `files`/`af`/`df` sagen nichts über den Inhalt anderer Ordner aus, ein Client muss dorthin ein `FS` senden, um es zu erfahren.
+
+### Aktualisierungen: `af` / `df` / `ad` / `dd`
+
+Wenn sich der Ordnerbaum oder der Inhalt des ausgewählten Ordners tatsächlich ändert, sendet der Server eine Nachricht pro betroffenem Pfad — der Wert ist der reine Pfad selbst, nicht in ein Objekt oder Array verpackt:
 
 ```json
-{ "evt": "fileadd", "fileevent": ["/Sequencer/gam Cyg/LIGHT/Luminance/img_001.FITS"] }
-{ "evt": "filedel", "fileevent": ["/rapport.txt"] }
+{ "af": "/Sequencer/gam Cyg/LIGHT/Luminance/img_001.FITS" }
+{ "df": "/rapport.txt" }
+{ "ad": "/Sequencer/neues Ziel" }
 ```
 
-| Wert von `evt` | Bedeutung |
+| Schlüssel | Bedeutung |
 |---|---|
-| `fileadd` | Datei(en) im ausgewählten Ordner hinzugekommen |
-| `filedel` | Datei(en) aus dem ausgewählten Ordner verschwunden |
-| `folderadd` / `folderdel` | Unterordner im Webroot erstellt / gelöscht (gleiche Form, `fileevent` enthält die Ordnerpfade) |
+| `af` | Datei im ausgewählten Ordner hinzugekommen |
+| `df` | Datei aus dem ausgewählten Ordner verschwunden |
+| `ad` | Unterordner irgendwo im Webroot erschienen |
+| `dd` | Unterordner irgendwo im Webroot verschwunden |
 
-`fileevent` ist **immer ein Array**; heute enthält es einen einzigen Pfad pro Nachricht (N Dateien = N Nachrichten). Nach einem `FS` erhält der Client für jede Datei des alten Ordners ein `filedel` und dann für jede Datei des neuen ein `fileadd`: es gibt **keine** Nachricht, die den neuen `selectedfolder` ankündigt, der nur im Dump existiert.
+Jede Nachricht trägt genau einen Pfad (N Dateien = N Nachrichten) — siehe [`af`/`df`/`ad`/`dd`]({{% relref "server-messages.de.md" %}}#af) für die vollständige Referenz. Eine Umbenennung wird als Löschung gefolgt von einer Erstellung gemeldet: der Server vergleicht eine Vorher-/Nachher-Liste, er erkennt Umbenennungen nicht als solche.
 
-Zusätzlich sendet der Server bei jedem Durchlauf [`uc`]({{% relref "server-messages.de.md" %}}#uc)-Nachrichten `files` und `folders` mit den **vollständigen** Listen: ein Client kann also entweder die `evt`-Ereignisse einzeln anwenden oder seine Listen einfach mit diesen `uc` ersetzen.
-
-{{% notice style="warning" title="Falle: `evt` beginnt mit `ev`" %}}
-Die übliche Regel ist, die ersten 1 oder 2 Zeichen des Schlüssels zu vergleichen. `evt` beginnt jedoch mit `ev`, dem Typ der [Element-Updates mit Metadaten]({{% relref "server-messages.de.md" %}}#ev), deren Payload ein Objekt und keine Zeichenkette ist. Ein Client, der über das Präfix verzweigt, muss **vor** dem Test auf `ev` auf **exakte Gleichheit mit `evt`** prüfen, sonst hält er ein Dateiereignis für ein Element-Update.
-{{% /notice %}}
+Nach den Pfad-Nachrichten sendet der Server [`uc`]({{% relref "server-messages.de.md" %}}#uc)-Nachrichten `files` und/oder `folders` mit der vollständigen aktualisierten Liste — aber nur für das, was sich bei diesem Durchlauf tatsächlich geändert hat, nie bedingungslos. Ein Client kann also entweder die Pfad-Ereignisse laufend anwenden oder seine Liste(n) einfach mit der/den passenden `uc`-Nachricht(en) ersetzen.
 
 ### Die URL einer Datei bilden
 

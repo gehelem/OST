@@ -155,14 +155,6 @@ bool  PropertyMulti::setElt(QString key, QVariant val, bool emitEvent)
         getElt(key)->accept(&vu, m, s);
         return true;
     }
-    if (mElts[key]->getType() == "light")
-    {
-        ElementUpdate vu;
-        m["value"] = val;
-        getElt(key)->accept(&vu, m, s);
-        return true;
-    }
-
     if ((mElts[key]->getType() == "bool") && (val.canConvert<bool>()) )
     {
         ElementUpdate vu;
@@ -212,9 +204,30 @@ bool  PropertyMulti::setElt(QString key, QVariant val, bool emitEvent)
                 break;
         }
     }
-    if ((mElts[key]->getType() == "prg") || (mElts[key]->getType() == "img") || (mElts[key]->getType() == "video") )
+    if (mElts[key]->getType() == "light")
     {
-        // prg/img/video can't be updated via frontend
+        // Regression fixed 2026-09-26: this used to no-op here (grouped
+        // with prg/img/video below), which silently broke every
+        // Basemodule::setStateEvent() call across the whole codebase -
+        // setStateEvent() sets "state" through this same setElt() (via
+        // setAll()), not through ElementLight::setValue() directly, so
+        // "state" stayed frozen at its Idle default forever while the
+        // other fields (statedescription, event, ...) kept updating
+        // normally. ElementUpdate::visit(ElementLight*, ...) already does
+        // the int-to-State conversion correctly - it just wasn't reached.
+        // A client can still reach this through SV/SA, but "signals" (the
+        // only property using "light" today) is permission:ReadOnly, so a
+        // compliant client already won't offer to write it.
+        ElementUpdate vu;
+        QVariantMap m;
+        m["value"] = val;
+        getElt(key)->accept(&vu, m, s);
+        return true;
+    }
+    if ((mElts[key]->getType() == "prg") || (mElts[key]->getType() == "img") || (mElts[key]->getType() == "video"))
+    {
+        // Display-only, no visitor-based write path exists for these
+        // (ElementUpdate::visit(ElementImg*, ...) etc. are no-op stubs).
         return true;
     }
     logError("PropertyMulti::setValue - %1 - can't update, unhandled type : %2(%3)", {key, mElts[key]->getType(), val.toString()});
@@ -278,7 +291,7 @@ void PropertyMulti::setAll(const QVariantMap &pValues)
     {
         if ((mElts[elt]->getType() == "int") || (mElts[elt]->getType() == "float") || (mElts[elt]->getType() == "string")
                 || (mElts[elt]->getType() == "bool") || (mElts[elt]->getType() == "date") || (mElts[elt]->getType() == "time")
-                || (mElts[elt]->getType() == "datetime") || (mElts[elt]->getType() == "light"))
+                || (mElts[elt]->getType() == "datetime"))
         {
             if (!pValues.contains(elt))
             {

@@ -1,6 +1,6 @@
 ---
 title: Controller, GlobalDatastore e file
-weight: 35
+weight: 30
 description: "Ciò che non è un modulo ordinario: dati del controller, carico di sistema, configurazioni, modulo GlobalDatastore, file system"
 ---
 
@@ -16,13 +16,19 @@ Il controller è il componente del server che carica i moduli e pilota il server
 | `currentconf` | Nome della configurazione corrente |
 | `banner` | Banner del server (testo libero, opzione `--banner`) |
 | `git` | Versione del server: `Gitdate`, `Githash`, `Gitmessage`, `Gittag` |
-| `libraries` | Librerie di moduli disponibili, un oggetto di metadati per libreria |
-| `profiles` | Profili disponibili: oggetto `nome della classe del modulo → elenco di nomi di profilo` |
+| `libraries` | Librerie di moduli disponibili, un oggetto di metadati per libreria — le chiavi sono **con prefisso `libost`** (`libostfocus`, `libostdummy`...); rimuoverlo prima di passarlo a [`ML`]({{% relref "client-messages.it.md" %}}#ml) |
+| `profiles` | Profili disponibili: oggetto `nome libreria trasformato → elenco di nomi di profilo` — vedi la convenzione di chiave qui sotto |
 | `indiserver` | `"Y"` se il server INDI integrato è attivato, `"N"` altrimenti |
 | `indidrivers` | Catalogo dei driver INDI installati: elenco di `{binary, family, label, mdpd}` |
 | `indiactivedrivers` | Driver INDI attualmente avviati |
 | `systemwatcher` | Carico del server, vedi più avanti |
 | `files`, `folders` | Copia di `d.files.files` e `d.files.folders`, vedi [File system](#fichiers) |
+
+{{% notice style="warning" title="Chiave di `profiles`: non il nome della libreria così com'è, non `infos.template`" %}}
+`profiles` è indicizzato dal **nome della libreria** del modulo (la stessa stringa passata come `lib` a [`ML`]({{% relref "client-messages.it.md" %}}#ml), cioè la chiave in `controllerdata.libraries` senza il prefisso `libost`) — ma trasformata: **prima lettera maiuscola, il resto minuscolo** (`"focus"` → `"Focus"`, non una semplice capitalizzazione — un nome di libreria con un'altra maiuscola verrebbe comunque appiattito, es. un ipotetico `"myFocus"` → `"Myfocus"`). Questa chiave non è né il nome/etichetta dell'istanza del modulo, né necessariamente identica a `infos.template` (di solito coincidono in pratica, ma i due sono impostati indipendentemente e nulla nel protocollo lo garantisce).
+
+Questa convenzione non è documentata altrove e non è imposta dal backend — è stata ricostruita analizzando la logica di ricerca di Rooster. Due client indipendenti costruiti solo a partire da questa documentazione ci sono cascati (un selettore di profili che si rendeva silenziosamente vuoto). Se devi cercare i profili disponibili di un modulo, riproduci esattamente questa trasformazione sul nome della libreria invece di indovinare.
+{{% /notice %}}
 
 {{% notice style="warning" title="`uc`: una chiave per messaggio, valore sostituito in blocco" %}}
 Un messaggio `uc` porta **una sola chiave** di `controllerdata`, e il suo valore sostituisce **interamente** quello precedente (nessuna fusione). Un client che legge solo la prima chiave del payload (come fa Rooster) è quindi corretto finché il server invia una sola chiave per messaggio, il che oggi è vero.
@@ -77,9 +83,23 @@ Una **configurazione** è un insieme denominato di moduli (libreria, etichetta, 
 
 I moduli effettivamente caricati sono quelli del dump (`d.m`); compaiono e scompaiono tramite [`aa`]({{% relref "server-messages.it.md" %}}#aa) e [`dm`]({{% relref "server-messages.it.md" %}}#dm). La configurazione **non contiene mai** `GlobalDatastore` (vedi sotto), che è sempre presente.
 
+{{% notice style="warning" title="Una configurazione include silenziosamente i driver INDI attivi" %}}
+`CS` salva anche i driver INDI attualmente in esecuzione oltre all'elenco dei moduli, e `CL` li riavvia — ma ciò è invisibile in `controllerdata.availableconfs`, la cui forma descrive solo i moduli (`{modulelabel, moduletype, profilename}`), mai i driver. Un client che costruisce un editor di configurazioni limitandosi all'elenco dei moduli non mostra il quadro completo di ciò che accadrà realmente al `CL`.
+{{% /notice %}}
+
+{{% notice style="note" title="Nessuna operazione di eliminazione" %}}
+Non esiste alcun comando per rimuovere una configurazione salvata — `CL` e `CS` sono le uniche due operazioni. Una configurazione che un client non vuole più resta indefinitamente in `controllerdata.availableconfs` (può solo essere sovrascritta con lo stesso nome da un altro `CS`).
+{{% /notice %}}
+
 ### Server INDI e driver
 
 Se `controllerdata.indiserver` vale `"Y"`, il server pilota un'istanza INDI integrata. I comandi [`YA`/`YZ`/`YL`/`YR`/`YS`]({{% relref "client-messages.it.md" %}}#indi) la avviano, la arrestano e gestiscono i driver; `controllerdata.indidrivers` fornisce il catalogo disponibile e `controllerdata.indiactivedrivers` ciò che è in esecuzione. `binary` è il valore da passare come `driver` in `YL`, `YR` e `YS`.
+
+`controllerdata.indidrivers` e `controllerdata.indiactivedrivers` sono entrambi elenchi di oggetti `{binary, family, label}` (`indidrivers` ha in più `mdpd`, vedi la tabella sopra).
+
+{{% notice style="warning" title="YA/YZ/YL/YR/YS non hanno una conferma dedicata" %}}
+Nessuno di questi comandi genera un proprio messaggio di conferma. Successo o fallimento vanno dedotti indirettamente: `YL`/`YR`/`YS` sono seguiti da un aggiornamento `uc` di `indiactivedrivers` che riflette la modifica richiesta (ma questo conferma solo che il server ci ha *provato*, non che il driver INDI sottostante sia effettivamente partito), mentre `YA`/`YZ` non producono alcun `uc` — solo messaggi `l` (log), pensati per un umano, non per essere analizzati programmaticamente da un client. `controllerdata.indiserver` stesso riflette l'opzione di avvio `--indiserver`, non se il server integrato sia effettivamente in esecuzione in questo momento.
+{{% /notice %}}
 
 ## Il modulo `GlobalDatastore` {#globaldatastore}
 
@@ -130,36 +150,47 @@ Non ci sono né paginazione né limite di dimensione: su un webroot molto pieno 
 
 ### Scegliere la cartella: `FS`
 
-[`FS`]({{% relref "client-messages.it.md" %}}#fs) indica la cartella di cui si vuole l'elenco dei file. Il server sorveglia **una sola** cartella alla volta.
+[`FS`]({{% relref "client-messages.it.md" %}}#fs) indica la cartella da sorvegliare e di cui elencare i file. Il server sorveglia il **contenuto** di una sola cartella alla volta; l'albero delle cartelle (`folders`) è invece tracciato in modo indipendente, vedi sotto.
 
 {{% notice style="warning" title="La cartella selezionata è globale per il server" %}}
-Non esiste una cartella per client: un `FS` cambia l'elenco di file visto da **tutti** i client connessi (gli eventi seguenti sono diffusi a tutti). Un client non deve usarlo per una semplice navigazione «locale» se altri client possono essere connessi.
+Non esiste una cartella per client: un `FS` cambia l'elenco di file visto da **tutti** i client connessi. Un client non deve usarlo per una semplice navigazione «locale» se altri client possono essere connessi.
 
-Il server **non valida** il percorso: una cartella inesistente restituisce semplicemente un elenco vuoto, senza errore.
+Il percorso **viene validato**: la destinazione deve esistere e trovarsi all'interno del webroot (nessuna via di fuga con `../`). Una richiesta non valida viene rifiutata lato server (registrata, senza cambiamento di stato) — non restituisce silenziosamente un elenco vuoto.
 {{% /notice %}}
 
-### Aggiornamenti: `evt`
+Un `FS` riuscito sostituisce l'elenco di file in blocco: il client riceve un solo messaggio [`uc`]({{% relref "server-messages.it.md" %}}#uc) `files` con l'elenco completo della nuova cartella, non un flusso di `af`/`df` — selezionare una cartella non è una mutazione del file system, non è stato realmente aggiunto o rimosso nulla. **Non** c'è alcun messaggio che annuncia il nuovo `selectedfolder` in sé, che esiste solo nel dump.
 
-Quando il contenuto della cartella selezionata cambia (file creato, eliminato o rinominato), o dopo un `FS`, il server invia eventi di primo livello `evt`:
+### Albero delle cartelle vs. file della cartella selezionata
+
+`folders` (l'intero albero ricorsivo) e `files` (il contenuto della cartella selezionata) non hanno lo stesso ambito:
+
+| | Ambito | Aggiornamenti live |
+|---|---|---|
+| `folders` / `ad` / `dd` | **Tutto il webroot**, ricorsivamente — indipendente da cosa è selezionato | Sempre, indipendentemente dalla selezione `FS` corrente |
+| `files` / `af` / `df` | **Solo la cartella selezionata** | Solo per i cambiamenti alla cartella selezionata dall'ultimo `FS` |
+
+Una cartella creata o eliminata ovunque nel webroot viene segnalata live tramite `ad`/`dd` anche se nessun client l'ha attualmente selezionata. Un file creato o eliminato viene segnalato tramite `af`/`df` solo se riguarda la cartella selezionata per ultima dal `FS` di un client — `files`/`af`/`df` non dicono nulla sul contenuto delle altre cartelle, un client deve farci un `FS` per scoprirlo.
+
+### Aggiornamenti: `af` / `df` / `ad` / `dd`
+
+Quando l'albero delle cartelle o il contenuto della cartella selezionata cambia realmente, il server invia un messaggio per ogni percorso interessato — il valore è il percorso nudo stesso, non racchiuso in un oggetto o array:
 
 ```json
-{ "evt": "fileadd", "fileevent": ["/Sequencer/gam Cyg/LIGHT/Luminance/img_001.FITS"] }
-{ "evt": "filedel", "fileevent": ["/rapport.txt"] }
+{ "af": "/Sequencer/gam Cyg/LIGHT/Luminance/img_001.FITS" }
+{ "df": "/rapport.txt" }
+{ "ad": "/Sequencer/nuovo target" }
 ```
 
-| Valore di `evt` | Significato |
+| Chiave | Significato |
 |---|---|
-| `fileadd` | File apparso/i nella cartella selezionata |
-| `filedel` | File scomparso/i dalla cartella selezionata |
-| `folderadd` / `folderdel` | Sottocartella creata / eliminata nel webroot (stessa forma, `fileevent` contiene i percorsi delle cartelle) |
+| `af` | File apparso nella cartella selezionata |
+| `df` | File scomparso dalla cartella selezionata |
+| `ad` | Sottocartella apparsa ovunque nel webroot |
+| `dd` | Sottocartella scomparsa ovunque nel webroot |
 
-`fileevent` è **sempre un array**; oggi contiene un solo percorso per messaggio (N file = N messaggi). Dopo un `FS`, il client riceve un `filedel` per ogni file della vecchia cartella, poi un `fileadd` per ogni file della nuova: **non** c'è alcun messaggio che annuncia il nuovo `selectedfolder`, che esiste solo nel dump.
+Ogni messaggio porta esattamente un percorso (N file = N messaggi) — vedi [`af`/`df`/`ad`/`dd`]({{% relref "server-messages.it.md" %}}#af) per il riferimento completo. Una rinomina viene segnalata come un'eliminazione seguita da una creazione: il server confronta un elenco prima/dopo, non rileva le rinomine in quanto tali.
 
-A ogni passaggio il server invia inoltre messaggi [`uc`]({{% relref "server-messages.it.md" %}}#uc) `files` e `folders` contenenti gli elenchi **completi**: un client può quindi applicare gli eventi `evt` uno per uno, oppure semplicemente sostituire i propri elenchi con questi `uc`.
-
-{{% notice style="warning" title="Trappola: `evt` inizia con `ev`" %}}
-La regola abituale è confrontare i primi 1 o 2 caratteri della chiave. Ora, `evt` inizia con `ev`, il tipo degli [aggiornamenti di elemento con metadati]({{% relref "server-messages.it.md" %}}#ev), il cui payload è un oggetto e non una stringa. Un client che smista sul prefisso deve **verificare l'uguaglianza esatta con `evt` prima** di verificare `ev`, altrimenti scambierà un evento di file per un aggiornamento di elemento.
-{{% /notice %}}
+Dopo i messaggi per percorso, il server invia [`uc`]({{% relref "server-messages.it.md" %}}#uc) `files` e/o `folders` con l'elenco completo aggiornato — ma solo per quello dei due che è realmente cambiato in questo passaggio, mai incondizionatamente. Un client può quindi applicare gli eventi per percorso in modo incrementale, oppure semplicemente sostituire il/i proprio/i elenco/i con il/i messaggio/i `uc` corrispondente/i.
 
 ### Costruire l'URL di un file
 

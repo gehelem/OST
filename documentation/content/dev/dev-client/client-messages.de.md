@@ -1,6 +1,6 @@
 ---
 title: Nachrichten Client → Server
-weight: 30
+weight: 50
 description: "Alle JSON-Nachrichten, die Clients an den OST-Server senden können"
 ---
 
@@ -22,6 +22,7 @@ Alle Client-Befehlsschlüssel stehen in **GROSSBUCHSTABEN** (z. B. `DU`, `SV`, `
 | [`IL`](#il) | Sprache ändern |
 | [`SV`](#sv) | Wert eines einzelnen Elements senden |
 | [`SA`](#sa) | Alle Elementwerte senden |
+| [`DP`](#dp) | Property-Dump anfordern |
 | [`I1`](#i1) | Klick auf preicon1 der Property |
 | [`I2`](#i2) | Klick auf preicon2 der Property |
 | [`I3`](#i3) | Klick auf posticon1 der Property |
@@ -36,11 +37,13 @@ Alle Client-Befehlsschlüssel stehen in **GROSSBUCHSTABEN** (z. B. `DU`, `SV`, `
 | [`GF`](#gf) | Grid-Zeile auswählen |
 | [`GH`](#gh) | Grid-Zeile nach oben verschieben |
 | [`GB`](#gb) | Grid-Zeile nach unten verschieben |
+| [`GR`](#gr) | Grid zurücksetzen (leeren) |
 | [`CL`](#cl) | Modulkonfiguration laden |
 | [`CS`](#cs) | Aktuelle Konfiguration speichern |
 | [`FS`](#fs) | Überwachten Dateiordner wählen |
 | [`ML`](#ml) | Modul laden |
 | [`MK`](#mk) | Modul entladen |
+| [`QY`](#qy) | Modul abfragen (Inter-Modul-Mechanismus, nicht für Clients gedacht) |
 | [`YA`](#indi) | Eingebetteten INDI-Server starten |
 | [`YZ`](#indi) | Eingebetteten INDI-Server stoppen |
 | [`YL`](#indi) | INDI-Treiber laden |
@@ -179,9 +182,33 @@ Ein `SA` muss alle editierbaren Elemente der Property enthalten. Fehlt auch nur 
 
 ---
 
-## Icon-Aktionen
+### `DP` — Property-Dump anfordern {#dp}
 
-Die Icons einer Property (preicon / posticon) lösen Backend-Aktionen aus, etwa das Speichern eines Profils, das Laden eines Profils oder das Starten eines Prozesses. Klick-Ereignisse werden über folgende Befehle gesendet.
+Bittet den Server, den vollständigen Zustand einer Property erneut zu senden, als wäre sie gerade (neu) geladen worden — nützlich, um eine Property zu aktualisieren, bei der ein Client eine Desynchronisation vermutet, ohne das ganze Modul neu zu laden. Der Server antwortet mit einer [`ap`]({{% relref "server-messages.de.md" %}}#ap)-Nachricht für genau diese Property.
+
+```json
+{
+  "DP": {
+    "m": {
+      "Focus": {
+        "p": {
+          "parameters": {}
+        }
+      }
+    }
+  }
+}
+```
+
+Kein `e`-Feld: `DP` bezieht sich auf die gesamte Property, nicht auf ein einzelnes Element.
+
+---
+
+## Icon-Aktionen {#icon-actions}
+
+`preicon1`/`preicon2`/`posticon1`/`posticon2` (Properties) und `preicon`/`posticon` (Elemente, siehe [Datenmodell]({{% relref "structure.de.md" %}})) sind keine Dekoration: jedes ist eine **klickbare Aktion**. Ein nicht-leerer Wert ist der Name des zu rendernden Google-Fonts-Icons (Material Icons); ein Klick darauf sendet den passenden Befehl unten, **ganz ohne Wert oder Parameter** — ein leeres Payload, das einfach die Property (oder das Element) adressiert. Was die Aktion serverseitig tatsächlich tut (Profil speichern, Profil laden, Prozess starten...), entscheidet allein das Modul; die einzige Aufgabe des Clients ist, das Icon zu rendern und den Klick unverändert weiterzugeben.
+
+Ein **leerer String bedeutet, dass an dieser Stelle kein Icon vorhanden ist** — nichts zu rendern, folglich nichts zu klicken oder zu senden. Für ein leeres Icon-Feld sollte weder ein Platzhalter gerendert noch ein Klick-Handler registriert werden.
 
 ### `I1` — Klick auf preicon1 der Property {#i1}
 
@@ -269,6 +296,10 @@ Gleiche Struktur wie `J1`.
 
 Der Server antwortet mit einer `fl`-Nachricht (Profil geladen) und sendet anschließend die aktualisierten Property-Werte.
 
+{{% notice style="note" title="Ein vorübergehendes `fc` geht `fl` voraus" %}}
+Der Server sendet unmittelbar vor `fl` ein [`fc`]({{% relref "server-messages.de.md" %}}#fs) (nicht gespeicherte Änderungen), als Zwischenschritt beim Laden des Profils, bevor sich die Werte der Property tatsächlich ändern. Ein Client, der auf `fc` reagiert, indem er einen Hinweis auf „nicht gespeicherte Änderungen" anzeigt, sieht diesen für eine Nachricht lang aufblitzen und sich selbst korrigieren, sobald direkt danach `fl` eintrifft — erwartet, kein Bug.
+{{% /notice %}}
+
 ---
 
 ### `PS` — Profil speichern {#ps}
@@ -319,8 +350,10 @@ Fügt der Grid eine neue Zeile mit den übergebenen Elementwerten hinzu.
 
 Der Server antwortet mit einer `gc`-Nachricht, die den Index der neuen Zeile bestätigt.
 
-{{% notice style="note" title="Basis-Elemente aktualisieren sich vor der Grid-Zeile" %}}
-Das Erstellen einer Grid-Zeile wendet die übermittelten Werte zuerst auf die Basis-Elemente der Property an (jedes sendet sein eigenes `ea`), fügt dann die Zeile hinzu und sendet `gc`. Zeigt eine Property gleichzeitig ihre Basis-Elemente und ihr Grid an (`showElts` und `showGrid` beide aktiv — eine unübliche Kombination), sieht ein live-rendernder Client kurz, wie die Basis-Elemente die Werte der neuen Zeile widerspiegeln, bevor die Zeile selbst erscheint. Das ist der echte Datastore-Zustand, kein Bug — die Darstellung sollte sich daran anpassen, statt es herauszufiltern, und vor allem niemals Polling einsetzen, um das zu umgehen.
+{{% notice style="note" title="Jedes `ea` einfach anwenden, wie es kommt — nichts zu hinterfragen" %}}
+Das Erstellen einer Grid-Zeile wendet die übermittelten Werte zuerst auf die Basis-Elemente der Property an, fügt dann die Zeile hinzu und sendet `gc`. Das kann mehr als eine `ea`-Nachricht brauchen (eine pro geändertem Basis-Element, nacheinander gesendet — das Senden von `target`/`exposure`/`count` wie oben erzeugt drei separate `ea`-Nachrichten vor dem abschließenden `gc`), aber ein Client muss diese Anzahl nie kennen oder vorhersagen: der Server sendet immer nur genau das, was nötig ist, um den Datastore des Clients korrekt zu halten — nicht mehr und nicht weniger (siehe [Grundsätze der Client-Architektur]({{% relref "client-pattern.de.md" %}})). Jede Nachricht genau so anwenden, wie sie kommt, wie immer — das Ergebnis ist korrekt, egal wie viele Nachrichten es waren.
+
+Der einzige sichtbare Nebeneffekt: eine Property, die gleichzeitig ihre Basis-Elemente und ihr Grid anzeigt (`showElts` und `showGrid` beide aktiv — eine unübliche Kombination), flackert durch diese Zwischenzustände, bevor die neue Zeile erscheint. Das ist der echte Datastore-Zustand, kein Bug, und er löst sich von selbst auf — kein Grund, ihn herauszufiltern oder mit Polling zu umgehen.
 {{% /notice %}}
 
 ---
@@ -439,6 +472,28 @@ Verschiebt die Zeile mit Index `i` um eine Position nach unten.
 
 ---
 
+### `GR` — Grid zurücksetzen {#gr}
+
+Leert das gesamte Grid einer Property (alle Zeilen entfernt) — nicht nur eine einzelne Zeile wie `GD`. Der Server sendet daraufhin [`gr`]({{% relref "server-messages.de.md" %}}#gr).
+
+```json
+{
+  "GR": {
+    "m": {
+      "Sequencer": {
+        "p": {
+          "sequence": {}
+        }
+      }
+    }
+  }
+}
+```
+
+Kein `i`-Feld: `GR` bezieht sich auf das gesamte Grid, nicht auf eine einzelne Zeile.
+
+---
+
 ## Modul-Lebenszyklus
 
 ### `CL` — Konfiguration laden {#cl}
@@ -475,6 +530,23 @@ Fordert den Server auf, ein Modul dynamisch zu laden. Diese Befehle richten sich
 | `label` | Label dieser Instanz; der **Modulname** ist dieses Label ohne Leerzeichen. Ist ein Modul dieses Namens bereits geladen, wird die Anfrage abgelehnt |
 | `profile` | Name des zu ladenden Profils (optional) |
 
+{{% notice style="warning" title="Keinen controllerdata.libraries-Schlüssel unverändert übernehmen" %}}
+Die Schlüssel von `controllerdata.libraries` sind bereits präfigiert (`libostfocus`, `libostdummy`...). Der Server stellt `libost` bedingungslos erneut voran, sodass ein direkt weitergereichter Schlüssel doppelt präfigiert wird und fehlschlägt:
+
+```json
+{ "ML": { "lib": "libostdummy", "label": "MyDummy" } }
+```
+```
+Error loading library MyDummy - Cannot load library libostlibostdummy: cannot open shared object file: No such file or directory
+```
+
+Das Präfix `libost` zuerst vom Schlüssel entfernen (dieselbe Transformation, auf die sich die Schlüsselkonvention von `profiles` stützt, siehe [Controller-Daten]({{% relref "controller.de.md" %}})):
+
+```json
+{ "ML": { "lib": "dummy", "label": "MyDummy" } }
+```
+{{% /notice %}}
+
 ---
 
 ### `MK` — Modul entladen {#mk}
@@ -486,6 +558,35 @@ Fordert den Server auf, ein laufendes Modul zu entladen, bezeichnet durch seinen
 ```
 
 `GlobalDatastore` kann nicht entladen werden: die Anfrage wird abgelehnt (Fehlermeldung in den Logs).
+
+---
+
+## Modul abfragen
+
+### `QY` — Modul abfragen {#qy}
+
+{{% notice style="warning" title="Inter-Modul-Kommunikation, keine Client-Funktion" %}}
+`QY`/`qa` existiert in erster Linie, damit ein Modul einem anderen Modul intern eine Frage stellen kann (ein Modul, das `Basemodule::otherModuleQuery()` aufruft, läuft über denselben Mechanismus). Ein Client kann technisch auch `QY` senden — die Hülle ist identisch — aber dafür gibt es heute keinen etablierten Anwendungsfall auf Client-Seite. Hier der Vollständigkeit halber dokumentiert, und weil es relevant sein wird, wenn dokumentiert wird, wie man ein Modul baut — nicht als etwas, worauf ein Client eine Funktion aufbauen sollte.
+{{% /notice %}}
+
+Generischer, pro Modul definierter Anfrage-/Antwort-Mechanismus: einem Modul eine benannte Frage mit Parametern stellen, eine benannte Antwort über [`qa`]({{% relref "server-messages.de.md" %}}#qa) zurückerhalten. Welche Anfragenamen ein Modul tatsächlich versteht (falls überhaupt), entscheidet allein das Modul — das Protokoll definiert nur die Hülle. Zu beachten: keine `p`-Hülle hier, `QY` adressiert das Modul selbst, nicht eine seiner Properties.
+
+```json
+{
+  "QY": {
+    "m": {
+      "Sequencer": {
+        "query": "profileduration",
+        "params": { "profile": "default" }
+      }
+    }
+  }
+}
+```
+
+{{% notice style="note" title="Noch nicht viel zu sehen" %}}
+Heute implementiert nur das Modul `Sequencer` eine echte Antwort (`profileduration`), intern genutzt vom Planner-Modul. Kein anderes ausgeliefertes Modul antwortet bislang sinnvoll auf irgendeinen Anfragenamen.
+{{% /notice %}}
 
 ---
 

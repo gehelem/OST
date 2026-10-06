@@ -1,6 +1,6 @@
 ---
 title: Messaggi Client → Server
-weight: 30
+weight: 50
 description: "Tutti i messaggi JSON che i client possono inviare al server OST"
 ---
 
@@ -22,6 +22,7 @@ Tutte le chiavi dei comandi client sono in **MAIUSCOLO** (es. `DU`, `SV`, `SA`, 
 | [`IL`](#il) | Cambiare la lingua |
 | [`SV`](#sv) | Inviare il valore di un singolo elemento |
 | [`SA`](#sa) | Inviare tutti i valori degli elementi |
+| [`DP`](#dp) | Richiedere il dump di una proprietà |
 | [`I1`](#i1) | Clic su preicon1 di proprietà |
 | [`I2`](#i2) | Clic su preicon2 di proprietà |
 | [`I3`](#i3) | Clic su posticon1 di proprietà |
@@ -36,11 +37,13 @@ Tutte le chiavi dei comandi client sono in **MAIUSCOLO** (es. `DU`, `SV`, `SA`, 
 | [`GF`](#gf) | Selezionare una riga di griglia |
 | [`GH`](#gh) | Spostare in alto una riga di griglia |
 | [`GB`](#gb) | Spostare in basso una riga di griglia |
+| [`GR`](#gr) | Azzerare (svuotare) la griglia |
 | [`CL`](#cl) | Caricare una configurazione di moduli |
 | [`CS`](#cs) | Salvare la configurazione corrente |
 | [`FS`](#fs) | Scegliere la cartella di file sorvegliata |
 | [`ML`](#ml) | Caricare un modulo |
 | [`MK`](#mk) | Scaricare un modulo |
+| [`QY`](#qy) | Interrogare un modulo (meccanismo inter-modulo, non destinato al client) |
 | [`YA`](#indi) | Avviare il server INDI integrato |
 | [`YZ`](#indi) | Arrestare il server INDI integrato |
 | [`YL`](#indi) | Caricare un driver INDI |
@@ -179,9 +182,33 @@ Un `SA` deve contenere tutti gli elementi editabili della proprietà. Se anche u
 
 ---
 
-## Azioni sulle icone
+### `DP` — Richiedere il dump di una proprietà {#dp}
 
-Le icone di proprietà (preicon / posticon) attivano azioni backend come il salvataggio di un profilo, il caricamento di un profilo o l'avvio di un processo. Gli eventi di clic vengono inviati tramite i seguenti comandi.
+Chiede al server di rinviare lo stato completo di una proprietà, come se fosse appena stata (ri)caricata — utile per forzare l'aggiornamento di una proprietà che un client sospetta essere disallineata, senza ricaricare l'intero modulo. Il server risponde con un messaggio [`ap`]({{% relref "server-messages.it.md" %}}#ap) per quella sola proprietà.
+
+```json
+{
+  "DP": {
+    "m": {
+      "Focus": {
+        "p": {
+          "parameters": {}
+        }
+      }
+    }
+  }
+}
+```
+
+Nessun campo `e`: `DP` riguarda l'intera proprietà, non un singolo elemento.
+
+---
+
+## Azioni sulle icone {#icon-actions}
+
+`preicon1`/`preicon2`/`posticon1`/`posticon2` (proprietà) e `preicon`/`posticon` (elementi, vedi [Modello dati]({{% relref "structure.it.md" %}})) non sono decorazioni: ciascuna è un'**azione cliccabile**. Un valore non vuoto è il nome dell'icona Google Fonts (Material Icons) da visualizzare; cliccando sull'icona visualizzata si invia il comando corrispondente sotto, **senza alcun valore o parametro** — un payload vuoto che punta semplicemente alla proprietà (o all'elemento). Cosa fa realmente l'azione lato server (salvare un profilo, caricare un profilo, avviare un processo...) dipende interamente dal modulo; l'unico compito del client è visualizzare l'icona e inoltrare il clic così com'è.
+
+Una **stringa vuota significa che non c'è alcuna icona** in quella posizione — nulla da visualizzare, e quindi nulla da cliccare o inviare. Non visualizzare un segnaposto né collegare un gestore di clic per un campo icona vuoto.
 
 ### `I1` — Clic su preicon1 di proprietà {#i1}
 
@@ -269,6 +296,10 @@ Stessa struttura di `J1`.
 
 Il server risponde con un messaggio `fl` (profilo caricato) poi invia i valori delle proprietà aggiornati.
 
+{{% notice style="note" title="Un `fc` transitorio precede `fl`" %}}
+Il server invia un messaggio [`fc`]({{% relref "server-messages.it.md" %}}#fs) (modifiche non salvate) immediatamente prima di `fl`, come passaggio intermedio del caricamento del profilo, prima che i valori della proprietà cambino effettivamente. Un client che reagisce a `fc` mostrando un indicatore "modifiche non salvate" lo vedrà lampeggiare per un messaggio e autocorreggersi non appena arriva `fl` subito dopo — atteso, non un bug.
+{{% /notice %}}
+
 ---
 
 ### `PS` — Salvare un profilo {#ps}
@@ -319,8 +350,10 @@ Aggiunge una nuova riga alla griglia con i valori degli elementi forniti.
 
 Il server risponde con un messaggio `gc` che confirma l'indice della nuova riga.
 
-{{% notice style="note" title="Gli elementi di base si aggiornano prima della riga di griglia" %}}
-Creare una riga di griglia applica prima i valori inviati agli elementi di base della proprietà (ognuno emette il proprio `ea`), poi aggiunge la riga ed emette `gc`. Se una proprietà mostra sia i suoi elementi di base sia la sua griglia contemporaneamente (`showElts` e `showGrid` entrambi attivi — combinazione rara), un client che visualizza in diretta vedrà brevemente gli elementi di base riflettere i valori della nuova riga prima che la riga stessa appaia. Questo è il vero stato del datastore, non un bug — adattate la visualizzazione a questo comportamento invece di cercare di filtrarlo, e soprattutto non fate mai polling per aggirarlo.
+{{% notice style="note" title="Applicate ogni `ea` così com'è — niente da chiedersi" %}}
+Creare una riga di griglia applica prima i valori inviati agli elementi di base della proprietà, poi aggiunge la riga ed emette `gc`. Questo può richiedere più di un messaggio `ea` (uno per ogni elemento di base modificato, inviati uno dopo l'altro — inviare `target`/`exposure`/`count` come sopra produce tre messaggi `ea` distinti prima del `gc` finale), ma un client non ha mai bisogno di conoscere o prevedere questo numero: il server invia sempre e solo lo stretto necessario per mantenere corretto il datastore del client, né più né meno (vedi [Principi di architettura client]({{% relref "client-pattern.it.md" %}})). Applicate ogni messaggio esattamente come arriva, come fate sempre, e il risultato è corretto indipendentemente dal numero di messaggi ricevuti.
+
+L'unico effetto visibile: una proprietà che mostra sia i suoi elementi di base sia la sua griglia contemporaneamente (`showElts` e `showGrid` entrambi attivi — combinazione rara) sfarfallerà attraverso questi stati intermedi prima che la nuova riga appaia. Questo è il vero stato del datastore, non un bug, e si risolve da solo — non serve filtrarlo né fare polling per aggirarlo.
 {{% /notice %}}
 
 ---
@@ -439,6 +472,28 @@ Sposta la riga all'indice `i` di una posizione verso il basso.
 
 ---
 
+### `GR` — Azzerare la griglia {#gr}
+
+Svuota completamente la griglia di una proprietà (tutte le righe rimosse) — non una singola riga come `GD`. Il server diffonde [`gr`]({{% relref "server-messages.it.md" %}}#gr) in risposta.
+
+```json
+{
+  "GR": {
+    "m": {
+      "Sequencer": {
+        "p": {
+          "sequence": {}
+        }
+      }
+    }
+  }
+}
+```
+
+Nessun campo `i`: `GR` riguarda l'intera griglia, non una singola riga.
+
+---
+
 ## Ciclo di vita dei moduli
 
 ### `CL` — Caricare una configurazione {#cl}
@@ -475,6 +530,23 @@ Chiede al server di caricare dinamicamente un modulo. Questi comandi si rivolgon
 | `label` | Etichetta di questa istanza; il **nome del modulo** è questa etichetta senza spazi. Se un modulo con questo nome è già caricato, la richiesta viene rifiutata |
 | `profile` | Nome del profilo da caricare (facoltativo) |
 
+{{% notice style="warning" title="Non passare una chiave di controllerdata.libraries così com'è" %}}
+Le chiavi di `controllerdata.libraries` sono già con prefisso (`libostfocus`, `libostdummy`...). Il server aggiunge di nuovo `libost` incondizionatamente, quindi inoltrare una chiave direttamente la prefissa due volte e fallisce:
+
+```json
+{ "ML": { "lib": "libostdummy", "label": "MyDummy" } }
+```
+```
+Error loading library MyDummy - Cannot load library libostlibostdummy: cannot open shared object file: No such file or directory
+```
+
+Rimuovere prima il prefisso `libost` dalla chiave (stessa trasformazione su cui si basa la convenzione di chiave di `profiles`, vedi [Controller data]({{% relref "controller.it.md" %}})):
+
+```json
+{ "ML": { "lib": "dummy", "label": "MyDummy" } }
+```
+{{% /notice %}}
+
 ---
 
 ### `MK` — Scaricare un modulo {#mk}
@@ -486,6 +558,35 @@ Chiede al server di scaricare un modulo in esecuzione, indicato dal suo nome.
 ```
 
 `GlobalDatastore` non può essere scaricato: la richiesta viene rifiutata (messaggio di errore nei log).
+
+---
+
+## Interrogare un modulo
+
+### `QY` — Interrogare un modulo {#qy}
+
+{{% notice style="warning" title="Comunicazione inter-modulo, non una funzionalità client" %}}
+`QY`/`qa` esiste principalmente perché un modulo possa porre una domanda a un altro modulo internamente (un modulo che chiama `Basemodule::otherModuleQuery()`, che passa per questo stesso meccanismo). Un client può tecnicamente inviare `QY` anche lui — l'involucro è identico — ma oggi non esiste un caso d'uso lato client consolidato. Documentato qui per completezza, e perché sarà rilevante quando si documenterà come costruire un modulo — non come qualcosa su cui un client dovrebbe costruire una funzionalità.
+{{% /notice %}}
+
+Meccanismo generico di richiesta/risposta specifico per modulo: porre a un modulo una domanda nominata con parametri, ricevere una risposta nominata tramite [`qa`]({{% relref "server-messages.it.md" %}}#qa). Quali nomi di richiesta un modulo comprenda realmente (se ne comprende) dipende interamente da quel modulo — il protocollo definisce solo l'involucro. Da notare: nessun involucro `p` qui, `QY` punta al modulo stesso, non a una sua proprietà.
+
+```json
+{
+  "QY": {
+    "m": {
+      "Sequencer": {
+        "query": "profileduration",
+        "params": { "profile": "default" }
+      }
+    }
+  }
+}
+```
+
+{{% notice style="note" title="Ancora poco da vedere" %}}
+Oggi solo il modulo `Sequencer` implementa una vera risposta (`profileduration`), usata internamente dal modulo Planner. Nessun altro modulo distribuito risponde in modo significativo a nessun nome di richiesta per ora.
+{{% /notice %}}
 
 ---
 

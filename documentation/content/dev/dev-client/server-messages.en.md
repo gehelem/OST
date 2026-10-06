@@ -1,6 +1,6 @@
 ---
 title: Server → Client Messages
-weight: 20
+weight: 40
 description: "All JSON messages sent by the OST server to connected clients"
 ---
 
@@ -17,10 +17,6 @@ Every message is a JSON object with **one top-level key**. That key encodes the 
 Clients should match on the **first 1 or 2 characters** of the key, not the full string, since the description part can change.
 
 All server-sent event keys are **lowercase** (e.g. `d`, `ea`, `ap`, `gc`).
-
-{{% notice style="warning" title="Exception: `evt` starts with `ev`" %}}
-The [`evt`](#evt) key (file events) starts with the same two characters as [`ev`](#ev). Check for an exact match with `evt` first, and only then fall back to prefixes, otherwise a file event is mistaken for an element update.
-{{% /notice %}}
 
 ---
 
@@ -49,7 +45,11 @@ The [`evt`](#evt) key (file events) starts with the same two characters as [`ev`
 | [`fc`](#fs) | Profile has unsaved changes |
 | [`l`](#l) | Log entry |
 | [`uc`](#uc) | Controller data update |
-| [`evt`](#evt) | File or folder event (added/removed) |
+| [`af`](#af) | File added |
+| [`df`](#af) | File deleted |
+| [`ad`](#af) | Directory added |
+| [`dd`](#af) | Directory deleted |
+| [`qa`](#qa) | Answer to a module query (inter-module mechanism, not client-facing) |
 | [`xx`](#xx) | Keepalive pong |
 
 ---
@@ -66,7 +66,7 @@ Sent in response to a `DU` request. Contains everything: all modules, logs, file
     "serverlng": "en",
     "m": {
       "Focus": {
-        "infos": { "label": "Focus", "name": "Focus", "description": "..." },
+        "infos": { "modulelabel": "Focus", "description": "..." },
         "f": { "name": "default", "changed": false },
         "l": {
           "myLov": { "label": "My LOV", "type": "string", "values": { "a": "Option A" } }
@@ -145,7 +145,7 @@ Sent when a module is loaded or reloaded at runtime. Contains the complete modul
 {
   "aa-dump all data": {
     "Guider": {
-      "infos": { "label": "Guider", "name": "Guider", "description": "..." },
+      "infos": { "modulelabel": "Guider", "description": "..." },
       "f": { "name": "default", "changed": false },
       "l": {},
       "p": {
@@ -553,22 +553,52 @@ The payload is `{"key": value}` where `value` can be a string, array, or object.
 
 ---
 
-## `evt` — File or folder event {#evt}
+## `af` / `df` / `ad` / `dd` — File and folder events {#af}
 
-Sent to all clients when the content of the watched file folder changes (see [File system]({{% relref "controller.en.md" %}}#fichiers)). Unlike the other messages, the key is exactly `evt` and its **value is a string** giving the event type; the paths are in a sibling `fileevent` field.
+Sent to all clients when the content of the watched file folder changes (see [File system]({{% relref "controller.en.md" %}}#fichiers)). Unlike other messages, the value is a **bare string**: the affected path, not wrapped in an object or array — the server only ever reports one path per message.
 
 ```json
-{ "evt": "fileadd", "fileevent": ["/Allsky/image_001.jpeg"] }
+{ "af": "/Allsky/image_001.jpeg" }
+{ "df": "/Allsky/old_image.jpeg" }
 ```
 
-| `evt` | Meaning |
+| Key | Meaning |
 |---|---|
-| `fileadd` | File(s) added to the selected folder |
-| `filedel` | File(s) removed from the selected folder |
-| `folderadd` | Sub-folder added to the webroot |
-| `folderdel` | Sub-folder removed from the webroot |
+| `af` | File added to the selected folder |
+| `df` | File removed from the selected folder |
+| `ad` | Sub-folder added anywhere in the webroot |
+| `dd` | Sub-folder removed anywhere in the webroot |
 
-`fileevent` is always an array of paths relative to the webroot (starting with `/`).
+`af`/`df` only concern the folder currently selected via [`FS`]({{% relref "client-messages.en.md" %}}#fs) — nothing is reported for other folders' content. `ad`/`dd` are global: they fire for the whole webroot tree regardless of what is currently selected. See [File system]({{% relref "controller.en.md" %}}#fichiers) for the full picture.
+
+---
+
+## `qa` — Answer to a module query {#qa}
+
+{{% notice style="warning" title="Inter-module communication, not a client feature" %}}
+See the note on [`QY`]({{% relref "client-messages.en.md" %}}#qy): this mechanism exists primarily for one module to query another internally. Documented here for completeness, not as a client-facing feature.
+{{% /notice %}}
+
+Reply to a [`QY`]({{% relref "client-messages.en.md" %}}#qy) query. `QY`/`qa` is a **generic, per-module request/answer mechanism**: a client (or another module, internally) asks a module a named question with parameters, and gets a named answer back. What query names a module actually understands, and what its answer looks like, is entirely up to that module — the protocol only defines the envelope, not the content.
+
+```json
+{
+  "qa-query answer": {
+    "Sequencer": {
+      "q": {
+        "query": "profileduration",
+        "result": { "seconds": 3600 }
+      }
+    }
+  }
+}
+```
+
+`result` is whatever the module returned for that query — its shape depends entirely on `query`. A module with no matching case for the requested `query` name returns an empty `result`, silently.
+
+{{% notice style="note" title="Not much to see yet" %}}
+Today only the `Sequencer` module implements a real answer (`profileduration`), used internally by the Planner module rather than by any documented client workflow. No other shipped module responds meaningfully to any query name — this mechanism exists and is fully wired, but there is little to query in practice right now.
+{{% /notice %}}
 
 ---
 

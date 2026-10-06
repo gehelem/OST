@@ -1,6 +1,6 @@
 ---
 title: Messages Serveur → Client
-weight: 20
+weight: 40
 description: "Tous les messages JSON envoyés par le serveur OST aux clients connectés"
 ---
 
@@ -17,10 +17,6 @@ Chaque message est un objet JSON avec **une seule clé de premier niveau**. Cett
 Les clients doivent comparer sur les **1 ou 2 premiers caractères** de la clé, et non sur la chaîne complète, car la partie description peut changer.
 
 Toutes les clés d'événements envoyées par le serveur sont en **minuscules** (ex. `d`, `ea`, `ap`, `gc`).
-
-{{% notice style="warning" title="Exception : `evt` commence par `ev`" %}}
-La clé [`evt`](#evt) (événements de fichiers) commence par les mêmes deux caractères que [`ev`](#ev). Comparer d'abord l'égalité exacte avec `evt`, puis seulement les préfixes, sinon un événement de fichier est pris pour une mise à jour d'élément.
-{{% /notice %}}
 
 ---
 
@@ -49,7 +45,11 @@ La clé [`evt`](#evt) (événements de fichiers) commence par les mêmes deux ca
 | [`fc`](#fs) | Profil modifié (modifications non sauvegardées) |
 | [`l`](#l) | Entrée de log |
 | [`uc`](#uc) | Mise à jour des données du contrôleur |
-| [`evt`](#evt) | Événement de fichier ou de dossier (ajout/suppression) |
+| [`af`](#af) | Fichier ajouté |
+| [`df`](#af) | Fichier supprimé |
+| [`ad`](#af) | Dossier ajouté |
+| [`dd`](#af) | Dossier supprimé |
+| [`qa`](#qa) | Réponse à une requête de module (mécanisme inter-module, pas destiné au client) |
 | [`xx`](#xx) | Pong keepalive |
 
 ---
@@ -66,7 +66,7 @@ Envoyé en réponse à une requête `DU`. Contient tout : tous les modules, les 
     "serverlng": "en",
     "m": {
       "Focus": {
-        "infos": { "label": "Focus", "name": "Focus", "description": "..." },
+        "infos": { "modulelabel": "Focus", "description": "..." },
         "f": { "name": "default", "changed": false },
         "l": {
           "myLov": { "label": "My LOV", "type": "string", "values": { "a": "Option A" } }
@@ -145,7 +145,7 @@ Envoyé lorsqu'un module est chargé ou rechargé à l'exécution. Contient l'é
 {
   "aa-dump all data": {
     "Guider": {
-      "infos": { "label": "Guider", "name": "Guider", "description": "..." },
+      "infos": { "modulelabel": "Guider", "description": "..." },
       "f": { "name": "default", "changed": false },
       "l": {},
       "p": {
@@ -553,22 +553,52 @@ Le payload est `{"clé": valeur}` où `valeur` peut être une chaîne, un tablea
 
 ---
 
-## `evt` — Événement de fichier ou de dossier {#evt}
+## `af` / `df` / `ad` / `dd` — Événements de fichier ou de dossier {#af}
 
-Envoyé à tous les clients quand le contenu du dossier de fichiers surveillé change (voir [Système de fichiers]({{% relref "controller.fr.md" %}}#fichiers)). Contrairement aux autres messages, la clé est exactement `evt` et sa **valeur est une chaîne** qui donne le type d'événement ; les chemins sont dans un champ frère `fileevent`.
+Envoyé à tous les clients quand le contenu du dossier de fichiers surveillé change (voir [Système de fichiers]({{% relref "controller.fr.md" %}}#fichiers)). Contrairement aux autres messages, la valeur est une **chaîne brute** : le chemin concerné, sans être enveloppé dans un objet ou un tableau — le serveur ne signale jamais qu'un seul chemin par message.
 
 ```json
-{ "evt": "fileadd", "fileevent": ["/Allsky/image_001.jpeg"] }
+{ "af": "/Allsky/image_001.jpeg" }
+{ "df": "/Allsky/old_image.jpeg" }
 ```
 
-| `evt` | Signification |
+| Clé | Signification |
 |---|---|
-| `fileadd` | Fichier(s) ajouté(s) au dossier sélectionné |
-| `filedel` | Fichier(s) supprimé(s) du dossier sélectionné |
-| `folderadd` | Sous-dossier ajouté au webroot |
-| `folderdel` | Sous-dossier supprimé du webroot |
+| `af` | Fichier ajouté au dossier sélectionné |
+| `df` | Fichier supprimé du dossier sélectionné |
+| `ad` | Sous-dossier ajouté n'importe où dans le webroot |
+| `dd` | Sous-dossier supprimé n'importe où dans le webroot |
 
-`fileevent` est toujours un tableau de chemins relatifs au webroot (commençant par `/`).
+`af`/`df` ne concernent que le dossier actuellement sélectionné via [`FS`]({{% relref "client-messages.fr.md" %}}#fs) — rien n'est signalé pour le contenu des autres dossiers. `ad`/`dd` sont globaux : ils se déclenchent pour tout l'arbre du webroot, quel que soit le dossier actuellement sélectionné. Voir [Système de fichiers]({{% relref "controller.fr.md" %}}#fichiers) pour la vue d'ensemble.
+
+---
+
+## `qa` — Réponse à une requête de module {#qa}
+
+{{% notice style="warning" title="Communication inter-module, pas une fonctionnalité client" %}}
+Voir la note sur [`QY`]({{% relref "client-messages.fr.md" %}}#qy) : ce mécanisme existe avant tout pour qu'un module en interroge un autre en interne. Documenté ici pour l'exhaustivité, pas comme une fonctionnalité destinée au client.
+{{% /notice %}}
+
+Réponse à une requête [`QY`]({{% relref "client-messages.fr.md" %}}#qy). `QY`/`qa` est un **mécanisme générique de requête/réponse propre à chaque module** : un client (ou un autre module, en interne) pose à un module une question nommée avec des paramètres, et reçoit une réponse nommée en retour. Les noms de requête qu'un module comprend réellement, et la forme de sa réponse, dépendent entièrement de ce module — le protocole ne définit que l'enveloppe, pas le contenu.
+
+```json
+{
+  "qa-query answer": {
+    "Sequencer": {
+      "q": {
+        "query": "profileduration",
+        "result": { "seconds": 3600 }
+      }
+    }
+  }
+}
+```
+
+`result` est ce que le module a renvoyé pour cette requête — sa forme dépend entièrement de `query`. Un module sans cas correspondant à la `query` demandée renvoie un `result` vide, silencieusement.
+
+{{% notice style="note" title="Pas grand-chose à voir pour l'instant" %}}
+Aujourd'hui seul le module `Sequencer` implémente une vraie réponse (`profileduration`), utilisée en interne par le module Planner plutôt que par un quelconque flux client documenté. Aucun autre module livré ne répond de façon utile à une quelconque requête — ce mécanisme existe et est entièrement câblé, mais il y a peu de choses à interroger en pratique pour l'instant.
+{{% /notice %}}
 
 ---
 

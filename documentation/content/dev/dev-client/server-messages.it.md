@@ -1,6 +1,6 @@
 ---
 title: Messaggi Server → Client
-weight: 20
+weight: 40
 description: "Tutti i messaggi JSON inviati dal server OST ai client connessi"
 ---
 
@@ -17,10 +17,6 @@ Ogni messaggio è un oggetto JSON con **una sola chiave di primo livello**. Ques
 I client devono confrontare i **primi 1 o 2 caratteri** della chiave, non l'intera stringa, poiché la parte descrittiva può cambiare.
 
 Tutte le chiavi degli eventi inviate dal server sono in **minuscolo** (es. `d`, `ea`, `ap`, `gc`).
-
-{{% notice style="warning" title="Eccezione: `evt` inizia con `ev`" %}}
-La chiave [`evt`](#evt) (eventi di file) inizia con gli stessi due caratteri di [`ev`](#ev). Confrontare prima l'uguaglianza esatta con `evt`, e solo dopo i prefissi, altrimenti un evento di file viene scambiato per un aggiornamento di elemento.
-{{% /notice %}}
 
 ---
 
@@ -49,7 +45,11 @@ La chiave [`evt`](#evt) (eventi di file) inizia con gli stessi due caratteri di 
 | [`fc`](#fs) | Profilo modificato (modifiche non salvate) |
 | [`l`](#l) | Voce di log |
 | [`uc`](#uc) | Aggiornamento dei dati del controller |
-| [`evt`](#evt) | Evento di file o di cartella (aggiunta/eliminazione) |
+| [`af`](#af) | File aggiunto |
+| [`df`](#af) | File eliminato |
+| [`ad`](#af) | Cartella aggiunta |
+| [`dd`](#af) | Cartella eliminata |
+| [`qa`](#qa) | Risposta a una richiesta di modulo (meccanismo inter-modulo, non destinato al client) |
 | [`xx`](#xx) | Pong keepalive |
 
 ---
@@ -66,7 +66,7 @@ Inviato in risposta a una richiesta `DU`. Contiene tutto: tutti i moduli, i log,
     "serverlng": "en",
     "m": {
       "Focus": {
-        "infos": { "label": "Focus", "name": "Focus", "description": "..." },
+        "infos": { "modulelabel": "Focus", "description": "..." },
         "f": { "name": "default", "changed": false },
         "l": {
           "myLov": { "label": "My LOV", "type": "string", "values": { "a": "Option A" } }
@@ -145,7 +145,7 @@ Inviato quando un modulo viene caricato o ricaricato a runtime. Contiene lo stat
 {
   "aa-dump all data": {
     "Guider": {
-      "infos": { "label": "Guider", "name": "Guider", "description": "..." },
+      "infos": { "modulelabel": "Guider", "description": "..." },
       "f": { "name": "default", "changed": false },
       "l": {},
       "p": {
@@ -553,22 +553,52 @@ Il payload è `{"chiave": valore}` dove `valore` può essere una stringa, un arr
 
 ---
 
-## `evt` — Evento di file o di cartella {#evt}
+## `af` / `df` / `ad` / `dd` — Eventi di file e cartella {#af}
 
-Inviato a tutti i client quando il contenuto della cartella di file sorvegliata cambia (vedi [File system]({{% relref "controller.it.md" %}}#fichiers)). A differenza degli altri messaggi, la chiave è esattamente `evt` e il suo **valore è una stringa** che indica il tipo di evento; i percorsi si trovano in un campo affiancato `fileevent`.
+Inviato a tutti i client quando il contenuto della cartella di file sorvegliata cambia (vedi [File system]({{% relref "controller.it.md" %}}#fichiers)). A differenza degli altri messaggi, il valore è una **stringa nuda**: il percorso interessato, non racchiuso in un oggetto o array — il server segnala sempre un solo percorso per messaggio.
 
 ```json
-{ "evt": "fileadd", "fileevent": ["/Allsky/image_001.jpeg"] }
+{ "af": "/Allsky/image_001.jpeg" }
+{ "df": "/Allsky/old_image.jpeg" }
 ```
 
-| `evt` | Significato |
+| Chiave | Significato |
 |---|---|
-| `fileadd` | File aggiunto/i alla cartella selezionata |
-| `filedel` | File eliminato/i dalla cartella selezionata |
-| `folderadd` | Sottocartella aggiunta al webroot |
-| `folderdel` | Sottocartella eliminata dal webroot |
+| `af` | File aggiunto alla cartella selezionata |
+| `df` | File eliminato dalla cartella selezionata |
+| `ad` | Sottocartella aggiunta ovunque nel webroot |
+| `dd` | Sottocartella eliminata ovunque nel webroot |
 
-`fileevent` è sempre un array di percorsi relativi al webroot (che iniziano con `/`).
+`af`/`df` riguardano solo la cartella attualmente selezionata tramite [`FS`]({{% relref "client-messages.it.md" %}}#fs) — non viene segnalato nulla per il contenuto delle altre cartelle. `ad`/`dd` sono globali: si attivano per l'intero albero del webroot, indipendentemente da cosa è attualmente selezionato. Vedi [File system]({{% relref "controller.it.md" %}}#fichiers) per il quadro completo.
+
+---
+
+## `qa` — Risposta a una richiesta di modulo {#qa}
+
+{{% notice style="warning" title="Comunicazione inter-modulo, non una funzionalità client" %}}
+Vedi la nota su [`QY`]({{% relref "client-messages.it.md" %}}#qy): questo meccanismo esiste principalmente perché un modulo ne interroghi un altro internamente. Documentato qui per completezza, non come funzionalità destinata al client.
+{{% /notice %}}
+
+Risposta a una richiesta [`QY`]({{% relref "client-messages.it.md" %}}#qy). `QY`/`qa` è un **meccanismo generico di richiesta/risposta specifico per modulo**: un client (o un altro modulo, internamente) pone a un modulo una domanda nominata con parametri, e riceve indietro una risposta nominata. Quali nomi di richiesta un modulo comprenda realmente, e la forma della sua risposta, dipende interamente da quel modulo — il protocollo definisce solo l'involucro, non il contenuto.
+
+```json
+{
+  "qa-query answer": {
+    "Sequencer": {
+      "q": {
+        "query": "profileduration",
+        "result": { "seconds": 3600 }
+      }
+    }
+  }
+}
+```
+
+`result` è ciò che il modulo ha restituito per quella richiesta — la sua forma dipende interamente da `query`. Un modulo senza un caso corrispondente al nome `query` richiesto restituisce silenziosamente un `result` vuoto.
+
+{{% notice style="note" title="Ancora poco da vedere" %}}
+Oggi solo il modulo `Sequencer` implementa una vera risposta (`profileduration`), usata internamente dal modulo Planner piuttosto che da un qualsiasi flusso client documentato. Nessun altro modulo distribuito risponde in modo significativo a nessun nome di richiesta per ora — il meccanismo esiste ed è completamente cablato, ma c'è ancora poco da interrogare in pratica.
+{{% /notice %}}
 
 ---
 

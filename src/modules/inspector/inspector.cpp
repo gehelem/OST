@@ -1,6 +1,7 @@
 #include "inspector.h"
 #include <QPainter>
 #include <opencv2/opencv.hpp>
+#include <algorithm>
 #include <cmath>
 #include "version.cc"
 
@@ -120,6 +121,71 @@ Inspector::Inspector(QString name, QString label, QString profile, QVariantMap a
     i->setValue(200);
     i->setSlider(OST::SliderAndValue, false);
     getProperty("parms")->addElt(i);
+
+    // Collimation-analysis safety bounds (Gilles, 2026-10-04: a flat/
+    // featureless frame -- overexposed, underexposed, or just no donut in
+    // frame -- makes the OpenCV contour pipeline in analyzeFrame() both
+    // very slow and prone to drawing incoherent contours across the whole
+    // image; a saturated frame in particular can threshold into one giant
+    // blob, whose "local refinement" step then runs an expensive Otsu
+    // threshold + contour search over a near-full-frame ROI -- see
+    // analyzeFrame()'s own comments on each bound for the full story).
+    auto *f = new OST::ElementFloat("mindynrange", "Min. std dev to analyze (ADU)", "52", "");
+    f->setAutoUpdate(true);
+    f->setDirectEdit(true);
+    f->setMinMax(0, 1000, false);
+    f->setValue(20);
+    f->setSlider(OST::SliderAndValue, false);
+    getProperty("parms")->addElt(f);
+
+    f = new OST::ElementFloat("maxstarsize", "Max candidate size (% of frame)", "54", "");
+    f->setAutoUpdate(true);
+    f->setDirectEdit(true);
+    f->setMinMax(0.1, 50, false);
+    f->setValue(5);
+    f->setSlider(OST::SliderAndValue, false);
+    getProperty("parms")->addElt(f);
+
+    // Coarse-detection sensitivity (Gilles, 2026-10-04, on a real noisy
+    // frame where several real donuts weren't detected at all: "je suis un
+    // peu decu de la detection des donuts" -- the coarse adaptiveThreshold()
+    // in analyzeFrame() is the gatekeeper; anything it misses never reaches
+    // the per-candidate local-refinement step that could otherwise recover
+    // it). Exposed as tunables (defaults match the previous hardcoded
+    // behavior exactly: margin=5, blockdivisor=8) rather than guessed new
+    // constants, since the right values depend on the actual camera/gain/
+    // noise floor and can only really be found by testing against real
+    // frames -- not something buildable/testable from here.
+    f = new OST::ElementFloat("threshmargin", "Detection sensitivity margin (0-255, lower = more sensitive)", "56",
+                              "");
+    f->setAutoUpdate(true);
+    f->setDirectEdit(true);
+    f->setMinMax(0, 50, false);
+    f->setValue(5);
+    f->setSlider(OST::SliderAndValue, false);
+    getProperty("parms")->addElt(f);
+
+    auto *bd = new OST::ElementInt("blockdivisor", "Detection locality (frame size / N, higher = more local)", "58",
+                                   "");
+    bd->setAutoUpdate(true);
+    bd->setDirectEdit(true);
+    bd->setMinMax(2, 64, false);
+    bd->setValue(8);
+    bd->setSlider(OST::SliderAndValue, false);
+    getProperty("parms")->addElt(bd);
+
+    // Reject point-like candidates (frame not actually defocused enough for
+    // the donut method -- see analyzeFrame()'s own comment on this) below
+    // this equivalent radius, in pixels -- Gilles, 2026-10-04, after a
+    // wild convergence line turned out to come from a near-focus star
+    // field, not real donuts.
+    auto *msr = new OST::ElementInt("minstarradius", "Min. candidate radius (pixels)", "60", "");
+    msr->setAutoUpdate(true);
+    msr->setDirectEdit(true);
+    msr->setMinMax(0, 200, false);
+    msr->setValue(5);
+    msr->setSlider(OST::SliderAndValue, false);
+    getProperty("parms")->addElt(msr);
 
     getEltLight("states", "idle")->setValue(OST::Ok, true);
     getEltLight("focushome", "defined")->setValue(OST::Idle, true);
@@ -766,6 +832,36 @@ void Inspector::analyzeFrame(void)
     if (!buffer || stats.width == 0 || stats.height == 0)
         return;
 
+    // A frame with (almost) no local contrast -- flat sky, fully
+    // saturated, or essentially black -- has nothing for the contour
+    // pipeline below to usefully find, and running it anyway is both slow
+    // and prone to drawing incoherent contours across the whole frame (see
+    // the "coarse candidate detection" comment further down for why) --
+    // Gilles, 2026-10-04: "si l'image est plate ... l'analyse opencv est
+    // tres tres longue, et me dessine des contours incoherents sur toute
+    // l'image". Bail out the same way the <2-donuts case below does,
+    // before doing any OpenCV work at all.
+    if (stats.stddev[0] < getFloat("parms", "mindynrange"))
+    {
+        getProperty("stars")->clearGrid();
+        getProperty("stars")->emitAll();
+        getEltLight("correction", "quality")->setValue(OST::Error, true);
+
+        double const scale = getSampling();
+        QImage rawImage = _image->getRawQImage();
+        QImage overlay = rawImage.convertToFormat(QImage::Format_RGB32);
+        overlay.setColorTable(rawImage.colorTable());
+        double const sx = overlay.width() > 0 ? overlay.width() / static_cast<double>(stats.width) : 1.0;
+        double const sy = overlay.height() > 0 ? overlay.height() / static_cast<double>(stats.height) : 1.0;
+        QPainter painter(&overlay);
+        painter.setRenderHint(QPainter::Antialiasing);
+        drawConvergenceOverlay(painter, stats.width / 2.0, stats.height / 2.0, 0, 0, false,
+                               std::isfinite(scale) && scale > 0 ? scale : 0, sx, sy);
+        painter.end();
+        publishCollimationImages(overlay);
+        return;
+    }
+
     // Wrap the raw buffer as an OpenCV Mat. v1 assumes a mono camera (the
     // usual case for collimation/guide cameras) -- color/Bayer is not
     // handled here.
@@ -790,21 +886,81 @@ void Inspector::analyzeFrame(void)
     // neighborhood instead, so it catches both. Morphological close/open
     // bridges small gaps in a ring's edge and removes speckle noise before
     // contour extraction.
-    int const blockSize = std::max(21, (std::min(stats.width, stats.height) / 8) | 1); // odd
+    //
+    // Both knobs below are tunable ("threshmargin"/"blockdivisor" on
+    // "parms") -- this is the step that actually decides whether a faint
+    // donut gets picked up at all; anything it misses never reaches the
+    // per-candidate local-refinement step further down. Gilles, 2026-10-04,
+    // on a real frame where several visible donuts weren't detected: "je
+    // suis un peu decu de la detection des donuts".
+    int const blockDivisor = getInt("parms", "blockdivisor");
+    int const blockSize = std::max(21, (std::min(stats.width, stats.height) / blockDivisor) | 1); // odd
     cv::Mat coarseBin;
-    cv::adaptiveThreshold(img8, coarseBin, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, blockSize, -5);
+    cv::adaptiveThreshold(img8, coarseBin, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, blockSize,
+                          -getFloat("parms", "threshmargin"));
     cv::Mat const morphKernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(3, 3));
     cv::morphologyEx(coarseBin, coarseBin, cv::MORPH_CLOSE, morphKernel);
     cv::morphologyEx(coarseBin, coarseBin, cv::MORPH_OPEN, morphKernel);
 
-    std::vector<std::vector<cv::Point>> candidates;
-    cv::findContours(coarseBin, candidates, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+    std::vector<std::vector<cv::Point>> rawCandidates;
+    cv::findContours(coarseBin, rawCandidates, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
     getProperty("stars")->clearGrid();
 
     double const minArea = 30.0; // reject noise speckles
+    // Upper bound too -- a real donut is always a small fraction of the
+    // frame. Without this, a saturated/overexposed frame (near-uniform
+    // bright value) can threshold into one giant blob covering almost the
+    // whole image; the "local refinement" step below then runs an
+    // expensive Otsu threshold + contour search + per-pixel centroid loop
+    // over a near-full-frame ROI -- the main source of both "tres tres
+    // longue" and the crash on small configs (a correspondingly huge
+    // cv::Mat::zeros allocation) -- Gilles, 2026-10-04: "limite la
+    // recherche des contours sur une surface raisonnable".
+    double const maxArea = getFloat("parms", "maxstarsize") / 100.0 * stats.width * stats.height;
     double const cx0 = stats.width / 2.0;
     double const cy0 = stats.height / 2.0;
+
+    // A real donut, meaningfully defocused, has a sizeable apparent radius;
+    // a plain point-like star (frame not actually defocused, or barely so)
+    // thresholds into a tiny blob that still clears minArea but carries no
+    // real ring-deformation signal -- its "deformation vector" further down
+    // is then pure centroid noise. Left in, a field of such points (cf.
+    // Gilles, 2026-10-04, showing the raw frame behind an earlier wild
+    // convergence-line screenshot: real point stars, not donuts) poisons
+    // the convergence fit with noise instead of being correctly recognized
+    // as "not enough donuts to analyze" (the existing starPos.size() < 2
+    // case). Reject anything whose equivalent radius (from its coarse
+    // area) is below a tunable floor before it's even considered a
+    // candidate.
+    double const minRadiusPx = getInt("parms", "minstarradius");
+
+    // Also bound how many candidates actually reach the expensive local-
+    // refinement step below: a frame that's just noisy (not flat enough to
+    // trip the stddev bail-out above, but with no real donuts) can still
+    // produce hundreds of small contours that individually pass
+    // minArea/maxArea/minRadiusPx. A real collimation frame realistically
+    // has a handful of donuts, so keep only the largest ones.
+    std::vector<std::vector<cv::Point>> candidates;
+    for (const std::vector<cv::Point> &c : rawCandidates)
+    {
+        double const area = cv::contourArea(c);
+        if (area < minArea || area > maxArea)
+            continue;
+        if (minRadiusPx > 0 && std::sqrt(area / CV_PI) < minRadiusPx)
+            continue;
+        candidates.push_back(c);
+    }
+    int const maxCandidates = 60;
+    if (static_cast<int>(candidates.size()) > maxCandidates)
+    {
+        std::sort(candidates.begin(), candidates.end(),
+                  [](const std::vector<cv::Point> &a, const std::vector<cv::Point> &b)
+        {
+            return cv::contourArea(a) > cv::contourArea(b);
+        });
+        candidates.resize(maxCandidates);
+    }
 
     // Pixels -> arcsec, same convention as the rest of OST (getSampling()).
     double scale = getSampling();
@@ -829,8 +985,7 @@ void Inspector::analyzeFrame(void)
 
     for (const std::vector<cv::Point> &candidate : candidates)
     {
-        if (cv::contourArea(candidate) < minArea)
-            continue;
+        // candidates is already filtered to [minArea, maxArea] above.
 
         // Local refinement: re-threshold (Otsu) just this candidate's own
         // neighborhood, expanded a bit around its coarse bounding box. This
@@ -977,6 +1132,26 @@ void Inspector::analyzeFrame(void)
     {
         convX = cx0 + Cx / k;
         convY = cy0 + Cy / k;
+
+        // Reject a convergence point so far outside the frame it isn't a
+        // meaningful answer -- an ill-conditioned fit (k near zero, or
+        // deformation vectors dominated by per-star noise rather than a
+        // real collimation signal, e.g. stars that aren't actually
+        // defocused enough for the donut method to mean anything) can
+        // extrapolate arbitrarily far; drawing that literally (a line
+        // shooting off past the image edge) is more confusing than useful
+        // -- Gilles, 2026-10-04, on exactly this ("et avec cette image ?",
+        // the convergence line running clean off the frame).
+        double const maxConvDist = 3.0 * std::hypot(stats.width, stats.height);
+        if (std::hypot(convX - cx0, convY - cy0) > maxConvDist)
+        {
+            hasConvergence = false;
+            convX = cx0;
+            convY = cy0;
+        }
+    }
+    if (hasConvergence)
+    {
         getEltFloat("correction", "convergencex")->setValue(convX, false);
         getEltFloat("correction", "convergencey")->setValue(convY, false);
     }

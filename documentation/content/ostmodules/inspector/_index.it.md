@@ -49,6 +49,18 @@ I due interruttori sono indipendenti (non esclusivi) e sono salvati con il profi
 |---|---|
 | **Zoning** | Griglia N×N di suddivisione dell'immagine per l'analisi per zona (da 1×1 a 64×64) |
 
+### Rilevamento della collimazione
+
+Questi parametri limitano e regolano il rilevamento dei donut per l'analisi di collimazione (vedi «Rilevamento per stella» più sotto) — valori predefiniti pensati per funzionare senza alcuna regolazione, da modificare solo se necessario.
+
+| Parametro | Predefinito | Descrizione |
+|---|---|---|
+| **Deviazione standard minima (ADU)** | 20 | Sotto questo valore, l'immagine è considerata piatta (sovraesposta, sottoesposta, nessun donut) e l'analisi di collimazione viene saltata interamente per quella acquisizione |
+| **Dimensione massima candidato (% immagine)** | 5 % | Un contorno più grande di questa frazione dell'immagine viene scartato d'ufficio (non è mai un vero donut — tipicamente un artefatto di saturazione) |
+| **Margine di rilevamento (0-255)** | 5 | Contrasto locale minimo richiesto perché un pixel sia considerato parte di un donut. **Diminuire** per rilevare donut più deboli/meno contrastati (con il rischio di catturare più rumore — già limitato dagli altri parametri qui) |
+| **Finezza di rilevamento (divisore)** | 8 | Controlla la dimensione della finestra di analisi locale (dimensione immagine / N). **Aumentare** (finestra più piccola, più locale) aiuta anche a rilevare donut deboli immersi in uno sfondo leggermente irregolare |
+| **Raggio minimo candidato (pixel)** | 5 | Scarta i candidati troppo piccoli/puntiformi per essere un vero donut defocalizzato — evita che un campo di stelle non sufficientemente defocalizzato (punti quasi puntiformi) inquini l'adattamento di collimazione con rumore |
+
 ### Defocalizzazione
 
 | Parametro | Descrizione |
@@ -120,6 +132,8 @@ Per ogni stella rilevata:
 - Un adattamento di cerchio ai minimi quadrati sul contorno esterno fornisce il centro teorico della stella — questo metodo resta affidabile anche quando l'anello è fortemente deformato (a mezzaluna, in caso di forte decollimazione)
 - Il vettore di deformazione è lo scostamento tra questo centro teorico e il centroide pesato per intensità dell'anello (ombra esclusa)
 
+Donut visibilmente presenti nell'immagine ma non rilevati indicano una soglia di rilevamento troppo stretta (diminuire il **Margine di rilevamento**, o aumentare la **Finezza di rilevamento**). Al contrario, un campo di stelle non sufficientemente defocalizzato (punti quasi puntiformi piuttosto che veri anelli) non fornisce alcun segnale di deformazione utilizzabile — il **Raggio minimo candidato** assicura che tali campi ricadano correttamente su «non sono stati rilevati donut sufficienti» invece di produrre un adattamento rumoroso e un punto di convergenza aberrante. Vedi «Rilevamento della collimazione» nei parametri sopra.
+
 ### Regressione e punto di convergenza
 
 I vettori di deformazione di tutte le stelle rilevate sono adattati ai minimi quadrati al modello `D(P) = C - k·P`. Il vettore `C` ottenuto è convertito in secondi d'arco (focale e dimensione del pixel del sensore), poi proiettato sulle 3 viti di collimazione a 120° per ottenere un segno e un'ampiezza per vite.
@@ -136,7 +150,7 @@ L'analisi di collimazione pubblica una propria immagine annotata (l'immagine pri
 
 E per l'insieme del campo:
 - Un bullseye (anelli tratteggiati) centrato sull'immagine, che materializza le stesse soglie di tolleranza dell'indicatore di qualità
-- Una linea che collega il centro teorico dell'immagine al punto di convergenza calcolato
+- Una linea che collega il centro teorico dell'immagine al punto di convergenza calcolato — assente se l'adattamento è considerato poco affidabile (punto di convergenza estrapolato troppo lontano fuori immagine, segno di un campo non sufficientemente defocalizzato o di troppo pochi donut utilizzabili)
 
 #### Prima della collimazione (esempio)
 

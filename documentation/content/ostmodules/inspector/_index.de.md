@@ -49,6 +49,18 @@ Beide Schalter sind unabhängig voneinander (nicht exklusiv) und werden mit dem 
 |---|---|
 | **Zoning** | N×N-Raster zur Bildaufteilung für die Zonenanalyse (von 1×1 bis 64×64) |
 
+### Kollimationserkennung
+
+Diese Parameter begrenzen und justieren die Donut-Erkennung für die Kollimationsanalyse (siehe „Erkennung pro Stern" weiter unten) — die Standardwerte sind so gewählt, dass sie ohne Anpassung funktionieren; nur bei Bedarf ändern.
+
+| Parameter | Standard | Beschreibung |
+|---|---|---|
+| **Minimale Standardabweichung (ADU)** | 20 | Darunter wird das Bild als flach angesehen (überbelichtet, unterbelichtet, kein Donut) und die Kollimationsanalyse wird für diese Aufnahme vollständig übersprungen |
+| **Max. Kandidatengröße (% des Bilds)** | 5 % | Eine Kontur, die größer als dieser Bildanteil ist, wird grundsätzlich verworfen (niemals ein echter Donut — typischerweise ein Sättigungsartefakt) |
+| **Erkennungsmarge (0-255)** | 5 | Minimaler lokaler Kontrast, der erforderlich ist, damit ein Pixel als Teil eines Donuts gilt. **Verringern**, um schwächere/kontrastärmere Donuts zu erfassen (mit dem Risiko, mehr Rauschen zu erfassen — bereits durch die anderen Parameter hier begrenzt) |
+| **Erkennungsfeinheit (Divisor)** | 8 | Steuert die Größe des lokalen Analysefensters (Bildgröße / N). **Erhöhen** (kleineres, lokaleres Fenster) hilft auch, schwache Donuts vor einem leicht ungleichmäßigen Hintergrund zu erkennen |
+| **Minimaler Kandidatenradius (Pixel)** | 5 | Verwirft Kandidaten, die zu klein/punktförmig sind, um ein echter defokussierter Donut zu sein — verhindert, dass ein nicht ausreichend defokussiertes Sternfeld (fast punktförmige Sterne) die Kollimationsanpassung mit Rauschen verunreinigt |
+
 ### Defokussierung
 
 | Parameter | Beschreibung |
@@ -120,6 +132,8 @@ Für jeden erkannten Stern:
 - Eine Kreisanpassung nach kleinsten Quadraten an der Außenkontur ergibt das theoretische Zentrum des Sterns — diese Methode bleibt auch bei stark verformtem Ring (sichelförmig, bei starker Dekollimation) zuverlässig
 - Der Verformungsvektor ist die Abweichung zwischen diesem theoretischen Zentrum und dem intensitätsgewichteten Schwerpunkt des Rings (Schatten ausgeschlossen)
 
+Donuts, die im Bild deutlich sichtbar, aber nicht erkannt werden, deuten auf eine zu strenge Schwellenwertempfindlichkeit hin (**Erkennungsmarge** verringern oder **Erkennungsfeinheit** erhöhen). Umgekehrt liefert ein nicht ausreichend defokussiertes Sternfeld (fast punktförmige Sterne statt echter Ringe) kein verwertbares Verformungssignal — der **Minimale Kandidatenradius** stellt sicher, dass solche Felder sauber auf „nicht genug Donuts erkannt" zurückfallen, anstatt eine verrauschte Anpassung und einen abweichenden Konvergenzpunkt zu erzeugen. Siehe „Kollimationserkennung" in den Parametern oben.
+
 ### Regression und Konvergenzpunkt
 
 Die Verformungsvektoren aller erkannten Sterne werden per kleinste Quadrate an das Modell `D(P) = C - k·P` angepasst. Der erhaltene Vektor `C` wird in Bogensekunden umgerechnet (Brennweite und Pixelgröße des Sensors) und dann auf die 3 im 120°-Abstand angeordneten Kollimationsschrauben projiziert, um Vorzeichen und Amplitude pro Schraube zu erhalten.
@@ -136,7 +150,7 @@ Die Kollimationsanalyse veröffentlicht ihr eigenes annotiertes Bild (das Hauptb
 
 Und für das gesamte Feld:
 - Ein Bullseye (gepunktete Ringe), zentriert auf dem Bild, das dieselben Toleranzschwellen wie die Qualitätsanzeige darstellt
-- Eine Linie, die das theoretische Zentrum des Bilds mit dem berechneten Konvergenzpunkt verbindet
+- Eine Linie, die das theoretische Zentrum des Bilds mit dem berechneten Konvergenzpunkt verbindet — fehlt, wenn die Anpassung als unzuverlässig eingeschätzt wird (Konvergenzpunkt zu weit außerhalb des Bilds extrapoliert, ein Zeichen für ein nicht ausreichend defokussiertes Feld oder zu wenige verwertbare Donuts)
 
 #### Vor der Kollimation (Beispiel)
 

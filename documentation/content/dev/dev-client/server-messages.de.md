@@ -1,6 +1,6 @@
 ---
 title: Nachrichten Server → Client
-weight: 20
+weight: 40
 description: "Alle JSON-Nachrichten, die der OST-Server an verbundene Clients sendet"
 ---
 
@@ -17,10 +17,6 @@ Jede Nachricht ist ein JSON-Objekt mit **genau einem Schlüssel der obersten Ebe
 Clients müssen die **ersten 1 oder 2 Zeichen** des Schlüssels abgleichen, nicht die vollständige Zeichenkette, da sich der Beschreibungsteil ändern kann.
 
 Alle vom Server gesendeten Ereignisschlüssel sind **klein geschrieben** (z. B. `d`, `ea`, `ap`, `gc`).
-
-{{% notice style="warning" title="Ausnahme: `evt` beginnt mit `ev`" %}}
-Der Schlüssel [`evt`](#evt) (Dateiereignisse) beginnt mit denselben zwei Zeichen wie [`ev`](#ev). Zuerst auf exakte Gleichheit mit `evt` prüfen, erst danach die Präfixe, sonst wird ein Dateiereignis für ein Element-Update gehalten.
-{{% /notice %}}
 
 ---
 
@@ -49,7 +45,11 @@ Der Schlüssel [`evt`](#evt) (Dateiereignisse) beginnt mit denselben zwei Zeiche
 | [`fc`](#fs) | Profil geändert (nicht gespeicherte Änderungen) |
 | [`l`](#l) | Log-Eintrag |
 | [`uc`](#uc) | Update der Controller-Daten |
-| [`evt`](#evt) | Datei- oder Ordnerereignis (Hinzufügen/Löschen) |
+| [`af`](#af) | Datei hinzugefügt |
+| [`df`](#af) | Datei gelöscht |
+| [`ad`](#af) | Verzeichnis hinzugefügt |
+| [`dd`](#af) | Verzeichnis gelöscht |
+| [`qa`](#qa) | Antwort auf eine Modul-Anfrage (Inter-Modul-Mechanismus, nicht für Clients gedacht) |
 | [`xx`](#xx) | Keepalive-Pong |
 
 ---
@@ -66,7 +66,7 @@ Wird als Antwort auf eine `DU`-Anfrage gesendet. Enthält alles: alle Module, Lo
     "serverlng": "en",
     "m": {
       "Focus": {
-        "infos": { "label": "Focus", "name": "Focus", "description": "..." },
+        "infos": { "modulelabel": "Focus", "description": "..." },
         "f": { "name": "default", "changed": false },
         "l": {
           "myLov": { "label": "My LOV", "type": "string", "values": { "a": "Option A" } }
@@ -145,7 +145,7 @@ Wird gesendet, wenn ein Modul zur Laufzeit geladen oder neu geladen wird. Enthä
 {
   "aa-dump all data": {
     "Guider": {
-      "infos": { "label": "Guider", "name": "Guider", "description": "..." },
+      "infos": { "modulelabel": "Guider", "description": "..." },
       "f": { "name": "default", "changed": false },
       "l": {},
       "p": {
@@ -553,22 +553,52 @@ Der Payload ist `{"Schlüssel": Wert}`, wobei `Wert` eine Zeichenkette, ein Arra
 
 ---
 
-## `evt` — Datei- oder Ordnerereignis {#evt}
+## `af` / `df` / `ad` / `dd` — Datei- und Ordnerereignisse {#af}
 
-Wird an alle Clients gesendet, wenn sich der Inhalt des überwachten Dateiordners ändert (siehe [Dateisystem]({{% relref "controller.de.md" %}}#fichiers)). Anders als bei den anderen Nachrichten lautet der Schlüssel genau `evt`, und sein **Wert ist eine Zeichenkette**, die den Ereignistyp angibt; die Pfade stehen in einem Geschwisterfeld `fileevent`.
+Wird an alle Clients gesendet, wenn sich der Inhalt des überwachten Dateiordners ändert (siehe [Dateisystem]({{% relref "controller.de.md" %}}#fichiers)). Anders als bei anderen Nachrichten ist der Wert eine **reine Zeichenkette**: der betroffene Pfad, nicht in ein Objekt oder Array verpackt — der Server meldet immer nur einen Pfad pro Nachricht.
 
 ```json
-{ "evt": "fileadd", "fileevent": ["/Allsky/image_001.jpeg"] }
+{ "af": "/Allsky/image_001.jpeg" }
+{ "df": "/Allsky/old_image.jpeg" }
 ```
 
-| `evt` | Bedeutung |
+| Schlüssel | Bedeutung |
 |---|---|
-| `fileadd` | Datei(en) zum ausgewählten Ordner hinzugefügt |
-| `filedel` | Datei(en) aus dem ausgewählten Ordner gelöscht |
-| `folderadd` | Unterordner zum Webroot hinzugefügt |
-| `folderdel` | Unterordner aus dem Webroot gelöscht |
+| `af` | Datei zum ausgewählten Ordner hinzugefügt |
+| `df` | Datei aus dem ausgewählten Ordner entfernt |
+| `ad` | Unterordner irgendwo im Webroot hinzugefügt |
+| `dd` | Unterordner irgendwo im Webroot entfernt |
 
-`fileevent` ist immer ein Array von Pfaden relativ zum Webroot (mit führendem `/`).
+`af`/`df` betreffen nur den aktuell über [`FS`]({{% relref "client-messages.de.md" %}}#fs) ausgewählten Ordner — für den Inhalt anderer Ordner wird nichts gemeldet. `ad`/`dd` sind global: sie lösen für den gesamten Webroot-Baum aus, unabhängig von der aktuellen Auswahl. Siehe [Dateisystem]({{% relref "controller.de.md" %}}#fichiers) für das Gesamtbild.
+
+---
+
+## `qa` — Antwort auf eine Modul-Anfrage {#qa}
+
+{{% notice style="warning" title="Inter-Modul-Kommunikation, keine Client-Funktion" %}}
+Siehe den Hinweis zu [`QY`]({{% relref "client-messages.de.md" %}}#qy): dieser Mechanismus existiert in erster Linie dafür, dass ein Modul ein anderes intern abfragt. Hier der Vollständigkeit halber dokumentiert, nicht als Client-Funktion.
+{{% /notice %}}
+
+Antwort auf eine [`QY`]({{% relref "client-messages.de.md" %}}#qy)-Anfrage. `QY`/`qa` ist ein **generischer, pro Modul definierter Anfrage-/Antwort-Mechanismus**: ein Client (oder intern ein anderes Modul) stellt einem Modul eine benannte Frage mit Parametern und erhält eine benannte Antwort zurück. Welche Anfragenamen ein Modul tatsächlich versteht und wie seine Antwort aussieht, entscheidet allein das Modul — das Protokoll definiert nur die Hülle, nicht den Inhalt.
+
+```json
+{
+  "qa-query answer": {
+    "Sequencer": {
+      "q": {
+        "query": "profileduration",
+        "result": { "seconds": 3600 }
+      }
+    }
+  }
+}
+```
+
+`result` ist das, was das Modul für diese Anfrage zurückgegeben hat — seine Form hängt vollständig von `query` ab. Ein Modul ohne passenden Fall für den angefragten `query`-Namen liefert stillschweigend ein leeres `result`.
+
+{{% notice style="note" title="Noch nicht viel zu sehen" %}}
+Heute implementiert nur das Modul `Sequencer` eine echte Antwort (`profileduration`), intern genutzt vom Planner-Modul statt von einem dokumentierten Client-Workflow. Kein anderes ausgeliefertes Modul antwortet bislang sinnvoll auf irgendeinen Anfragenamen — der Mechanismus existiert und ist vollständig verdrahtet, aber es gibt derzeit praktisch wenig abzufragen.
+{{% /notice %}}
 
 ---
 

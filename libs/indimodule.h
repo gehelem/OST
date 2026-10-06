@@ -70,6 +70,7 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool defineMeAsSequencer();
         bool defineMeAsImager();
         bool defineMeAsNavigator();
+        bool defineMeAsPlanner();
         double getPixelSize(const QString &deviceName);
         double getSampling();
         bool isFocuser()
@@ -96,6 +97,10 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         {
             return mIsOptic;
         }
+        bool isPlanner()
+        {
+            return mIsPlanner;
+        }
         bool giveMeADevice(QString name, QString label, INDI::BaseDevice::DRIVER_INTERFACE interface);
         bool giveMeAnOptic();
         bool giveMeAnEquipment();
@@ -119,6 +124,7 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool mIsImager = false;
         bool mIsNavigator = false;
         bool mIsOptic = false;
+        bool mIsPlanner = false;
         double mFocal;
         double mDiam;
         double mRed;

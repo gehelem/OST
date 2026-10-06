@@ -1,6 +1,6 @@
 ---
 title: Modello dati
-weight: 10
+weight: 20
 description: "Gerarchia dei moduli, proprietà ed elementi scambiati via WebSocket"
 ---
 
@@ -18,8 +18,27 @@ Module
 
 ## Connessione e stato iniziale
 
+### Trovare il server
+
+Un client **web** è servito *dal* server OST stesso, quindi conosce già il proprio host — l'URL WebSocket deve essere derivato dall'URL della pagina, non chiesto all'utente:
+
+| URL della pagina | URL WebSocket |
+|---|---|
+| `http://<host>/` | `ws://<host>:9624` (diretto, porta fissa) |
+| `https://<host>/` | `wss://<host>/ws/` (porta 443 implicita, tramite un percorso proxy inverso — le installazioni SSL non espongono direttamente la porta 9624) |
+
+È una convenzione, non qualcosa imposto dal protocollo — ma tutti i client esistenti la seguono, e un client che invece chiede all'utente di digitare a mano un URL WebSocket risolve un problema che nel caso web non esiste.
+
+Un client **non-web** (mobile, desktop) non ha un URL di pagina da cui derivare nulla, e ha bisogno che l'host gli venga fornito in altro modo:
+- **mDNS/Zeroconf**: il server si annuncia sulla rete locale con il tipo di servizio `_ostserver_ws._tcp` nel dominio `local`, con un record TXT `OstServer=Observatoire Sans Tete`. La porta annunciata è sempre `9624`. Questo permette a un client di **scansionare i server disponibili** sulla rete invece di richiedere che l'utente conosca un IP — utile per una prima connessione, o ogni volta che potrebbe esserci più di un server OST nelle vicinanze.
+- **Inserimento manuale, memorizzato**: sia esso scoperto o digitato, un client dovrebbe mantenere una piccola cronologia dei server già usati (host/porta/sicuro) in modo che riconnettersi in seguito non richieda di ripetere la scoperta o l'inserimento. È una comodità lato client, non parte del protocollo.
+
+In ogni caso, l'URL di base dei **media** (per immagini/video, vedi la nota "URL dei media" più sotto) segue lo stesso host, con la porta HTTP(S) standard (80/443) anziché 9624 — un client non-web ha bisogno anche di questo host, esattamente per la stessa ragione per cui ha bisogno dell'host WebSocket.
+
 Alla connessione, inviare una richiesta `DU` (vedi [Client → Server]({{< relref "client-messages.it.md" >}})).  
 Il server risponde con un messaggio dump completo (`d`) contenente tutti i moduli, i dati del controller e gli elenchi di file.
+
+I dati propri del controller (carico del server, configurazioni dei moduli, driver INDI, file system) non fanno parte del modello a moduli descritto in questa pagina — vedi [Controller, GlobalDatastore e file]({{% relref "controller.it.md" %}}).
 
 ---
 
@@ -32,7 +51,10 @@ Il suo identificatore è il suo nome interno (senza spazi).
 |---|---|---|
 | `infos.modulelabel` | string | Nome visualizzato del modulo |
 | `infos.description` | string | Descrizione del modulo |
-| `infos.template` | string | Tipo di modulo (es. `"focus"`, `"guider"`) — può essere assente |
+| `infos.template` | string | Suggerimento di visualizzazione per il frontend (quale rendering usare), es. `"focus"`, `"guider"` — puramente estetico, può essere assente |
+| `infos.library` | string | Il tipo del modulo, minuscolo (la libreria da cui è stato caricato, es. `"focus"`) |
+| `infos.classname` | string | Il tipo del modulo, con maiuscole/minuscole esatte (es. `"Focus"`) |
+| `infos.families` | array di string | Capacità dichiarate da questa istanza di modulo (es. `["guiding"]`) — zero, una o più |
 | `properties` | object | Mappa nome proprietà → oggetto proprietà |
 | `globallovs` | object | Mappa chiave LOV → oggetto LOV (liste di valori a livello modulo) |
 | `profile.name` | string | Nome del profilo attivo |
@@ -40,6 +62,15 @@ Il suo identificatore è il suo nome interno (senza spazi).
 
 {{% notice style="info" title="Formato wire" %}}
 Nel formato JSON di rete, `properties` è abbreviato in `p`, `globallovs` in `l`, e `profile` in `f`. I client devono gestire queste chiavi abbreviate.
+{{% /notice %}}
+
+{{% notice style="warning" title="Tipo, template e famiglia sono 3 cose diverse" %}}
+È allettante trattare `infos.template` come l'identità del modulo — non farlo. Sono 3 nozioni indipendenti:
+- il **tipo** (`infos.library`/`infos.classname`) è la vera identità del modulo — la libreria da cui è stato caricato. Due istanze dello stesso tipo (es. due moduli Focus) condividono sempre lo stesso tipo.
+- il **template** (`infos.template`) è solo un suggerimento di visualizzazione per il frontend, puramente estetico e del tutto opzionale. Due tipi diversi possono condividere lo stesso template generico (es. tutto ciò che viene renderizzato con `"default"`).
+- la **famiglia** (`infos.families`) è una capacità che un modulo dichiara su se stesso, indipendente sia dal tipo che dal template. Un modulo può dichiarare zero, una o più famiglie — esiste per permettere a un client di puntare a "qualsiasi modulo in grado di guidare", ad esempio, senza doversi preoccupare che il tipo effettivo sia `Guider` o un'implementazione diversa della stessa capacità.
+
+`loadedModules-<type>` e `loadedFamilies-<family>` (più sotto) fanno riferimento a `infos.library`/`infos.families` in minuscolo; `profiles-<Type>` fa invece riferimento a `infos.classname` con maiuscole/minuscole esatte. Usare direttamente il campo corrispondente — mai derivarne uno dall'altro trasformando le maiuscole/minuscole lato client.
 {{% /notice %}}
 
 {{% notice style="note" title="Campi interni" %}}
@@ -72,6 +103,22 @@ Una proprietà raggruppa elementi collegati. Le proprietà sono mostrate in modo
 | `rule` | int | Regola di raggruppamento degli elementi bool: `0` UnoTra (radio) · `1` AlPiùUno · `2` Qualsiasi |
 | `elements` | object | Mappa nome elemento → oggetto elemento |
 
+{{% notice style="tip" title="`preicon`/`posticon`: azioni cliccabili, non decorazioni" %}}
+Un valore non vuoto di `preicon1`/`preicon2`/`posticon1`/`posticon2` è il nome dell'icona Google Fonts (Material Icons) da visualizzare — ed è cliccabile: cliccandoci si invia [`I1`/`I2`/`I3`/`I4`]({{% relref "client-messages.it.md" %}}#i1) senza valore né parametro, solo un payload vuoto che punta alla proprietà. Una **stringa vuota significa che non c'è alcuna icona** in quella posizione — nulla da visualizzare, nulla da cliccare, nulla da inviare. Le `preicon`/`posticon` a livello di elemento (più sotto) funzionano allo stesso modo, tramite [`J1`/`J2`]({{% relref "client-messages.it.md" %}}#j1). Vedi [Azioni sulle icone]({{% relref "client-messages.it.md" %}}#icon-actions) per il riferimento completo dei messaggi.
+{{% /notice %}}
+
+{{% notice style="warning" title="`permission` governa gli elementi editabili, non la visualizzazione del valore" %}}
+`permission: 1` ("solo scrittura") non significa "nascondere il valore corrente" — significa che la proprietà non ha nulla di significativo da rileggere come input inviabile (un'azione a fuoco e dimentica). Una proprietà il cui unico elemento è di tipo solo-visualizzazione (`img`, `video`, `light`, `prg`, `message`) può legittimamente essere `permission: 1` — un'anteprima live della camera ne è un esempio reale — e deve comunque essere renderizzata a partire dal proprio valore, indipendentemente da `permission`. Condizionare l'interattività (mostrare un input, abilitare un invio) a `permission`, ma condizionare il rendering al **tipo** dell'elemento, non a `permission`.
+{{% /notice %}}
+
+{{% notice style="note" title="`rule` ha senso solo quando tutti gli elementi sono `bool`" %}}
+`rule` è presente su ogni proprietà (default `0`), ma ha significato — e va considerato — solo quando **tutti** gli elementi della proprietà sono di tipo `bool`. Compare anche, in modo inerte, su proprietà i cui elementi sono un mix di altri tipi (es. una coppia di coordinate con due elementi `float`) — un client dovrebbe ignorarlo in quel caso, invece di provare a renderizzare, ad esempio, due float come un gruppo radio.
+{{% /notice %}}
+
+{{% notice style="note" title="`badge` è impostato dall'autore del modulo, non da un client a runtime" %}}
+Non esiste alcun messaggio client che modifichi `badge` — è fisso per proprietà/elemento nella definizione stessa del modulo, non un preferito per utente/sessione che un client può impostare. Una schermata "preferiti" può leggere e aggregare ciò che è già segnato, ma non ha modo di lasciare che un utente marchi qualcosa come preferito da sé.
+{{% /notice %}}
+
 {{% notice style="tip" title="`level1`/`level2`/`order` sono informativi, non un contratto" %}}
 Questi campi sono puramente informativi — il backend non li impone mai, e un client è libero di rispettarli parzialmente o per niente. Esprimono solo il modo in cui lo sviluppatore di un modulo ha pensato di organizzare le proprie proprietà. È esattamente ciò che permette a client generici (Rooster, ostnoctua) di adattarsi a qualsiasi modulo senza UI dedicata per modulo.
 
@@ -100,9 +147,36 @@ Due cose da sapere se si costruisce qualcosa di simile:
 
 | Campo | Tipo | Descrizione |
 |---|---|---|
-| `hasGraph` | bool | La proprietà contiene un grafico |
-| `graphType` | string | `"XY"` · `"DY"` (asse temporale) · `"PHD"` (guida) |
-| `graphParams` | object | Configurazione del grafico |
+| `hasGraph` | bool | La proprietà contiene un grafico — **sempre presente**, anche quando `false` |
+| `graphType` | string | `"XY"` · `"DY"` · `"SXY"` · `"SDY"` · `"PHD"` — vedi sotto |
+| `graphParams` | object | Quale elemento fornisce quale ruolo del grafico — vedi sotto |
+
+Una proprietà con grafico è sempre anche una proprietà a griglia (`hasGrid: true`, vedi sopra): ogni riga della griglia è un punto dati, e `graphParams` associa un ruolo astratto del grafico alla **chiave dell'elemento** (uno dei `gridheaders`) il cui valore, in quella riga, fornisce quel ruolo.
+
+| `graphType` | Forma | Ruoli di `graphParams` |
+|---|---|---|
+| `XY` | Una sola serie a dispersione, limiti degli assi fissi | `X`, `Y`, `Xmin`, `Xmax`, `Ymin`, `Ymax`, più opzionalmente `graphColor` (sotto) |
+| `DY` | Una sola serie, data/ora sull'asse X | `D` (elemento data/ora), `Y`, più opzionalmente `graphColor` (sotto) |
+| `SXY` | Più serie a dispersione, raggruppate da una chiave di serie | `S` (elemento nome serie), `X`, `Y`, più opzionalmente `graphColors`/`axis`/`mapping` (sotto) |
+| `SDY` | Più serie, data/ora sull'asse X, raggruppate da una chiave di serie | `S`, `D`, `Y`, più opzionalmente `graphColors`/`axis`/`mapping` |
+| `PHD` | Grafico di guida dedicato in stile PHD2 (deriva + SNR + RMS) | `D`, `RA`, `DE`, `pRA`, `pDE`, `RSB`, `RMS` — ruoli fissi, specifici per questo uso |
+
+Campi opzionali di `graphParams`:
+
+| Campo | Usato da | Descrizione |
+|---|---|---|
+| `graphColor` | `XY`, `DY` | `{"R": int, "G": int, "B": int}` — colore per la serie unica |
+| `graphColors` | `SXY`, `SDY` | `{"<serie>": {"R": int, "G": int, "B": int}}` — colore per serie |
+| `axis` | `SXY`, `SDY` | `{"<nome>": {"min": number, "max": number, "pos": "left"\|"right", "text": string}}` — uno o più assi Y |
+| `mapping` | `SXY`, `SDY` | `{"<serie>": "<nome asse>"}` — su quale voce di `axis` viene tracciata ciascuna serie |
+
+{{% notice style="warning" title="`PHD` non è un tipo di grafico generico" %}}
+A differenza di `XY`/`DY`/`SXY`/`SDY`, i cui ruoli sono abbastanza generici da poter guidare un unico componente grafico riutilizzabile, `PHD` ha ruoli fissi e specifici per un grafico di guida in stile PHD2 (usato dal modulo `guider`). Un client che costruisce un componente grafico generico per gli altri quattro tipi avrà probabilmente bisogno di un'implementazione dedicata per `PHD`, o dovrà tralasciarlo — è quello che fa attualmente Rooster (solo `SXY`/`SDY`/`XY`/`DY`, `PHD` non gestito).
+{{% /notice %}}
+
+{{% notice style="tip" title="Rendere i grafici come componenti dinamici, non come immagini generate" %}}
+I dati di griglia di una proprietà con grafico cambiano nel tempo (`gc`/`gu`/`gd`/`gr`, o un `uc`/`ap`/`aa` fresco) — quindi vanno trattati come qualsiasi altro elemento di UI dinamico: disegnarli con un componente grafico/canvas che si ridisegna a ogni aggiornamento, come fa Rooster con Chart.js. Non renderizzarli lato server o lato client in un'immagine statica (uno snapshot PNG, un grafico renderizzato dal server) per poi semplicemente sostituire l'`<img>` — è visibilmente peggio di un grafico reale (nessun aggiornamento fluido, nessuna interattività, sfarfallio/ricaricamento visibile a ogni punto), e butta via tutto il senso di aver ricevuto i dati di griglia in diretta sulla connessione.
+{{% /notice %}}
 
 {{% notice style="info" title="Formato wire" %}}
 Nel formato JSON di rete, `elements` è abbreviato in `e`.
@@ -125,8 +199,8 @@ Un elemento contiene un unico valore tipizzato. Esistono 11 tipi di elementi.
 | `autoupdate` | bool | Indicatore interno del backend; ignorato dai client |
 | `badge` | bool | Indica se l'elemento è nell'elenco dei preferiti |
 | `directedit` | bool | Indica se questo elemento può essere scritto da solo via `SV` — vedi sotto |
-| `preicon` | string | Icona prima dell'elemento (opzionale) |
-| `posticon` | string | Icona dopo l'elemento (opzionale) |
+| `preicon` | string | Icona prima dell'elemento — azione cliccabile, vedi nota sopra (opzionale) |
+| `posticon` | string | Icona dopo l'elemento — azione cliccabile, vedi nota sopra (opzionale) |
 
 {{% notice style="warning" title="Aggiornamenti parziali" %}}
 Nei messaggi di aggiornamento `ee` e `ea`, gli elementi contengono **solo il loro valore** — senza i campi di metadati. I client devono conservare i metadati dell'ultimo dump completo.
@@ -220,13 +294,18 @@ Il campo `value` è un oggetto contenente i metadati dell'immagine:
 | `width` / `height` | int | Dimensioni dell'immagine in pixel |
 | `snr` | float | Rapporto segnale/rumore |
 | `hfravg` | float | HFR medio (raggio a mezzo flusso) delle stelle rilevate |
+| `hfravgdev` | float | Deviazione standard di `hfravg` |
 | `stars` | int | Numero di stelle rilevate |
 | `issolved` | bool | Indica se la risoluzione di campo è riuscita |
 | `solverra` / `solverde` | float | Coordinate RA/DEC risolte |
-| `solverorientation` | float | Angolo di rotazione del campo risolto |
+| `solverorientation` | float | Angolo di rotazione del campo risolto: dal Nord verso l'alto dell'immagine (gradi), rilevante solo se `issolved` |
+| `solverpixscale` | float | Scala del pixel risolta (arcsec/pixel), rilevante solo se `issolved` |
+| `solverfieldwidth` / `solverfieldheight` | float | Dimensione del campo risolta (minuti d'arco), rilevante solo se `issolved` |
+| `sampling` | float | Scala del pixel nominale (arcsec/pixel), calcolata dalla focale/riduttore dell'ottica e dalla dimensione del pixel della fotocamera del modulo — sempre disponibile una volta configurate fotocamera e ottica, indipendentemente da qualsiasi risoluzione (a differenza dei campi `solver*` sopra) |
 | `min` / `max` / `mean` / `median` / `stddev` | float[] | Statistiche per canale (vedi sotto) |
 | `histogram` | array | Dati dell'istogramma per canale (vedi sotto) |
 | `alternates` | string[] | Opzionale: versioni alternative dell'immagine |
+| `showstats` | bool | Impostato dallo sviluppatore del modulo: indica se i campi di statistiche sopra sono significativi per questa immagine e vanno mostrati (un modulo può impostarlo a `false` se non li calcola, o se non si applicano) |
 
 **Statistiche per canale**: `min`/`max`/`mean`/`median`/`stddev` sono
 array a **3 posizioni fisse**, indipendentemente dal numero reale di
@@ -308,7 +387,7 @@ I LOV forniscono un insieme di valori consentiti per gli elementi di tipo `int`,
 "lovScope": "module"
 ```
 
-Il LOV stesso è definito a livello modulo (`globallovs`) o controller (`controllerlovs`):
+Il LOV stesso è definito a livello modulo (`globallovs`) o controller (`lovs`):
 ```json
 "myCameraModels": {
   "label": "Modelli di camera",
@@ -320,19 +399,30 @@ Il LOV stesso è definito a livello modulo (`globallovs`) o controller (`control
 }
 ```
 
-**LOV integrati del controller** (sempre disponibili):
+**LOV integrati del controller**:
 
-| Chiave | Contenuto |
-|---|---|
-| `loadedModules` | Tutti i moduli caricati: `{nomeModulo: etichetta}` |
-| `loadedModules-<template>` | Moduli filtrati per tipo (es. `loadedModules-focus`) |
-| `profiles-<template>` | Profili disponibili per un tipo di modulo |
+| Chiave | Contenuto | Disponibilità |
+|---|---|---|
+| `loadedModules` | Tutti i moduli caricati: `{nomeModulo: etichetta}` | Sempre |
+| `loadedModules-<type>` | Moduli di un dato tipo, corrispondente a `infos.library` (es. `loadedModules-focus`) | Una volta caricato un modulo di quel tipo |
+| `loadedFamilies-<family>` | Moduli che dichiarano una data famiglia, corrispondente a `infos.families` (es. `loadedFamilies-guiding` elenca ogni modulo caricato in grado di guidare, qualunque sia il suo tipo effettivo) | Una volta caricato un modulo che dichiara quella famiglia |
+| `profiles-<Type>` | Profili disponibili per un tipo di modulo, corrispondente esattamente a `infos.classname` — da notare l'uso delle maiuscole, es. `profiles-Focus` | Una volta salvato un profilo di quel tipo |
 
 ---
 
 ## Controllo degli accessi
 
-La risposta dump contiene i valori `grant-server` e `grant-client`:
+La risposta dump contiene i valori `grant-server` e `grant-client`.
+
+`grant-server` è la politica di accesso propria del server, fissa (impostata all'avvio del server, uguale per ogni client):
+
+| Valore | Significato |
+|---|---|
+| `"0"` | Accesso completo lettura-scrittura, nessuna autenticazione richiesta — `grant-client` vale sempre `"1"` |
+| `"1"` | Accesso completo in sola lettura, nessuna autenticazione richiesta; l'accesso in scrittura dipende dai diritti propri dell'utente autenticato — `grant-client` vale `"0"` o `"1"` |
+| `"2"` | Nessun accesso senza autenticarsi; l'accesso in lettura e in scrittura dipende dai diritti propri dell'utente autenticato — `grant-client` vale `"-1"`, `"0"` o `"1"` |
+
+`grant-client` è la concessione attuale propria di questa connessione, che può cambiare dopo un `LO` (login) riuscito:
 
 | Valore | Significato |
 |---|---|

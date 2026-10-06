@@ -64,9 +64,14 @@ void DBManager::CreateDatabaseStructure()
         }
 
     }
-    // add Messier and common stars
+    // all catalogs together take a fraction of a second to load
+    // (measured live: ~270ms total), no reason to hold any of them back
     populateCatalog(":messier.txt", "Messier");
     populateCatalog(":stars.txt", "Stars");
+    populateCatalog(":ngc.txt", "NGC");
+    populateCatalog(":ic.txt", "IC");
+    populateCatalog(":ldn.txt", "LDN");
+    populateCatalog(":sh2.txt", "SH2");
 
 }
 bool DBManager::setDbProfile(const QString &pModuleType, const QString &pProfileName, QJsonObject &content )
@@ -377,6 +382,8 @@ bool DBManager::searchCatalog(const QString &pArgument, QList<catalogResult> &pR
 }
 bool DBManager::populateCatalog(const QString &pFileName, const QString &pName)
 {
+    QElapsedTimer timer;
+    timer.start();
     if(!mDb.open())
     {
         logError("populateCatalog dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
@@ -407,9 +414,10 @@ bool DBManager::populateCatalog(const QString &pFileName, const QString &pName)
         return false;
     }
     QTextStream in(&inputFile);
+    int lineCount = 0;
     while (!in.atEnd())
     {
-
+        lineCount++;
         QString line = in.readLine();
         line = line.replace("'", " ");
         QStringList splitted = line.split(u';');
@@ -453,6 +461,7 @@ bool DBManager::populateCatalog(const QString &pFileName, const QString &pName)
 
     mDb.close();
     inputFile.close();
+    logInfo("populateCatalog %1: %2 lines in %3 ms", {pName, lineCount, timer.elapsed()});
     return true;
     /*QFile file;
     file.setFileName(pFileName);

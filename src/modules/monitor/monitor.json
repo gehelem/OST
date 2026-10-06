@@ -55,7 +55,7 @@
             "guider": {
                 "type": "string",
                 "label": "Guider instance",
-                "listOfValues": "loadedModules-guider",
+                "listOfValues": "loadedFamilies-guiding",
                 "listOfValuesIsExternal": true,
                 "autoupdate": true,
                 "directedit": true,
@@ -66,7 +66,7 @@
             "sequencer": {
                 "type": "string",
                 "label": "Sequencer instance",
-                "listOfValues": "loadedModules-sequence",
+                "listOfValues": "loadedModules-sequencer",
                 "listOfValuesIsExternal": true,
                 "autoupdate": true,
                 "directedit": true,
@@ -77,7 +77,7 @@
             "focus": {
                 "type": "string",
                 "label": "Focus instance",
-                "listOfValues": "loadedModules-focus",
+                "listOfValues": "loadedFamilies-focus",
                 "listOfValuesIsExternal": true,
                 "autoupdate": true,
                 "directedit": true,

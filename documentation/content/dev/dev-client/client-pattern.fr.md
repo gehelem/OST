@@ -1,12 +1,12 @@
 ---
 title: Principes d'architecture client
-weight: 50
+weight: 10
 description: "Comment structurer un client OST : datastore unique, écriture via WS uniquement"
 ---
 
 Cette page décrit **comment un client doit être structuré**, pas le format
 des messages échangés (voir [Structure des données]({{% relref "structure.fr.md" %}})
-et les pages précédentes pour ça).
+et les pages suivantes pour ça).
 
 ## Principe : un datastore unique détient la vérité
 
@@ -32,6 +32,20 @@ l'envoi d'un message au serveur (`SV`/`SA` — voir
 local **ne change qu'en retour**, quand le serveur répond avec l'update
 confirmé. Le client ne présume jamais du résultat.
 {{% /notice %}}
+
+## Principe : aucune dépendance à internet
+
+Un serveur OST tourne souvent sur un réseau local isolé — un site d'observatoire distant sans accès à internet est un déploiement normal, pas un cas limite. Un client doit fonctionner correctement dans cette situation : **toute ressource dont il a besoin doit être embarquée avec le client lui-même**, pas récupérée depuis un CDN ou un autre service externe au moment de l'exécution.
+
+Ça concerne directement le rendu des icônes : [`preicon1`/`preicon2`/`posticon1`/`posticon2`/`preicon`/`posticon`]({{% relref "structure.fr.md" %}}) donnent un *nom* d'icône Google Fonts (Material Icons), pas une URL — un client doit embarquer localement la police/les glyphes d'icônes (vendorisés, auto-hébergés, ou empaquetés à la construction) plutôt que de charger la feuille de style du CDN Google, qui casse silencieusement dès qu'il n'y a plus de route vers internet.
+
+Ça vaut aussi pour tout ce qu'un client pourrait être tenté de tirer d'un CDN : un framework JS, une bibliothèque de graphes, une police web pour l'UI elle-même. Si le client en a besoin pour fonctionner, ça part avec le client.
+
+## Recommandation forte : proposer au moins un thème sombre et un thème clair
+
+Les clients OST sont couramment utilisés à l'oculaire ou à côté d'un télescope, de nuit — une interface pleine luminosité à fond blanc n'est pas qu'un décalage de style dans ce contexte, elle détruit purement et simplement la vision nocturne de l'opérateur. Un client doit proposer **au minimum un thème sombre et un thème clair**, et non figer l'un ou l'autre en dur.
+
+Ce n'est pas une exigence du protocole filaire — rien ici n'est imposé ni même visible côté serveur — mais c'est une recommandation forte pour tout ce qui est destiné à être utilisé lors de vraies sessions d'astrophotographie, pas seulement comme démo ou outil de test de bureau.
 
 ## Dump complet vs mises à jour partielles
 
@@ -97,6 +111,72 @@ est rendue avec une clé stable par propriété. Résultat : l'UI des
 propriétés non concernées n'est jamais perturbée, quelle que soit la
 vitesse à laquelle une autre propriété se met à jour en parallèle.
 {{% /notice %}}
+
+## Templates : écrans par type de module, avec un repli générique
+
+Chaque instance de module peut annoncer `infos.template` (voir
+[Modèle de données]({{% relref "structure.fr.md" %}})) — une chaîne
+nommant son type (`"focus"`, `"guider"`, `"sequencer"`...). C'est
+purement indicatif, et **son absence est autorisée**.
+
+{{% notice style="tip" title="Template absent = l'écran par défaut" %}}
+Un client qui gère des écrans dédiés par template doit traiter un
+`infos.template` absent (ou non reconnu) exactement comme la valeur
+littérale `"default"` — pas comme une erreur. Rooster procède ainsi
+avec un petit registre associant un nom de template en minuscules à un
+composant d'écran, avec repli sur son écran générique/par défaut quand
+le nom est absent ou absent du registre :
+```
+template = infos.template?.toLowerCase() || "default"
+screen = registry[template] ?? registry["default"]
+```
+C'est ce qui permet à un client de rester pleinement fonctionnel face
+à un type de module qu'il n'a jamais vu — un module nouveau ou tiers
+s'affiche toujours via l'écran générique — tout en offrant un écran
+soigné et dédié pour les types de modules qui le méritent.
+
+L'écran `"default"` n'est pas un repli minimal symbolique : c'est le
+**seul** écran que certains types de modules auront jamais, il doit
+donc rendre tout ce qu'une propriété/élément générique peut porter —
+status, `hint`, pré/posticônes, grilles, graphes, LOV, tout — pas
+seulement les valeurs. Un écran dédié par template peut être plus
+sélectif (masquer des champs, réorganiser la mise en page), mais
+l'écran par défaut ne doit pas faire disparaître silencieusement de
+l'information faute d'un écran dédié écrit pour ce module.
+{{% /notice %}}
+
+{{% notice style="tip" title="Recommandé : un seul composant de rendu de propriété, réutilisé partout" %}}
+Pas obligatoire, mais fortement conseillé : construire un composant
+**unique**, responsable du rendu d'une propriété (ou d'un élément) —
+gérant `directedit`, `permission`, les trois portées de LOV, les
+règles de groupe bool, `autoupdate`, les grilles, les graphes — et
+faire en sorte que **tous** les écrans l'utilisent pour leurs
+propriétés individuelles, y compris les écrans dédiés par template, pas
+seulement le repli générique.
+
+L'alternative — chaque écran réimplémentant son propre rendu de
+champs — duplique chaque nuance du format d'échange dans toute la base
+de code, et un correctif ou une nouvelle capacité backend n'atteint
+que les écrans dont quelqu'un s'est souvenu. Les écrans dédiés de
+Rooster (`GuiderComponent`, `FocusComponent`...) ont leur propre mise
+en page, mais délèguent chaque propriété individuelle au même
+composant de propriété générique que l'écran de repli — un correctif
+fait une seule fois à cet endroit (par exemple gérer correctement un
+groupe de switches exclusifs) s'applique partout automatiquement,
+écrans dédiés compris.
+{{% /notice %}}
+
+## Formulaires de propriété : `SA`, obligatoire pour `directedit: false`
+
+Au-delà du `SV` champ par champ, une propriété éditable a besoin d'un **chemin formulaire** : un écran listant tous ses éléments éditables à la fois, soumis ensemble via [`SA`]({{% relref "client-messages.fr.md" %}}#sa).
+
+{{% notice style="warning" title="Pas optionnel pour un élément `directedit: false`" %}}
+`SV` est rejeté par le backend pour tout élément avec `directedit: false` (voir [Modèle de données]({{% relref "structure.fr.md" %}})). `SA` est le **seul** moyen de jamais mettre à jour un tel élément — un client sans chemin formulaire ne peut tout simplement pas écrire sur cet élément, quelle que soit la qualité du reste de son UI.
+{{% /notice %}}
+
+Seuls les éléments **éditables** ont leur place dans ce formulaire — les types d'affichage seul (`img`, `video`, `light`, `prg`, `message`) sont rendus, jamais soumis ; à exclure complètement du payload plutôt que d'y envoyer une valeur sans sens.
+
+La même forme « soumettre un ensemble d'éléments à la fois » est réutilisée par la création de ligne de grille ([`GC`]({{% relref "client-messages.fr.md" %}}#gc)) et sa mise à jour ([`GU`]({{% relref "client-messages.fr.md" %}}#gu)) — les deux prennent une map `e` exactement comme `SA`. Ça vaut le coup de construire **un seul** composant formulaire réutilisable qui serve à la fois le formulaire de propriété, la boîte de création de ligne de grille et celle d'édition de ligne, plutôt que trois implémentations séparées d'une logique essentiellement identique (« rendre des éléments éditables, collecter leurs valeurs »). C'est ce que fait Rooster.
 
 ## Heartbeat
 

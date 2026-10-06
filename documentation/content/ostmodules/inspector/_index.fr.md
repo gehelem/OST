@@ -49,6 +49,18 @@ Les deux bascules sont indépendantes (non exclusives) et sont persistées avec 
 |---|---|
 | **Zoning** | Grille N×N de découpe de l'image pour l'analyse par zone (de 1×1 à 64×64) |
 
+### Détection de collimation
+
+Ces paramètres bornent et règlent la détection des donuts pour l'analyse de collimation (voir « Détection par étoile » plus bas) — valeurs par défaut pensées pour fonctionner sans réglage, à ajuster seulement si besoin.
+
+| Paramètre | Défaut | Description |
+|---|---|---|
+| **Écart-type minimal (ADU)** | 20 | En dessous, l'image est considérée plate (surexposée, sous-exposée, pas de donut) et l'analyse de collimation est sautée entièrement pour cette capture |
+| **Taille max. candidat (% image)** | 5 % | Un contour plus grand que cette fraction de l'image est rejeté d'office (jamais un vrai donut — typiquement un artefact de saturation) |
+| **Marge de détection (0-255)** | 5 | Contraste local minimal exigé pour qu'un pixel soit considéré comme faisant partie d'un donut. **Diminuer** pour détecter des donuts plus faibles/moins contrastés (au risque d'attraper plus de bruit — déjà borné par les autres paramètres ici) |
+| **Finesse de détection (diviseur)** | 8 | Contrôle la taille de la fenêtre d'analyse locale (taille image / N). **Augmenter** (fenêtre plus petite, plus locale) aide aussi à détecter des donuts faibles noyés dans un fond légèrement inégal |
+| **Rayon minimal candidat (pixels)** | 5 | Rejette les candidats trop petits/ponctuels pour être un vrai donut défocalisé — évite qu'un champ d'étoiles pas assez défocalisé (points quasi ponctuels) pollue l'ajustement de collimation avec du bruit |
+
 ### Défocalisation
 
 | Paramètre | Description |
@@ -120,6 +132,8 @@ Pour chaque étoile détectée :
 - Un ajustement de cercle par moindres carrés sur le contour externe donne le centre théorique de l'étoile — cette méthode reste fiable même quand l'anneau est fortement déformé (croissant, en cas de décollimation importante)
 - Le vecteur de déformation est l'écart entre ce centre théorique et le centroïde pondéré par intensité de l'anneau (ombre exclue)
 
+Des donuts visiblement présents dans l'image mais non détectés signalent une sensibilité de seuillage trop stricte (diminuer **Marge de détection**, ou augmenter **Finesse de détection**). À l'inverse, un champ d'étoiles pas assez défocalisé (points quasi ponctuels plutôt que de vrais anneaux) ne fournit aucun signal de déformation exploitable — **Rayon minimal candidat** s'assure que de tels champs retombent proprement sur « pas assez de donuts détectés » plutôt que de produire un ajustement bruité et un point de convergence aberrant. Voir « Détection de collimation » dans les paramètres ci-dessus.
+
 ### Régression et point de convergence
 
 Les vecteurs de déformation de toutes les étoiles détectées sont ajustés par moindres carrés au modèle `D(P) = C - k·P`. Le vecteur `C` obtenu est converti en arcsecondes (focale et taille de pixel du capteur), puis projeté sur les 3 vis de collimation à 120° pour obtenir un signe et une amplitude par vis.
@@ -136,7 +150,7 @@ L'analyse de collimation publie sa propre image annotée (l'image principale res
 
 Et pour l'ensemble du champ :
 - Un bullseye (anneaux pointillés) centré sur l'image, matérialisant les mêmes seuils de tolérance que le voyant qualité
-- Une ligne reliant le centre théorique de l'image au point de convergence calculé
+- Une ligne reliant le centre théorique de l'image au point de convergence calculé — absente si l'ajustement est jugé peu fiable (point de convergence extrapolé trop loin hors image, signe d'un champ pas assez défocalisé ou de trop peu de donuts exploitables)
 
 #### Avant collimation (exemple)
 

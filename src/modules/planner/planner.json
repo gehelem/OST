@@ -28,7 +28,7 @@
       "sequencemodule": {
           "type": "string",
           "label": "Sequence instance",
-          "listOfValues":"loadedModules-sequence",
+          "listOfValues":"loadedModules-sequencer",
           "listOfValuesIsExternal":true,
           "autoupdate": true,
           "directedit": true,

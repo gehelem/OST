@@ -1,12 +1,12 @@
 ---
 title: Principi di architettura client
-weight: 50
+weight: 10
 description: "Come strutturare un client OST: datastore unico, scrittura solo via WS"
 ---
 
 Questa pagina descrive **come deve essere strutturato un client**, non il formato
 dei messaggi scambiati (vedi [Modello dati]({{% relref "structure.it.md" %}})
-e le pagine precedenti per quello).
+e le pagine seguenti per quello).
 
 ## Principio: un datastore unico detiene la verità
 
@@ -32,6 +32,20 @@ l'invio di un messaggio al server (`SV`/`SA` — vedi
 locale **cambia solo in risposta**, quando il server risponde con
 l'aggiornamento confermato. Il client non presume mai il risultato.
 {{% /notice %}}
+
+## Principio: nessuna dipendenza da internet
+
+Un server OST gira spesso su una rete locale isolata — un sito osservativo remoto senza accesso a internet è un'installazione normale, non un caso limite. Un client deve funzionare correttamente in questa situazione: **ogni risorsa di cui ha bisogno deve essere inclusa nel client stesso**, non recuperata da un CDN o un altro servizio esterno a runtime.
+
+Questo riguarda direttamente il rendering delle icone: [`preicon1`/`preicon2`/`posticon1`/`posticon2`/`preicon`/`posticon`]({{% relref "structure.it.md" %}}) forniscono un *nome* di icona Google Fonts (Material Icons), non un URL — un client deve includere localmente il font/le glyph delle icone (vendorizzati, autoospitati, o inclusi in fase di build) invece di caricare il foglio di stile del CDN di Google, che smette silenziosamente di funzionare nel momento in cui non c'è più una via verso internet.
+
+Lo stesso vale per qualsiasi altra cosa che un client potesse essere tentato di prelevare da un CDN: un framework JS, una libreria di grafici, un web font per l'interfaccia stessa. Se serve al client per funzionare, viaggia insieme al client.
+
+## Raccomandazione forte: supportare almeno un tema scuro e uno chiaro
+
+I client OST vengono usati comunemente all'oculare o accanto a un telescopio, di notte — un'interfaccia a piena luminosità, con sfondo bianco, lì non è solo una discordanza stilistica: rovina attivamente la visione notturna dell'operatore. Un client dovrebbe offrire **come minimo sia un tema scuro sia uno chiaro**, senza fissarne uno in modo rigido nel codice.
+
+Questo non fa parte del protocollo di comunicazione — qui non c'è nulla che sia imposto o anche solo visibile lato server — ma è una raccomandazione forte per qualsiasi cosa pensata per essere usata in vere sessioni di astrofotografia, non solo come demo o strumento di test da scrivania.
 
 ## Dump completo vs aggiornamenti parziali
 
@@ -99,6 +113,74 @@ risultato è che la UI delle proprietà non coinvolte non viene mai
 disturbata, indipendentemente dalla velocità con cui un'altra
 proprietà si aggiorna altrove.
 {{% /notice %}}
+
+## Template: schermate per tipo di modulo con fallback generico
+
+Ogni istanza di modulo può dichiarare `infos.template` (vedi [Modello
+dati]({{% relref "structure.it.md" %}})) — una stringa che ne indica il
+tipo (`"focus"`, `"guider"`, `"sequencer"`...). È solo un suggerimento,
+ed **è ammesso che sia assente**.
+
+{{% notice style="tip" title="Template assente = la schermata di default" %}}
+Un client che supporta schermate personalizzate per template dovrebbe
+trattare un `infos.template` assente (o non riconosciuto) esattamente
+come il valore letterale `"default"` — non come un errore. Rooster fa
+così con un piccolo registro che associa un nome di template in
+minuscolo a un componente di schermata, ricadendo sulla propria
+schermata generica/di default quando il nome è assente o non presente
+nel registro:
+```
+template = infos.template?.toLowerCase() || "default"
+screen = registry[template] ?? registry["default"]
+```
+Questo è ciò che permette a un client di restare pienamente funzionante
+di fronte a un tipo di modulo mai visto prima — un modulo nuovo o di
+terze parti viene sempre renderizzato tramite la schermata generica —
+pur offrendo una schermata curata e mirata per i tipi di modulo che
+meritano l'investimento.
+
+La schermata `"default"` non è un fallback minimo simbolico: per
+alcuni tipi di modulo è l'**unica** schermata che avranno mai, quindi
+deve renderizzare tutto ciò che una proprietà/elemento generico può
+portare — status, `hint`, pre/posticone, griglie, grafici, LOV, tutto —
+non solo i valori. Una schermata dedicata per template può essere più
+curata (nascondere campi, riorganizzare il layout), ma quella di
+default non dovrebbe far sparire silenziosamente informazioni solo
+perché nessuno ha ancora scritto una schermata dedicata per quel
+modulo.
+{{% /notice %}}
+
+{{% notice style="tip" title="Consigliato: un unico componente di rendering delle proprietà, riusato ovunque" %}}
+Non obbligatorio, ma vale decisamente la pena: costruire un **unico**
+componente responsabile del rendering di una proprietà (o di un
+elemento) — gestendo `directedit`, `permission`, le tre portate di LOV,
+le regole dei gruppi bool, `autoupdate`, le griglie, i grafici — e far
+sì che **ogni** schermata lo usi per le singole proprietà, comprese le
+schermate personalizzate per template, non solo il fallback generico.
+
+L'alternativa — ogni schermata che reimplementa il proprio rendering
+dei campi — duplica ogni sfumatura del formato di trasporto in tutto il
+codice, e una correzione o una nuova funzionalità del backend raggiunge
+solo le schermate che qualcuno si ricorda di aggiornare. Le schermate
+personalizzate di Rooster (`GuiderComponent`, `FocusComponent`...)
+renderizzano il proprio layout, ma delegano comunque ogni singola
+proprietà allo stesso componente di proprietà generico usato dalla
+schermata di fallback — una correzione fatta lì una sola volta (ad
+esempio la corretta gestione di un gruppo di switch esclusivi) si
+applica automaticamente ovunque, schermate personalizzate comprese.
+{{% /notice %}}
+
+## Form di proprietà: `SA`, obbligatorio per `directedit: false`
+
+Oltre a `SV` campo per campo, una proprietà editabile ha bisogno di un **percorso form**: una schermata che elenca tutti i suoi elementi editabili in una volta, inviati insieme tramite [`SA`]({{% relref "client-messages.it.md" %}}#sa).
+
+{{% notice style="warning" title="Non opzionale per un elemento con `directedit: false`" %}}
+`SV` viene rifiutato dal backend per qualsiasi elemento con `directedit: false` (vedi [Modello dati]({{% relref "structure.it.md" %}})). `SA` è l'**unico** modo per aggiornare mai un tale elemento — un client senza percorso form semplicemente non può scrivere su quell'elemento, per quanto ben fatto sia il resto della sua UI.
+{{% /notice %}}
+
+Solo gli elementi **editabili** appartengono a questo form — i tipi di sola visualizzazione (`img`, `video`, `light`, `prg`, `message`) vengono renderizzati, mai inviati; vanno esclusi del tutto dal payload piuttosto che inviare loro un valore privo di senso.
+
+La stessa forma "inviare un insieme di elementi in una volta" è riusata dalla creazione di riga di griglia ([`GC`]({{% relref "client-messages.it.md" %}}#gc)) e dal suo aggiornamento ([`GU`]({{% relref "client-messages.it.md" %}}#gu)) — entrambi prendono una mappa `e` esattamente come `SA`. Vale la pena costruire **un unico** componente form riutilizzabile che serva sia il form della proprietà semplice, sia la finestra di creazione riga di griglia, sia quella di modifica riga — invece di tre implementazioni separate della stessa logica di fondo ("renderizzare elementi editabili, raccoglierne i valori"). È quello che fa Rooster.
 
 ## Heartbeat
 

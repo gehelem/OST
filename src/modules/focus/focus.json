@@ -215,6 +215,54 @@
                     [9,"9x9"]
                 ]
 
+            },
+            "detthreshold": {
+                "order":"72",
+                "autoupdate":true,
+                "directedit":true,
+                "type":"float",
+                "label": "Detection threshold (sigma)",
+                "value": 4,
+                "format": "99.9",
+                "min": 1,
+                "max": 20,
+                "hint": "star extraction (StellarSolver/SEP) detection threshold, in multiples of the background noise - native default is 2, very permissive (lots of noise false positives on a real sensor). Raise if the focus V-curve picks up far more 'stars' than are actually in the frame"
+            },
+            "detminarea": {
+                "order":"74",
+                "autoupdate":true,
+                "directedit":true,
+                "type":"int",
+                "label": "Min. detection area (px)",
+                "value": 20,
+                "format": "9999",
+                "min": 1,
+                "max": 1000,
+                "hint": "minimum pixel area for a star detection, smaller ones are ignored - native default is 10, small enough that a single noise speck can pass"
+            },
+            "deblendcontrast": {
+                "order":"76",
+                "autoupdate":true,
+                "directedit":true,
+                "type":"float",
+                "label": "Deblend contrast (%)",
+                "value": 5,
+                "format": "99.99",
+                "min": 0.01,
+                "max": 100,
+                "hint": "minimum flux a secondary peak inside one detection must have (as a percentage of the total) before SEP splits it into a separate star - native default is 0.5%, so a single defocused/donut-shaped star (uneven ring, secondary shadow) is very easily counted as several. Raise this to stop that"
+            },
+            "detminradius": {
+                "order":"78",
+                "autoupdate":true,
+                "directedit":true,
+                "type":"float",
+                "label": "Min. star radius (px)",
+                "value": 5,
+                "format": "999.9",
+                "min": 0,
+                "max": 200,
+                "hint": "rejects detections smaller than this radius - native default is 3.5px"
             }
 
         }

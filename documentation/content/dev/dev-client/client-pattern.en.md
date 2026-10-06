@@ -1,12 +1,12 @@
 ---
 title: Client Architecture Principles
-weight: 50
+weight: 10
 description: "How to structure an OST client: single datastore, writes through the server only"
 ---
 
 This page describes **how a client should be structured**, not the format
 of the exchanged messages (see [Data Model]({{% relref "structure.en.md" %}})
-and the previous pages for that).
+and the following pages for that).
 
 ## Principle: a single datastore holds the truth
 
@@ -33,6 +33,20 @@ message to the server (`SV`/`SA` — see
 datastore **only changes in return**, once the server responds with the
 confirmed update. The client never assumes the outcome.
 {{% /notice %}}
+
+## Principle: no internet dependency
+
+An OST server is frequently run on an isolated local network — a remote observatory site with no path to the outside internet is a normal deployment, not an edge case. A client has to work correctly there: **every resource it needs must be bundled with the client itself**, not fetched from a CDN or any other external service at runtime.
+
+This directly affects icon rendering: [`preicon1`/`preicon2`/`posticon1`/`posticon2`/`preicon`/`posticon`]({{% relref "structure.en.md" %}}) give a Google Fonts (Material Icons) icon *name*, not a URL — a client has to ship the icon font/glyphs locally (vendored, self-hosted, or bundled at build time) instead of loading Google's CDN stylesheet, which silently breaks the moment there is no route to the outside internet.
+
+The same goes for anything else a client might be tempted to pull from a CDN: a JS framework, a charting library, a web font for the UI itself. If the client needs it to run, it ships with the client.
+
+## Strong recommendation: support at least a dark and a light theme
+
+OST clients are commonly used at the eyepiece or next to a telescope, at night — a full-brightness, white-background UI is not just a stylistic mismatch there, it actively ruins the operator's night vision. A client should offer **at minimum both a dark and a light theme**, not hardcode one or the other.
+
+This is not part of the wire protocol — nothing here is enforced or even visible server-side — but it is a strong recommendation for anything meant to be used for real astrophotography sessions, not just as a demo or a desk-testing tool.
 
 ## Full dump vs partial updates
 
@@ -94,6 +108,69 @@ store, and every list of properties is rendered with a stable
 per-property key. As a result, unrelated properties' UI is never
 disturbed, no matter how fast another property updates elsewhere.
 {{% /notice %}}
+
+## Templates: per-module-type screens with a generic fallback
+
+Each module instance may advertise `infos.template` (see [Data
+Model]({{% relref "structure.en.md" %}})) — a string naming its type
+(`"focus"`, `"guider"`, `"sequencer"`...). It is a hint only, and it is
+**allowed to be absent**.
+
+{{% notice style="tip" title="Absent template = the default screen" %}}
+A client that supports per-template custom screens should treat a
+missing (or unrecognized) `infos.template` exactly like the literal
+value `"default"` — not as an error. Rooster does this with a small
+registry mapping a lowercased template name to a screen component,
+falling back to its generic/default screen when the name is absent or
+not in the registry:
+```
+template = infos.template?.toLowerCase() || "default"
+screen = registry[template] ?? registry["default"]
+```
+This is what lets a client stay fully functional against a module type
+it has never seen before — a new or third-party module always renders
+through the generic screen — while still offering a polished, purpose-built
+screen for the module types worth investing in.
+
+The `"default"` screen is not a token minimal fallback: it is the
+**only** screen some module types will ever get, so it has to render
+everything a generic property/element can carry — status, `hint`,
+pre/posticons, grids, graphs, LOVs, the lot — not just values. A
+custom per-template screen is free to be more curated (hide fields,
+reorganize layout), but the default one should not silently drop
+information because no one wrote a dedicated screen for that module
+yet.
+{{% /notice %}}
+
+{{% notice style="tip" title="Recommended: one single property-rendering component, reused everywhere" %}}
+Not mandatory, but strongly worth it: build a **single** component
+responsible for rendering one property (or one element) — handling
+`directedit`, `permission`, the three LOV scopes, bool-group rules,
+`autoupdate`, grids, graphs — and have **every** screen use it for
+individual properties, including custom per-template screens, not just
+the generic fallback.
+
+The alternative — each screen re-implementing its own field rendering —
+duplicates every wire-format nuance across the codebase, and a fix or a
+new backend capability only reaches the screens someone remembers to
+update. Rooster's custom screens (`GuiderComponent`, `FocusComponent`...)
+render their own layout, but still delegate each individual property to
+the same generic property component the fallback screen uses — a fix
+made once there (e.g. correctly handling an exclusive switch group)
+applies everywhere automatically, custom screens included.
+{{% /notice %}}
+
+## Property forms: `SA`, mandatory for `directedit: false`
+
+Beyond field-by-field `SV`, an editable property needs a **form path**: a screen listing all its editable elements at once, submitted together via [`SA`]({{% relref "client-messages.en.md" %}}#sa).
+
+{{% notice style="warning" title="Not optional for a `directedit: false` element" %}}
+`SV` is rejected by the backend for any element with `directedit: false` (see [Data model]({{% relref "structure.en.md" %}})). `SA` is the **only** way to ever update such an element — a client with no form path simply cannot write to that element at all, no matter how the rest of its UI is built.
+{{% /notice %}}
+
+Only **editable** elements belong in this form — display-only types (`img`, `video`, `light`, `prg`, `message`) are rendered, never submitted; leave them out of the payload entirely rather than sending a meaningless value for them.
+
+The same "submit a set of elements at once" shape is reused by grid line creation ([`GC`]({{% relref "client-messages.en.md" %}}#gc)) and update ([`GU`]({{% relref "client-messages.en.md" %}}#gu)) — both take an `e` map exactly like `SA` does. It is worth building **one** reusable form component that serves the plain-property form, the grid-row-create dialog and the grid-row-edit dialog alike, rather than three separate implementations of essentially the same "render editable elements, collect their values" logic. Rooster does this.
 
 ## Heartbeat
 

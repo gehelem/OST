@@ -1,6 +1,6 @@
 ---
 title: Mensajes Servidor → Cliente
-weight: 20
+weight: 40
 description: "Todos los mensajes JSON enviados por el servidor OST a los clientes conectados"
 ---
 
@@ -17,10 +17,6 @@ Cada mensaje es un objeto JSON con **una única clave de primer nivel**. Esta cl
 Los clientes deben comparar los **1 o 2 primeros caracteres** de la clave, no la cadena completa, ya que la parte de descripción puede cambiar.
 
 Todas las claves de eventos enviadas por el servidor están en **minúsculas** (ej. `d`, `ea`, `ap`, `gc`).
-
-{{% notice style="warning" title="Excepción: `evt` empieza por `ev`" %}}
-La clave [`evt`](#evt) (eventos de archivos) empieza por los mismos dos caracteres que [`ev`](#ev). Comparar primero la igualdad exacta con `evt` y solo después los prefijos; de lo contrario, un evento de archivo se toma por una actualización de elemento.
-{{% /notice %}}
 
 ---
 
@@ -49,7 +45,11 @@ La clave [`evt`](#evt) (eventos de archivos) empieza por los mismos dos caracter
 | [`fc`](#fs) | Perfil modificado (modificaciones no guardadas) |
 | [`l`](#l) | Entrada de log |
 | [`uc`](#uc) | Actualización de los datos del controlador |
-| [`evt`](#evt) | Evento de archivo o de carpeta (alta/baja) |
+| [`af`](#af) | Archivo añadido |
+| [`df`](#af) | Archivo eliminado |
+| [`ad`](#af) | Carpeta añadida |
+| [`dd`](#af) | Carpeta eliminada |
+| [`qa`](#qa) | Respuesta a una consulta de módulo (mecanismo inter-módulo, no pensado para el cliente) |
 | [`xx`](#xx) | Pong keepalive |
 
 ---
@@ -66,7 +66,7 @@ Enviado como respuesta a una petición `DU`. Contiene todo: todos los módulos, 
     "serverlng": "en",
     "m": {
       "Focus": {
-        "infos": { "label": "Focus", "name": "Focus", "description": "..." },
+        "infos": { "modulelabel": "Focus", "description": "..." },
         "f": { "name": "default", "changed": false },
         "l": {
           "myLov": { "label": "My LOV", "type": "string", "values": { "a": "Option A" } }
@@ -145,7 +145,7 @@ Enviado cuando un módulo se carga o recarga en tiempo de ejecución. Contiene e
 {
   "aa-dump all data": {
     "Guider": {
-      "infos": { "label": "Guider", "name": "Guider", "description": "..." },
+      "infos": { "modulelabel": "Guider", "description": "..." },
       "f": { "name": "default", "changed": false },
       "l": {},
       "p": {
@@ -553,22 +553,52 @@ El payload es `{"clave": valor}` donde `valor` puede ser una cadena, un array o 
 
 ---
 
-## `evt` — Evento de archivo o de carpeta {#evt}
+## `af` / `df` / `ad` / `dd` — Eventos de archivo y de carpeta {#af}
 
-Enviado a todos los clientes cuando cambia el contenido de la carpeta de archivos vigilada (ver [Sistema de archivos]({{% relref "controller.es.md" %}}#fichiers)). A diferencia de los demás mensajes, la clave es exactamente `evt` y su **valor es una cadena** que indica el tipo de evento; las rutas van en un campo hermano `fileevent`.
+Enviado a todos los clientes cuando cambia el contenido de la carpeta de archivos vigilada (ver [Sistema de archivos]({{% relref "controller.es.md" %}}#fichiers)). A diferencia de los demás mensajes, el valor es una **cadena simple**: la ruta afectada, sin envolver en un objeto ni en un array — el servidor solo reporta una ruta por mensaje.
 
 ```json
-{ "evt": "fileadd", "fileevent": ["/Allsky/image_001.jpeg"] }
+{ "af": "/Allsky/image_001.jpeg" }
+{ "df": "/Allsky/old_image.jpeg" }
 ```
 
-| `evt` | Significado |
+| Clave | Significado |
 |---|---|
-| `fileadd` | Archivo(s) añadido(s) a la carpeta seleccionada |
-| `filedel` | Archivo(s) eliminado(s) de la carpeta seleccionada |
-| `folderadd` | Subcarpeta añadida al webroot |
-| `folderdel` | Subcarpeta eliminada del webroot |
+| `af` | Archivo añadido a la carpeta seleccionada |
+| `df` | Archivo eliminado de la carpeta seleccionada |
+| `ad` | Subcarpeta añadida en cualquier parte del webroot |
+| `dd` | Subcarpeta eliminada de cualquier parte del webroot |
 
-`fileevent` es siempre un array de rutas relativas al webroot (que empiezan por `/`).
+`af`/`df` solo conciernen a la carpeta actualmente seleccionada vía [`FS`]({{% relref "client-messages.es.md" %}}#fs) — no se notifica nada sobre el contenido de otras carpetas. `ad`/`dd` son globales: se disparan para todo el árbol del webroot, sea cual sea la carpeta actualmente seleccionada. Ver [Sistema de archivos]({{% relref "controller.es.md" %}}#fichiers) para el panorama completo.
+
+---
+
+## `qa` — Respuesta a una consulta de módulo {#qa}
+
+{{% notice style="warning" title="Comunicación inter-módulo, no una funcionalidad de cliente" %}}
+Ver la nota sobre [`QY`]({{% relref "client-messages.es.md" %}}#qy): este mecanismo existe principalmente para que un módulo consulte a otro internamente. Documentado aquí por exhaustividad, no como funcionalidad pensada para el cliente.
+{{% /notice %}}
+
+Respuesta a una consulta [`QY`]({{% relref "client-messages.es.md" %}}#qy). `QY`/`qa` es un **mecanismo genérico de consulta/respuesta propio de cada módulo**: un cliente (u otro módulo, internamente) hace a un módulo una pregunta con nombre y parámetros, y recibe una respuesta con nombre a cambio. Qué nombres de consulta entiende realmente un módulo, y la forma de su respuesta, depende enteramente de ese módulo — el protocolo solo define el sobre, no el contenido.
+
+```json
+{
+  "qa-query answer": {
+    "Sequencer": {
+      "q": {
+        "query": "profileduration",
+        "result": { "seconds": 3600 }
+      }
+    }
+  }
+}
+```
+
+`result` es lo que el módulo devolvió para esa consulta — su forma depende enteramente de `query`. Un módulo sin un caso que coincida con el nombre de `query` solicitado devuelve silenciosamente un `result` vacío.
+
+{{% notice style="note" title="Todavía poco que ver" %}}
+Hoy solo el módulo `Sequencer` implementa una respuesta real (`profileduration`), usada internamente por el módulo Planner en lugar de por ningún flujo de cliente documentado. Ningún otro módulo incluido responde de forma significativa a ningún nombre de consulta por ahora — el mecanismo existe y está completamente cableado, pero de momento hay poco que consultar en la práctica.
+{{% /notice %}}
 
 ---
 

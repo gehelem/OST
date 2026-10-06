@@ -11,15 +11,18 @@
 int main(int argc, char *argv[])
 {
     qDebug() << "MAIN 0";
-    // Initialize Qt embedded resources (must be done before using them)
-    Q_INIT_RESOURCE(translations);
-    // Register custom types for queued signal/slot connections
-    qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
-    qRegisterMetaType<OST::EvType>("OST::EvType");
 
-    QGuiApplication app(argc, argv, false);
-    QGuiApplication::setOrganizationName("alazob.team");
-    QGuiApplication::setApplicationName("ost");
+    // Parse arguments before constructing QGuiApplication: on an unknown
+    // option or --help, we want a plain `return` from main() with no
+    // QGuiApplication ever having existed. Constructing one only to have
+    // it torn down almost immediately (no event loop ever run) reliably
+    // corrupted the heap on exit ("double free or corruption") - true even
+    // with a clean return letting destructors run normally, so it's not
+    // about skipping destructors, something about this app's very early
+    // teardown itself is the problem. Simplest robust fix: don't create it
+    // at all on an early-exit path.
+    QStringList cliArgs;
+    for (int i = 0; i < argc; ++i) cliArgs << QString::fromLocal8Bit(argv[i]);
 
     QCommandLineParser argParser;
     argParser.addHelpOption();
@@ -75,7 +78,27 @@ int main(int argc, char *argv[])
     argParser.addOption(setAdminPasswordOption);
     argParser.addOption(systemWatchIntervalOption);
     argParser.addOption(minFreePercentOption);
-    argParser.process(app);
+    if (!argParser.parse(cliArgs))
+    {
+        fputs(qPrintable(argParser.errorText()), stderr);
+        fputs("\n", stderr);
+        return 1;
+    }
+    if (argParser.isSet("help"))
+    {
+        fputs(qPrintable(argParser.helpText()), stdout);
+        return 0;
+    }
+
+    // Only now, past every early-exit path, construct the application.
+    QGuiApplication app(argc, argv, false);
+    QGuiApplication::setOrganizationName("alazob.team");
+    QGuiApplication::setApplicationName("ost");
+    // Initialize Qt embedded resources (must be done before using them)
+    Q_INIT_RESOURCE(translations);
+    // Register custom types for queued signal/slot connections
+    qRegisterMetaType<OST::LogLevel>("OST::LogLevel");
+    qRegisterMetaType<OST::EvType>("OST::EvType");
 
     QString webroot = argParser.value(webrootOption);
     QString dbPath = argParser.value(dbPathOption);
@@ -111,29 +134,39 @@ int main(int argc, char *argv[])
     mLogger.info("  //*******   ********     /**    ");
     mLogger.info("   ///////   ////////      //     ");
     mLogger.info("                                  ");
-    mLogger.info("Git Hash              =" + QString::fromStdString(Version::GIT_SHA1));
-    mLogger.info("Git Date              =" + QString::fromStdString(Version::GIT_DATE));
-    mLogger.info("Git Commit subject    =" + QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
-    mLogger.info("Git Tag               =" + QString::fromStdString(Version::GIT_TAG));
+    // %1 placeholders here, not string concatenation - startup logging used
+    // to bake the actual runtime value (git hash, log filename, ...)
+    // straight into the logged QString, so the tool that scans the server's
+    // own log history for translatable strings picked up a different
+    // "source" text every single run (a timestamped log filename is never
+    // the same twice) instead of one stable, reusable template - Gilles,
+    // 2026-10-04, spotting one such entry in a translations_pending_*.ts:
+    // "on peut generaliser a toutes les mLogger.info() qui sont utilisees
+    // sans argument". QString::arg() keeps the template stable across runs
+    // (translate it once) while still substituting the real value.
+    mLogger.info(QString("Git Hash              =%1").arg(QString::fromStdString(Version::GIT_SHA1)));
+    mLogger.info(QString("Git Date              =%1").arg(QString::fromStdString(Version::GIT_DATE)));
+    mLogger.info(QString("Git Commit subject    =%1").arg(QString::fromStdString(Version::GIT_COMMIT_SUBJECT)));
+    mLogger.info(QString("Git Tag               =%1").arg(QString::fromStdString(Version::GIT_TAG)));
 
-    mLogger.info("Webroot               =" + webroot);
-    mLogger.info("DB Path               =" + dbPath);
-    mLogger.info("Modules Library Path  =" + libPath);
-    mLogger.info("Load configuration    =" + conf);
-    mLogger.info("Embedded Indi server  =" + indiserver);
-    mLogger.info("WebSocket SSL         =" + ssl);
+    mLogger.info(QString("Webroot               =%1").arg(webroot));
+    mLogger.info(QString("DB Path               =%1").arg(dbPath));
+    mLogger.info(QString("Modules Library Path  =%1").arg(libPath));
+    mLogger.info(QString("Load configuration    =%1").arg(conf));
+    mLogger.info(QString("Embedded Indi server  =%1").arg(indiserver));
+    mLogger.info(QString("WebSocket SSL         =%1").arg(ssl));
     if (ssl != "N")
     {
-        mLogger.info("SSL Certificate       =" + sslCert);
-        mLogger.info("SSL Private Key       =" + sslKey);
+        mLogger.info(QString("SSL Certificate       =%1").arg(sslCert));
+        mLogger.info(QString("SSL Private Key       =%1").arg(sslKey));
     }
-    mLogger.info("Language              =" + lng);
-    mLogger.info("Security              =" + grant);
-    mLogger.info("Log file              =" + logfile);
-    mLogger.info("Log level             =" + QString::number(loglevel));
-    mLogger.info("Banner                =" + banner);
-    mLogger.info("System watch interval =" + QString::number(systemWatchInterval) + "s (0 to disable)");
-    mLogger.info("Min free disk space   =" + QString::number(minFreePercent) + "%");
+    mLogger.info(QString("Language              =%1").arg(lng));
+    mLogger.info(QString("Security              =%1").arg(grant));
+    mLogger.info(QString("Log file              =%1").arg(logfile));
+    mLogger.info(QString("Log level             =%1").arg(loglevel));
+    mLogger.info(QString("Banner                =%1").arg(banner));
+    mLogger.info(QString("System watch interval =%1s (0 to disable)").arg(systemWatchInterval));
+    mLogger.info(QString("Min free disk space   =%1%").arg(minFreePercent));
     if (setAdminPassword != "") mLogger.info("Set ADMIN password    = [hidden]");
 
     mLogger.setLogLevel(static_cast<OST::LogLevel>(loglevel));
@@ -164,7 +197,7 @@ int main(int argc, char *argv[])
     Q_UNUSED(controller);
 
     int nAppReturnCode = QGuiApplication::exec();
-    mLogger.info("OST app terminated with status : " + QString::number(nAppReturnCode));
+    mLogger.info(QString("OST app terminated with status : %1").arg(nAppReturnCode));
     return nAppReturnCode;
 
 }

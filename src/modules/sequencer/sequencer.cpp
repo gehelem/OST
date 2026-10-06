@@ -25,7 +25,7 @@ Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap a
     setMetadata("thisGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
     setMetadata("description",    "Sequencer module");
     setMetadata("thisversion",    QString::fromStdString(Version::GIT_TAG));
-    setMetadata("template",       "sequence");
+    setMetadata("template",       "sequencer");
 
     loadOstPropertiesFromFile(":sequencer.json");
 
@@ -73,6 +73,25 @@ Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap a
     pMachine->connectToState("Done",          QScxmlStateMachine::onEntry(this, &Sequencer::SMDone));
     pMachine->connectToState("Aborted",       QScxmlStateMachine::onEntry(this, &Sequencer::SMAborted));
     pMachine->connectToState("Error",         QScxmlStateMachine::onEntry(this, &Sequencer::SMError));
+
+    // SMError() alone can't tell which of the 9 "target=Error" transitions
+    // fired - QScxmlStateMachine::onEntry's connected slot only gets a
+    // bool (entering/leaving), never the triggering event. connectToEvent()
+    // does receive it (QScxmlEvent, see qscxmlevent.h) - record it here so
+    // SMError() can log something actionable instead of just "Sequence
+    // error" with no reason (Gilles, 2026-09-26, hitting exactly that).
+    for (const QString errorEvent :
+            {"CameraAlert", "CoolingTimeout", "FilterTimeout",
+             "FocusTimeout", "GuiderTimeout", "GuiderLost", "ExposureTimeout",
+             "DitherTimeout", "RecalTimeout"
+            })
+    {
+        pMachine->connectToEvent(errorEvent, this, &Sequencer::SMErrorCause);
+    }
+}
+void Sequencer::SMErrorCause(const QScxmlEvent &event)
+{
+    mLastErrorCause = event.name();
 }
 
 Sequencer::~Sequencer() {}
@@ -464,7 +483,8 @@ void Sequencer::SMAborted()
 void Sequencer::SMError()
 {
     //qDebug() << "SMError";
-    logInfo("Sequence error");
+    logInfo("Sequence error - cause: %1", {mLastErrorCause.isEmpty() ? "unknown" : mLastErrorCause});
+    mLastErrorCause.clear();
     mSettleTimer->stop();
     mElapsedTimer->stop();
     getProperty("actions")->setState(OST::Error, true);
@@ -509,7 +529,19 @@ void Sequencer::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QSt
         int         s  = o["state"].toInt();
         QString     sd = o["statedescription"].toString();
 
-        if (OST::IntToState(s) == OST::Ok && sd == "ready" && pMachine->isActive("Focusing"))
+        if (OST::IntToState(s) == OST::Ok && sd == "ready" && !pMachine->isActive("Focusing"))
+        {
+            // The focus module really did report done - but this sequencer
+            // isn't waiting on it right now, so FocusDone is deliberately
+            // NOT submitted (submitting an unexpected event would just be
+            // ignored by the current scxml state anyway). Logged because a
+            // silent drop here previously showed up 180s later as a bare,
+            // unexplained "Sequence error" (FocusTimeout) - Gilles,
+            // 2026-09-26: "comme si le sequenceur ne recevait pas le focus
+            // done".
+            logInfo("Focus module reported done, but sequencer isn't in Focusing (ignored)");
+        }
+        else if (OST::IntToState(s) == OST::Ok && sd == "ready" && pMachine->isActive("Focusing"))
         {
             logInfo("Focus completed");
             mHasFocusedOnce    = true;

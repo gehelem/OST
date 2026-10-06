@@ -2,6 +2,7 @@
 #define BASEMODULE_h_
 
 #include <dbmanager.h>
+#include <QSet>
 /*!
  * This Class shouldn't be used as is
  * Every functionnal module should inherit it
@@ -37,12 +38,31 @@ class Basemodule : public DBManager
         QString getCurrentProfile();
         bool getCurrentProfileChanged();
 
+        /*!
+         * "family" = a capability a module declares it has, orthogonal to
+         * its type (the C++/library class, e.g. "Guider"/"BlindPEC") and to
+         * its display template. A module can belong to 0, 1 or several
+         * families - set once at init (declareFamily is meant to be called
+         * from a module's own init code, e.g. via a shared IndiModule
+         * defineMeAsX() helper), never changed afterwards. The controller
+         * exposes membership as one "family-<name>" lov per family (see
+         * Controller::loadModule/onExternalEvent's MK case), the same way
+         * it already exposes "loadedModules-<type>" - this is what lets
+         * e.g. Sequencer pick any loaded module with family "guiding" as
+         * its guiding slave, regardless of whether it's actually a Guider
+         * or a BlindPEC instance.
+         */
+        void declareFamily(const QString &family);
+        QStringList getFamilies() const;
+        bool hasFamily(const QString &family) const;
+
         virtual void onAfterInit(void);
 
     private:
 
         QVariantMap mAvailableModuleLibs;
         QVariantMap mAvailableProfiles;
+        QSet<QString> mFamilies;
         QString mWebroot;
         int     mMinFreePercent = 10;
         QString mModuleName;

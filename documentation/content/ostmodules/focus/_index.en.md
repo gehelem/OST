@@ -49,6 +49,21 @@ These parameters are accessible from the module **Parameters** menu. A set of pa
 | **Backlash** | Overshoot applied before each movement to compensate mechanical play. The focuser moves back by this value before advancing to the target |
 | **Zoning** | Divides the image into zones (1×1 to 9×9). See dedicated section below |
 
+### Star detection
+
+HFR measurement relies on StellarSolver (SEP source extraction), with a setting designed to hold up across the whole range swept by focusing — from sharp focus to the deliberately defocused extremes at the start/end of the sequence.
+
+| Parameter | Default | Description |
+|---|---|---|
+| **Detection threshold (sigma)** | 4 | Detection threshold, in multiples of the background noise. Increasing it reduces false positives (sensor noise detected as a star) |
+| **Min. detection area (px)** | 20 | Minimum area in pixels for a detection to be kept — eliminates small noise artifacts |
+| **Deblend contrast (%)** | 5 % | Minimum flux a secondary peak must represent (as a % of the total flux) before SEP splits it into a separate object. A defocused star (irregular ring, secondary mirror shadow) is otherwise easily split into several "stars" — increase to avoid this |
+| **Min. star radius (px)** | 5 | Rejects detections smaller than this radius — filters out residual fragments from over-segmentation |
+
+{{% notice style="note" title="Abnormally high star count, or a jump when defocused" %}}
+If the reported star count seems much higher than what is visible by eye on the image, or increases noticeably at the defocused ends of the sequence, this is a sign that these settings are too permissive for the sensor/optics in use — increase the detection threshold and/or the deblend contrast above.
+{{% /notice %}}
+
 ## Algorithm
 
 Focusing proceeds in two phases.

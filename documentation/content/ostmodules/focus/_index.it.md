@@ -49,6 +49,21 @@ Questi parametri sono accessibili dal menu **Parametri** del modulo. Un set di p
 | **Backlash** | Overshoot applicato prima di ogni spostamento per correggere il gioco meccanico. Il focheggiatore arretra di questo valore prima di avanzare verso il target |
 | **Zoning** | Suddivisione dell'immagine in zone (1×1 a 9×9). Vedi sezione dedicata più sotto |
 
+### Rilevamento delle stelle
+
+La misura HFR si basa su StellarSolver (estrazione di sorgenti SEP), con un'impostazione pensata per restare valida su tutto l'intervallo percorso dalla messa a fuoco — dal punto nitido fino alle estremità volontariamente defocalizzate a inizio/fine sequenza.
+
+| Parametro | Predefinito | Descrizione |
+|---|---|---|
+| **Soglia di rilevamento (σ)** | 4 | Soglia di rilevamento, in multipli del rumore di fondo. Aumentarla riduce i falsi positivi (rumore del sensore rilevato come stella) |
+| **Area min. di rilevamento (px)** | 20 | Area minima in pixel perché un rilevamento venga considerato valido — elimina i piccoli artefatti di rumore |
+| **Contrasto di separazione (%)** | 5 % | Flusso minimo che un picco secondario deve rappresentare (in % del flusso totale) prima che SEP lo separi in un oggetto distinto. Una stella defocalizzata (anello irregolare, ombra del secondario) viene altrimenti facilmente scomposta in più «stelle» — aumentarlo per evitarlo |
+| **Raggio min. della stella (px)** | 5 | Rigetta i rilevamenti più piccoli di questo raggio — filtra i frammenti residui di una sovra-segmentazione |
+
+{{% notice style="note" title="Numero di stelle anormalmente elevato, o che varia bruscamente in defocalizzato" %}}
+Se il numero di stelle rilevate appare molto superiore a quanto visibile a occhio nell'immagine, o aumenta nettamente alle estremità defocalizzate della sequenza, è il segno che queste impostazioni sono troppo permissive per il sensore/l'ottica utilizzata — aumentare la soglia di rilevamento e/o il contrasto di separazione indicati sopra.
+{{% /notice %}}
+
 ## Algoritmo
 
 La messa a fuoco si svolge in due fasi.
