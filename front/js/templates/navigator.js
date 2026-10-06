@@ -1020,10 +1020,22 @@ export function mount(client, moduleName) {
 
     // "Search" (Gilles, 2026-10-06: "nouveau bouton 'search' ... associe a
     // une nouvelle fenetre") - see buildSearchPanel()'s own header comment
-    // for the full design. `getEngine`/`onSelect` forward-referenced the
-    // same way `selection`/`sky` already are above (buildSkyDome() hasn't
-    // run yet at this point in build()).
-    const searchPanel = Panels.make({ id: "search", title: t("navigator.search"), x: 340, y: 580, w: 340 });
+    // for the full design. collapsed:true (same reasoning as "Settings"
+    // below) - this template already opens 4 other panels by default
+    // (Selection/Timenav/Location/Mountposition); on a narrow/short phone
+    // viewport they all get clamped toward the same corner and can
+    // genuinely overlap each other, same root cause as the catalog-select
+    // saga but one layer up (a WHOLE panel buried under another one this
+    // time, not a control buried in a scroll). Gilles, 2026-10-06: search
+    // panel was open by default, "impossible de saisir ... rien du tout
+    // au toucher" - the tap was landing on a different, overlapping
+    // panel's own content instead (confirmed live, elementFromPoint() at
+    // the input's own on-screen position hit a sibling panel's read-only
+    // value span). Starting collapsed means it only ever appears on an
+    // explicit tap on its own quicknav button, which togglePanel() also
+    // raises to the front (z-order) - reachable regardless of whatever
+    // else happens to visually sit in the same spot.
+    const searchPanel = Panels.make({ id: "search", title: t("navigator.search"), x: 340, y: 580, w: 340, collapsed: true });
     searchPanel.appendChild(track(buildSearchPanel(client, moduleName, sky.engine, selection.onSelect)));
     quickNavEntries.push({ id: "search", label: t("navigator.search"), icon: "search", iconOnly: true });
 

@@ -37,7 +37,8 @@ function nextZ() { return ++zCounter; }
 // persists the new order under (sc, id) so it survives a reload - Gilles,
 // 2026-10-0X: "celle que je selectionne doit passer au premier plan ...
 // + a conserver dans le localstorage". Called on ANY interaction with the
-// panel (see make()'s own capture-phase listener below), not just the
+// panel (see make()'s own "click" bubble-phase listener below, and the
+// drag bar/resize handle's own "mousedown" listeners), not just the
 // quicknav button's own show/hide.
 function raisePanel(panel, id, sc) {
   const z = nextZ();
@@ -45,7 +46,24 @@ function raisePanel(panel, id, sc) {
   const s = loadState(sc, id);
   s.z = z;
   saveState(sc, id, s);
+  // `appendChild` on a node already in the tree is a real remove-then-
+  // reinsert, even when it's already `layer`'s own child just moving to
+  // the end - and that blurs a focused descendant regardless, confirmed
+  // in isolation (a focused <input> loses focus the instant its own
+  // ancestor panel gets reordered this way, even among the SAME
+  // siblings). Caught live, Gilles 2026-10-06, navigator's Search panel:
+  // "impossible de saisir ... rien du tout au toucher" - a tap focuses
+  // the input (mousedown), then this file's own "click" handler fires
+  // raisePanel() on the SAME tap, silently blurring it again before any
+  // typing - or even the on-screen keyboard - has a chance to happen.
+  // Restored explicitly right after the move: every panel with an
+  // editable field in its body (not just Search) was equally exposed,
+  // the DOM move itself is what breaks it, nothing specific to this one
+  // panel's layout.
+  const focused = document.activeElement;
+  const hadFocus = panel.contains(focused);
   layer.appendChild(panel);
+  if (hadFocus && document.activeElement !== focused) focused.focus();
 }
 
 // Inserts a freshly-made panel at its correct sorted position among
@@ -331,7 +349,56 @@ export function make(opts) {
 
   insertSorted(panel, z);
   if (!opts.persistent) live.push(panel);
+
+  // Y is only floored above (SAFE_TOP), never capped to the bottom edge -
+  // a panel whose own natural height pushes it past the bottom of a short
+  // viewport stays completely unreachable below the fold, with
+  // #panel-layer's own overflow:auto giving no visible hint that
+  // scrolling would reveal it. Can't be clamped synchronously like X
+  // above: the caller appends its own content into `body` AFTER make()
+  // returns, so the panel's real height isn't known yet here, AND a
+  // panel that starts `collapsed` has no real height at all yet either
+  // (display:none) - clampBottomIntoView() runs again from
+  // togglePanel() below for exactly that second case, once the panel
+  // actually becomes visible and has a real height to measure. Caught
+  // live, Gilles 2026-10-06, navigator's new Search panel (y:580) on a
+  // phone: "impossible de saisir ... rien du tout au toucher" - exactly
+  // what tapping empty space below the fold (or a `collapsed` panel's
+  // own zero-height rect) looks like.
+  requestAnimationFrame(() => clampBottomIntoView(panel));
+
   return body;
+}
+
+/**
+ * Nudges `panel` up just enough that its bottom edge stays reachable -
+ * above `#quicknav` (position:fixed, z-index 20 - ABOVE #panel-layer's
+ * own 5, so a panel merely clamped to the layer's raw bottom edge can
+ * still end up genuinely unclickable UNDER it, confirmed live: the
+ * layer-edge-only version of this fix correctly moved a panel's bottom
+ * onto the viewport edge, but tapping where its now-visible input sat
+ * actually focused a quicknav button instead) when it's shown, or
+ * #panel-layer's own bottom edge otherwise. Measured live every time
+ * (not a hardcoded constant alongside SAFE_TOP), since #quicknav's own
+ * height varies with however many icons wrapped onto it, and is hidden
+ * entirely on non-module screens. Same SAFE_TOP floor as the initial
+ * X/Y clamp in make() so this never pushes a panel back up above it
+ * either. Called once from make() itself (via requestAnimationFrame,
+ * once every panel this build() pass appended its own content has had a
+ * chance to), and again from togglePanel() whenever a `collapsed` panel
+ * is revealed (make()'s own call measured nothing useful then - a
+ * collapsed panel has no real height at all).
+ */
+function clampBottomIntoView(panel) {
+  const quicknav = document.getElementById("quicknav");
+  const bottomLimit = (quicknav && !quicknav.classList.contains("hidden"))
+    ? quicknav.getBoundingClientRect().top
+    : layerRect().bottom;
+  const overflow = panel.getBoundingClientRect().bottom - bottomLimit;
+  if (overflow > 0) {
+    const top = parseFloat(panel.style.top) || 0;
+    panel.style.top = Math.max(SAFE_TOP, top - overflow) + "px";
+  }
 }
 
 // Looks a panel up by id directly in the layer's own DOM, not the `live`
@@ -384,6 +451,10 @@ export function togglePanel(id) {
     panel.classList.remove("flash");
     void panel.offsetWidth; // restart the animation if toggled again quickly
     panel.classList.add("flash");
+    // make()'s own clampBottomIntoView() call ran while this panel was
+    // still `collapsed` (no real height to measure yet) - redo it now
+    // that it actually has one. See that function's own doc comment.
+    requestAnimationFrame(() => clampBottomIntoView(panel));
   }
   notifyVisibility(id, willShow);
   return willShow;
