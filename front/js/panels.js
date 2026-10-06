@@ -242,7 +242,23 @@ export function make(opts) {
   panel.className = "panel-float";
   panel.dataset.panel = id;
   panel.dataset.scope = sc; // togglePanel()'s own lookup below needs this panel's own scope, not whatever scope happens to be active when it's later toggled
-  panel.style.left = (st.x != null ? st.x : (opts.x != null ? opts.x : 20)) + "px";
+  // X clamped too, not just Y below - a position saved from a wide/desktop
+  // session (e.g. localStorage synced via a browser account, or just the
+  // same person switching screens) stayed exactly where it was saved
+  // regardless of how narrow the *current* layer actually is, pushing the
+  // panel - and whatever control inside it - off the right edge on a
+  // phone with no obvious way back short of scrolling #panel-layer itself
+  // (overflow:auto, but no visible affordance hinting that's needed).
+  // Caught live, Gilles 2026-10-06: "sur le planetarium/navigator avec
+  // l'application android ou en navigation web sur mon smartphone je
+  // n'arrive pas a modifier le 'star catalog'" - the Settings panel's own
+  // saved x (desktop session) left its star-catalog <select> unreachable
+  // on a narrow viewport. Width guesses 220px when neither a saved nor a
+  // requested width is known (this file's own smallest commonly-used
+  // panel width) - better an approximate clamp than none.
+  const panelW = st.w != null ? st.w : (opts.w || 220);
+  const clampedX = Math.max(6, Math.min(st.x != null ? st.x : (opts.x != null ? opts.x : 20), layerRect().width - panelW - 6));
+  panel.style.left = clampedX + "px";
   // Clamped even for an already-saved position: a layout saved from before
   // SAFE_TOP existed (or from before it was raised) would otherwise stay
   // stuck under the chrome forever - see this file's SAFE_TOP comment.

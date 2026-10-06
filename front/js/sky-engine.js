@@ -387,6 +387,13 @@ export class SkyEngine {
     this.showConstellations = true;
     this.showCardinals = true;
     this.showMessier = true;
+    // Gilles, 2026-10-06: "je n'ai pas de coche pour afficher/masquer les
+    // planetes" - genuinely missing until now (the render loop drew
+    // Sun/Moon/planets unconditionally, no show* gate at all, unlike every
+    // other overlay). Default on (core celestial content, same as
+    // showConstellations/showMessier above, not an optional reference
+    // overlay like the grids).
+    this.showPlanets = true;
     this.showTrueHorizon = false;
     this.showEquatorialGrid = false;
     this.showAzimuthalGrid = false;
@@ -1446,47 +1453,51 @@ export class SkyEngine {
 
     // Sun/Moon/planets - live position for `date`, not from any static file
     // (a fixed file would drift the instant the displayed time isn't "now").
-    ctx.textAlign = "left";
-    ctx.font = uiFont(10);
-    for (const p of PLANETS) {
-      const equ = Equator(p.body, date, this.observer, true, true);
-      const h = Horizon(date, this.observer, equ.ra, equ.dec, "normal");
-      const scr = toScreen(horizontalToVector(h.azimuth, h.altitude));
-      if (!scr.visible) continue;
-      const illum = Illumination(p.body, date);
-      let radiusPx;
-      if (p.body === Body.Sun || p.body === Body.Moon) {
-        // Real angular diameter (varies with actual Earth-Sun/Earth-Moon
-        // distance - a genuine "supermoon" is visibly bigger here too, not
-        // just brighter) - measured directly on screen (offset the
-        // altitude by half the angular diameter and project it, same
-        // "offset + project()" technique as the Messier ellipses' own
-        // radii) rather than a fixed px-per-degree constant, so it stays
-        // correct at any zoom/projection. Floored at 5px (bigger than
-        // magnitudeToRadius()'s own 3.2px ceiling for stars/planets, so
-        // the Sun/Moon read as clearly bigger than anything else even
-        // dezoomed) - the REAL angular size only exceeds that floor once
-        // zoomed in a fair amount (whole-dome view: ~0.5deg is only ~1-2px
-        // no matter how the Earth-Moon distance varies), which is also
-        // exactly the regime where seeing it actually vary starts to
-        // matter (e.g. examining the Moon up close).
-        const radiusKm = p.body === Body.Sun ? SUN_RADIUS_KM : MOON_RADIUS_KM;
-        const angularDiameterDeg = (2 * Math.atan(radiusKm / (illum.geo_dist * AU_KM)) * 180) / Math.PI;
-        const edge = toScreen(horizontalToVector(h.azimuth, h.altitude + angularDiameterDeg / 2));
-        radiusPx = edge.visible ? Math.max(5, Math.hypot(edge.x - scr.x, edge.y - scr.y)) : magnitudeToRadius(illum.mag);
-      } else {
-        // The five naked-eye planets: real angular size (at most ~1
-        // arcminute for Venus) is too small to matter at this scale - only
-        // brightness does, and it genuinely varies a lot (e.g. Venus
-        // ranges roughly mag -4.9 to -3.8). Same star scale (magnitudeToRadius)
-        // so a dim Mars/Mercury doesn't outsize a bright Venus/Jupiter.
-        radiusPx = magnitudeToRadius(illum.mag);
+    // Gated on showPlanets (Gilles, 2026-10-06: previously drawn
+    // unconditionally, no toggle existed at all).
+    if (this.showPlanets) {
+      ctx.textAlign = "left";
+      ctx.font = uiFont(10);
+      for (const p of PLANETS) {
+        const equ = Equator(p.body, date, this.observer, true, true);
+        const h = Horizon(date, this.observer, equ.ra, equ.dec, "normal");
+        const scr = toScreen(horizontalToVector(h.azimuth, h.altitude));
+        if (!scr.visible) continue;
+        const illum = Illumination(p.body, date);
+        let radiusPx;
+        if (p.body === Body.Sun || p.body === Body.Moon) {
+          // Real angular diameter (varies with actual Earth-Sun/Earth-Moon
+          // distance - a genuine "supermoon" is visibly bigger here too, not
+          // just brighter) - measured directly on screen (offset the
+          // altitude by half the angular diameter and project it, same
+          // "offset + project()" technique as the Messier ellipses' own
+          // radii) rather than a fixed px-per-degree constant, so it stays
+          // correct at any zoom/projection. Floored at 5px (bigger than
+          // magnitudeToRadius()'s own 3.2px ceiling for stars/planets, so
+          // the Sun/Moon read as clearly bigger than anything else even
+          // dezoomed) - the REAL angular size only exceeds that floor once
+          // zoomed in a fair amount (whole-dome view: ~0.5deg is only ~1-2px
+          // no matter how the Earth-Moon distance varies), which is also
+          // exactly the regime where seeing it actually vary starts to
+          // matter (e.g. examining the Moon up close).
+          const radiusKm = p.body === Body.Sun ? SUN_RADIUS_KM : MOON_RADIUS_KM;
+          const angularDiameterDeg = (2 * Math.atan(radiusKm / (illum.geo_dist * AU_KM)) * 180) / Math.PI;
+          const edge = toScreen(horizontalToVector(h.azimuth, h.altitude + angularDiameterDeg / 2));
+          radiusPx = edge.visible ? Math.max(5, Math.hypot(edge.x - scr.x, edge.y - scr.y)) : magnitudeToRadius(illum.mag);
+        } else {
+          // The five naked-eye planets: real angular size (at most ~1
+          // arcminute for Venus) is too small to matter at this scale - only
+          // brightness does, and it genuinely varies a lot (e.g. Venus
+          // ranges roughly mag -4.9 to -3.8). Same star scale (magnitudeToRadius)
+          // so a dim Mars/Mercury doesn't outsize a bright Venus/Jupiter.
+          radiusPx = magnitudeToRadius(illum.mag);
+        }
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(scr.x, scr.y, radiusPx, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.fillText(p.label, scr.x + radiusPx + 3 * labelScale, scr.y);
       }
-      ctx.fillStyle = p.color;
-      ctx.beginPath();
-      ctx.arc(scr.x, scr.y, radiusPx, 0, 2 * Math.PI);
-      ctx.fill();
-      ctx.fillText(p.label, scr.x + radiusPx + 3 * labelScale, scr.y);
     }
 
     if (groundClipActive) ctx.restore(); // matches the ctx.save() in the ground-mask block above

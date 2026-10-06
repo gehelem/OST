@@ -250,6 +250,7 @@ function saveDisplaySettings(engine) {
       showConstellations: engine.showConstellations,
       showCardinals: engine.showCardinals,
       showMessier: engine.showMessier,
+      showPlanets: engine.showPlanets,
       showTrueHorizon: engine.showTrueHorizon,
       showEquatorialGrid: engine.showEquatorialGrid,
       showAzimuthalGrid: engine.showAzimuthalGrid,
@@ -297,6 +298,10 @@ function buildSettingsPanel(engine) {
   wrap.appendChild(checkboxRow(t("navigator.constellations"), "showConstellations"));
   wrap.appendChild(checkboxRow(t("navigator.cardinalPoints"), "showCardinals"));
   wrap.appendChild(checkboxRow(t("navigator.messierObjects"), "showMessier"));
+  // Gilles, 2026-10-06: "je n'ai pas de coche pour afficher/masquer les
+  // planetes" - genuinely missing (sky-engine.js's own render loop drew
+  // them unconditionally until now, no show* flag existed at all).
+  wrap.appendChild(checkboxRow(t("navigator.planets"), "showPlanets"));
   wrap.appendChild(checkboxRow(t("navigator.trueHorizon"), "showTrueHorizon"));
   wrap.appendChild(checkboxRow(t("navigator.equatorialGrid"), "showEquatorialGrid"));
   wrap.appendChild(checkboxRow(t("navigator.azimuthalGrid"), "showAzimuthalGrid"));

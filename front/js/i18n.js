@@ -176,6 +176,7 @@ const STRINGS = {
   "navigator.constellations": { en: "Constellations", fr: "Constellations", de: "Sternbilder", it: "Costellazioni", es: "Constelaciones" },
   "navigator.cardinalPoints": { en: "Cardinal points", fr: "Points cardinaux", de: "Himmelsrichtungen", it: "Punti cardinali", es: "Puntos cardinales" },
   "navigator.messierObjects": { en: "Messier objects", fr: "Objets Messier", de: "Messier-Objekte", it: "Oggetti Messier", es: "Objetos Messier" },
+  "navigator.planets": { en: "Planets", fr: "Planètes", de: "Planeten", it: "Pianeti", es: "Planetas" },
   "navigator.trueHorizon": { en: "True horizon", fr: "Horizon réel", de: "Wahrer Horizont", it: "Orizzonte reale", es: "Horizonte real" },
   "navigator.equatorialGrid": { en: "Equatorial grid", fr: "Grille équatoriale", de: "Äquatorialgitter", it: "Griglia equatoriale", es: "Cuadrícula ecuatorial" },
   "navigator.azimuthalGrid": { en: "Azimuthal grid", fr: "Grille azimutale", de: "Azimutalgitter", it: "Griglia azimutale", es: "Cuadrícula azimutal" },
