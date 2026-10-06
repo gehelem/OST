@@ -427,6 +427,19 @@ export class Datastore {
       for (const propName of Object.keys(props)) {
         const prop = this._ensureProperty(modName, propName);
         prop.rows = [];
+        // `.grid`/`.gridheaders` (the raw wire array-of-arrays, only ever
+        // set by _normalizeProperty() on a dump/"ap" replace - see that
+        // function's own doc comment) were left stale here until found
+        // live, 2026-10-06: a search with zero matches sends "gr" (this
+        // handler), a non-empty one sends a full "ap" replace, so only
+        // the empty case ever hit this path. `.rows` is this datastore's
+        // one documented live-state field (render.js's own
+        // renderGridSection() already only ever reads `.rows`, never
+        // `.grid`) - cleared here too defensively, so a future caller
+        // reaching for the raw wire shape instead doesn't get burned by
+        // an empty result silently reading back as the PREVIOUS search's
+        // leftover rows.
+        prop.grid = [];
         this._emit(topics.property(modName, propName));
       }
     }

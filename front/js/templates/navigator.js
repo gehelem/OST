@@ -549,8 +549,18 @@ function mergeDiscoveredCatalogs(state, names) {
 }
 
 /**
- * Backend `results` grid -> the same flat result shape searchLocal()
- * returns, so the search panel can treat every source uniformly.
+ * Backend `results` property -> the same flat result shape
+ * searchLocal() returns, so the search panel can treat every source
+ * uniformly. Reads `prop.rows` (array of {header: value} objects,
+ * datastore.js's own live-maintained grid representation - see
+ * render.js's renderGridSection(), the only other consumer of a grid
+ * property, which already only ever reads `.rows` too), NOT
+ * `prop.grid`/`.gridheaders` (the raw wire array-of-arrays) - found live,
+ * 2026-10-06, after a zero-match search ("gr", grid-reset) showed the
+ * PREVIOUS search's rows back: `.grid` is only ever written once per
+ * dump/"ap" replace (_normalizeProperty()'s own doc comment), `.gr`
+ * (zero matches) only clears `.rows`, so `.grid` goes stale - exactly
+ * the field this used to read.
  *
  * Two wire-format quirks confirmed against a real search (not guessed):
  * - `RA` is in HOURS (navigator.cpp/dbmanager.cpp store raw INDI-style
@@ -566,22 +576,18 @@ function mergeDiscoveredCatalogs(state, names) {
  * matters for which conversion centers on it correctly).
  */
 function parseBackendResults(prop) {
-  if (!prop || !prop.grid || !prop.gridheaders) return [];
-  const h = prop.gridheaders;
-  const idx = (name) => h.indexOf(name);
-  const catalogIdx = idx("catalog"), codeIdx = idx("code"), raIdx = idx("RA"), decIdx = idx("DEC"),
-    nsIdx = idx("NS"), magIdx = idx("mag"), nameIdx = idx("name"), aliasIdx = idx("alias"), diamIdx = idx("diam");
-  return prop.grid.map((row) => {
-    const decMag = parseFloat(row[decIdx]) || 0;
+  if (!prop || !prop.rows) return [];
+  return prop.rows.map((row) => {
+    const decMag = parseFloat(row.DEC) || 0;
     return {
       kind: "backend",
-      catalog: row[catalogIdx] || "",
-      code: row[codeIdx] || "",
-      name: row[nameIdx] || row[aliasIdx] || row[codeIdx] || "",
-      ra: (parseFloat(row[raIdx]) || 0) * 15,
-      dec: row[nsIdx] === "-" ? -decMag : decMag,
-      mag: parseFloat(row[magIdx]) || 0,
-      diam: parseFloat(row[diamIdx]) || 0,
+      catalog: row.catalog || "",
+      code: row.code || "",
+      name: row.name || row.alias || row.code || "",
+      ra: (parseFloat(row.RA) || 0) * 15,
+      dec: row.NS === "-" ? -decMag : decMag,
+      mag: parseFloat(row.mag) || 0,
+      diam: parseFloat(row.diam) || 0,
       ofDate: false,
     };
   });
@@ -620,16 +626,33 @@ function buildSearchPanel(client, moduleName, engine, onSelect) {
   let pendingUnsub = null;
   function requestBackendSearch(term, onReply) {
     if (pendingUnsub) { pendingUnsub(); pendingUnsub = null; }
-    // client.subscribe() always calls back once synchronously with
-    // whatever `results` already held BEFORE this request even reaches
-    // the server (core/datastore.js's own subscribe() doc comment) -
-    // that replay has to be skipped, or a stale/unrelated previous
-    // search's results would render as if they were this one's answer.
+    // The backend does NOT send one clean "here's the answer" reply -
+    // confirmed live by tracing the raw WS traffic: a search streams as
+    // a BURST of incremental, per-FIELD "ea" updates (one result row
+    // built up one element at a time: DEC, then NS, then RA, ...) each
+    // followed by its own "gc" (grid-create) commit once that row is
+    // complete, repeated once per matching row. Treating "the next
+    // message" as "the final answer" (an earlier version of this code)
+    // just grabbed whatever incomplete mid-row state happened to exist
+    // at that instant - sometimes an empty grid, sometimes a previous
+    // search's leftover rows. `prop.rows` only reflects a genuinely
+    // complete row once its own "gc" has landed (core/datastore.js's
+    // _applyGridCreate - rows already accumulate correctly there, each
+    // "gc" appends one), so this instead stays subscribed for the whole
+    // burst and re-renders on every single update, exactly how
+    // OstErix's own catalog-dialog.component.ts stays correct too: a
+    // perpetual subscription for the component's lifetime, not a
+    // one-shot wait. Only ever superseded by a NEWER request
+    // (pendingUnsub above) or the panel's own disposal - never
+    // auto-unsubscribed mid-search, since there's no "search is done"
+    // signal in this protocol to key off of.
     let first = true;
     const unsub = client.subscribe(client.topics.property(moduleName, "results"), (prop) => {
+      // Skip only the very first invocation - subscribe()'s own
+      // synchronous replay of whatever `results` held BEFORE this
+      // request even reached the server (core/datastore.js's own
+      // subscribe() doc comment), not a real update at all.
       if (first) { first = false; return; }
-      unsub();
-      if (pendingUnsub === unsub) pendingUnsub = null;
       onReply(parseBackendResults(prop));
     });
     pendingUnsub = unsub;
@@ -668,8 +691,14 @@ function buildSearchPanel(client, moduleName, engine, onSelect) {
     const term = input.value.trim();
     if (!term) return;
     const localKeys = new Set(Object.keys(state.local).filter((k) => state.local[k]));
-    let allResults = engine ? engine.searchLocal(term, localKeys) : [];
-    renderResults(allResults);
+    // Fixed for this search - only the backend side streams in over
+    // several events (see requestBackendSearch()'s own doc comment), so
+    // each of those re-renders `localResults.concat(...)` fresh rather
+    // than appending onto a running total (prop.rows is already the
+    // full cumulative list as of that event, not a delta - concatenating
+    // it again on top of itself every time would just duplicate rows).
+    const localResults = engine ? engine.searchLocal(term, localKeys) : [];
+    renderResults(localResults);
 
     // Skip the backend entirely once Gilles has actually unchecked every
     // known backend catalog - but keep trying it by default before
@@ -681,8 +710,7 @@ function buildSearchPanel(client, moduleName, engine, onSelect) {
         const filtered = state.backendSelected.length
           ? backendRows.filter((r) => state.backendSelected.includes(r.catalog))
           : backendRows;
-        allResults = allResults.concat(filtered);
-        renderResults(allResults);
+        renderResults(localResults.concat(filtered));
       });
     }
   }
