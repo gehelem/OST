@@ -295,6 +295,49 @@ function buildSettingsPanel(engine) {
     return el("label", { class: "form-row", style: "cursor:pointer" }, [cb, el("span", { text: label })]);
   }
 
+  // Star catalog depth - Gilles, 2026-09-29: "leger par defaut, mais
+  // parametrable par l'utilisateur - donc prevoir tous les catalogues
+  // possibles des le depart" (the actual selector was deferred until now:
+  // 2026-10-03, "le grand saut : on augmente la densite, on passe la
+  // taille au dessus sur les catalogues", after which sky-catalog.js
+  // gained the "full" depth this exposes). Re-fetches on change (not just
+  // a display-setting flip like everything else in this panel), so it
+  // gets its own persistAndRender()-alike rather than reusing
+  // checkboxRow()'s synchronous one. Kept at the TOP of the panel, above
+  // the long checkbox list below - Gilles, 2026-10-06, on mobile/touch
+  // specifically: "je n'arrive pas a modifier le 'star catalog'",
+  // narrowed down to "il faut scroller pour l'atteindre" past 16
+  // checkboxes on a short phone screen - a native <select> tap landing
+  // right at the end of an in-panel scroll gesture is a well-known
+  // Android/Chrome ambiguity (scroll-settle vs. a genuine tap, the
+  // browser can swallow the one that would open the picker) that the
+  // language select/LOV dropdowns elsewhere never hit, since neither
+  // lives inside a long scrollable list like this one did.
+  const depthRow = el("div", { class: "form-row" }, [el("span", { class: "muted small", text: t("navigator.catalogDepth") })]);
+  const depthSelect = el("select", { class: "field-input" });
+  for (const key of Object.keys(STAR_DEPTHS)) {
+    depthSelect.appendChild(el("option", { value: key, text: t("navigator.catalogDepth." + key) }));
+  }
+  depthSelect.value = engine.catalogDepth || "light";
+  depthSelect.addEventListener("change", () => {
+    engine.loadCatalog(depthSelect.value).then(() => persistAndRender()).catch((e) => console.error("[navigator] catalog load", e));
+  });
+  depthRow.appendChild(depthSelect);
+  wrap.appendChild(depthRow);
+
+  const zoomRow = el("div", { class: "form-row" }, [el("span", { class: "muted small", text: t("navigator.zoom") })]);
+  const zoomSlider = el("input", { type: "range", min: String(ZOOM_MIN), max: String(ZOOM_MAX), step: "0.1", value: String(engine.zoom), style: "flex:1" });
+  zoomSlider.addEventListener("input", () => { engine.zoom = parseFloat(zoomSlider.value); persistAndRender(); });
+  zoomRow.appendChild(zoomSlider);
+  wrap.appendChild(zoomRow);
+  // Kept in sync when zoom changes some other way (wheel, or a future
+  // pinch-zoom) — same "one listener reflects every path" idea as
+  // app.js's own panelvisibility listener for the quicknav buttons.
+  engine.onZoomChange = () => { zoomSlider.value = String(engine.zoom); saveDisplaySettings(engine); };
+  // Gilles, 2026-10-01: "quand je fais F5 la position du planetarium n'est
+  // pas preservee" - see sky-engine.js's own onRotationChange doc comment.
+  engine.onRotationChange = () => saveDisplaySettings(engine);
+
   wrap.appendChild(checkboxRow(t("navigator.constellations"), "showConstellations"));
   wrap.appendChild(checkboxRow(t("navigator.cardinalPoints"), "showCardinals"));
   wrap.appendChild(checkboxRow(t("navigator.messierObjects"), "showMessier"));
@@ -327,40 +370,6 @@ function buildSettingsPanel(engine) {
     persistAndRender();
   });
   wrap.appendChild(el("label", { class: "form-row", style: "cursor:pointer" }, [projCb, el("span", { text: t("navigator.stereographic") })]));
-
-  // Star catalog depth - Gilles, 2026-09-29: "leger par defaut, mais
-  // parametrable par l'utilisateur - donc prevoir tous les catalogues
-  // possibles des le depart" (the actual selector was deferred until now:
-  // 2026-10-03, "le grand saut : on augmente la densite, on passe la
-  // taille au dessus sur les catalogues", after which sky-catalog.js
-  // gained the "full" depth this exposes). Re-fetches on change (not just
-  // a display-setting flip like everything else in this panel), so it
-  // gets its own persistAndRender()-alike rather than reusing
-  // checkboxRow()'s synchronous one.
-  const depthRow = el("div", { class: "form-row" }, [el("span", { class: "muted small", text: t("navigator.catalogDepth") })]);
-  const depthSelect = el("select", { class: "field-input" });
-  for (const key of Object.keys(STAR_DEPTHS)) {
-    depthSelect.appendChild(el("option", { value: key, text: t("navigator.catalogDepth." + key) }));
-  }
-  depthSelect.value = engine.catalogDepth || "light";
-  depthSelect.addEventListener("change", () => {
-    engine.loadCatalog(depthSelect.value).then(() => persistAndRender()).catch((e) => console.error("[navigator] catalog load", e));
-  });
-  depthRow.appendChild(depthSelect);
-  wrap.appendChild(depthRow);
-
-  const zoomRow = el("div", { class: "form-row" }, [el("span", { class: "muted small", text: t("navigator.zoom") })]);
-  const zoomSlider = el("input", { type: "range", min: String(ZOOM_MIN), max: String(ZOOM_MAX), step: "0.1", value: String(engine.zoom), style: "flex:1" });
-  zoomSlider.addEventListener("input", () => { engine.zoom = parseFloat(zoomSlider.value); persistAndRender(); });
-  zoomRow.appendChild(zoomSlider);
-  wrap.appendChild(zoomRow);
-  // Kept in sync when zoom changes some other way (wheel, or a future
-  // pinch-zoom) — same "one listener reflects every path" idea as
-  // app.js's own panelvisibility listener for the quicknav buttons.
-  engine.onZoomChange = () => { zoomSlider.value = String(engine.zoom); saveDisplaySettings(engine); };
-  // Gilles, 2026-10-01: "quand je fais F5 la position du planetarium n'est
-  // pas preservee" - see sky-engine.js's own onRotationChange doc comment.
-  engine.onRotationChange = () => saveDisplaySettings(engine);
 
   wrap._dispose = () => { engine.onZoomChange = null; engine.onRotationChange = null; };
   return wrap;
