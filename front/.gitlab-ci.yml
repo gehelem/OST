@@ -1,9 +1,12 @@
-# CI for ostcore's mobile wrapper (Capacitor, android/ — see
-# capacitor.config.json/package.json). Builds a debug-signed APK
-# (fr.ostserver.ostcore, "OST") and publishes it as the project's "latest"
-# GitLab release, same pattern OST/.gitlab-ci.yml already uses for its own
-# "latest" deb/rpm releases (generic package registry + release-cli,
-# delete-then-recreate the "latest" release each time).
+# CI for ostcore: a debug-signed Android APK (Capacitor, android/ — see
+# capacitor.config.json/package.json, fr.ostserver.ostcore, "OST") and a
+# zip of the plain web build (www/ - same output, "meme si quasi
+# identique au repo", Gilles 2026-10-06, for a direct web deploy without
+# cloning the repo), built in parallel (two independent `build`-stage
+# jobs, no dependency between them) and both published to the project's
+# "latest" GitLab release, same pattern OST/.gitlab-ci.yml already uses
+# for its own "latest" deb/rpm releases (generic package registry +
+# release-cli, delete-then-recreate the "latest" release each time).
 #
 # iOS is NOT in scope here (no macOS runner / Apple Developer account
 # available yet — see notes/NOTES-frontend-ostcore.md if that changes).
@@ -21,6 +24,12 @@ stages:
 variables:
   PACKAGE_REGISTRY_LATEST: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/latest/latest"
   APK_FILE_LATEST: "ostcore_latest.apk"
+  # Gilles, 2026-10-06: "ajoute dans la release un zip pour le html, meme
+  # si quasi identique au repo" - the same www/ prepare-www already
+  # produces for the Android build, zipped as its own release asset for a
+  # direct web deploy. Built by its own job (below), in parallel with
+  # build-android on a separate (lighter, no Android SDK) runner.
+  WWW_ZIP_LATEST: "ostcore_latest_www.zip"
 
 .build-rules: &build-rules
   rules:
@@ -61,10 +70,35 @@ build-android:
     expire_in: 4 week
   <<: *build-rules
 
-release-android-latest:
+build-web-zip:
+  stage: build
+  # No Android SDK needed for this one - a plain Node image is enough and
+  # much faster than build-android's own (same `build` stage, no
+  # dependency between the two, so GitLab runs them in parallel on
+  # whichever runners are free - Gilles, 2026-10-06: "les builds peuvent
+  # tourner en parallele sur plusieurs runners").
+  image: node:20
+  before_script:
+    # node:20 (Debian) doesn't ship zip by default - same "install what's
+    # actually missing" approach build-android's own before_script uses
+    # for its own JDK gap.
+    - apt-get update -qq
+    - apt-get install -y -qq zip
+  script:
+    - npm ci
+    - npm run prepare-www
+    - cd www && zip -r "../$WWW_ZIP_LATEST" . && cd ..
+  artifacts:
+    paths:
+      - "$WWW_ZIP_LATEST"
+    expire_in: 4 week
+  <<: *build-rules
+
+release-latest:
   stage: release
   dependencies:
     - build-android
+    - build-web-zip
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   script:
     - sh ./CI/CI-upload-release-latest.sh

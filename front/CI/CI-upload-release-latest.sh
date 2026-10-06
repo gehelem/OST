@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# CI - Upload + Release - Latest (Android APK)
+# CI - Upload + Release - Latest (Android APK + web www/ zip)
 #
 # Mirrors OST/CI/CI-upload-release-latest.sh's own pattern exactly (same
 # project, consistency on purpose): delete whatever "latest" release
@@ -23,6 +23,9 @@ echo "delete previous latest tag"
 curl --request DELETE --header "JOB-TOKEN: ${CI_JOB_TOKEN}" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/repository/tags/latest" || true
 echo "upload APK"
 curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${APK_FILE_LATEST} "${PACKAGE_REGISTRY_LATEST}/${APK_FILE_LATEST}"
+echo "upload web zip"
+curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${WWW_ZIP_LATEST} "${PACKAGE_REGISTRY_LATEST}/${WWW_ZIP_LATEST}"
 echo "create release"
 release-cli create --name "latest" --tag-name latest --ref "$CI_COMMIT_SHA" \
-  --assets-link "{\"name\":\"${APK_FILE_LATEST}\",\"url\":\"${PACKAGE_REGISTRY_LATEST}/${APK_FILE_LATEST}\"}"
+  --assets-link "{\"name\":\"${APK_FILE_LATEST}\",\"url\":\"${PACKAGE_REGISTRY_LATEST}/${APK_FILE_LATEST}\"}" \
+  --assets-link "{\"name\":\"${WWW_ZIP_LATEST}\",\"url\":\"${PACKAGE_REGISTRY_LATEST}/${WWW_ZIP_LATEST}\"}"

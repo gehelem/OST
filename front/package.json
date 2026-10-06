@@ -4,7 +4,7 @@
   "description": "Capacitor Android wrapper for ostcore/UI3 (fr.ostserver.ostcore) - the web app itself stays plain ES modules, no bundler; this only exists to produce an installable Android APK. See README.md for the web app proper.",
   "private": true,
   "scripts": {
-    "prepare-www": "rm -rf www && mkdir -p www && cp -r index.html js css assets core lib celestial-data www/",
+    "prepare-www": "rm -rf www && mkdir -p www && cp -r index.html js css assets core lib celestial-data www/ && node CI/write-gitdata.js",
     "android:sync": "npm run prepare-www && npx cap sync android",
     "android:build": "npm run android:sync && cd android && ./gradlew assembleDebug"
   },

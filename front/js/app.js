@@ -63,6 +63,9 @@ const paramsToggleEl = document.getElementById("params-toggle");
 const dialogRootEl = document.getElementById("dialog-root");
 const connectBtnLabelEl = document.getElementById("connect-btn-label");
 const disconnectBtnLabelEl = document.getElementById("disconnect-btn-label");
+const versionInfoEl = document.getElementById("version-info");
+const versionInfoTagEl = document.getElementById("version-info-tag");
+const versionInfoMessageEl = document.getElementById("version-info-message");
 const clearCacheBtnEl = document.getElementById("clear-cache-btn");
 const clearCacheBtnLabelEl = document.getElementById("clear-cache-btn-label");
 const discoverRowEl = document.getElementById("discover-row");
@@ -383,6 +386,23 @@ client.onStatus((s) => {
   if (s === "connecting" || s === "disconnected") { activeView = null; renderModbarNow(); renderContentNow(); }
 });
 applyStaticLabels();
+
+// ---- build/version info (Settings, after the connection info) ----------
+// Gilles, 2026-10-06: "ajoute un fichier 'gitdata' ... pour afficher la
+// version (tag date commit message de commit)" - static per-build data
+// (CI/write-gitdata.js), fetched once; no error UI if the file is
+// missing (an older/non-CI www/ build, or plain local dev straight off
+// index.html without ever running `npm run prepare-www`) - the row just
+// stays hidden, same as it starts in index.html.
+fetch("gitdata.json").then((r) => (r.ok ? r.json() : null)).then((d) => {
+  if (!d) return;
+  versionInfoTagEl.textContent = `${d.tag} · ${(d.date || "").slice(0, 10)} · ${d.commit}`;
+  // A visible line, not just a title tooltip - Gilles, 2026-10-06: "je ne
+  // vois pas le 'commit message' dans ton screenshot" - a tooltip needs
+  // hover, which the Android app (touch) has no equivalent of at all.
+  versionInfoMessageEl.textContent = d.message || "";
+  versionInfoEl.classList.remove("hidden");
+}).catch(() => { /* no gitdata.json in this build - leave the row hidden */ });
 
 // ---- rendering -------------------------------------------------------
 
