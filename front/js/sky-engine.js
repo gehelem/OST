@@ -565,6 +565,37 @@ export class SkyEngine {
     img.src = url;
   }
 
+  /**
+   * Re-centers the view on the telescope's current position (Gilles,
+   * 2026-10-06: "centrer la vue sur la position du telescope si elle est
+   * definie"). No-op (returns false) if mountRaDeg/mountDecDeg aren't
+   * known yet - the caller (templates/navigator.js) uses the return value
+   * to keep its own quicknav button disabled until then.
+   *
+   * Same of-date conversion as the mount marker's own drawing code
+   * (equatorialOfDateToHorizontal, not project()'s J2000 catalog
+   * pipeline - mountRaDeg/mountDecDeg are OF DATE, see this file's own
+   * constructor comment). The screen center is always the view-space
+   * vector (0,0,1) (toScreen()'s own x=-r*v.x/y=-r*v.y: both are zero
+   * exactly when v.x=v.y=0, i.e. v.z=1 for a unit vector) - the minimal
+   * rotation taking the mount's fixed-frame vector there is exactly
+   * fromTwoVectors(mountVector, {0,0,1}), same primitive the trackball
+   * drag already uses for the opposite problem (point-under-cursor ->
+   * cursor).
+   */
+  centerOnMount() {
+    if (this.mountRaDeg === null || this.mountDecDeg === null) return false;
+    const { azimuth, altitude } = equatorialOfDateToHorizontal(this.mountRaDeg, this.mountDecDeg, this.observer, this.getTime());
+    const mountVector = horizontalToVector(azimuth, altitude);
+    this.rotation = fromTwoVectors(mountVector, { x: 0, y: 0, z: 1 });
+    this.render();
+    // Same "once per gesture" persistence path as a trackball drag ending
+    // (see _handlePointerUp() above) - F5 should still show this centered
+    // view afterwards, not silently revert to whatever was panned before.
+    if (this.onRotationChange) this.onRotationChange();
+    return true;
+  }
+
   _onWheel(ev) {
     ev.preventDefault();
     const f = ev.deltaY < 0 ? 1.1 : 1 / 1.1;

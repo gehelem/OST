@@ -31,7 +31,7 @@
 // addtoplanner), centeringparams, slaves - plus image/optic/parms, generic
 // to any imager.
 
-import { renderProperty, updateQuickNav, getMediaBaseUrl, moduleLifecycle, renderActionsPanel } from "../render.js";
+import { renderProperty, updateQuickNav, getMediaBaseUrl, moduleLifecycle, renderActionsPanel, getQuickNavButton } from "../render.js";
 import { el } from "../dom.js";
 import * as Panels from "../panels.js";
 import { SkyEngine, ZOOM_MIN, ZOOM_MAX } from "../sky-engine.js";
@@ -590,6 +590,12 @@ function buildSkyDome(client, moduleName, onSelect, getTime) {
       engine.mountDecDeg = dec;
       engine.render();
     }
+    // Keep the "center on mount" quicknav button's enabled state current
+    // even though this doesn't trigger a module rebuild (see that entry's
+    // own doc comment in mount()'s build()) - a no-op before that button
+    // exists yet (first dump, build() hasn't reached updateQuickNav() yet).
+    const btn = getQuickNavButton("centerOnMount");
+    if (btn) btn.disabled = engine.mountRaDeg === null;
   });
 
   // Sensor field of view (Gilles, 2026-10-03: "le champ du capteur (cadre
@@ -719,6 +725,25 @@ export function mount(client, moduleName) {
       const timeNavPanel = Panels.make({ id: "timenav", title: t("navigator.timeNav"), x: 340, y: 463, w: 300 });
       timeNavPanel.appendChild(track(buildTimeNavPanel(sky.engine, () => simulatedTime, setSimTime)));
       quickNavEntries.push({ id: "timenav", label: t("navigator.timeNavQuicknav"), icon: "schedule", iconOnly: true });
+
+      // "Center on mount" (Gilles, 2026-10-06: "ajoute un bouton
+      // 'align_flex_center' ... pas de fenetre associee ... centrer la vue
+      // sur la position du telescope si elle est definie (bouton inactif
+      // sinon)") - a pure action, no panel to toggle (onClick, see
+      // views.js's renderQuickNav() own doc comment on that field).
+      // Initial disabled state read straight off the engine (already
+      // live by this point - see buildSkyDome()'s own mountposition
+      // subscribe, which delivers its cached value synchronously same as
+      // every other subscribe in this file); kept in sync afterwards by
+      // that same handler directly flipping this button's `disabled`
+      // attribute (getQuickNavButton()) - build() only reruns on a real
+      // module dump, not on every mountposition tick, so there's no
+      // other hook to redo this from.
+      quickNavEntries.push({
+        id: "centerOnMount", label: t("navigator.centerOnMount"), icon: "align_flex_center", iconOnly: true,
+        disabled: sky.engine.mountRaDeg === null,
+        onClick: () => sky.engine.centerOnMount(),
+      });
     }
 
     if (has("location")) {

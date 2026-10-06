@@ -74,6 +74,17 @@ export function updateQuickNav(entries) {
   if (quickNavSep) quickNavSep.classList.toggle("hidden", !show);
 }
 
+/** Finds a quicknav button rendered by the last updateQuickNav() call, by
+ * its entry `id` - for a template that needs to flip a button's enabled
+ * state later from outside the build() that created it (e.g. navigator's
+ * "center on mount" button, enabled/disabled from the mountposition
+ * property subscription, which doesn't trigger a full module rebuild -
+ * see templates/navigator.js's own comment on why not). Returns null if
+ * the quicknav isn't mounted or has no such entry right now. */
+export function getQuickNavButton(id) {
+  return quickNavRoot ? quickNavRoot.querySelector(`[data-panel-id="${id}"]`) : null;
+}
+
 // ---- shared "root template" pieces ---------------------------------------
 // Every template (this file's own generic renderModuleView below,
 // templates/scaffold.js, templates/guider.js, templates/navigator.js) is

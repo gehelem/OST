@@ -120,7 +120,7 @@ export function renderModbar(client, activeKey, onSelect) {
  */
 export function renderQuickNav(entries) {
   const bar = document.createDocumentFragment();
-  for (const { id, label, icon: iconName, iconOnly } of entries) {
+  for (const { id, label, icon: iconName, iconOnly, onClick, disabled } of entries) {
     // `iconOnly` (render.js's own renderActionsPanel(): the actions
     // window's button, Gilles, 2026-10-03: "bouton = juste une icone
     // 'dashboard_customize'") drops the text span entirely - `title`
@@ -128,10 +128,19 @@ export function renderQuickNav(entries) {
     // keeps its previous icon+label (icon given) or plain-text (no icon)
     // shape, unchanged.
     const content = iconOnly ? [icon(iconName)] : iconName ? [icon(iconName), el("span", { text: label })] : label;
+    // `onClick` (Gilles, 2026-10-06: "ajoute un bouton ... pas de fenetre
+    // associee" - navigator's "center on mount" button) opts a button out
+    // of the panel-toggle behaviour entirely: it fires its own callback
+    // instead of togglePanel(id), and never gets the "active" class (there
+    // is no panel visibility for it to reflect). `disabled` sets the
+    // button's initial enabled state at creation time (the caller is
+    // responsible for updating it later itself, e.g. from a property
+    // subscription - getQuickNavButton() below finds this same element by
+    // `data-panel-id` for that).
     const btn = el("button", {
-      class: "quicknav-btn" + (iconOnly ? " quicknav-btn-icon-only" : "") + (isPanelVisible(id) ? " active" : ""),
-      title: label, "data-panel-id": id,
-      onclick: () => btn.classList.toggle("active", togglePanel(id)),
+      class: "quicknav-btn" + (iconOnly ? " quicknav-btn-icon-only" : "") + (!onClick && isPanelVisible(id) ? " active" : ""),
+      title: label, "data-panel-id": id, disabled: !!disabled,
+      onclick: onClick ? onClick : () => btn.classList.toggle("active", togglePanel(id)),
     }, content);
     bar.appendChild(btn);
   }

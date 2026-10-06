@@ -202,6 +202,7 @@ const STRINGS = {
   "navigator.settingsQuicknav": { en: "Settings", fr: "Réglages", de: "Einstellungen", it: "Impostazioni", es: "Ajustes" },
   "navigator.timeNav": { en: "Time navigator", fr: "Navigation temporelle", de: "Zeitnavigator", it: "Navigatore temporale", es: "Navegador temporal" },
   "navigator.timeNavQuicknav": { en: "Time", fr: "Temps", de: "Zeit", it: "Tempo", es: "Tiempo" },
+  "navigator.centerOnMount": { en: "Center on mount", fr: "Centrer sur la monture", de: "Auf Montierung zentrieren", it: "Centra sulla montatura", es: "Centrar en la montura" },
   "navigator.nowBtn": { en: "Now", fr: "Maintenant", de: "Jetzt", it: "Adesso", es: "Ahora" },
   "navigator.rise": { en: "Rise", fr: "Lever", de: "Aufgang", it: "Levata", es: "Salida" },
   "navigator.transit": { en: "Meridian passage", fr: "Passage méridien", de: "Meridiandurchgang", it: "Passaggio al meridiano", es: "Paso meridiano" },

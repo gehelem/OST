@@ -96,6 +96,13 @@
 }
 .quicknav-btn .material-icons { font-size: 16px; }
 .quicknav-btn:hover { color: var(--accent); border-color: var(--accent-dim); }
+/* Gilles, 2026-10-06: navigator's "center on mount" button, inactive
+ * until a mount position is known - same opacity/cursor language as
+ * .btn:disabled (components.css), this class just never needed it before
+ * (every earlier quicknav entry always toggles a panel, never gated on
+ * data availability). */
+.quicknav-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.quicknav-btn:disabled:hover { color: var(--text-secondary); border-color: var(--border-subtle); }
 /* The actions window's own button (render.js's renderActionsPanel()) -
  * icon only, no label span at all, so the wide text-oriented padding
  * above would leave it looking oddly stretched - square it up instead,
