@@ -147,6 +147,14 @@ beyond the one `connect()` sends automatically) · `login(user, pw, language?)`
   own `location` per structure.en.md's "Finding the server" table. Web
   client only; a non-web client needs its own discovery (mDNS, manual
   entry — not implemented here, out of scope for a web core).
+- `deriveUrlsFromHost(host, ssl)` — derives `{wsUrl, mediaUrl}` from a bare
+  host and an SSL on/off flag instead (the UI's own single host field +
+  toggle): `ssl:false` → `ws://host:9624` + `http://host/ostmedia/`,
+  `ssl:true` → `wss://host/ws/` + `https://host/ostmedia/` (reverse-proxy
+  path route on the standard HTTPS port, no raw port exposed).
+- `cleanHost(host)` — strips a scheme/path/port a user might paste into
+  that same host field out of habit, so `deriveUrlsFromHost` always gets
+  a bare host.
 - `mediaUrl(mediaBaseUrl, relativePath)` — joins a media base URL with a
   wire-relative path (`img`/`video`/file paths), handling the "don't
   double the `/`" footgun the docs call out.

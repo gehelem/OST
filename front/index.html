@@ -108,8 +108,23 @@
           <div class="brand"><span class="material-icons">stars</span><span>OST — UI3</span></div>
           <nav id="system-views"></nav>
           <div class="settings-sep"></div>
-          <div class="form-row"><input id="ws-url" class="field-input" style="width:100%" placeholder="ws://host:9624"></div>
-          <div class="form-row"><input id="media-url" class="field-input" style="width:100%" placeholder="http://host/ostmedia/"></div>
+          <!-- Gilles, 2026-10-06: "les deux zones qui servent a fixer
+               l'url dans les settings sont lourdes et redondantes ...
+               une seule zone de saisie, juste l'url sans http/https ou
+               ws/wss pas de port pas de /ostmedia ou /ws. Tout ca doit
+               etre determine juste avec le toggle et l'URL" - one bare
+               host + an SSL toggle (a button, not a checkbox - "il faut
+               mettre des boutons plutot que des puces ou des cases a
+               cocher", render.js's own boolean-element convention,
+               reused here) replace the old #ws-url/#media-url pair;
+               core/index.js's deriveUrlsFromHost(host, ssl) builds both
+               real URLs from the two (js/app.js). -->
+          <div class="form-row">
+            <input id="server-host" class="field-input" style="width:100%" placeholder="host">
+            <button id="server-ssl-toggle" class="btn btn-sm toggle-btn" type="button" title="SSL">
+              <span class="material-icons">lock_open</span><span id="server-ssl-label">SSL</span>
+            </button>
+          </div>
           <!-- Gilles, 2026-10-03: "ajoute la fonction discover dans le cas
                ou on utilise l'app android ... comme sur rooster" - hidden
                by default (js/app.js only shows it once js/zeroconf.js's

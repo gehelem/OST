@@ -6,8 +6,8 @@
 // needs instead. UI3-specific: a module renders as floating panels on a
 // shared canvas instead of a single docked node — see renderContentNow().
 
-import { createClient, deriveDefaultUrls, normalizeMediaUrl } from "../core/index.js";
-import { renderModuleView, buildParamsPanel, setMediaBaseUrl, setDialogRoot, setQuickNavRoot, getDisableTemplates } from "./render.js";
+import { createClient, deriveUrlsFromHost, cleanHost, normalizeMediaUrl } from "../core/index.js";
+import { renderModuleView, buildParamsPanel, setMediaBaseUrl, getMediaBaseUrl, setDialogRoot, setQuickNavRoot, getDisableTemplates } from "./render.js";
 import { renderModbar, renderSystemViews, renderHome, renderController, renderFiles, renderLogs, renderLogin, renderLogPanel } from "./views.js";
 import { el, icon, iconButton } from "./dom.js";
 import * as Panels from "./panels.js";
@@ -53,8 +53,9 @@ const connWidgetEl = document.getElementById("conn-widget");
 const connToggleEl = document.getElementById("conn-toggle");
 const connPanelEl = document.getElementById("conn-panel");
 const grantPill = document.getElementById("grant-pill");
-const wsUrlInput = document.getElementById("ws-url");
-const mediaUrlInput = document.getElementById("media-url");
+const serverHostInput = document.getElementById("server-host");
+const serverSslToggleEl = document.getElementById("server-ssl-toggle");
+const serverSslLabelEl = document.getElementById("server-ssl-label");
 const themeToggle = document.getElementById("theme-toggle");
 const loginToggleEl = document.getElementById("login-toggle");
 const logToggleEl = document.getElementById("log-toggle");
@@ -93,6 +94,17 @@ function applyStaticLabels() {
   discoverBtnLabelEl.textContent = t("chrome.discover");
   connToggleEl.title = t("status." + client.connection.status);
 }
+
+// A button, not a checkbox (render.js's own boolean-element convention,
+// Gilles 2026-09-27: "il faut mettre des boutons plutot que des puces ou
+// des cases a cocher", reused here for the new SSL toggle - see
+// index.html's own comment on replacing the old #ws-url/#media-url pair).
+function sslOn() { return serverSslToggleEl.classList.contains("active"); }
+function setSsl(on) {
+  serverSslToggleEl.classList.toggle("active", on);
+  serverSslToggleEl.querySelector(".material-icons").textContent = on ? "lock" : "lock_open";
+}
+serverSslToggleEl.addEventListener("click", () => setSsl(!sslOn()));
 
 // ---- connection widget: collapsed status pill, click (or connecting/
 // disconnected) to fold out the full settings — Gilles, 2026-09-25: "settings
@@ -136,9 +148,16 @@ function loadHistory() {
   try { return JSON.parse(localStorage.getItem("ostcore-ui3.history") || "[]"); } catch (e) { return []; }
 }
 function saveHistory(entry) {
-  const hist = loadHistory().filter((h) => h.wsUrl !== entry.wsUrl);
+  const hist = loadHistory().filter((h) => h.host !== entry.host);
   hist.unshift(entry);
   try { localStorage.setItem("ostcore-ui3.history", JSON.stringify(hist.slice(0, 10))); } catch (e) { /* ignore */ }
+}
+// Gilles, 2026-10-06: "ajoute un bouton sur chaque ligne de la liste des
+// url connues pour supprimer la ligne si besoin" - renderConnectScreen()'s
+// own "Recent servers" list, below.
+function removeHistory(host) {
+  const hist = loadHistory().filter((h) => h.host !== host);
+  try { localStorage.setItem("ostcore-ui3.history", JSON.stringify(hist)); } catch (e) { /* ignore */ }
 }
 
 // The active view survives a reload (Gilles, 2026-09-27: "apres un f5 je ne
@@ -158,10 +177,21 @@ function saveLastView(key) {
 }
 
 const hist = loadHistory();
-const defaults = deriveDefaultUrls(window.location);
-wsUrlInput.value = (hist[0] && hist[0].wsUrl) || defaults.wsUrl;
-mediaUrlInput.value = normalizeMediaUrl((hist[0] && hist[0].mediaUrl) || defaults.mediaUrl);
-setMediaBaseUrl(mediaUrlInput.value);
+if (hist[0]) {
+  serverHostInput.value = hist[0].host;
+  setSsl(!!hist[0].ssl);
+} else if (!zeroconf.isAvailable()) {
+  // Web: auto-init from the browser's own URL (Gilles, 2026-10-06: "l'URL
+  // doit etre initialise automatiquement sur la version web, avec l'URL
+  // du navigateur"). The Android app has no page URL to derive anything
+  // from at all - "pour l'app android on est oblige de saisir ou
+  // discover" - left empty there, same as before this change.
+  serverHostInput.value = window.location.hostname || "127.0.0.1";
+  setSsl(window.location.protocol === "https:");
+} else {
+  setSsl(false);
+}
+setMediaBaseUrl(normalizeMediaUrl(deriveUrlsFromHost(serverHostInput.value, sslOn()).mediaUrl));
 
 // ---- theme -----------------------------------------------------------
 // Manual light/dark/red cycle, persisted — client-pattern.en.md's dark-mode
@@ -309,15 +339,18 @@ paramsToggleEl.addEventListener("click", () => { if (!paramsToggleEl.disabled) o
 // ---- connection controls --------------------------------------------------
 
 document.getElementById("connect-btn").addEventListener("click", () => {
-  mediaUrlInput.value = normalizeMediaUrl(mediaUrlInput.value);
-  setMediaBaseUrl(mediaUrlInput.value);
-  saveHistory({ wsUrl: wsUrlInput.value, mediaUrl: mediaUrlInput.value });
+  const host = cleanHost(serverHostInput.value);
+  serverHostInput.value = host;
+  const ssl = sslOn();
+  const urls = deriveUrlsFromHost(host, ssl);
+  setMediaBaseUrl(normalizeMediaUrl(urls.mediaUrl));
+  saveHistory({ host, ssl });
   loginShown = false;
   activeView = null;
   const lang = document.getElementById("lang-select").value;
   setLanguage(lang);
   applyStaticLabels();
-  client.connect(wsUrlInput.value, { language: lang });
+  client.connect(urls.wsUrl, { language: lang });
 });
 document.getElementById("disconnect-btn").addEventListener("click", () => client.disconnect());
 // "Self-service recovery" button (see index.html's own comment on why) - a
@@ -352,8 +385,11 @@ if (zeroconf.isAvailable()) {
     for (const s of servers) {
       const btn = el("button", { class: "btn btn-sm spacer", text: s.name });
       btn.addEventListener("click", () => {
-        wsUrlInput.value = s.wsUrl;
-        mediaUrlInput.value = s.mediaUrl; // already normalizeMediaUrl()-shaped (built with a trailing "/", see zeroconf.js)
+        serverHostInput.value = s.host;
+        // Discovery only ever makes sense unencrypted on a local network
+        // (zeroconf.js's own header comment: "cette fonction discover n'a
+        // d'usage que si on est en reseau local, donc sans SSL") - always off.
+        setSsl(false);
         discoverResultsEl.innerHTML = "";
       });
       discoverResultsEl.appendChild(btn);
@@ -471,7 +507,7 @@ function renderContentNow() {
   let result;
   if (activeView === "__home") result = renderHome(client, selectView);
   else if (activeView === "__controller") result = renderController(client);
-  else if (activeView === "__files") result = renderFiles(client, mediaUrlInput.value);
+  else if (activeView === "__files") result = renderFiles(client, getMediaBaseUrl());
   else result = renderLogs(client);
   dockedViewEl.appendChild(result.node);
   contentDispose = result.dispose || null;
@@ -487,9 +523,11 @@ function renderConnectScreen() {
   const ul = el("ul");
   for (const h of loadHistory()) {
     const li = el("li");
-    const btn = el("button", { class: "btn spacer", text: h.wsUrl });
-    btn.addEventListener("click", () => { wsUrlInput.value = h.wsUrl; mediaUrlInput.value = h.mediaUrl; document.getElementById("connect-btn").click(); });
+    const content = h.ssl ? [icon("lock", { small: true }), el("span", { text: h.host })] : h.host;
+    const btn = el("button", { class: "btn spacer" }, content);
+    btn.addEventListener("click", () => { serverHostInput.value = h.host; setSsl(!!h.ssl); document.getElementById("connect-btn").click(); });
     li.appendChild(btn);
+    li.appendChild(iconButton("close", t("chrome.removeServer"), () => { removeHistory(h.host); renderContentNow(); }, { danger: true }));
     ul.appendChild(li);
   }
   if (!loadHistory().length) ul.appendChild(el("li", { class: "muted small", text: t("chrome.noHistoryYet") }));

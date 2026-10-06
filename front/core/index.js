@@ -47,6 +47,40 @@ export function normalizeMediaUrl(url) {
   return url.endsWith("/") ? url : url + "/";
 }
 
+/** Strips a scheme (http://, https://, ws://, wss://, ...), any path
+ * (/ostmedia/, /ws/, ...) and a trailing :port a user might paste out of
+ * habit — the single host-only connection field (app.js's #server-host,
+ * Gilles 2026-10-06: "une seule zone de saisie, juste l'url sans
+ * http/https ou ws/wss pas de port") is meant to hold a bare host only;
+ * this makes a pasted full URL degrade to its host instead of producing a
+ * broken double-prefixed one. */
+export function cleanHost(host) {
+  if (!host) return "";
+  return host.trim()
+    .replace(/^[a-z][a-z0-9+.-]*:\/\//i, "")
+    .replace(/\/.*$/, "")
+    .replace(/:\d+$/, "");
+}
+
+/**
+ * Derives the WebSocket URL and the media base URL from a bare host and an
+ * SSL on/off toggle — the single-field+toggle connection UI (Gilles,
+ * 2026-10-06: "une seule zone de saisie ... pas de port pas de /ostmedia
+ * ou /ws. Tout ca doit etre determine juste avec le toggle et l'URL").
+ * Same two shapes deriveDefaultUrls() above already derives from
+ * `loc.protocol` — ssl:true goes through a reverse-proxy-style path route
+ * on the standard HTTPS port (no raw 9624 exposed), ssl:false talks to
+ * the raw ports directly. Confirmed against Gilles's own worked examples
+ * before implementing, not guessed.
+ */
+export function deriveUrlsFromHost(host, ssl) {
+  host = cleanHost(host);
+  if (!host) return { wsUrl: "", mediaUrl: "" };
+  return ssl
+    ? { wsUrl: `wss://${host}/ws/`, mediaUrl: `https://${host}/ostmedia/` }
+    : { wsUrl: `ws://${host}:9624`, mediaUrl: `http://${host}/ostmedia/` };
+}
+
 /**
  * Convenience factory bundling a Datastore + Connection into one object.
  * Everything it exposes is also reachable through `.datastore`/`.connection`
