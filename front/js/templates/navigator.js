@@ -300,30 +300,48 @@ function buildSettingsPanel(engine) {
   // possibles des le depart" (the actual selector was deferred until now:
   // 2026-10-03, "le grand saut : on augmente la densite, on passe la
   // taille au dessus sur les catalogues", after which sky-catalog.js
-  // gained the "full" depth this exposes). Re-fetches on change (not just
-  // a display-setting flip like everything else in this panel), so it
-  // gets its own persistAndRender()-alike rather than reusing
-  // checkboxRow()'s synchronous one. Kept at the TOP of the panel, above
-  // the long checkbox list below - Gilles, 2026-10-06, on mobile/touch
-  // specifically: "je n'arrive pas a modifier le 'star catalog'",
-  // narrowed down to "il faut scroller pour l'atteindre" past 16
-  // checkboxes on a short phone screen - a native <select> tap landing
-  // right at the end of an in-panel scroll gesture is a well-known
-  // Android/Chrome ambiguity (scroll-settle vs. a genuine tap, the
-  // browser can swallow the one that would open the picker) that the
-  // language select/LOV dropdowns elsewhere never hit, since neither
-  // lives inside a long scrollable list like this one did.
+  // gained the "full" depth this exposes).
+  //
+  // A native <select> here (Gilles, 2026-10-06, mobile/touch
+  // specifically: "je n'arrive pas a modifier le 'star catalog'") went
+  // through two real fixes - moving it above the long checkbox list
+  // (it needed an in-panel scroll to reach, "il faut scroller pour
+  // l'atteindre") - that still didn't help ("Ko sur le probleme ...
+  // aucun progres"). The actual wall: desktop Chrome's own touch/device
+  // emulation (everything this project can test against) still renders a
+  // <select> as the DESKTOP in-page dropdown - real mobile Chrome/Android
+  // WebView instead opens an OS-level native picker, a genuinely
+  // different code path no amount of viewport/touch-event emulation ever
+  // exercises. Every "it works" result this session got was from testing
+  // the wrong implementation entirely.
+  //
+  // Replaced with a plain 3-button toggle group instead of chasing an
+  // unreproducible native-picker bug further - same "des boutons plutot
+  // que des cases a cocher/puces" convention this project already uses
+  // for booleans (checkboxRow() above), now extended to this one other
+  // small closed set. No native OS control involved at all, so there's no
+  // platform-specific picker behavior left to break.
   const depthRow = el("div", { class: "form-row" }, [el("span", { class: "muted small", text: t("navigator.catalogDepth") })]);
-  const depthSelect = el("select", { class: "field-input" });
-  for (const key of Object.keys(STAR_DEPTHS)) {
-    depthSelect.appendChild(el("option", { value: key, text: t("navigator.catalogDepth." + key) }));
+  const depthBtns = el("div", { class: "form-row" });
+  const depthButtons = {};
+  let currentDepth = engine.catalogDepth || "light";
+  function setDepthActive(depth) {
+    for (const key of Object.keys(depthButtons)) depthButtons[key].classList.toggle("active", key === depth);
   }
-  depthSelect.value = engine.catalogDepth || "light";
-  depthSelect.addEventListener("change", () => {
-    engine.loadCatalog(depthSelect.value).then(() => persistAndRender()).catch((e) => console.error("[navigator] catalog load", e));
-  });
-  depthRow.appendChild(depthSelect);
+  for (const key of Object.keys(STAR_DEPTHS)) {
+    const btn = el("button", { type: "button", class: "btn btn-sm toggle-btn", title: STAR_DEPTHS[key].label, text: t("navigator.catalogDepth." + key + "Short") });
+    btn.addEventListener("click", () => {
+      if (currentDepth === key) return;
+      currentDepth = key;
+      setDepthActive(key);
+      engine.loadCatalog(key).then(() => persistAndRender()).catch((e) => console.error("[navigator] catalog load", e));
+    });
+    depthButtons[key] = btn;
+    depthBtns.appendChild(btn);
+  }
+  setDepthActive(currentDepth);
   wrap.appendChild(depthRow);
+  wrap.appendChild(depthBtns);
 
   const zoomRow = el("div", { class: "form-row" }, [el("span", { class: "muted small", text: t("navigator.zoom") })]);
   const zoomSlider = el("input", { type: "range", min: String(ZOOM_MIN), max: String(ZOOM_MAX), step: "0.1", value: String(engine.zoom), style: "flex:1" });
