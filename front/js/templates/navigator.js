@@ -32,7 +32,7 @@
 // to any imager.
 
 import { renderProperty, updateQuickNav, getMediaBaseUrl, moduleLifecycle, renderActionsPanel, getQuickNavButton } from "../render.js";
-import { el } from "../dom.js";
+import { el, iconButton } from "../dom.js";
 import * as Panels from "../panels.js";
 import { SkyEngine, ZOOM_MIN, ZOOM_MAX } from "../sky-engine.js";
 import { STAR_DEPTHS } from "../sky-catalog.js";
@@ -483,6 +483,283 @@ function buildTimeNavPanel(engine, getSimTime, setSimTime) {
   return wrap;
 }
 
+// ---- search panel + catalog-selection modal (Gilles, 2026-10-06) --------
+//
+// "Fonction de recherche multicriteres ... nouveau bouton 'search' ...
+// associe a une nouvelle fenetre ... zone de saisie + bouton lancer +
+// bouton catalogues ... liste des resultats ... clic sur une ligne =
+// centrage + selection". The "multicriteres" part turned out to live
+// entirely in WHICH catalogs get searched, not in the search term itself
+// - the backend's own protocol (search.name + posticon "forward" -> the
+// `results` grid, confirmed against OstErix's catalog-dialog.component.ts
+// and navigator.cpp/dbmanager.cpp's searchCatalog()) takes a single
+// free-text term and searches EVERY catalog row in one SQL LIKE query -
+// there is no server-side per-catalog filter at all, every hit just
+// carries its own `catalog` column back. So:
+// - local catalogs (stars/messier/planets, client-side data already
+//   loaded - see SkyEngine.searchLocal()) genuinely run as independent,
+//   separately-filterable searches - the "en parallele" part of Gilles's
+//   own suggestion applies here, and for free: they're synchronous array
+//   scans, done before the backend has even replied.
+// - the backend side is ONE query regardless of how many backend
+//   catalogs are checked; "selecting backend catalogs" can only mean
+//   filtering its results client-side by their own `catalog` field -
+//   there's no cheaper way to ask the server for less.
+// Results still stream in "au fil de l'eau" as asked: local results
+// render immediately (synchronous), the backend's reply (a real network
+// round-trip) gets appended to the same list whenever it arrives.
+//
+// Known backend catalog names aren't hardcoded anywhere (this install's
+// CATALOGS table content isn't something this client can know in
+// advance, and hardcoding a guessed list would drift from whatever
+// Gilles actually seeded) - discovered live instead, by collecting the
+// distinct `catalog` values any real search ever returns, merged into a
+// persisted list the catalog modal's checkboxes are built from. A fresh
+// catalog name discovered this way is added pre-checked, same spirit as
+// every local catalog defaulting to checked - a NEW catalog Gilles adds
+// to his backend later should show up searched by default, not silently
+// excluded until he remembers to come enable it by hand.
+const SEARCH_CATALOGS_KEY = "ostcore-ui3.navigator.searchCatalogs";
+function loadSearchCatalogs() {
+  let d = {};
+  try { d = JSON.parse(localStorage.getItem(SEARCH_CATALOGS_KEY)) || {}; } catch (e) { /* ignore */ }
+  return {
+    local: Object.assign({ stars: true, messier: true, planets: true }, d.local),
+    backendKnown: Array.isArray(d.backendKnown) ? d.backendKnown : [],
+    backendSelected: Array.isArray(d.backendSelected) ? d.backendSelected : [],
+  };
+}
+function saveSearchCatalogs(state) {
+  try { localStorage.setItem(SEARCH_CATALOGS_KEY, JSON.stringify(state)); } catch (e) { /* ignore */ }
+}
+/** Adds any name in `names` that isn't already known to both
+ * backendKnown and backendSelected (pre-checked by default, see this
+ * section's own header comment). Returns true if anything changed, so
+ * the caller only persists/re-renders when it actually needs to. */
+function mergeDiscoveredCatalogs(state, names) {
+  let changed = false;
+  for (const name of names) {
+    if (name && !state.backendKnown.includes(name)) {
+      state.backendKnown.push(name);
+      state.backendSelected.push(name);
+      changed = true;
+    }
+  }
+  return changed;
+}
+
+/**
+ * Backend `results` grid -> the same flat result shape searchLocal()
+ * returns, so the search panel can treat every source uniformly.
+ *
+ * Two wire-format quirks confirmed against a real search (not guessed):
+ * - `RA` is in HOURS (navigator.cpp/dbmanager.cpp store raw INDI-style
+ *   equatorial coordinates, same convention as mountposition.RA/
+ *   target.targetra elsewhere in this file) - *15 to this file's own
+ *   degrees convention, right at this wire boundary, same pattern as
+ *   buildSelectionPanel()'s own targetra conversion.
+ * - `DEC` is an unsigned magnitude with the sign carried SEPARATELY in
+ *   `NS` ("+"/"-") - confirmed live (e.g. a real M8 row: DEC=24.38,
+ *   NS="-", the Lagoon Nebula's actual declination is -24.38degC).
+ * `ofDate: false` - this is a static catalog table, not a live-computed
+ * position (see SkyEngine.centerOn()'s own doc comment on why that
+ * matters for which conversion centers on it correctly).
+ */
+function parseBackendResults(prop) {
+  if (!prop || !prop.grid || !prop.gridheaders) return [];
+  const h = prop.gridheaders;
+  const idx = (name) => h.indexOf(name);
+  const catalogIdx = idx("catalog"), codeIdx = idx("code"), raIdx = idx("RA"), decIdx = idx("DEC"),
+    nsIdx = idx("NS"), magIdx = idx("mag"), nameIdx = idx("name"), aliasIdx = idx("alias"), diamIdx = idx("diam");
+  return prop.grid.map((row) => {
+    const decMag = parseFloat(row[decIdx]) || 0;
+    return {
+      kind: "backend",
+      catalog: row[catalogIdx] || "",
+      code: row[codeIdx] || "",
+      name: row[nameIdx] || row[aliasIdx] || row[codeIdx] || "",
+      ra: (parseFloat(row[raIdx]) || 0) * 15,
+      dec: row[nsIdx] === "-" ? -decMag : decMag,
+      mag: parseFloat(row[magIdx]) || 0,
+      diam: parseFloat(row[diamIdx]) || 0,
+      ofDate: false,
+    };
+  });
+}
+
+/**
+ * The "Search" panel: a search term + launch button + catalog-selection
+ * modal button, and the result list below (`buildSearchResultsRow()`'s
+ * own clicks center the view + feed the Selection panel, same as tapping
+ * the dome directly - `onSelect` is `buildSelectionPanel()`'s own, not a
+ * second copy).
+ *
+ * Single-flight by construction: `requestBackendSearch()` cancels
+ * whatever backend reply it was still waiting on before sending a new
+ * request - the backend's own `results` property has no per-request
+ * correlation id at all (confirmed against navigator.cpp - a search
+ * just overwrites the one shared grid), so two in-flight requests can
+ * never be told apart anyway; this way the most recent one always wins
+ * instead of racing unpredictably.
+ */
+function buildSearchPanel(client, moduleName, engine, onSelect) {
+  const wrap = el("div", { class: "search-panel" });
+  const input = el("input", { class: "field-input", style: "flex:1", placeholder: t("navigator.searchPlaceholder") });
+  const launchBtn = iconButton("search", t("navigator.searchLaunch"), () => runSearch());
+  const catalogsBtn = iconButton("filter_alt", t("navigator.searchCatalogsBtn"), () => openCatalogModal());
+  wrap.appendChild(el("div", { class: "form-row" }, [input, launchBtn, catalogsBtn]));
+  const resultsEl = el("div", { class: "grid-table-wrap" });
+  wrap.appendChild(resultsEl);
+  input.addEventListener("keydown", (ev) => { if (ev.key === "Enter") runSearch(); });
+
+  const state = loadSearchCatalogs();
+
+  // Cancels itself and resubscribes fresh on every call - see this
+  // section's own doc comment on why single-flight, not per-request
+  // tracking (the protocol gives us nothing to track a request BY).
+  let pendingUnsub = null;
+  function requestBackendSearch(term, onReply) {
+    if (pendingUnsub) { pendingUnsub(); pendingUnsub = null; }
+    // client.subscribe() always calls back once synchronously with
+    // whatever `results` already held BEFORE this request even reaches
+    // the server (core/datastore.js's own subscribe() doc comment) -
+    // that replay has to be skipped, or a stale/unrelated previous
+    // search's results would render as if they were this one's answer.
+    let first = true;
+    const unsub = client.subscribe(client.topics.property(moduleName, "results"), (prop) => {
+      if (first) { first = false; return; }
+      unsub();
+      if (pendingUnsub === unsub) pendingUnsub = null;
+      onReply(parseBackendResults(prop));
+    });
+    pendingUnsub = unsub;
+    client.setValue(moduleName, "search", "name", term);
+    client.clickElementIcon(2, moduleName, "search", "name"); // J2 = posticon ("forward")
+  }
+
+  function renderResults(rows) {
+    resultsEl.innerHTML = "";
+    if (!rows.length) { resultsEl.appendChild(el("div", { class: "muted small", text: t("navigator.searchNoResults") })); return; }
+    const table = el("table", { class: "grid-table" });
+    table.appendChild(el("thead", null, [el("tr", null, [
+      el("th", { text: t("navigator.searchColName") }),
+      el("th", { text: t("navigator.searchColCatalog") }),
+      el("th", { text: t("navigator.searchColCoords") }),
+      el("th", { text: t("navigator.searchColMag") }),
+    ])]));
+    const tbody = el("tbody");
+    for (const r of rows) {
+      const tr = el("tr", { class: "grid-row" });
+      tr.appendChild(el("td", { text: r.name }));
+      tr.appendChild(el("td", { class: "muted small", text: r.catalog }));
+      tr.appendChild(el("td", { class: "muted small mono", text: `${fmtHours(r.ra)}  ${fmtDeg(r.dec)}` }));
+      tr.appendChild(el("td", { class: "muted small", text: r.mag !== undefined ? r.mag.toFixed(1) : "" }));
+      tr.addEventListener("click", () => {
+        onSelect({ kind: r.kind === "star" || r.kind === "messier" ? r.kind : null, name: r.name, ra: r.ra, dec: r.dec, mag: r.mag });
+        if (engine) engine.centerOn(r.ra, r.dec, { ofDate: r.ofDate });
+      });
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+    resultsEl.appendChild(table);
+  }
+
+  function runSearch() {
+    const term = input.value.trim();
+    if (!term) return;
+    const localKeys = new Set(Object.keys(state.local).filter((k) => state.local[k]));
+    let allResults = engine ? engine.searchLocal(term, localKeys) : [];
+    renderResults(allResults);
+
+    // Skip the backend entirely once Gilles has actually unchecked every
+    // known backend catalog - but keep trying it by default before
+    // anything's ever been discovered (backendKnown.length === 0), so a
+    // first-ever search still reaches the server.
+    if (state.backendSelected.length > 0 || state.backendKnown.length === 0) {
+      requestBackendSearch(term, (backendRows) => {
+        if (mergeDiscoveredCatalogs(state, [...new Set(backendRows.map((r) => r.catalog))])) saveSearchCatalogs(state);
+        const filtered = state.backendSelected.length
+          ? backendRows.filter((r) => state.backendSelected.includes(r.catalog))
+          : backendRows;
+        allResults = allResults.concat(filtered);
+        renderResults(allResults);
+      });
+    }
+  }
+
+  /** The catalog-selection modal (Gilles: "importante et compliquee").
+   * Same `.dialog-overlay`/`.dialog` shell as app.js's own Parameters
+   * dialog/render.js's grid-row dialogs - not reused directly (both are
+   * module-private to their own file), rebuilt here the same way app.js
+   * already does for its own bespoke dialog. */
+  function openCatalogModal() {
+    const overlay = el("div", { class: "dialog-overlay" });
+    const close = () => overlay.remove();
+    const localBox = el("div");
+    for (const key of ["stars", "messier", "planets"]) {
+      const cb = el("input", { type: "checkbox" });
+      cb.checked = !!state.local[key];
+      cb.addEventListener("change", () => { state.local[key] = cb.checked; saveSearchCatalogs(state); });
+      localBox.appendChild(el("label", { class: "form-row", style: "cursor:pointer" }, [cb, el("span", { text: t("navigator.searchCatalog." + key) })]));
+    }
+    const backendBox = el("div");
+    function renderBackendBox() {
+      backendBox.innerHTML = "";
+      if (!state.backendKnown.length) {
+        backendBox.appendChild(el("div", { class: "muted small", text: t("navigator.searchBackendNoneYet") }));
+        return;
+      }
+      for (const name of state.backendKnown) {
+        const cb = el("input", { type: "checkbox" });
+        cb.checked = state.backendSelected.includes(name);
+        cb.addEventListener("change", () => {
+          state.backendSelected = cb.checked
+            ? [...new Set([...state.backendSelected, name])]
+            : state.backendSelected.filter((n) => n !== name);
+          saveSearchCatalogs(state);
+        });
+        backendBox.appendChild(el("label", { class: "form-row", style: "cursor:pointer" }, [cb, el("span", { text: name })]));
+      }
+    }
+    renderBackendBox();
+    const refreshBtn = el("button", { class: "btn btn-sm", text: t("navigator.searchRefreshCatalogs") });
+    refreshBtn.addEventListener("click", () => {
+      // An unfiltered probe ("%%' LIKE matches everything, confirmed
+      // live) purely to discover catalog names - its own rows are
+      // discarded, only the distinct `catalog` values matter here.
+      requestBackendSearch("", (rows) => {
+        if (mergeDiscoveredCatalogs(state, [...new Set(rows.map((r) => r.catalog))])) saveSearchCatalogs(state);
+        renderBackendBox();
+      });
+    });
+
+    const dialog = el("div", { class: "dialog" }, [
+      el("div", { class: "dialog-header" }, [el("h3", { text: t("navigator.searchCatalogsTitle") }), iconButton("close", t("common.close"), close)]),
+      el("div", { class: "muted small", text: t("navigator.searchLocalCatalogsLabel") }),
+      localBox,
+      el("div", { class: "muted small", text: t("navigator.searchBackendCatalogsLabel") }),
+      backendBox,
+      refreshBtn,
+    ]);
+    overlay.appendChild(dialog);
+    overlay.addEventListener("click", (ev) => { if (ev.target === overlay) close(); });
+    document.getElementById("dialog-root").appendChild(overlay);
+
+    // First time the modal is ever opened with nothing discovered yet -
+    // probe right away so it isn't just an empty section (same request
+    // the manual "refresh" button fires).
+    if (!state.backendKnown.length) {
+      requestBackendSearch("", (rows) => {
+        if (mergeDiscoveredCatalogs(state, [...new Set(rows.map((r) => r.catalog))])) saveSearchCatalogs(state);
+        renderBackendBox();
+      });
+    }
+  }
+
+  wrap._dispose = () => { if (pendingUnsub) pendingUnsub(); };
+  return wrap;
+}
+
 // Same shared #bg-layer element imagelayer.js targets for guider/focus/
 // sequencer's own image background - looked up directly here (unlike
 // imagelayer.js's setBgLayer() indirection) since this is the only
@@ -712,6 +989,15 @@ export function mount(client, moduleName) {
     // 'left_click'" - ligature verified against the vendored font first;
     // "left_clic" doesn't exist, "left_click" does).
     quickNavEntries.push({ id: "selection", label: t("navigator.selection"), icon: "left_click", iconOnly: true });
+
+    // "Search" (Gilles, 2026-10-06: "nouveau bouton 'search' ... associe a
+    // une nouvelle fenetre") - see buildSearchPanel()'s own header comment
+    // for the full design. `getEngine`/`onSelect` forward-referenced the
+    // same way `selection`/`sky` already are above (buildSkyDome() hasn't
+    // run yet at this point in build()).
+    const searchPanel = Panels.make({ id: "search", title: t("navigator.search"), x: 340, y: 580, w: 340 });
+    searchPanel.appendChild(track(buildSearchPanel(client, moduleName, sky.engine, selection.onSelect)));
+    quickNavEntries.push({ id: "search", label: t("navigator.search"), icon: "search", iconOnly: true });
 
     if (sky.engine) {
       const settingsPanel = Panels.make({ id: "settings", title: t("navigator.displaySettings"), x: 660, y: 92, w: 260, collapsed: true });

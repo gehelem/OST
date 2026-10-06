@@ -566,34 +566,104 @@ export class SkyEngine {
   }
 
   /**
-   * Re-centers the view on the telescope's current position (Gilles,
-   * 2026-10-06: "centrer la vue sur la position du telescope si elle est
-   * definie"). No-op (returns false) if mountRaDeg/mountDecDeg aren't
-   * known yet - the caller (templates/navigator.js) uses the return value
-   * to keep its own quicknav button disabled until then.
+   * Re-centers the view on an arbitrary RA/Dec (Gilles, 2026-10-06, first
+   * for "centrer la vue sur la position du telescope", generalized the
+   * same day for the search panel's "click a result -> center on it").
+   * Returns false (no-op) for a null/undefined RA or Dec - callers use
+   * this to know whether centering actually happened.
    *
-   * Same of-date conversion as the mount marker's own drawing code
-   * (equatorialOfDateToHorizontal, not project()'s J2000 catalog
-   * pipeline - mountRaDeg/mountDecDeg are OF DATE, see this file's own
-   * constructor comment). The screen center is always the view-space
-   * vector (0,0,1) (toScreen()'s own x=-r*v.x/y=-r*v.y: both are zero
-   * exactly when v.x=v.y=0, i.e. v.z=1 for a unit vector) - the minimal
-   * rotation taking the mount's fixed-frame vector there is exactly
-   * fromTwoVectors(mountVector, {0,0,1}), same primitive the trackball
+   * `opts.ofDate`: true for a position already expressed OF DATE
+   * (mountRaDeg/mountDecDeg, or a planet's live Equator() position -
+   * see searchLocal() below) - equatorialOfDateToHorizontal(), same
+   * conversion as the mount marker's own drawing code. false (the
+   * default) for a J2000 catalog position (this.catalog's own
+   * stars/messier, or a backend search result - see this file's header
+   * on why backend search results are also J2000: the DB is a static
+   * catalog table, not a live-computed position) -
+   * equatorialToHorizontal(), same as the hit-testing in _select().
+   *
+   * The screen center is always the view-space vector (0,0,1)
+   * (toScreen()'s own x=-r*v.x/y=-r*v.y: both are zero exactly when
+   * v.x=v.y=0, i.e. v.z=1 for a unit vector) - the minimal rotation
+   * taking the target's fixed-frame vector there is exactly
+   * fromTwoVectors(targetVector, {0,0,1}), same primitive the trackball
    * drag already uses for the opposite problem (point-under-cursor ->
    * cursor).
    */
-  centerOnMount() {
-    if (this.mountRaDeg === null || this.mountDecDeg === null) return false;
-    const { azimuth, altitude } = equatorialOfDateToHorizontal(this.mountRaDeg, this.mountDecDeg, this.observer, this.getTime());
-    const mountVector = horizontalToVector(azimuth, altitude);
-    this.rotation = fromTwoVectors(mountVector, { x: 0, y: 0, z: 1 });
+  centerOn(raDeg, decDeg, opts) {
+    if (raDeg === null || raDeg === undefined || decDeg === null || decDeg === undefined) return false;
+    const date = this.getTime();
+    const { azimuth, altitude } = (opts && opts.ofDate)
+      ? equatorialOfDateToHorizontal(raDeg, decDeg, this.observer, date)
+      : equatorialToHorizontal(raDeg, decDeg, this.observer, date);
+    const targetVector = horizontalToVector(azimuth, altitude);
+    this.rotation = fromTwoVectors(targetVector, { x: 0, y: 0, z: 1 });
     this.render();
     // Same "once per gesture" persistence path as a trackball drag ending
     // (see _handlePointerUp() above) - F5 should still show this centered
     // view afterwards, not silently revert to whatever was panned before.
     if (this.onRotationChange) this.onRotationChange();
     return true;
+  }
+
+  /** Thin wrapper kept for callers that only ever center on the mount
+   * (templates/navigator.js's "center on mount" quicknav button) -
+   * mountRaDeg/mountDecDeg are always OF DATE, see this file's own
+   * constructor comment on them. */
+  centerOnMount() {
+    return this.centerOn(this.mountRaDeg, this.mountDecDeg, { ofDate: true });
+  }
+
+  /**
+   * Client-side catalog search (Gilles, 2026-10-06: "fonction de
+   * recherche multicriteres ... catalogues stockes localement dans
+   * l'application (messier, planetes, IC, stars, ...)" - IC deferred,
+   * see notes/NOTES-frontend-ostcore-planetarium.md). Plain substring
+   * match, case-insensitive - same spirit as the backend's own
+   * `LIKE '%term%'`, not fuzzy and not anchored to the start of the
+   * name. `catalogs` is a Set of "stars"/"messier"/"planets" (whichever
+   * the search panel's catalog-selection modal has checked).
+   *
+   * Only scans whatever `this.catalog` currently holds - i.e. the
+   * catalog depth the user has selected in Settings (light/deep/full),
+   * not necessarily "full" - this searches what's actually loaded on
+   * the dome right now, not a separate heavier fetch just for search.
+   *
+   * Returns a flat array of {kind, name, ra (degrees, see this file's
+   * RA convention), dec, mag, ofDate, catalog} - `ofDate` tells the
+   * caller which conversion centerOn() needs: false for stars/messier
+   * (static J2000 catalog data), true for planets (Equator() already
+   * returns a live, of-date position, same category as mountRaDeg).
+   */
+  searchLocal(term, catalogs) {
+    const needle = term.trim().toLowerCase();
+    if (!needle) return [];
+    const results = [];
+    if (catalogs.has("stars") && this.catalog.stars) {
+      for (const s of this.catalog.stars) {
+        if (s.name && s.name.toLowerCase().includes(needle)) {
+          results.push({ kind: "star", name: s.name, ra: s.ra, dec: s.dec, mag: s.mag, ofDate: false, catalog: "stars" });
+        }
+      }
+    }
+    if (catalogs.has("messier") && this.catalog.messier) {
+      for (const m of this.catalog.messier) {
+        const haystack = `${m.name} ${m.alt} ${m.desig}`.toLowerCase();
+        if (haystack.includes(needle)) {
+          results.push({ kind: "messier", name: m.alt ? `${m.name} (${m.alt})` : m.name, ra: m.ra, dec: m.dec, mag: m.mag, ofDate: false, catalog: "messier" });
+        }
+      }
+    }
+    if (catalogs.has("planets")) {
+      const date = this.getTime();
+      for (const p of PLANETS) {
+        if (p.label.toLowerCase().includes(needle)) {
+          const equ = Equator(p.body, date, this.observer, true, true);
+          results.push({ kind: "planet", name: p.label, ra: equ.ra * 15, dec: equ.dec, mag: Illumination(p.body, date).mag, ofDate: true, catalog: "planets" });
+        }
+      }
+    }
+    return results;
   }
 
   _onWheel(ev) {
