@@ -35,7 +35,7 @@ Rules-Requires-Root: no
 Package: ostserver
 Architecture: any
 Section: science
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqt6sql6-sqlite
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt6sql6-sqlite, gsc
 Description: Observatoire Sans Tête
  Light and headless astrophotography automation tool
 
@@ -44,7 +44,7 @@ Architecture: any
 Section: science
 Conflicts: ostserver
 Replaces: ostserver
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqt6sql6-sqlite, nginx
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt6sql6-sqlite, gsc, nginx
 Description: Observatoire Sans Tête - all-in-one
  Backend + web UI + nginx, ready to use after a single install.
  .
@@ -52,8 +52,9 @@ Description: Observatoire Sans Tête - all-in-one
  two Conflict/Replace each other and can never be installed together),
  plus the front/ web client's static files and an nginx site wiring
  them together, so a single `apt install ./ostserver-complete.deb`
- works standalone with no custom repository required - only nginx
- itself needs to resolve, from the standard distribution archives.
+ gets a working system - nginx resolves from the standard distribution
+ archives, but libindi1 and gsc still require the ppa:mutlaqja/ppa PPA
+ (confirmed 2026-10, see install-latest-complete.sh which adds it).
  .
  Pick this package to get a working system immediately; pick plain
  "ostserver" to bring your own web server/TLS/layout instead.

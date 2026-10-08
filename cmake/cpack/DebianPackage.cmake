@@ -128,8 +128,10 @@ set(CPACK_DEBIAN_RUNTIME_PACKAGE_SHLIBDEPS ON)
 # shlibdeps auto-detects shared library deps from ELF NEEDED entries, using
 # the build platform's package database — correct names regardless of Ubuntu version.
 # Only add what shlibdeps cannot detect: Qt SQL plugins are loaded at runtime
-# via Qt's plugin mechanism and have no ELF NEEDED entry in the binary.
-set(CPACK_DEBIAN_RUNTIME_PACKAGE_DEPENDS "libqt6sql6-sqlite")
+# via Qt's plugin mechanism and have no ELF NEEDED entry in the binary; gsc
+# (Guide Star Catalog query tool) is invoked as an external subprocess, same
+# as the INDI driver binaries, not linked - no ELF NEEDED entry either.
+set(CPACK_DEBIAN_RUNTIME_PACKAGE_DEPENDS "libqt6sql6-sqlite, gsc")
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_CONTROL_EXTRA
     "${CMAKE_CURRENT_LIST_DIR}/postinst"
     "${CMAKE_CURRENT_LIST_DIR}/prerm")
@@ -156,8 +158,9 @@ set(CPACK_DEBIAN_DEVELOPMENT_PACKAGE_DEPENDS
 # see CMakeLists.txt's own OST_RUNTIME_TARGETS) + front/'s static files
 # (install()ed from cmake/Frontend.cmake's own frontend_www output) + a
 # postinst that wires nginx. A single `apt install ./ostserver-complete.deb`
-# must work completely standalone - no custom PPA/repo needed, just nginx
-# resolved from the standard distro archives - so this is deliberately
+# gets a working system - nginx resolves from the standard distro archives,
+# libindi1/gsc still need ppa:mutlaqja/ppa (confirmed 2026-10, see
+# install-latest-complete.sh, which adds it) - so this is deliberately
 # Conflicts/Replaces "ostserver", NOT Depends: a dependency would force
 # downloading/installing two separate custom .deb files to get anything
 # working, defeating the entire point (Gilles, 2026-10 packaging
@@ -173,7 +176,7 @@ set(CPACK_DEBIAN_COMPLETE_PACKAGE_MAINTAINER "gilles <gilles@joag.fr>")
 set(CPACK_DEBIAN_COMPLETE_DESCRIPTION
     "Observatoire Sans Tête - all-in-one\n Backend + web UI + nginx, ready to use after a single install")
 set(CPACK_DEBIAN_COMPLETE_PACKAGE_SHLIBDEPS ON)
-set(CPACK_DEBIAN_COMPLETE_PACKAGE_DEPENDS "libqt6sql6-sqlite, nginx")
+set(CPACK_DEBIAN_COMPLETE_PACKAGE_DEPENDS "libqt6sql6-sqlite, gsc, nginx")
 set(CPACK_DEBIAN_COMPLETE_PACKAGE_CONFLICTS "ostserver")
 set(CPACK_DEBIAN_COMPLETE_PACKAGE_REPLACES  "ostserver")
 set(CPACK_DEBIAN_COMPLETE_PACKAGE_CONTROL_EXTRA
