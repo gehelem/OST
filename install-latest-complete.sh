@@ -29,5 +29,26 @@ sudo apt update
 echo "Installing ${DEB_FILE}..."
 sudo apt install -y "./${DEB_FILE}"
 
+# Documentation (the Hugo site built by the separate build-doc CI job,
+# see documentation/CI/CI-build.sh) rides on the same "latest" generic
+# package registry, not inside the .deb itself - the doc job runs in
+# its own CI stage/image (Hugo, not the Qt6/C++ toolchain) and the
+# release that publishes it only happens after every build job,
+# ostserver-complete's included, so it can't be baked into the
+# package at CPack time without risking a stale/mismatched tarball.
+# Served for free under the existing nginx root (/var/www/pilost),
+# no site config change needed - it's just a static subdirectory.
+DOC_FILE="documentation_latest.tar.gz"
+DOC_URL="https://gitlab.ostserver.fr/api/v4/projects/1/packages/generic/latest/latest/${DOC_FILE}"
+DOC_DEST="/var/www/pilost/documentation"
+
+echo "Downloading ${DOC_FILE}..."
+curl --fail --location --output "${DOC_FILE}" "${DOC_URL}"
+
+echo "Installing documentation to ${DOC_DEST}..."
+sudo mkdir -p "${DOC_DEST}"
+sudo tar -xzf "${DOC_FILE}" -C "${DOC_DEST}"
+
 echo "Done - ostserver-complete is installed, the service should be starting."
 echo "Web UI: http://<this-machine>/"
+echo "Documentation: http://<this-machine>/documentation/"
