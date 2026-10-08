@@ -13,15 +13,15 @@ mkdir -p media
 
 echo "Starting server..."
 export QT_QPA_PLATFORM=offscreen
-# Run under gdb (batch mode) instead of bare - sidesteps core_pattern/
-# systemd-coredump entirely (a plain core file may not even land where
-# we can read it on a GitLab Docker-executor runner), gdb catches the
-# fault itself via ptrace and prints a real backtrace straight into
-# server.log. Harmless if nothing crashes: "run" just returns and
-# "bt full" prints "No stack." once ostserver exits/gets killed below.
-gdb -batch -ex run -ex "bt full" -ex quit \
-    --args ostserver --webroot=media --indiserver=Y \
-    > server.log 2>&1 &
+# Plain run, not gdb-wrapped: tried that first, it caught nothing - gdb
+# only traces the top-level ostserver process and explicitly detaches
+# from every forked child ("Detaching after vfork from child process
+# ...", confirmed in a real run's output), so a crash in a driver
+# subprocess (indi_simulator_ccd/_guide) or indiserver itself would
+# never show up there. Core dumps don't have that blind spot - any
+# process in the tree that crashes dumps on its own, caught below.
+ulimit -c unlimited
+ostserver --webroot=media --indiserver=Y > server.log 2>&1 &
 SERVER_PID=$!
 
 sleep 7
@@ -30,6 +30,23 @@ echo "Checking server process..."
 if ! ps -p $SERVER_PID > /dev/null 2>&1; then
     echo "ERROR: server crashed at startup!"
     cat server.log
+    echo "--- Looking for core dumps (any process in the tree, not just ostserver) ---"
+    shopt -s nullglob
+    FOUND_CORE=0
+    for core in core core.* /var/lib/systemd/coredump/*; do
+        [ -f "$core" ] || continue
+        FOUND_CORE=1
+        echo "=== ${core} ==="
+        case "$core" in
+            *.zst) zstd -dq "$core" -o /tmp/core.decompressed 2>&1 && core=/tmp/core.decompressed ;;
+            *.xz)  unxz -k -c "$core" > /tmp/core.decompressed 2>&1 && core=/tmp/core.decompressed ;;
+        esac
+        file "$core" || true
+        # No executable given: gdb reads the crashing binary's path from
+        # the core file's own NT_FILE note.
+        gdb -batch -ex "bt full" -ex quit "$core" 2>&1 || true
+    done
+    [ "${FOUND_CORE}" -eq 0 ] && echo "No core dump found (core_pattern may redirect elsewhere on this runner)."
     exit 1
 fi
 
