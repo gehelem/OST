@@ -1,0 +1,56 @@
+# .install scriptlet for the "ostserver" package (issue #230).
+#
+# Deliberately does NOT enable/start the systemd service - unlike the
+# Debian postinst (cmake/cpack/postinst), which does, Arch convention is
+# hands-off here (see https://wiki.archlinux.org/title/Systemd#Using_units
+# and the Arch packaging guidelines on install scriptlets): print the
+# command instead of running it for the user.
+#
+# No pre_remove: same pre-existing asymmetry as the Debian side
+# (debian/rules's own comment) - "ostserver" has never stopped/disabled
+# its service on removal on any packaging backend, not fixed here either.
+
+post_install() {
+    _configure
+    _hint
+}
+
+post_upgrade() {
+    _configure
+}
+
+_configure() {
+    # Same heuristic as the Debian postinst scripts: works for the
+    # common case (a direct `sudo pacman -U ...`, or an AUR helper that
+    # does `makepkg` as you then `sudo pacman -U` for the install step),
+    # unreliable under anything nested (root shell, sudo -i).
+    INSTALL_USER="${SUDO_USER:-${USER:-root}}"
+    USER_HOME=$(getent passwd "${INSTALL_USER}" | cut -d: -f6)
+    OST_DIR="${USER_HOME}/.ost"
+
+    sed -i "s/^User=.*/User=${INSTALL_USER}/" /usr/lib/systemd/system/ostserver.service
+    sed -i "s|^WorkingDirectory=.*|WorkingDirectory=${OST_DIR}|" /usr/lib/systemd/system/ostserver.service
+
+    mkdir -p "${OST_DIR}"
+    chown "${INSTALL_USER}" "${OST_DIR}"
+
+    mkdir -p /var/lib/osterix/media
+    chown -R "${INSTALL_USER}" /var/lib/osterix
+
+    # Shared skeleton (cmake/cpack/ostserver.parms.skel), installed by
+    # CMake to share/ostserver/ - same file as the Debian side, one
+    # source of truth.
+    PARMS_FILE="${OST_DIR}/ostserver.parms"
+    if [ ! -f "${PARMS_FILE}" ]; then
+        cp /usr/share/ostserver/ostserver.parms.skel "${PARMS_FILE}"
+        chown "${INSTALL_USER}" "${PARMS_FILE}"
+    fi
+
+    systemctl daemon-reload
+}
+
+_hint() {
+    echo "==> ostserver is installed but not started (Arch convention)."
+    echo "==> Enable and start it with:"
+    echo "        systemctl enable --now ostserver.service"
+}

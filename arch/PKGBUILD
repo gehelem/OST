@@ -1,0 +1,73 @@
+# Maintainer: Gilles <gilles@joag.fr>
+#
+# Split package, mirrors the Debian side (cmake/cpack/DebianPackage.cmake,
+# debian/control): "ostserver" (backend only) and "ostserver-complete"
+# (same binaries installed a second time + front/'s web UI + nginx wiring,
+# Conflicts/Replaces "ostserver" - never Depends, see that file's own
+# header comment for why).
+#
+# pkgver is pinned to this project's real version tags (issue #230 - kept
+# homogeneous with the Debian/CPack side, which derives its own version
+# the same way via `git describe`). Bump pkgver + pkgrel=1 by hand on each
+# new tag. CI also builds this unpinned, straight off `main`'s HEAD, for
+# the rolling "latest" artifact (see CI/CI-build-arch.sh) - same two-track
+# approach as ostserver_latest_*.deb vs the tagged release ones.
+
+pkgbase=ostserver
+pkgname=('ostserver' 'ostserver-complete')
+pkgver=0.0.15
+pkgrel=1
+arch=('x86_64')
+url='https://gitlab.ostserver.fr/ost/ostserver'
+license=('GPL-3.0-or-later')
+makedepends=(
+    'cmake' 'git' 'extra-cmake-modules'
+    'qt6-base' 'qt6-tools' 'qt6-scxml' 'qt6-websockets'
+    'mesa' 'libnova' 'gsl' 'wcslib' 'cfitsio' 'avahi' 'eigen'
+    'libraw' 'libsecret' 'opencv' 'libindi'
+)
+# Same runtime libs for both packages (both ship the exact same binaries) -
+# nginx is ostserver-complete's own addition, see depends_ostserver-complete
+# below. libindi/gsc/astrometry.net themselves are NOT listed as hard
+# depends: libindi is in [extra] so pacman resolves it on its own, but gsc
+# and astrometry.net only exist on AUR and are only needed for plate
+# solving, not for the server to start - optdepends instead (matches the
+# Debian side's own optdepends-equivalent "Recommends", not a hard Depends).
+_depends_common=(
+    'qt6-base' 'qt6-websockets' 'qt6-scxml'
+    'libnova' 'gsl' 'wcslib' 'cfitsio' 'avahi' 'libsecret' 'opencv' 'libraw'
+    'libindi'
+)
+optdepends_ostserver=(
+    'astrometry.net: plate solving (Navigator/Polar modules)'
+    'gsc: star field data for INDI'"'"'s CCD simulator'
+)
+optdepends_ostserver-complete=("${optdepends_ostserver[@]}")
+
+source=("${pkgbase}-${pkgver}.tar.gz::${url}/-/archive/${pkgver}/${pkgbase}-${pkgver}.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+    cmake -B build -S "${pkgbase}-${pkgver}" \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr
+    cmake --build build
+}
+
+package_ostserver() {
+    pkgdesc='Observatoire Sans Tête - light and headless astrophotography automation tool'
+    depends=("${_depends_common[@]}")
+    install=ostserver.install
+
+    DESTDIR="${pkgdir}" cmake --install build --component Runtime
+}
+
+package_ostserver-complete() {
+    pkgdesc='Observatoire Sans Tête - all-in-one (backend + web UI + nginx)'
+    depends=("${_depends_common[@]}" 'nginx')
+    conflicts=('ostserver')
+    provides=('ostserver')
+    install=ostserver-complete.install
+
+    DESTDIR="${pkgdir}" cmake --install build --component Complete
+}
