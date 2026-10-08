@@ -16,15 +16,12 @@
 #
 set -e
 
-# Ask for the sudo password once, then keep the credential cache alive
-# for as long as this script runs instead of prompting again at every
-# `sudo` call below - the astrometry.net AUR build alone can take
-# several minutes, well past sudo's default ~15 min timeout once a
-# few steps add up.
-sudo -v
-( while kill -0 "$$" 2>/dev/null; do sudo -n true; sleep 60; done ) &
-SUDO_KEEPALIVE_PID=$!
-trap 'kill "${SUDO_KEEPALIVE_PID}" 2>/dev/null' EXIT
+# Note: the password may be asked for repeatedly during this script.
+# A sudo credential-cache keepalive was tried here and removed again -
+# it doesn't reliably cover makepkg's own internal sudo calls (pacman
+# -U/-S) during the astrometry.net/gsc AUR builds further down, so it
+# wasn't actually fixing anything, just adding a background process
+# for no benefit.
 
 DEB_EQUIV="ostserver-complete_latest_arch_x86_64.pkg.tar.zst"
 URL="https://gitlab.ostserver.fr/api/v4/projects/1/packages/generic/latest/latest/${DEB_EQUIV}"
