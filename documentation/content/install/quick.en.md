@@ -1,5 +1,5 @@
 ---
-title: Quick install (recommended)
+title: Quick install (Ubuntu Resolute)
 weight: 5
 description: "The fastest way to get OST running: one fresh Ubuntu 26.04 machine, one script"
 ---
@@ -12,6 +12,11 @@ follow the three steps below, in order.
 This single script installs everything needed on one machine: the OST
 backend, the web interface, nginx, INDI, `astrometry.net` and the
 documentation you are reading right now.
+
+{{% notice style="note" title="Using Arch Linux instead?" %}}
+This page is for Ubuntu specifically. On Arch Linux, follow
+[Quick install (Arch Linux)](../quick-arch/) instead.
+{{% /notice %}}
 
 ---
 

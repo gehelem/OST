@@ -1,5 +1,5 @@
 ---
-title: Schnellinstallation (empfohlen)
+title: Schnellinstallation (Ubuntu Resolute)
 weight: 5
 description: "Der schnellste Weg, OST zum Laufen zu bringen: eine frische Ubuntu-26.04-Maschine, ein Skript"
 ---
@@ -13,6 +13,12 @@ Reihenfolge.
 Dieses einzige Skript installiert alles Nötige auf einer Maschine: das
 OST-Backend, die Weboberfläche, nginx, INDI, `astrometry.net` und die
 Dokumentation, die Sie gerade lesen.
+
+{{% notice style="note" title="Verwenden Sie stattdessen Arch Linux?" %}}
+Diese Seite ist speziell für Ubuntu. Unter Arch Linux folgen Sie
+stattdessen der
+[Schnellinstallation (Arch Linux)](../quick-arch/).
+{{% /notice %}}
 
 ---
 

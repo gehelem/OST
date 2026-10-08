@@ -90,6 +90,10 @@ _install_aur astrometry.net
 # not in OST. Don't let it take the whole script down.
 _install_aur gsc || echo "WARNING: gsc failed to build (optional, only used by INDI's CCD simulator) - continuing without it."
 
+# wget isn't part of a minimal Arch install either (same gap as
+# hostname/inetutils above) - needed from here on for the index files.
+sudo pacman -S --needed --noconfirm wget
+
 # Baseline plate-solving indexes, same default set and reasoning as
 # install-latest-complete.sh.
 echo "Downloading default astrometry.net indexes (wide field >5°, ~152 MB)..."
