@@ -83,6 +83,30 @@ server {
         alias /var/lib/osterix/media/;
         autoindex on;
     }
+
+    # The Hugo site under documentation/ is built with baseURL set to
+    # the real documentation.ostserver.fr (hugo.toml) - it is NOT
+    # rebuilt with a different baseURL just for this local, subpath
+    # mount (that would mean two parallel Hugo builds to keep in sync).
+    # The Relearn theme emits root-relative links for everything except
+    # the language switcher (href=/css/..., src=/js/..., and the
+    # unquoted data-nav-id=/.../data-url=/... the nav sidebar/language
+    # select use - Hugo's --minify drops attribute quotes wherever the
+    # value has no whitespace) - these resolve against the domain root
+    # instead of /documentation/ unless rewritten here. Confirmed by
+    # extracting the real documentation_latest.tar.gz, 2026-10 - these
+    # four attribute names plus the one inline search-index JS var
+    # (index_js_url) are the complete, exhaustive list for this theme.
+    location /documentation/ {
+        sub_filter 'href=/'          'href=/documentation/';
+        sub_filter 'src=/'           'src=/documentation/';
+        sub_filter 'data-nav-id=/'   'data-nav-id=/documentation/';
+        sub_filter 'data-url=/'      'data-url=/documentation/';
+        sub_filter 'index_js_url="/' 'index_js_url="/documentation/';
+        sub_filter_once off;
+        sub_filter_types text/html;
+        try_files $uri $uri/ =404;
+    }
 }
 EOF
         # The stock default site also claims `default_server` on port 80
