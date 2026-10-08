@@ -41,6 +41,13 @@ sudo cp /usr/share/doc/ostserver-complete/pilost.conf.example /etc/nginx/conf.d/
 sudo systemctl enable --now nginx.service
 sudo systemctl reload nginx.service
 
+# firewalld is on by default on Fedora, unlike Ubuntu/Arch - confirmed
+# the hard way: the web UI and WebSocket are both unreachable from
+# another machine until these ports are opened.
+echo "Opening the web UI (80) and WebSocket (9624) ports in firewalld..."
+sudo firewall-cmd --add-port=80/tcp --add-port=9624/tcp --permanent
+sudo firewall-cmd --reload
+
 # ostserver.parms is created by the package's own %post scriptlet
 # (same shared cmake/cpack/ostserver.parms.skel as the other two
 # packaging backends) if missing - nothing more to do here.

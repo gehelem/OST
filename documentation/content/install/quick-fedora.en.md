@@ -56,6 +56,9 @@ The script then does everything by itself. A few things to expect:
 
 - It will ask for **your password** a few times (`sudo`) — this is
   normal, it needs permission to install system packages.
+- It opens the web UI (80) and WebSocket (9624) ports in `firewalld`,
+  which is on by default on Fedora (unlike Ubuntu/Arch) and would
+  otherwise block both from any other machine on your network.
 - `gsc` (INDI's CCD *simulator* star field data) has no Fedora
   package at all — the script skips it with a note. This is never
   needed for real hardware, only for the simulator.
