@@ -42,7 +42,13 @@ set(STELLARSOLVER_INCLUDE_DIR
     ${CMAKE_BINARY_DIR}/libs/stellarsolver
 )
 set(STELLARSOLVER_LIBRARIES stellarsolver)
+# Installed into BOTH components, same reasoning as OST_RUNTIME_TARGETS
+# below: "Complete" ships its own full, independent copy of everything
+# Runtime needs (issue #229) - otherwise dpkg-shlibdeps can't find this
+# private/bundled .so from inside the Complete package tree and CPack
+# fails ("cannot find library libstellarsolver6.so.2", confirmed 2026-10-08).
 install(TARGETS stellarsolver LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime)
+install(TARGETS stellarsolver LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Complete)
 find_library(avahi-client-lib avahi-client REQUIRED)
 find_library(avahi-common-lib avahi-common REQUIRED)
 find_path(avahi-client-includes avahi-client/client.h REQUIRED)
@@ -584,7 +590,13 @@ target_link_libraries(ostmeteo PRIVATE
 )
 target_compile_definitions(ostmeteo PRIVATE METEO_MODULE)
 
-install(TARGETS
+# Captured once so the "Complete" component (issue #229 - same compiled
+# binary + modules, packaged a second time alongside front/'s static
+# files, not a dependent of the Runtime component - see
+# cmake/cpack/DebianPackage.cmake's own header comment) can reinstall the
+# exact same target list below without a second hand-maintained copy that
+# could quietly drift out of sync whenever a module is added.
+set(OST_RUNTIME_TARGETS
     ostserver
     ostbasemodule ostindimodule
     ostindipanel
@@ -600,15 +612,46 @@ install(TARGETS
     ostparkmanager
     ostmonitor
     ostmeteo
+)
+
+install(TARGETS ${OST_RUNTIME_TARGETS}
     RUNTIME DESTINATION "/usr/bin"     COMPONENT Runtime
     LIBRARY DESTINATION "/usr/lib"     COMPONENT Runtime
     PUBLIC_HEADER DESTINATION "/usr/include/ost" COMPONENT Development
+)
+
+# Same binaries again, under the "Complete" component - see
+# cmake/cpack/DebianPackage.cmake. No PUBLIC_HEADER here: a beginner
+# installing the all-in-one package has no use for module dev headers.
+install(TARGETS ${OST_RUNTIME_TARGETS}
+    RUNTIME DESTINATION "/usr/bin" COMPONENT Complete
+    LIBRARY DESTINATION "/usr/lib" COMPONENT Complete
 )
 
 install(
     FILES "${CMAKE_CURRENT_SOURCE_DIR}/ostserver.service"
     DESTINATION "lib/systemd/system"
     COMPONENT Runtime
+)
+install(
+    FILES "${CMAKE_CURRENT_SOURCE_DIR}/ostserver.service"
+    DESTINATION "lib/systemd/system"
+    COMPONENT Complete
+)
+
+# Default ostserver.parms content, shared by both postinst scripts (they
+# `cp` it instead of each carrying their own copy of the same heredoc -
+# was duplicated three times, including in install-latest-complete.sh,
+# until Gilles asked "on n'avait pas déjà un squelette quelque part ?").
+install(
+    FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cpack/ostserver.parms.skel"
+    DESTINATION "share/ostserver"
+    COMPONENT Runtime
+)
+install(
+    FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cpack/ostserver.parms.skel"
+    DESTINATION "share/ostserver"
+    COMPONENT Complete
 )
 
 # Generate version.cc at build time (not configure time)
@@ -634,8 +677,22 @@ message(STATUS "CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}")
 message(STATUS "Version file will be generated at build time: ${CMAKE_CURRENT_BINARY_DIR}/version.cc")
 
 # ---------------------------------------------------------------------------
-# Packaging (CPack / Debian)
+# Frontend (front/ - issue #229) + Packaging (CPack / Debian)
 # ---------------------------------------------------------------------------
+include(cmake/Frontend.cmake)
+
+# front-www/'s contents, built by the frontend_www target above (always
+# part of the default ALL build, well before CPack's own separate
+# packaging step ever runs - see cmake/Frontend.cmake). Complete
+# component only (issue #229) - the minimal ostserver package has no use
+# for this. Trailing slash on the source path: copy front-www/'s
+# *contents* into the destination, not a nested front-www/ directory.
+install(
+    DIRECTORY "${FRONTEND_WWW_DIR}/"
+    DESTINATION "/var/www/pilost"
+    COMPONENT Complete
+)
+
 include(cmake/cpack/DebianPackage.cmake)
 
 #get_cmake_property(_variableNames VARIABLES)

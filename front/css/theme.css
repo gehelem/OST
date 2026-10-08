@@ -1,0 +1,189 @@
+/* theme.css — design tokens only, no selectors beyond :root/[data-theme].
+ *
+ * Design language: adapted from ostnoctua's themes.css (glass panels, a
+ * cyan "night-vision-friendly" accent, generous use of translucent
+ * surfaces) — but re-tuned for a conventional sidebar+content app instead
+ * of floating panels over a sky canvas. Three themes: dark (default,
+ * cyan accent), light, and "red" (Gilles, 2026-10-05: "identique au
+ * sombre, mais avec nuances rouges plutot que vertes" — a real
+ * astronomer's night-vision screen, same dark structure as the default
+ * theme with every accent-ish color shifted into the red family instead
+ * of green/cyan, so as little non-red light as possible reaches the eye
+ * during an observing session). Every color used anywhere in UI3 must be
+ * one of these variables — no hardcoded colors in component CSS.
+ */
+
+:root {
+  /* Surfaces */
+  --bg: #0a0d12;
+  --bg-raised: #10141b;
+  /* Translucent "glass" surfaces (ostnoctua's --bg-panel/--bg-panel-solid,
+     see ostnoctua/web/themes.css) — always paired with backdrop-filter:
+     blur() via the .glass helper class in panels.css, never used alone
+     (a translucent background with no blur behind it just looks like a
+     washed-out flat color). */
+  --bg-panel: rgba(20, 26, 34, 0.66);
+  --bg-panel-solid: rgba(20, 26, 34, 0.88);
+  --bg-elevated: #1c2530;
+  --bg-input: #10151c;
+  --bg-hover: rgba(0, 229, 204, 0.07);
+  --bg-active: rgba(0, 229, 204, 0.14);
+  --overlay: rgba(3, 5, 8, 0.6);
+
+  /* Accent (cyan, ostnoctua's default "noctua" hue, tuned down slightly) */
+  --accent: #00e5cc;
+  --accent-rgb: 0, 229, 204;
+  --accent-strong: #22f2d8;
+  --accent-dim: rgba(0, 229, 204, 0.45);
+  --accent-subtle: rgba(0, 229, 204, 0.16);
+  --accent-faint: rgba(0, 229, 204, 0.08);
+  --on-accent: #04211d;
+
+  /* Text */
+  --text: #e7ecf1;
+  --text-secondary: #b7c1cc;
+  --text-muted: #7c8896;
+  --text-dim: #55606c;
+
+  /* Borders */
+  --border-subtle: rgba(0, 229, 204, 0.08);
+  --border: rgba(148, 163, 184, 0.16);
+  --border-strong: rgba(0, 229, 204, 0.32);
+  --border-active: #00e5cc;
+
+  /* Status */
+  --standby: #64707d;
+  --ok: #4ade80;
+  --ok-rgb: 74, 222, 128;
+  --busy: #f5b942;
+  --busy-rgb: 245, 185, 66;
+  --error: #f36a6a;
+  --error-rgb: 243, 106, 106;
+  --warn: #f5b942;
+  /* Distinct from --warn (yellow) and --error (now "critical", red) -
+     log level 3/"error" sits between them (Gilles, 2026-10-03: "jaune
+     warning orange error rouge critical"). */
+  --orange: #f5832e;
+  --orange-rgb: 245, 131, 46;
+
+  /* Semantic buttons */
+  --btn-success: #4ade80;
+  --btn-warning: #f5b942;
+  --btn-danger: #f36a6a;
+
+  /* Shadows */
+  --shadow-panel: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --shadow-pop: 0 16px 44px rgba(0, 0, 0, 0.55);
+  --shadow-glow: 0 0 0 1px var(--accent-subtle), 0 0 18px rgba(var(--accent-rgb), 0.18);
+
+  /* Rhythm */
+  --radius-sm: 5px;
+  --radius: 9px;
+  --radius-lg: 14px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --font-ui: -apple-system, "Segoe UI", Roboto, system-ui, sans-serif;
+}
+
+/* Explicit dark (same values as :root — lets data-theme="dark" be set
+   explicitly by the toggle instead of relying on "not light"). */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+:root:not([data-theme="light"]) {
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #eef1f4;
+  --bg-raised: #f7f9fb;
+  --bg-panel: rgba(255, 255, 255, 0.68);
+  --bg-panel-solid: rgba(255, 255, 255, 0.9);
+  --bg-elevated: #eef3f5;
+  --bg-input: #ffffff;
+  --bg-hover: rgba(0, 137, 123, 0.06);
+  --bg-active: rgba(0, 137, 123, 0.12);
+  --overlay: rgba(20, 30, 35, 0.35);
+
+  --accent: #00897b;
+  --accent-rgb: 0, 137, 123;
+  --accent-strong: #00695c;
+  --accent-dim: rgba(0, 137, 123, 0.4);
+  --accent-subtle: rgba(0, 137, 123, 0.14);
+  --accent-faint: rgba(0, 137, 123, 0.07);
+  --on-accent: #ffffff;
+
+  --text: #16212a;
+  --text-secondary: #3d4c58;
+  --text-muted: #667582;
+  --text-dim: #8d99a4;
+
+  --border-subtle: rgba(0, 137, 123, 0.12);
+  --border: rgba(32, 48, 58, 0.14);
+  --border-strong: rgba(0, 137, 123, 0.4);
+  --border-active: #00897b;
+
+  --standby: #8b97a3;
+  --ok: #2e9e5b;
+  --ok-rgb: 46, 158, 91;
+  --busy: #c98a12;
+  --busy-rgb: 201, 138, 18;
+  --error: #d1453d;
+  --error-rgb: 209, 69, 61;
+  --warn: #c98a12;
+  --orange: #c1630f;
+  --orange-rgb: 193, 99, 15;
+
+  --btn-success: #2e9e5b;
+  --btn-warning: #c98a12;
+  --btn-danger: #d1453d;
+
+  --shadow-panel: 0 6px 20px rgba(20, 30, 40, 0.10);
+  --shadow-pop: 0 16px 40px rgba(20, 30, 40, 0.18);
+  --shadow-glow: 0 0 0 1px var(--accent-subtle), 0 0 14px rgba(var(--accent-rgb), 0.12);
+}
+
+/* "Red" night-vision theme — same dark surfaces/text/structure as the
+ * default :root theme above (deliberately NOT redefined here, per
+ * Gilles's own "identique au sombre"), only the accent (cyan -> red) is
+ * overridden. --ok used to turn into a duller red here too (a real green
+ * pixel being exactly the kind of light this theme exists to avoid), but
+ * that conflated two different jobs one token was doing - Gilles,
+ * 2026-10-06, catching it on the Home dashboard's status dots showing red
+ * for a module that's actually fine: "vert pour le statut c'est vert pour
+ * le statut, quel que soit le theme" - status color meaning (green=ok,
+ * amber=busy, red=error) has to stay theme-independent everywhere it's
+ * used (dots, value-box accents, ...), or a reader can mistake "fine" for
+ * "broken" at a glance. --ok now falls through to :root's own green
+ * unchanged, same as --busy/--warn/--orange/--error already did (never
+ * green to begin with, so never needed overriding here in the first
+ * place). Every accent-derived rgba() below had to be restated too
+ * (components.css reads several of these as hand-written
+ * rgba(R,G,B,alpha) literals, not a calc() off --accent-rgb) —
+ * --shadow-glow doesn't need restating since it already composes
+ * var(--accent-subtle)/var(--accent-rgb), so it picks up the new values
+ * on its own. */
+[data-theme="red"] {
+  color-scheme: dark;
+
+  --bg-hover: rgba(255, 69, 58, 0.07);
+  --bg-active: rgba(255, 69, 58, 0.14);
+
+  --accent: #ff453a;
+  --accent-rgb: 255, 69, 58;
+  --accent-strong: #ff7a70;
+  --accent-dim: rgba(255, 69, 58, 0.45);
+  --accent-subtle: rgba(255, 69, 58, 0.16);
+  --accent-faint: rgba(255, 69, 58, 0.08);
+  --on-accent: #2a0a08;
+
+  --border-subtle: rgba(255, 69, 58, 0.08);
+  --border-strong: rgba(255, 69, 58, 0.32);
+  --border-active: #ff453a;
+}

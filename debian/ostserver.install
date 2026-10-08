@@ -1,0 +1,20 @@
+# Debhelper file-list for the "ostserver" binary package - issue #229.
+#
+# Made explicit here for the first time: before this, debian/control
+# declared only ONE binary package, so dh_install had nothing to choose
+# between and staged everything by default. Adding ostserver-complete
+# (see debian/control) means debhelper now needs an explicit split -
+# this file preserves exactly what "ostserver" already shipped before
+# (binary, module libs, dev headers, systemd unit, changelog), nothing
+# removed or added, just made explicit. The header/doc split CPack's own
+# Runtime/Development components already do (cmake/cpack/
+# DebianPackage.cmake) is NOT replicated here - Launchpad has only ever
+# built a single "ostserver" binary package (no "-dev" in debian/control
+# at all), and this commit isn't the place to change that pre-existing
+# asymmetry between the two packaging paths.
+usr/bin/ostserver
+usr/lib/libost*.so*
+usr/include/ost/*
+lib/systemd/system/ostserver.service
+usr/share/doc/ostserver/changelog.Debian.gz
+usr/share/ostserver/ostserver.parms.skel

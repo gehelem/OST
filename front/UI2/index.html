@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ostcore UI2 — reference client</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header id="topbar">
+    <span class="title">ostcore UI2</span>
+    <span id="status-pill" class="disconnected">disconnected</span>
+    <input id="ws-url" class="field-input" style="width:260px" placeholder="ws://host:9624">
+    <input id="media-url" class="field-input" style="width:220px" placeholder="http://host/ostmedia/">
+    <button id="connect-btn" class="btn btn-primary">Connect</button>
+    <button id="disconnect-btn" class="btn">Disconnect</button>
+    <select id="lang-select" class="field-input">
+      <option value="en">EN</option>
+      <option value="fr">FR</option>
+      <option value="de">DE</option>
+      <option value="es">ES</option>
+      <option value="it">IT</option>
+    </select>
+    <span class="spacer"></span>
+    <span id="grant-pill" class="muted small"></span>
+    <button id="theme-toggle" class="btn">Toggle theme</button>
+  </header>
+  <div id="layout">
+    <div id="sidebar-slot"></div>
+    <main id="content"></main>
+  </div>
+  <div id="dialog-root"></div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

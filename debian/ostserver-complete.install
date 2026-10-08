@@ -1,0 +1,17 @@
+# Debhelper file-list for the "ostserver-complete" binary package - see
+# debian/control's own description and cmake/cpack/DebianPackage.cmake's
+# Complete-component header comment for the full rationale.
+#
+# Same binary/libs/service as ostserver.install (dh_install stages an
+# independent copy into THIS package too - deliberate duplication, not a
+# mistake, see debian/control: Conflicts/Replaces, not Depends) plus the
+# frontend's static files. No dev headers (a beginner installing the
+# all-in-one package has no use for module headers) and no changelog
+# (Debian policy wants it under this package's own name,
+# share/doc/ostserver-complete/ - cmake/Frontend.cmake doesn't produce
+# that yet, left as a known rough edge rather than solved here).
+usr/bin/ostserver
+usr/lib/libost*.so*
+lib/systemd/system/ostserver.service
+usr/share/ostserver/ostserver.parms.skel
+var/www/pilost/*

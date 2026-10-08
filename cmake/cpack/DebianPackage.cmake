@@ -105,7 +105,7 @@ set(CPACK_STRIP_FILES TRUE)
 
 # Component-based packaging: one .deb per component
 set(CPACK_DEB_COMPONENT_INSTALL ON)
-set(CPACK_COMPONENTS_ALL Runtime Development)
+set(CPACK_COMPONENTS_ALL Runtime Development Complete)
 
 # Global package metadata
 set(CPACK_PACKAGE_VERSION     "${OST_UPSTREAM_VERSION}")
@@ -128,8 +128,10 @@ set(CPACK_DEBIAN_RUNTIME_PACKAGE_SHLIBDEPS ON)
 # shlibdeps auto-detects shared library deps from ELF NEEDED entries, using
 # the build platform's package database — correct names regardless of Ubuntu version.
 # Only add what shlibdeps cannot detect: Qt SQL plugins are loaded at runtime
-# via Qt's plugin mechanism and have no ELF NEEDED entry in the binary.
-set(CPACK_DEBIAN_RUNTIME_PACKAGE_DEPENDS "libqt6sql6-sqlite")
+# via Qt's plugin mechanism and have no ELF NEEDED entry in the binary; gsc
+# (Guide Star Catalog query tool) is invoked as an external subprocess, same
+# as the INDI driver binaries, not linked - no ELF NEEDED entry either.
+set(CPACK_DEBIAN_RUNTIME_PACKAGE_DEPENDS "libqt6sql6-sqlite, gsc")
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_CONTROL_EXTRA
     "${CMAKE_CURRENT_LIST_DIR}/postinst"
     "${CMAKE_CURRENT_LIST_DIR}/prerm")
@@ -147,5 +149,38 @@ set(CPACK_DEBIAN_DEVELOPMENT_DESCRIPTION
     "Observatoire Sans Tête - development headers\n Headers for building OST modules")
 set(CPACK_DEBIAN_DEVELOPMENT_PACKAGE_DEPENDS
     "ostserver (= ${OST_UPSTREAM_VERSION})")
+
+# ---------------------------------------------------------------------------
+# ostserver-complete  (Complete component - issue #229)
+# ---------------------------------------------------------------------------
+# Beginner-friendly, self-contained alternative to "ostserver": the exact
+# same compiled binaries (installed a second time under this component,
+# see CMakeLists.txt's own OST_RUNTIME_TARGETS) + front/'s static files
+# (install()ed from cmake/Frontend.cmake's own frontend_www output) + a
+# postinst that wires nginx. A single `apt install ./ostserver-complete.deb`
+# gets a working system - nginx resolves from the standard distro archives,
+# libindi1/gsc still need ppa:mutlaqja/ppa (confirmed 2026-10, see
+# install-latest-complete.sh, which adds it) - so this is deliberately
+# Conflicts/Replaces "ostserver", NOT Depends: a dependency would force
+# downloading/installing two separate custom .deb files to get anything
+# working, defeating the entire point (Gilles, 2026-10 packaging
+# discussion: "le débutant aura toujours deux paquets a telecharger").
+# The two packages install the same files under the same paths (binary,
+# systemd unit) by design and can never coexist on one system.
+set(CPACK_DEBIAN_COMPLETE_PACKAGE_NAME    "ostserver-complete")
+set(CPACK_DEBIAN_COMPLETE_FILE_NAME
+    "ostserver-complete_${OST_DEBIAN_VERSION}_${CMAKE_SYSTEM_PROCESSOR}.deb")
+set(CPACK_DEBIAN_COMPLETE_PACKAGE_SECTION   "science")
+set(CPACK_DEBIAN_COMPLETE_PACKAGE_PRIORITY  "optional")
+set(CPACK_DEBIAN_COMPLETE_PACKAGE_MAINTAINER "gilles <gilles@joag.fr>")
+set(CPACK_DEBIAN_COMPLETE_DESCRIPTION
+    "Observatoire Sans Tête - all-in-one\n Backend + web UI + nginx, ready to use after a single install")
+set(CPACK_DEBIAN_COMPLETE_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_COMPLETE_PACKAGE_DEPENDS "libqt6sql6-sqlite, gsc, nginx")
+set(CPACK_DEBIAN_COMPLETE_PACKAGE_CONFLICTS "ostserver")
+set(CPACK_DEBIAN_COMPLETE_PACKAGE_REPLACES  "ostserver")
+set(CPACK_DEBIAN_COMPLETE_PACKAGE_CONTROL_EXTRA
+    "${CMAKE_CURRENT_LIST_DIR}/complete/postinst"
+    "${CMAKE_CURRENT_LIST_DIR}/complete/prerm")
 
 include(CPack)

@@ -2,7 +2,6 @@
     <qresource prefix="/">
         <file>sequencer.json</file>
         <file>sequencer.scxml</file>
-        <file>sequencer.fr.md</file>
         <file>sequencer.en.md</file>
     </qresource>
 </RCC>
