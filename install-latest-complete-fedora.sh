@@ -63,8 +63,19 @@ skip {
 sudo mv /tmp/nginx.conf.new /etc/nginx/nginx.conf
 sudo chown root:root /etc/nginx/nginx.conf
 sudo chmod 644 /etc/nginx/nginx.conf
+# SELinux (enforcing by default on Fedora, unlike Ubuntu/Arch) ties
+# the mv'd-in file to /tmp's own context, not /etc/nginx's expected
+# one - confirmed the hard way: "open() nginx.conf failed (13:
+# Permission denied)" despite correct plain Unix ownership/mode.
+# restorecon re-applies the context the system's policy expects for
+# this exact path.
+sudo restorecon -v /etc/nginx/nginx.conf
 
 sudo cp /usr/share/doc/ostserver-complete/pilost.conf.example /etc/nginx/conf.d/pilost.conf
+# Belt and suspenders - plain cp into an existing directory usually
+# does pick up the right context on its own (unlike mv), but not worth
+# a fourth test cycle to find out the hard way if it doesn't.
+sudo restorecon -v /etc/nginx/conf.d/pilost.conf
 sudo systemctl enable --now nginx.service
 sudo systemctl reload nginx.service
 
