@@ -13,15 +13,40 @@ mkdir -p media
 
 echo "Starting server..."
 export QT_QPA_PLATFORM=offscreen
-# Plain run, not gdb-wrapped: tried that first, it caught nothing - gdb
-# only traces the top-level ostserver process and explicitly detaches
-# from every forked child ("Detaching after vfork from child process
-# ...", confirmed in a real run's output), so a crash in a driver
-# subprocess (indi_simulator_ccd/_guide) or indiserver itself would
-# never show up there. Core dumps don't have that blind spot - any
-# process in the tree that crashes dumps on its own, caught below.
-ulimit -c unlimited
-ostserver --webroot=media --indiserver=Y > server.log 2>&1 &
+
+# Two things tried and ruled out already (see git log for this file):
+# - gdb -ex run alone: only traces the top-level ostserver process and
+#   detaches from every forked child, catches nothing if the crash is
+#   in a driver subprocess (indi_simulator_ccd/_guide) or indiserver.
+# - ulimit -c unlimited + scanning for a core file afterwards: this
+#   runner's core_pattern redirects wherever the HOST's does, which a
+#   container has no visibility into - confirmed, nothing ever appears.
+#
+# This time: gdb with detach-on-fork off, so it keeps tracing every
+# forked child too (as separate "inferiors") instead of letting go of
+# them - "run" then stops on a crash anywhere in the whole tree, and
+# the python loop below walks every inferior and backtraces whichever
+# one is actually sitting on a fatal signal.
+cat > /tmp/crash.gdb << 'EOF'
+set detach-on-fork off
+set schedule-multiple on
+run
+python
+import gdb
+infs = gdb.inferiors()
+print("=== %d inferior(s) alive when 'run' stopped ===" % len(infs))
+for inf in infs:
+    print("--- inferior %d, pid %s ---" % (inf.num, inf.pid))
+    try:
+        gdb.execute("inferior %d" % inf.num)
+        gdb.execute("thread apply all bt full")
+    except Exception as e:
+        print("(error backtracing inferior %d: %s)" % (inf.num, e))
+end
+quit
+EOF
+gdb -batch -x /tmp/crash.gdb --args ostserver --webroot=media --indiserver=Y \
+    > server.log 2>&1 &
 SERVER_PID=$!
 
 sleep 7
@@ -30,23 +55,6 @@ echo "Checking server process..."
 if ! ps -p $SERVER_PID > /dev/null 2>&1; then
     echo "ERROR: server crashed at startup!"
     cat server.log
-    echo "--- Looking for core dumps (any process in the tree, not just ostserver) ---"
-    shopt -s nullglob
-    FOUND_CORE=0
-    for core in core core.* /var/lib/systemd/coredump/*; do
-        [ -f "$core" ] || continue
-        FOUND_CORE=1
-        echo "=== ${core} ==="
-        case "$core" in
-            *.zst) zstd -dq "$core" -o /tmp/core.decompressed 2>&1 && core=/tmp/core.decompressed ;;
-            *.xz)  unxz -k -c "$core" > /tmp/core.decompressed 2>&1 && core=/tmp/core.decompressed ;;
-        esac
-        file "$core" || true
-        # No executable given: gdb reads the crashing binary's path from
-        # the core file's own NT_FILE note.
-        gdb -batch -ex "bt full" -ex quit "$core" 2>&1 || true
-    done
-    [ "${FOUND_CORE}" -eq 0 ] && echo "No core dump found (core_pattern may redirect elsewhere on this runner)."
     exit 1
 fi
 
