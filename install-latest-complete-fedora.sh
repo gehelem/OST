@@ -29,7 +29,11 @@ sudo dnf install -y wget >/dev/null 2>&1 || true
 wget -q "${URL}" -O "${DEB_EQUIV}" || curl --fail --location --output "${DEB_EQUIV}" "${URL}"
 
 echo "Installing ${DEB_EQUIV}..."
-sudo dnf install -y "./${DEB_EQUIV}"
+# libindi explicitly alongside the package itself: the RPM's own
+# auto-detected Requires doesn't reliably pull it in (same reason
+# CI-test-rpm.sh has always listed it separately too, on top of the
+# package it's testing - confirmed missing here the same way).
+sudo dnf install -y "./${DEB_EQUIV}" libindi
 
 echo "Enabling and starting ostserver..."
 sudo systemctl daemon-reload

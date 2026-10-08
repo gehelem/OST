@@ -27,10 +27,14 @@ set(CPACK_RPM_PACKAGE_URL "https://gitlab.ostserver.fr/ost/ostserver/")
 set(CPACK_RPM_PACKAGE_LICENSE "GPLv3")
 set(CPACK_RPM_PACKAGE_VERSION "${OST_UPSTREAM_VERSION}")
 set(CPACK_RPM_PACKAGE_RELEASE "${OST_DEBIAN_REVISION}")
-# RPM dependencies are auto-detected from ELF NEEDED entries by
-# rpmbuild's own find-requires, same idea as Debian's dpkg-shlibdeps -
-# only add what that cannot see (a loaded-at-runtime Qt plugin,
-# nginx).
+# RPM dependencies are supposed to be auto-detected from ELF NEEDED
+# entries, same idea as Debian's dpkg-shlibdeps - but confirmed the
+# hard way that libindi specifically does NOT get picked up this way
+# for this package (CPack's auto-generated spec doesn't run the same
+# full find-requires machinery a hand-written SPEC + plain rpmbuild
+# would), so it needs listing explicitly here, same as nginx below for
+# the Complete component.
+set(_requires_common "libindi")
 
 # ---------------------------------------------------------------------------
 # ostserver (Runtime component)
@@ -44,6 +48,7 @@ set(CPACK_RPM_RUNTIME_PACKAGE_NAME "ostserver")
 set(CPACK_RPM_RUNTIME_FILE_NAME "ostserver.rpm")
 set(CPACK_RPM_RUNTIME_PACKAGE_SUMMARY "Observatoire Sans Tête - headless astrophotography automation tool")
 set(CPACK_RPM_RUNTIME_PACKAGE_DESCRIPTION "Light and headless astrophotography automation tool.")
+set(CPACK_RPM_RUNTIME_PACKAGE_REQUIRES "${_requires_common}")
 set(CPACK_RPM_RUNTIME_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_LIST_DIR}/rpm/post-runtime")
 
 # ---------------------------------------------------------------------------
@@ -67,7 +72,7 @@ set(CPACK_RPM_COMPLETE_PACKAGE_NAME "ostserver-complete")
 set(CPACK_RPM_COMPLETE_FILE_NAME "ostserver-complete.rpm")
 set(CPACK_RPM_COMPLETE_PACKAGE_SUMMARY "Observatoire Sans Tête - all-in-one (backend + web UI + nginx)")
 set(CPACK_RPM_COMPLETE_PACKAGE_DESCRIPTION "Backend + web UI + nginx, same binaries as \"ostserver\" installed a second time - see that package if you want to bring your own web server/layout instead.")
-set(CPACK_RPM_COMPLETE_PACKAGE_REQUIRES "nginx")
+set(CPACK_RPM_COMPLETE_PACKAGE_REQUIRES "${_requires_common}, nginx")
 set(CPACK_RPM_COMPLETE_PACKAGE_CONFLICTS "ostserver")
 set(CPACK_RPM_COMPLETE_PACKAGE_OBSOLETES "ostserver")
 set(CPACK_RPM_COMPLETE_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_LIST_DIR}/rpm/post-complete")
