@@ -19,6 +19,15 @@ pkgver=0.0.15
 pkgrel=1
 arch=('x86_64')
 url='https://gitlab.ostserver.fr/ost/ostserver'
+# Arch's makepkg.conf enables LTO by default, unlike the Ubuntu CI
+# images this project otherwise builds on - confirmed the hard way:
+# "relocation ... can not be used when making a shared object; recompile
+# with -fPIC" on libostbasemodule.so, despite -fPIC already being set
+# project-wide (CMakeLists.txt) - GCC's LTO bytecode wasn't carrying it
+# through consistently across this module/stellarsolver-static-lib
+# combination. Disabling LTO for this package only, rather than
+# chasing down which translation unit lost the flag project-wide.
+options=('!lto')
 license=('GPL-3.0-or-later')
 makedepends=(
     'cmake' 'git' 'extra-cmake-modules'
