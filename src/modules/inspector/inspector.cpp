@@ -1,6 +1,12 @@
 #include "inspector.h"
 #include <QPainter>
 #include <opencv2/opencv.hpp>
+// contourArea()/boundingRect() live here - <opencv2/opencv.hpp>'s
+// umbrella include doesn't reliably pull this in on every OpenCV
+// packaging (confirmed missing on Arch's current opencv package,
+// "'contourArea' is not a member of 'cv'" - builds fine on Ubuntu's
+// older OpenCV, which apparently does pull it in transitively).
+#include <opencv2/imgproc.hpp>
 #include <algorithm>
 #include <cmath>
 #include "version.cc"
