@@ -117,5 +117,11 @@ else
 fi
 
 echo "Done - ostserver-complete is installed, the service should be starting."
-echo "Web UI: http://<this-machine>/"
-echo "Documentation: http://<this-machine>/documentation/"
+# hostname -I lists every address on every interface (first one is
+# usually the main LAN IP, which is what matters here - this is
+# accessed from another machine on the local network, a .local/mDNS
+# name is not guaranteed to resolve on every client).
+THIS_MACHINE="$(hostname -I 2>/dev/null | awk '{print $1}')"
+THIS_MACHINE="${THIS_MACHINE:-$(hostname)}"
+echo "Web UI: http://${THIS_MACHINE}/"
+echo "Documentation: http://${THIS_MACHINE}/documentation/"
