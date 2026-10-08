@@ -26,10 +26,13 @@ cd ..
 
 DEB_RUNTIME=$(ls build/ostserver_*.deb | head -1)
 DEB_DEV=$(ls build/ostserver-dev_*.deb | head -1)
-echo "Packages built: ${DEB_RUNTIME}  ${DEB_DEV}"
+DEB_COMPLETE=$(ls build/ostserver-complete_*.deb | head -1)
+echo "Packages built: ${DEB_RUNTIME}  ${DEB_DEV}  ${DEB_COMPLETE}"
 cp "${DEB_RUNTIME}" "./${DEB_FILE_LATEST}"
 cp "${DEB_RUNTIME}" "./${DEB_FILE_TAG}"
 cp "${DEB_DEV}" "./${DEB_FILE_DEV_LATEST}"
 cp "${DEB_DEV}" "./${DEB_FILE_DEV_TAG}"
+cp "${DEB_COMPLETE}" "./${DEB_FILE_COMPLETE_LATEST}"
+cp "${DEB_COMPLETE}" "./${DEB_FILE_COMPLETE_TAG}"
 
-echo "Build complete: ${DEB_RUNTIME}  ${DEB_DEV}"
+echo "Build complete: ${DEB_RUNTIME}  ${DEB_DEV}  ${DEB_COMPLETE}"
