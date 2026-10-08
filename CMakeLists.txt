@@ -634,8 +634,9 @@ message(STATUS "CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}")
 message(STATUS "Version file will be generated at build time: ${CMAKE_CURRENT_BINARY_DIR}/version.cc")
 
 # ---------------------------------------------------------------------------
-# Packaging (CPack / Debian)
+# Frontend (front/ - issue #229) + Packaging (CPack / Debian)
 # ---------------------------------------------------------------------------
+include(cmake/Frontend.cmake)
 include(cmake/cpack/DebianPackage.cmake)
 
 #get_cmake_property(_variableNames VARIABLES)
