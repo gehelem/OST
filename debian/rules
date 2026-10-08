@@ -33,5 +33,5 @@ override_dh_shlibdeps:
 # below, correctly, from the start.
 execute_before_dh_installdeb:
 	cp cmake/cpack/postinst debian/ostserver.postinst
-	cp cmake/cpack/postinst-complete debian/ostserver-complete.postinst
-	cp cmake/cpack/prerm-complete debian/ostserver-complete.prerm
+	cp cmake/cpack/complete/postinst debian/ostserver-complete.postinst
+	cp cmake/cpack/complete/prerm debian/ostserver-complete.prerm

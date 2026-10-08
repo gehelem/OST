@@ -177,7 +177,7 @@ set(CPACK_DEBIAN_COMPLETE_PACKAGE_DEPENDS "libqt6sql6-sqlite, nginx")
 set(CPACK_DEBIAN_COMPLETE_PACKAGE_CONFLICTS "ostserver")
 set(CPACK_DEBIAN_COMPLETE_PACKAGE_REPLACES  "ostserver")
 set(CPACK_DEBIAN_COMPLETE_PACKAGE_CONTROL_EXTRA
-    "${CMAKE_CURRENT_LIST_DIR}/postinst-complete"
-    "${CMAKE_CURRENT_LIST_DIR}/prerm-complete")
+    "${CMAKE_CURRENT_LIST_DIR}/complete/postinst"
+    "${CMAKE_CURRENT_LIST_DIR}/complete/prerm")
 
 include(CPack)
