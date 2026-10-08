@@ -24,9 +24,12 @@ cd build
 cpack -G RPM
 cd ..
 
-RPM_RUNTIME=$(ls build/ostserver-[0-9]*.rpm 2>/dev/null | head -1)
-RPM_DEV=$(ls build/ostserver-devel-*.rpm | head -1)
-RPM_COMPLETE=$(ls build/ostserver-complete-*.rpm | head -1)
+# Fixed names (CPACK_RPM_<COMPONENT>_FILE_NAME in RpmPackage.cmake) -
+# the default would have been CPACK_PACKAGE_NAME-based ("OST-...-Linux-
+# <Component>.rpm"), not matching any of these, confirmed the hard way.
+RPM_RUNTIME="build/ostserver.rpm"
+RPM_DEV="build/ostserver-devel.rpm"
+RPM_COMPLETE="build/ostserver-complete.rpm"
 echo "RPMs built: ${RPM_RUNTIME}  ${RPM_DEV}  ${RPM_COMPLETE}"
 rpm -qpi "${RPM_RUNTIME}"
 rpm -qp --requires "${RPM_RUNTIME}"

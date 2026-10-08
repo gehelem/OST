@@ -28,8 +28,16 @@ fi
 systemctl daemon-reload >/dev/null 2>&1 || true
 
 # Hands-off on purpose (Fedora packaging guidelines: services are not
-# auto-enabled by convention, see %systemd_post's own documentation) -
-# same choice already made for Arch.
+# auto-enabled by convention) - same choice already made for Arch.
+#
+# NOTE: this file's content is embedded verbatim into the generated
+# RPM spec file. rpmbuild expands any percent-prefixed identifier
+# wherever it appears, including inside a "#" comment like this one -
+# confirmed the hard way: an earlier version of this very comment
+# named a real systemd macro in prose, rpmbuild invoked it for real
+# with no arguments, and the whole build failed. Never write a bare
+# percent sign followed by a word anywhere in this file, comments
+# included.
 echo "==> ostserver is installed but not started (Fedora convention)."
 echo "==> Enable and start it with:"
 echo "        systemctl enable --now ostserver.service"
