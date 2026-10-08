@@ -2,10 +2,13 @@
 #
 # Downloads and installs the latest "ostserver-complete" package
 # (issue #229): backend + web UI + nginx, ready to use after this
-# single script. No PPA/custom repo needed - nginx and every other
-# dependency resolve from the standard distro archives, that's the
-# whole point of this package (see cmake/cpack/DebianPackage.cmake's
-# Complete-component comment).
+# single script. Everything resolves from the standard distro
+# archives EXCEPT libindi1: INDI has never shipped in Ubuntu's own
+# repos (confirmed 2026-10, Ubuntu 26.04 "resolute" included - and
+# older INDI PPA builds for pre-26.04 series are gone too), only via
+# the ppa:mutlaqja/ppa PPA (same one the old install.sh/install_daily.sh
+# used), so we add that one PPA here - the beginner still only runs
+# this one script, no manual repo wrangling.
 #
 # Targets Ubuntu 26.04 (build-job-2604 in .gitlab-ci.yml, the only
 # mandatory/always-built job). Adjust the filename below if you need
@@ -18,6 +21,10 @@ URL="https://gitlab.ostserver.fr/api/v4/projects/1/packages/generic/latest/lates
 
 echo "Downloading ${DEB_FILE}..."
 curl --fail --location --output "${DEB_FILE}" "${URL}"
+
+echo "Adding the INDI library PPA (libindi1 is not in the standard Ubuntu archives)..."
+sudo add-apt-repository -y ppa:mutlaqja/ppa
+sudo apt update
 
 echo "Installing ${DEB_FILE}..."
 sudo apt install -y "./${DEB_FILE}"
