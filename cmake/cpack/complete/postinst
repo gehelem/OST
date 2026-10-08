@@ -19,8 +19,13 @@ set -e
 
 case "$1" in
     configure)
-        # Use the user who invoked sudo, fallback to current user
-        INSTALL_USER="${SUDO_USER:-${USER:-root}}"
+        # Prefer the username install-latest-complete.sh passes explicitly
+        # (OST_INSTALL_USER, preserved through its own `sudo --preserve-env`
+        # call) - $SUDO_USER is only reliable for a single, direct `sudo
+        # <cmd>` and silently resolves to "root" under anything nested
+        # (a root shell, `sudo -i`, a script already elevated calling
+        # `sudo apt install` again from inside itself), confirmed 2026-10.
+        INSTALL_USER="${OST_INSTALL_USER:-${SUDO_USER:-${USER:-root}}}"
         USER_HOME=$(getent passwd "${INSTALL_USER}" | cut -d: -f6)
         OST_DIR="${USER_HOME}/.ost"
 
