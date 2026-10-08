@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OST — UI3</title>
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/panels.css">
+<!-- Vendored (no CDN), like ostnoctua's own lib/chart.min.js — only the
+     guider template's dedicated drift/guiding charts use it (Gilles,
+     2026-09-27: "tu as deja fait strictement la meme chose dans
+     ostnoctua"); the generic renderer's own graph properties keep the
+     dependency-free canvas renderer in js/chart.js. -->
+<script src="lib/chart.min.js"></script>
+<!-- Error-bar series type for the focus template's own V-curve chart
+     (Gilles, 2026-10-03: "regarde le graphique de rooster, avec la courbe
+     de regression et les barres d'erreur") - registers against the same
+     global `Chart` chart.min.js above just set, must load after it. -->
+<script src="lib/chart-error-bars.min.js"></script>
+</head>
+<body>
+  <!-- One flat container: #canvas fills it edge to edge, #modbar, #quicknav
+       and #top-right (now just theme toggle + connection widget — the only
+       truly global controls) float directly on top of that same surface as
+       their own small glass chips — there is no shared banner/strip behind
+       them. Mirrors ostnoctua's #on-layer + .on-modbar + .on-conn-cluster,
+       all siblings at the same level — see panels.css's .glass. -->
+  <div id="app">
+    <div id="canvas">
+      <div id="bg-layer"></div>
+      <!-- Always visible now (app.js's renderContentNow() no longer
+           toggles a "hidden" class on it) - pointer-events:none
+           (panels.css) when empty, and hosts the persistent log panel
+           (views.js's renderLogPanel()) regardless of which view is
+           active, module or docked. -->
+      <div id="panel-layer"></div>
+      <div id="docked-view" class="hidden"></div>
+    </div>
+    <nav id="modbar" class="glass"></nav>
+    <!-- Bottom bar for the module currently on screen: navigation (one
+         button per panel/level1, filled by render.js/templates) on the
+         left, params (this same module's own actions) on the right,
+         separated by a small divider that only shows when there is
+         something to separate — Gilles, 2026-09-27: "le bouton params ...
+         devrait y figurer car il se rapporte au module en cours
+         d'affichage". Whole bar's visibility is driven by app.js from
+         isModuleView(), not by whether there are nav entries — the actions
+         zone matters even for a module with none. -->
+    <nav id="quicknav" class="glass hidden">
+      <div id="quicknav-nav" class="quicknav-zone hidden"></div>
+      <div id="quicknav-sep" class="bar-sep hidden"></div>
+      <div id="quicknav-actions" class="quicknav-zone">
+        <button id="params-toggle" class="icon-chip" title="Parameters" disabled><span class="material-icons">settings</span></button>
+      </div>
+    </nav>
+    <div id="top-right">
+      <!-- Gilles, 2026-10-03: "en haut a droite, juste avant le bouton
+           d'ajustement de taille, ajoute encore un bouton pour la gestion
+           de logs" - opens the always-on floating log panel (views.js's
+           renderLogPanel()). Badge dot (hidden by default) tracks the
+           worst level currently in the log buffer - app.js's own
+           client.topics.logs() subscription, same "corner dot on a
+           #top-right icon-chip" shape as the login button's own grant
+           colouring above, not the module buttons' .status-dot vocabulary
+           (see panels.css's own comment on that button's dot). -->
+      <button id="log-toggle" class="glass icon-chip" title="Logs">
+        <span class="material-icons">list</span>
+        <span id="log-badge-dot" class="status-dot log-badge-dot hidden"></span>
+      </button>
+      <div id="zoom-widget">
+        <button id="zoom-toggle" class="glass icon-chip" title="UI size"><span class="material-icons">format_size</span></button>
+        <div id="zoom-panel" class="glass zoom-panel hidden">
+          <input id="zoom-slider" type="range" min="0.7" max="1.6" step="0.1" value="1">
+        </div>
+      </div>
+      <button id="theme-toggle" class="glass icon-chip" title="Toggle theme"><span class="material-icons">brightness_2</span></button>
+      <!-- Gilles, 2026-10-03: "ajoute un bouton en haut a droite si
+           grantserver != 0 pour afficher une fenetre de login" - hidden by
+           default (app.js's own session subscription shows it once the
+           dump's grant-server says the server has access control enabled
+           at all - see that file's own comment for the "0"/"1"/"2"
+           meaning). Opens the same login dialog the app already shows
+           automatically when grant-client is "-1" (fully denied) - this
+           button is for the OTHER case, logging in for more than the
+           server's current default (e.g. read-only "1" -> write access),
+           where nothing forces the dialog open on its own. -->
+      <!-- Was "vpn_key" (a stand-in for a few weeks - the old vendored font
+           didn't have "login", see base.css's own header comment on the
+           Material Symbols switch). Back to the actually-intended name now
+           that it resolves correctly. -->
+      <button id="login-toggle" class="glass icon-chip hidden" title="Login"><span class="material-icons">login</span></button>
+      <div id="conn-widget">
+        <!-- Gilles, 2026-10-03: "diminue la taille du bouton connection =
+             taille identique au toggle jour/nuit, juste icone
+             power_settings_new de google, avec la couleur qui change en
+             fonction de l'etat de la connection (pas de libelle)" - same
+             .icon-chip base as theme-toggle/log-toggle (36x36, no text),
+             .conn-toggle now only carries the status-based colour (app.js's
+             own onStatus()). The status text that used to be visible here
+             lives in `title` instead (a tooltip), kept in sync the same
+             places the old text node was. -->
+        <button id="conn-toggle" class="glass icon-chip conn-toggle" type="button">
+          <span class="material-icons">power_settings_new</span>
+        </button>
+        <div id="conn-panel" class="glass conn-panel">
+          <div class="brand"><span class="material-icons">stars</span><span>OST — UI3</span></div>
+          <nav id="system-views"></nav>
+          <div class="settings-sep"></div>
+          <!-- Gilles, 2026-10-06: "les deux zones qui servent a fixer
+               l'url dans les settings sont lourdes et redondantes ...
+               une seule zone de saisie, juste l'url sans http/https ou
+               ws/wss pas de port pas de /ostmedia ou /ws. Tout ca doit
+               etre determine juste avec le toggle et l'URL" - one bare
+               host + an SSL toggle (a button, not a checkbox - "il faut
+               mettre des boutons plutot que des puces ou des cases a
+               cocher", render.js's own boolean-element convention,
+               reused here) replace the old #ws-url/#media-url pair;
+               core/index.js's deriveUrlsFromHost(host, ssl) builds both
+               real URLs from the two (js/app.js). -->
+          <div class="form-row">
+            <input id="server-host" class="field-input" style="width:100%" placeholder="host">
+            <button id="server-ssl-toggle" class="btn btn-sm toggle-btn" type="button" title="SSL">
+              <span class="material-icons">lock_open</span><span id="server-ssl-label">SSL</span>
+            </button>
+          </div>
+          <!-- Gilles, 2026-10-03: "ajoute la fonction discover dans le cas
+               ou on utilise l'app android ... comme sur rooster" - hidden
+               by default (js/app.js only shows it once js/zeroconf.js's
+               own isAvailable() confirms this is the real native app, not
+               a browser - mDNS has no browser API to speak of). -->
+          <div class="form-row hidden" id="discover-row">
+            <button id="discover-btn" class="btn btn-sm" type="button"><span class="material-icons" style="font-size:15px;vertical-align:middle">wifi_find</span> <span id="discover-btn-label">Discover</span></button>
+          </div>
+          <div id="discover-results" class="discover-results"></div>
+          <div class="form-row">
+            <select id="lang-select" class="field-input">
+              <option value="en">EN</option>
+              <option value="fr">FR</option>
+              <option value="de">DE</option>
+              <option value="es">ES</option>
+              <option value="it">IT</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <button id="connect-btn" class="btn btn-primary"><span class="material-icons">power</span><span id="connect-btn-label">Connect</span></button>
+            <button id="disconnect-btn" class="btn"><span id="disconnect-btn-label">Disconnect</span></button>
+          </div>
+          <div id="grant-pill" class="grant-pill"></div>
+          <!-- Gilles, 2026-10-06: "ajoute un fichier 'gitdata' pour que
+               l'application android et le site web puissent afficher la
+               version (tag date commit message de commit) au niveau des
+               settings, apres les infos de connexion" - filled from
+               gitdata.json (CI/write-gitdata.js), right after the
+               connection info above. Empty/hidden until that fetch
+               resolves (js/app.js) - not every www/ build has the file
+               (a plain `npm run prepare-www` does, see that script, but
+               nothing stops someone serving an older build without it).
+               The commit message gets its own visible line, not just a
+               title tooltip - Gilles, right after a first version shipped
+               with it as a tooltip only: "je ne vois pas le 'commit
+               message' dans ton screenshot" - a tooltip needs hover,
+               which the Android app (touch, no pointer) can't do at all. -->
+          <div id="version-info" class="hidden">
+            <div id="version-info-tag" class="muted small mono"></div>
+            <div id="version-info-message" class="muted small"></div>
+          </div>
+          <div class="settings-sep"></div>
+          <!-- Gilles, 2026-10-02, after a stale localStorage value left his
+               regular Chrome profile's planetarium blank (stars gone, panels
+               still there) while a fresh profile/private window rendered
+               fine - a hard reload (Ctrl+Shift+R) bypasses the HTTP cache
+               but never touches localStorage, so it didn't help: "ajoute un
+               bouton 'clear cache + localstorage' avec confirmation - au
+               moins on sera a l'abris les prochains coups". Self-service
+               recovery from exactly this class of problem, no dev tools
+               needed. -->
+          <button id="clear-cache-btn" class="btn btn-sm btn-danger"><span class="material-icons">delete_sweep</span><span id="clear-cache-btn-label">Clear cache + localStorage</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="dialog-root"></div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

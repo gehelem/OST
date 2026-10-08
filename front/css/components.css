@@ -1,0 +1,517 @@
+/* components.css — every reusable visual component. Tokens only from
+ * theme.css; no hardcoded colors. Design language adapted from ostnoctua:
+ * rounded surfaces, a soft accent glow on the active/focused state, small
+ * uppercase section labels, monospace for numeric/technical values, subtle
+ * transitions on interactive state changes (no continuous/decorative
+ * animation beyond a busy spinner and a slow status pulse, mirroring what
+ * ostnoctua itself does for "busy"/"slewing" states). */
+
+/* ------------------------------------------------------------- buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  color: var(--text); padding: 6px 12px; border-radius: var(--radius-sm);
+  cursor: pointer; font: inherit; font-size: 12.5px;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+.btn:hover { border-color: var(--accent-dim); color: var(--text); background: var(--bg-hover); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+.btn .material-icons { font-size: 16px; }
+.btn-primary { background: var(--accent-subtle); border-color: var(--accent-dim); color: var(--accent-strong); font-weight: 600; }
+.btn-primary:hover { background: var(--accent-subtle); border-color: var(--accent); box-shadow: var(--shadow-glow); }
+.btn-danger { border-color: rgba(var(--error-rgb), 0.35); color: var(--btn-danger); }
+.btn-danger:hover { background: rgba(var(--error-rgb), 0.12); border-color: var(--btn-danger); }
+.btn-sm { padding: 3px 9px; font-size: 11.5px; }
+.btn-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: var(--radius-sm);
+  background: transparent; border: 1px solid transparent; color: var(--text-muted);
+  cursor: pointer; transition: all 0.15s ease; flex-shrink: 0;
+}
+.btn-icon:hover { color: var(--accent); background: var(--bg-hover); border-color: var(--border-subtle); }
+/* A directedit field's "send" confirm - invisible until the field is
+ * actually dirty, then turns green - Gilles, 2026-10-0X, on the previous
+ * unconditional "send" arrow: "la fleche n'est pas tres parlante, je
+ * prefererais une icone 'check' qui apparaisse en vert seulement si je
+ * modifie la zone". Space is reserved (opacity, not display:none) so
+ * typing doesn't shift the row. */
+.send-check { opacity: 0; pointer-events: none; }
+.send-check.dirty { opacity: 1; pointer-events: auto; color: var(--ok); }
+.send-check.dirty:hover { color: var(--ok); background: rgba(var(--ok-rgb), 0.12); }
+.toggle-btn { min-width: 52px; justify-content: center; }
+.toggle-btn.active { background: var(--accent-subtle); border-color: var(--accent); color: var(--accent-strong); box-shadow: 0 0 10px var(--accent-faint); }
+
+/* -------------------------------------------------------------- inputs */
+.field-input {
+  background: var(--bg-input); border: 1px solid var(--border); color: var(--text);
+  border-radius: var(--radius-sm); padding: 5px 8px; font: inherit; font-size: 12.5px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.field-input:focus { outline: none; border-color: var(--accent-dim); box-shadow: 0 0 0 3px var(--accent-faint); }
+.field-input.small { width: 120px; }
+.field-input.tiny { width: 48px; }
+.compound-input { display: inline-flex; gap: 3px; }
+.form-row { display: flex; align-items: center; gap: var(--space-2); margin: 6px 0; flex-wrap: wrap; }
+.form-row label { color: var(--text-muted); font-size: 12px; }
+
+.slider-wrap { display: inline-flex; align-items: center; gap: 8px; min-width: 160px; }
+input[type="range"] {
+  -webkit-appearance: none; appearance: none; flex: 1; height: 4px;
+  background: var(--accent-subtle); border-radius: 2px; outline: none; cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--accent); border: 2px solid var(--bg-panel); box-shadow: 0 0 0 1px var(--accent-dim);
+  cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 14px; height: 14px; border-radius: 50%; background: var(--accent);
+  border: 2px solid var(--bg-panel); box-shadow: 0 0 0 1px var(--accent-dim); cursor: pointer;
+}
+/* Editable sibling of the slider itself (SliderAndValue) - small enough to
+ * sit next to the range input, not a full-width .field-input. */
+.slider-val-input {
+  width: 4.5em; text-align: right; color: var(--accent); font-family: var(--font-mono); font-size: 12px;
+  background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 2px 4px;
+}
+.slider-val-input:focus { outline: none; border-color: var(--accent-dim); }
+
+/* --------------------------------------------------------------- pills */
+/* Connection status itself now lives in panels.css's #conn-widget
+   (.conn-dot/.conn-toggle) — this keyframe is shared with it. */
+@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+.grant-pill { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); }
+
+/* Sidebar nav rules removed 2026-09-25: UI3 now uses the horizontal module
+   bar in panels.css (.mod-btn etc.) instead of a vertical sidebar — see
+   panels.css's header comment. */
+
+/* ---------------------------------------------------------------- cards */
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--space-3) var(--space-4); margin-bottom: var(--space-4); box-shadow: var(--shadow-panel);
+}
+.panel > h3:first-child, .panel > h2:first-child { margin-top: 0; }
+.panel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-3); }
+
+/* ------------------------------------------------------------- home view
+ * One read-only card per loaded module (views.js's renderHome()) — same
+ * "icon over/with label, click to act" register as .mod-btn, scaled up to
+ * card size since each one also carries a few key figures. */
+.home-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-3); }
+.home-card {
+  position: relative;
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--space-3); cursor: pointer; box-shadow: var(--shadow-panel);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.home-card:hover { border-color: var(--accent-dim); box-shadow: var(--shadow-glow); }
+.home-card-header { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2); }
+.home-card-title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.home-card-body { display: flex; flex-direction: column; gap: 2px; }
+.home-card-row { display: flex; justify-content: space-between; gap: var(--space-2); font-size: 13px; }
+/* Gilles, 2026-10-05: "fais plutot des presentations en mode horizontal pour
+   guider et focus / Focus: values/curve / Guide: rms/guidegraph/drift" -
+   focus/guider cards (views.js's HOME_HORIZONTAL_BUILDERS) lay their
+   figures/charts out as side-by-side columns instead of the plain metric
+   row every other card gets, in a card wide enough to fit them (2 columns
+   for focus, 3 for guider — home-card-cols-N picks the span/min-width). */
+.home-card-big { min-width: 420px; }
+.home-card-cols-2 { grid-column: span 2; }
+.home-card-cols-3 { grid-column: span 3; min-width: 680px; }
+.home-card-columns { display: flex; gap: var(--space-3); align-items: flex-start; }
+.home-card-column { flex: 1 1 0; min-width: 0; }
+/* The chart's own gd-chart component, scaled down from its full-panel
+   height (280px, components.css above) to column size. Gilles, 2026-10-06:
+   "diminue de 1/3 la hauteur du graphe de focus sur la vignette" -
+   160px to ~107px; shared by guider's own guidegraph column too, which
+   wants roughly the same height. */
+.home-card-column.gd-chart { height: 107px; }
+.home-card-column.value-row { margin-bottom: 0; }
+/* The drift chart is square (Chart.js maintainAspectRatio:true,
+   aspectRatio:1) - it sets its own canvas height from ITS OWN WIDTH via an
+   inline style, written asynchronously (Chart.js's own responsive resize,
+   not necessarily in the same synchronous layout pass the browser used to
+   size this flex column) - a flex-basis alone gives the grid/flex layout
+   nothing to reserve height for UNTIL that later resize lands, so the
+   card's own box was still only as tall as its shortest column when
+   measured, with the canvas quietly overflowing past its bottom into the
+   row below (caught live again: same overflow class as the original
+   160px-equal-share bug, just at a bigger size this time - both width AND
+   height need to be pinned up front, not just width). Gilles, 2026-10-06:
+   "fait prendre plus de place au graphe de drift ... en faisant occupe 3
+   zones a la vignette" gave it its own full column, then: "il est
+   toujours trop haut ce graphe de drift: il faut que son cote corresponde
+   a la hauteur du graphe de guidage" - square, side matching the
+   guidegraph column's own height (.gd-chart above) instead of an
+   independent, taller size. */
+.home-card-column.gd-chart-square { flex: 0 0 107px; height: 107px; }
+/* Gilles, 2026-10-06: "tu lui fais occuper 3 zones, passe a deux en
+   mettant le RMS sous cette forme: en haut RMS total / en bas en plus
+   petit RMS RA et DEC" - a narrow compact-RMS column (buildCompactRms,
+   templates/guider.js), unaffected by the 2-vs-3-column back and forth
+   since on both the charts next to it just get their own column(s). */
+.home-card-column.rms-compact { flex: 0 0 130px; }
+.rms-compact { display: flex; flex-direction: column; gap: var(--space-2); }
+.rms-compact-sub { display: flex; gap: var(--space-3); }
+.rms-compact-item { display: flex; flex-direction: column; gap: 2px; }
+/* Gilles, 2026-10-06: "sur la vignette du focus garde le HFR tel quel,
+   mais diminue l'importance du 'focus final position', mets le en tout
+   petit en dessous de HFR, et donne la place gagnee au graphique" - a
+   narrow fixed-width column (same idea as rms-compact above) so the
+   curve chart's own column (default flex:1) picks up the freed-up width. */
+.home-card-column.focus-compact-result { flex: 0 0 110px; }
+.focus-compact-result { display: flex; flex-direction: column; gap: var(--space-2); }
+/* Gilles, 2026-10-06: "ajoute la possibilite de deplacer les vignettes +
+   position remanente" - a small drag handle in the header (views.js's
+   buildHomeCard), not the whole card, so a plain click elsewhere still
+   opens the module; dragging dims the card being moved. */
+.home-card-handle { cursor: grab; color: var(--text-dim); touch-action: none; }
+.home-card-handle:active { cursor: grabbing; }
+/* Follows the cursor in real time while dragging (views.js's own
+   transform: translate(), same visible-feedback idea as panels.js's
+   startDrag() moving a floating panel with the mouse) - z-index so it
+   visibly lifts above whichever card it's currently passing over, no
+   transition on transform itself so it tracks the pointer immediately. */
+.home-card.dragging { z-index: 50; cursor: grabbing; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45); transition: none; }
+/* Which side of the card currently under the pointer the dragged card
+   would land on (views.js's startCardDrag) - a plain colored edge, same
+   accent already used for the active modbar/quicknav button. */
+.home-card.drop-before { box-shadow: inset 3px 0 0 var(--accent); }
+.home-card.drop-after { box-shadow: inset -3px 0 0 var(--accent); }
+/* Gilles, 2026-10-06: "ajoute une vignette 'en dur' (qui ne correspond pas
+   a un module) avec les donnees systeme ('server load') et fais un truc
+   joli avec des spinners" - a fixed, non-draggable, non-clickable (no
+   module to open) card, always first (views.js's renderHome()), not part
+   of the reorderable set at all. */
+.home-card-system { cursor: default; }
+.home-card-system:hover { border-color: var(--border); box-shadow: var(--shadow-panel); }
+.home-system-body { display: flex; flex-direction: column; gap: var(--space-2); }
+.home-ring-row { display: flex; gap: var(--space-3); align-items: center; }
+.home-ring-object { font-weight: 600; font-size: 14px; }
+/* planner's Home card: two columns, name+RA/DEC on the left, the ring on
+   the right, vertically centered against that two-line block (Gilles,
+   2026-10-06: "separe en deux parties: a gauche nom objet puis RA/DEC en
+   dessous, a droite spinner sur deux lignes"). */
+.home-planner-row { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); }
+.home-planner-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.home-ring-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.home-ring-caption { max-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
+/* Gilles, 2026-10-06, sequencer's Home card: "ajoute le 'remaining time'
+   et un progress bar pour l'exposition en cours" - the shared prg-bar-*
+   component (above) defaults to a fixed 160px, sized for an inline table
+   cell; full width reads better in a card. */
+.home-bar-full { width: 100%; margin-top: 2px; }
+.home-exposure-bar { display: flex; flex-direction: column; gap: 2px; margin-top: 4px; }
+/* Gilles, 2026-10-06: "ajoute une 'toute petite' vignette de la derniere
+   image prise (apres/a droite du spinner de 'global progress'), pas plus
+   haut)", then: "ajuste la hauteur de l'image avec la hauteur du 'global
+   progress', mais sa largeur doit etre naturelle (sans stretch)" - a
+   fixed width alongside the fixed height forced object-fit:cover to crop
+   every frame into a square regardless of its real aspect ratio; height
+   alone, width left auto, scales it proportionally instead. */
+.home-seq-thumb { height: 56px; width: auto; border-radius: var(--radius-sm); cursor: zoom-in; flex-shrink: 0; border: 1px solid var(--border); }
+
+/* --------------------------------------------------------- status dots */
+.status-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 2px; flex-shrink: 0; box-shadow: 0 0 0 3px transparent; transition: box-shadow 0.2s ease; }
+.status-dot.status-standby { background: var(--standby); }
+.status-dot.status-ok { background: var(--ok); box-shadow: 0 0 8px rgba(var(--ok-rgb), 0.5); }
+.status-dot.status-busy { background: var(--busy); box-shadow: 0 0 8px rgba(var(--busy-rgb), 0.5); animation: pulse-dot 1s ease-in-out infinite; }
+.status-dot.status-error { background: var(--error); box-shadow: 0 0 8px rgba(var(--error-rgb), 0.5); }
+
+.badge-star { color: var(--warn); margin-left: 4px; }
+
+/* -------------------------------------------------------- module screen */
+.module-header { margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--border); }
+.module-header h2 { display: flex; align-items: center; gap: 8px; }
+.profile-bar { display: flex; align-items: center; gap: 8px; margin-top: var(--space-2); flex-wrap: wrap; }
+.profile-name { font-weight: 600; color: var(--accent); }
+.profile-name.changed::after { content: " •"; color: var(--warn); }
+/* Dev-mode "disable templates" checkbox (render.js's renderProfileBar()) -
+ * Gilles, 2026-10-03: "un petit toggle discret a droite du bouton save" -
+ * a bit of extra left margin sets it apart from the Load/Save button
+ * group it otherwise just flows after, muted/small text keeps it low-key. */
+.profile-bar-dev-toggle { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; }
+
+.tab-bar { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: var(--space-4); flex-wrap: wrap; }
+.tab-btn {
+  background: none; border: none; color: var(--text-muted); padding: 9px 16px; cursor: pointer;
+  border-bottom: 2px solid transparent; font: inherit; font-size: 12.5px; transition: color 0.15s ease, border-color 0.15s ease;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+.tab-panel.hidden { display: none; }
+
+.prop-group { margin: var(--space-3) 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-panel); overflow: hidden; }
+.prop-group summary {
+  cursor: pointer; padding: var(--space-2) var(--space-3); font-weight: 600; font-size: 11.5px;
+  text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); background: var(--bg-elevated);
+  list-style: none; display: flex; align-items: center; gap: 6px;
+}
+.prop-group summary::-webkit-details-marker { display: none; }
+.prop-group summary::before { content: "\25BE"; font-size: 10px; color: var(--accent); transition: transform 0.15s ease; }
+.prop-group:not([open]) summary::before { transform: rotate(-90deg); }
+.prop-group > .property { margin: var(--space-2); }
+
+.property {
+  border: 1px solid var(--border); background: var(--bg-panel-solid); border-radius: var(--radius);
+  margin: 0 0 var(--space-3); padding: var(--space-3) var(--space-4);
+  transition: border-color 0.15s ease;
+}
+.property:hover { border-color: var(--border-strong); }
+.property.hidden { display: none; }
+/* render.js's renderProperty({ framed: false }) - Gilles, 2026-10-03: "les
+ * elements de la propriete restent tout de meme entoures par un cadre, ca
+ * mange de la place pour rien" (the actions window: its own window chrome
+ * already frames the property, a second border/background/padding box
+ * around its elements wastes space for nothing). Two classes (specificity
+ * matches/beats `.prop-group > .property` above, and this rule comes
+ * after it in source order either way) so it reliably wins over the
+ * plain .property box styling. */
+.property.property-bare { border: 0; background: none; margin: 0; padding: 0; }
+.prop-header { display: flex; align-items: center; gap: 8px; margin-bottom: var(--space-2); }
+.prop-label { font-weight: 600; }
+.icon-slots { display: inline-flex; gap: 2px; }
+
+/* Chart.js canvases (templates/guider.js's own drift/guiding charts —
+   panels.css's .panel-float-body already scrolls/pads the rest). */
+.gd-chart { position: relative; width: 100%; height: 280px; }
+.gd-chart-square { height: auto; }
+.gd-chart.hidden { display: none; }
+
+/* templates/guider.js's fuller image stats+histogram panel. */
+.stat-sec { margin: 10px 0 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); }
+.stat-sec:first-child { margin-top: 0; }
+/* imagelayer.js's statSecLine() - a stat-sec title with its own (already-
+ * merged) value inline, instead of stacked on its own line above it. */
+.stat-sec-line { display: flex; align-items: baseline; gap: var(--space-2); margin: 10px 0 4px; }
+.stat-sec-line:first-child { margin-top: 0; }
+.stat-sec-inline { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); flex-shrink: 0; }
+/* imagelayer.js's labeledPairsRow() - Stars/SNR, same small/dim/uppercase
+ * label font as .stat-sec-inline above (Gilles: "garde la meme police sur
+ * 'Stars' que pour 'FOCUS'"), left-aligned with a gap instead of
+ * .stat-row's space-between (several label:value pairs on one row, not
+ * just one). */
+.stat-inline-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2); padding: 3px 0; border-top: 1px solid var(--border-subtle); }
+.stat-row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); padding: 3px 0; border-top: 1px solid var(--border-subtle); }
+.stat-row:first-of-type { border-top: 0; }
+.stat-label { color: var(--text-muted); }
+.stat-value { font-weight: 600; }
+.img-stats-table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px; }
+.img-stats-table th, .img-stats-table td { padding: 4px 6px; text-align: center; }
+.img-stats-table th:first-child, .img-stats-table td:first-child { text-align: left; color: var(--text-muted); }
+.img-stats-table thead th { border-bottom: 1px solid var(--border); font-size: 10px; color: var(--text-dim); }
+.img-stats-table tbody tr { border-top: 1px solid var(--border-subtle); }
+
+/* imagelayer.js's buildImageAlternatesPanel() - a small strip of "alternate"
+ * crops for one image element (the focus module's own tilt quadrants -
+ * Gilles, 2026-10-03: "sur rooster on affiche 4 image supplementaires, de
+ * tilt"), same 2-per-row wrapping grid Rooster's own alternates-strip uses,
+ * clickable into the shared fullscreen viewer (.img-viewer above). */
+.img-alternates { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-2); }
+.img-alternate-thumb { width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: zoom-in; display: block; }
+.img-alternate-thumb:hover { border-color: var(--accent-dim); }
+
+/* imagelayer.js's buildImageGridPanel() - one panel for N separate image
+ * properties (inspector's own HFR/shape/collimation/corners maps) instead
+ * of N tiny floating ones - each tile a bit bigger than .img-alternates'
+ * own (these carry real diagnostic detail, not just a quick visual
+ * cross-check). */
+.img-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-3); min-width: 320px; }
+.img-grid-tile { display: flex; flex-direction: column; gap: var(--space-1); }
+.img-grid-thumb { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: zoom-in; display: block; background: var(--bg-elevated); }
+.img-grid-thumb:hover { border-color: var(--accent-dim); }
+.img-grid-tile-empty .img-grid-thumb { cursor: default; }
+.img-grid-label { font-size: 11px; color: var(--text-muted); text-align: center; }
+/* Gilles, 2026-10-06: "sur inspector ajoute les 4 images de controle en
+   vignettes toutes petites (2x2 qui doivent tenir dans la zone actuelle,
+   sans stretch)" - the same .img-grid component (views.js's buildHomeCard,
+   template === "inspector"), shrunk to fit a plain Home card instead of
+   its own wide floating panel: no forced min-width, a tighter gap, and no
+   per-tile label (redundant with the card's own header, and there's no
+   room for it at this size) - the thumbnail itself keeps object-fit:cover
+   (crops to a fixed ratio, never stretches/distorts either way). */
+.home-img-grid { min-width: 0; gap: 4px; }
+.home-img-grid .img-grid-label { display: none; }
+/* Gilles, 2026-10-06: "la vignette home du monitor avec le graphe
+   'session graph' sans les labels de serie" - a chart embedded directly
+   in a plain card's body (not via the focus/guider multi-column path, see
+   .home-card-column.gd-chart above), same compact height. */
+.home-embedded-chart { height: 107px; }
+
+.elt-table { width: 100%; border-collapse: collapse; }
+.elt-row td { padding: 6px 4px; vertical-align: middle; border-top: 1px solid var(--border-subtle); }
+.elt-row:first-child td { border-top: none; }
+.elt-label { color: var(--text-muted); white-space: nowrap; width: 1%; padding-right: var(--space-3); font-size: 12px; }
+.elt-value { width: 99%; }
+/* A run of consecutive self-descriptive buttons (render.js's own
+ * renderPropertyBody(), the "actions" property above all) - Gilles,
+ * 2026-10-03: "si on a une suite de boutons il sont affiches les uns au
+ * dessus des autres verticalement ... c'est moche" - flows them left to
+ * right instead, wrapping to a new line once they run out of room. */
+.elt-button-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.readonly-val { font-family: var(--font-mono); color: var(--text-secondary); }
+.freevalue { font-style: italic; color: var(--text-muted); margin-bottom: var(--space-2); }
+
+/* ------------------------------------------------------------------ grid */
+.grid-section { margin-top: var(--space-2); }
+.grid-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.grid-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.grid-table th, .grid-table td { padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--border-subtle); white-space: nowrap; }
+.grid-table th { background: var(--bg-elevated); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 10.5px; letter-spacing: 0.04em; position: sticky; top: 0; }
+.grid-row { cursor: pointer; transition: background 0.1s ease; }
+.grid-row:hover { background: var(--bg-hover); }
+.grid-row:last-child td { border-bottom: none; }
+.grid-actions { white-space: nowrap; display: flex; gap: 2px; }
+.grid-toolbar { display: flex; align-items: center; gap: var(--space-2); margin: var(--space-2) 0 var(--space-3); }
+.graph-canvas { width: 100%; max-width: 720px; height: 240px; background: var(--bg-elevated); border-radius: var(--radius-sm); display: block; border: 1px solid var(--border); }
+
+/* -------------------------------------------------------------- prg/img */
+.prg-bar-outer { width: 160px; height: 8px; background: var(--bg-elevated); border-radius: 5px; overflow: hidden; display: inline-block; vertical-align: middle; border: 1px solid var(--border); }
+.prg-bar-inner { height: 100%; background: linear-gradient(90deg, var(--accent-dim), var(--accent)); transition: width 0.25s ease; }
+.prg-label { margin-left: 8px; color: var(--text-muted); font-size: 12px; }
+
+/* prgtype:"spinner" - a real determinate ring (value 0-100, same contract
+ * as the "bar" variant - structure.en.md's own prg table), not an
+ * indeterminate always-spinning circle. OstErix/Rooster's own
+ * property.component.html renders this exact case as a
+ * mat-progress-spinner mode="determinate" - Gilles, 2026-10-03, on the
+ * CSS-spin version this used to be: "ils s'affichent tous en 'indetermine'
+ * et 'ronds' ... regarde comment c'est fait sur rooster et fais pareil".
+ * Built as a conic-gradient ring with a radial-gradient mask cutting the
+ * donut hole (real transparency, not an occluding background color, so it
+ * never needs to match whatever's behind it - a table row, a panel, a
+ * dialog, ...) rather than an SVG circle (document.createElement() isn't
+ * namespace-aware, so dom.js's own el() can't build real SVG nodes). */
+.prg-ring-wrap { position: relative; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; flex-shrink: 0; }
+.prg-ring {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(var(--accent) calc(var(--pct, 0) * 1%), var(--border) 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px));
+  transition: background 0.25s ease;
+}
+.prg-ring-value { position: relative; font-size: 8.5px; font-weight: 600; font-family: var(--font-mono); color: var(--text-muted); }
+/* Bigger size modifier for the Home dashboard's system card (views.js's
+   ringGauge()) - same ring, just scaled up to read as a dashboard gauge
+   rather than an inline per-row indicator. */
+.prg-ring-wrap.home-ring { width: 56px; height: 56px; }
+.home-ring .prg-ring-value { font-size: 14px; }
+
+.img-elt .preview-img { max-width: 340px; max-height: 250px; border-radius: var(--radius-sm); display: block; border: 1px solid var(--border); }
+.preview-video { max-width: 340px; border-radius: var(--radius-sm); }
+.img-stats { margin-top: 6px; font-size: 11.5px; }
+
+/* ---------------------------------------------------------------- dialog */
+.dialog-overlay { position: fixed; inset: 0; background: var(--overlay); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; z-index: 50; }
+.dialog { background: var(--bg-panel-solid); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4) var(--space-5); min-width: 340px; max-width: 90vw; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow-pop); }
+.dialog h3 { margin-top: 0; text-transform: none; font-size: 15px; color: var(--text); letter-spacing: 0; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-4); }
+/* The Parameters modal (app.js's openParamsDialog) can hold a lot — several
+   tabs of properties — so it gets a roomier default width than a small
+   confirm/edit dialog, still capped by .dialog's own max-width:90vw. */
+.dialog.params-dialog { width: 680px; }
+.params-dialog .dialog-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3); }
+.params-dialog .dialog-header h3 { margin: 0; }
+.form-table td { padding: 5px 6px; }
+
+/* ---------------------------------------------------------------- panel lists */
+.panel h3 { margin-top: 0; }
+.panel ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.panel li { display: flex; align-items: center; gap: var(--space-2); padding: 4px 0; }
+
+/* ---------------------------------------------------------------- files */
+.files-layout { display: flex; gap: var(--space-4); align-items: flex-start; }
+.folder-tree { width: 260px; flex-shrink: 0; max-height: 74vh; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-2); background: var(--bg-panel); }
+.folder-btn { display: flex; align-items: center; gap: 6px; width: 100%; text-align: left; background: none; border: none; color: var(--text-secondary); padding: 5px 6px; cursor: pointer; border-radius: var(--radius-sm); font: inherit; font-size: 12px; transition: all 0.12s ease; }
+.folder-btn:hover { background: var(--bg-hover); color: var(--text); }
+.folder-btn.active { background: var(--accent-subtle); color: var(--accent-strong); }
+.folder-btn .material-icons { color: var(--text-dim); font-size: 16px; }
+.folder-btn.active .material-icons { color: var(--accent); }
+.file-list-wrap { flex: 1; min-width: 0; }
+.file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: var(--space-3); margin-top: var(--space-2); }
+.file-card { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: var(--space-2); border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-panel); text-decoration: none; color: var(--text-secondary); transition: all 0.15s ease; }
+.file-card:hover { border-color: var(--accent-dim); color: var(--text); box-shadow: var(--shadow-glow); }
+.file-thumb { width: 100%; height: 92px; object-fit: cover; border-radius: var(--radius-sm); background: var(--bg-elevated); }
+.file-card .material-icons { color: var(--text-dim); }
+.file-name { word-break: break-all; text-align: center; font-size: 11px; }
+
+/* ----------------------------------------------------------------- logs */
+.log-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.log-table td { padding: 4px 10px; border-bottom: 1px solid var(--border-subtle); vertical-align: top; }
+.log-table tr:hover td { background: var(--bg-hover); }
+.log-warning td:last-child { color: var(--warn); }
+.log-error td:last-child { color: var(--orange); }
+.log-critical td:last-child { color: var(--error); }
+.log-toolbar { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3); }
+
+/* ---------------------------------------------------- floating log panel
+ * (views.js's renderLogPanel(), #top-right's own log button in app.js) -
+ * same colour-by-level convention as .log-table above, compact rows
+ * instead of a table (ostnoctua's web/log.js's own .w-log-row shape). */
+.log-panel-body { display: flex; flex-direction: column; gap: var(--space-2); }
+.log-panel-body .log-toolbar { margin-bottom: 0; }
+.log-panel-body .log-filter-module { flex: 1 1 auto; min-width: 0; }
+.log-panel-list { display: flex; flex-direction: column; overflow-y: auto; max-height: 50vh; font-size: 12px; font-family: var(--font-mono); }
+.log-panel-row { display: flex; gap: 8px; padding: 2px 4px; border-bottom: 1px solid var(--border-subtle); }
+.log-panel-row:hover { background: var(--bg-hover); }
+.log-panel-time { color: var(--text-dim); flex-shrink: 0; }
+.log-panel-src { color: var(--text-muted); flex-shrink: 0; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.log-panel-msg { flex: 1 1 auto; min-width: 0; color: var(--text-secondary); }
+.log-panel-row.log-warning .log-panel-msg { color: var(--warn); }
+.log-panel-row.log-error .log-panel-msg { color: var(--orange); }
+.log-panel-row.log-critical .log-panel-msg { color: var(--error); }
+
+/* -------------------------------------------------------------- connect */
+.connect-screen { max-width: 560px; margin: 8vh auto; text-align: center; }
+.connect-screen .lede { color: var(--text-muted); margin-bottom: var(--space-4); }
+.connect-screen .panel { text-align: left; }
+.connect-screen .material-icons.icon-lg { color: var(--accent); }
+
+/* -------------------------------------------------------------- system */
+.metric-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 12px; border-bottom: 1px solid var(--border-subtle); }
+.metric-row:last-child { border-bottom: none; }
+.metric-row .label { color: var(--text-muted); }
+.metric-row .value { font-family: var(--font-mono); color: var(--text-secondary); }
+.metric-row-group { margin-top: var(--space-2); }
+.banner { background: var(--accent-faint); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: var(--space-2) var(--space-3); margin-bottom: var(--space-3); font-size: 12.5px; }
+
+/* Time-navigator + Selection panel's own "ce soir" visibility arc
+ * (Gilles, 2026-10-02, after astro2001's own day/night-gradient widgets)
+ * - same framed-canvas look as .graph-canvas above, fixed intrinsic size
+ * (no resize observer on these, unlike the sky dome itself - matches
+ * .graph-canvas's own existing tradeoff). */
+.timenav-canvas, .altitude-chart { display: block; width: 100%; max-width: 280px; height: auto; aspect-ratio: 280 / 48; border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: ew-resize; margin-top: var(--space-2); }
+.altitude-chart { aspect-ratio: 280 / 90; cursor: default; margin-top: var(--space-3); }
+.timenav-readout { flex: 1 1 auto; }
+
+/* Bordered/accented "value box" look, born on guider's own "values" panel
+ * (Gilles, 2026-10-03: "rends-la plus graphique") for its RMS figures
+ * (matches OstErix/Rooster's own guider.component.css, green left-border
+ * accent, read directly rather than guessed) - generic enough (just
+ * .value-row/.value-box, not RMS-specific) that focus.js's own "Final
+ * result" panel reuses it too (Gilles, 2026-10-03: "inspire toi de
+ * l'affichage des valeurs RMS du guider pour afficher ... HFR et
+ * position"), same class names both places rather than two near-duplicate
+ * CSS blocks. */
+.value-row { display: flex; gap: var(--space-2); margin-bottom: var(--space-3); }
+.value-box { flex: 1; padding: var(--space-2); border-radius: var(--radius-sm); border-left: 3px solid var(--ok); background: rgba(var(--ok-rgb), 0.08); }
+.value-box-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); }
+.value-box-number { font-size: 15px; font-weight: 600; font-family: var(--font-mono); margin-top: 2px; }
+.pulse-axis { display: flex; align-items: center; gap: var(--space-1); margin-top: var(--space-2); }
+.pulse-axis-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); width: 24px; flex-shrink: 0; }
+.pulse-dir-label { font-size: 10px; color: var(--text-muted); flex-shrink: 0; }
+.pulse-bar { position: relative; flex: 1; height: 18px; border-radius: var(--radius-sm); background: var(--bg-elevated); border: 1px solid var(--border); overflow: hidden; }
+.pulse-bar-center { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--border-strong); }
+.pulse-bar-fill { position: absolute; top: 0; bottom: 0; background: var(--accent); }
+.pulse-bar-value { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text); text-shadow: 0 0 3px var(--bg), 0 0 3px var(--bg), 0 0 3px var(--bg); pointer-events: none; }
+.cal-quality-row { display: flex; align-items: center; gap: var(--space-1); margin-top: var(--space-3); }
+
+/* OST server discovery (Android app only, js/zeroconf.js) - #discover-row
+ * is hidden by default (app.js only shows it once zeroconf.isAvailable()
+ * confirms this is the real native app). */
+.discover-results { display: flex; flex-wrap: wrap; gap: var(--space-1); margin: 0 0 var(--space-2); }
+.discover-results:empty { margin: 0; }
