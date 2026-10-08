@@ -584,7 +584,13 @@ target_link_libraries(ostmeteo PRIVATE
 )
 target_compile_definitions(ostmeteo PRIVATE METEO_MODULE)
 
-install(TARGETS
+# Captured once so the "Complete" component (issue #229 - same compiled
+# binary + modules, packaged a second time alongside front/'s static
+# files, not a dependent of the Runtime component - see
+# cmake/cpack/DebianPackage.cmake's own header comment) can reinstall the
+# exact same target list below without a second hand-maintained copy that
+# could quietly drift out of sync whenever a module is added.
+set(OST_RUNTIME_TARGETS
     ostserver
     ostbasemodule ostindimodule
     ostindipanel
@@ -600,15 +606,31 @@ install(TARGETS
     ostparkmanager
     ostmonitor
     ostmeteo
+)
+
+install(TARGETS ${OST_RUNTIME_TARGETS}
     RUNTIME DESTINATION "/usr/bin"     COMPONENT Runtime
     LIBRARY DESTINATION "/usr/lib"     COMPONENT Runtime
     PUBLIC_HEADER DESTINATION "/usr/include/ost" COMPONENT Development
+)
+
+# Same binaries again, under the "Complete" component - see
+# cmake/cpack/DebianPackage.cmake. No PUBLIC_HEADER here: a beginner
+# installing the all-in-one package has no use for module dev headers.
+install(TARGETS ${OST_RUNTIME_TARGETS}
+    RUNTIME DESTINATION "/usr/bin" COMPONENT Complete
+    LIBRARY DESTINATION "/usr/lib" COMPONENT Complete
 )
 
 install(
     FILES "${CMAKE_CURRENT_SOURCE_DIR}/ostserver.service"
     DESTINATION "lib/systemd/system"
     COMPONENT Runtime
+)
+install(
+    FILES "${CMAKE_CURRENT_SOURCE_DIR}/ostserver.service"
+    DESTINATION "lib/systemd/system"
+    COMPONENT Complete
 )
 
 # Generate version.cc at build time (not configure time)
@@ -637,6 +659,19 @@ message(STATUS "Version file will be generated at build time: ${CMAKE_CURRENT_BI
 # Frontend (front/ - issue #229) + Packaging (CPack / Debian)
 # ---------------------------------------------------------------------------
 include(cmake/Frontend.cmake)
+
+# front-www/'s contents, built by the frontend_www target above (always
+# part of the default ALL build, well before CPack's own separate
+# packaging step ever runs - see cmake/Frontend.cmake). Complete
+# component only (issue #229) - the minimal ostserver package has no use
+# for this. Trailing slash on the source path: copy front-www/'s
+# *contents* into the destination, not a nested front-www/ directory.
+install(
+    DIRECTORY "${FRONTEND_WWW_DIR}/"
+    DESTINATION "/var/www/pilost"
+    COMPONENT Complete
+)
+
 include(cmake/cpack/DebianPackage.cmake)
 
 #get_cmake_property(_variableNames VARIABLES)

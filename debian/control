@@ -39,3 +39,22 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, libqt6sql6-sqlite
 Description: Observatoire Sans Tête
  Light and headless astrophotography automation tool
 
+Package: ostserver-complete
+Architecture: any
+Section: science
+Conflicts: ostserver
+Replaces: ostserver
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt6sql6-sqlite, nginx
+Description: Observatoire Sans Tête - all-in-one
+ Backend + web UI + nginx, ready to use after a single install.
+ .
+ Same binaries as the "ostserver" package (not a dependent of it - the
+ two Conflict/Replace each other and can never be installed together),
+ plus the front/ web client's static files and an nginx site wiring
+ them together, so a single `apt install ./ostserver-complete.deb`
+ works standalone with no custom repository required - only nginx
+ itself needs to resolve, from the standard distribution archives.
+ .
+ Pick this package to get a working system immediately; pick plain
+ "ostserver" to bring your own web server/TLS/layout instead.
+

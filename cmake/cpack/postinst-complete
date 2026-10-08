@@ -1,0 +1,141 @@
+#!/bin/sh
+set -e
+#
+# postinst for the "ostserver-complete" package (issue #229) - the
+# beginner-friendly, self-contained alternative to "ostserver" (see
+# cmake/cpack/DebianPackage.cmake's own header comment on why this is a
+# SEPARATE, independent package rather than a layer on top of it:
+# Conflicts/Replaces, not Depends - a single `apt install
+# ./ostserver-complete.deb` must work standalone, no custom PPA/repo
+# needed, just nginx from the standard distro archives).
+#
+# Everything up to the "--- nginx ---" marker below is deliberately kept
+# identical to cmake/cpack/postinst (the plain "ostserver" package) -
+# this package ships its own copy of the same binaries, so it needs the
+# exact same service/working-directory/webroot setup on top of the
+# nginx wiring. Not sourced/shared from one file: two small, fully
+# readable standalone scripts beat an extra indirection for just these
+# two consumers - keep them in sync by hand if one changes.
+
+case "$1" in
+    configure)
+        # Use the user who invoked sudo, fallback to current user
+        INSTALL_USER="${SUDO_USER:-${USER:-root}}"
+        USER_HOME=$(getent passwd "${INSTALL_USER}" | cut -d: -f6)
+        OST_DIR="${USER_HOME}/.ost"
+
+        # Patch the service file with the actual user and working directory
+        sed -i "s/^User=.*/User=${INSTALL_USER}/" /usr/lib/systemd/system/ostserver.service
+        sed -i "s|^WorkingDirectory=.*|WorkingDirectory=${OST_DIR}|" /usr/lib/systemd/system/ostserver.service
+
+        # Create working directory and set ownership
+        mkdir -p "${OST_DIR}"
+        chown "${INSTALL_USER}" "${OST_DIR}"
+
+        # Create media directory and set ownership
+        mkdir -p /var/lib/osterix/media
+        chown -R "${INSTALL_USER}" /var/lib/osterix
+
+        # Create default parms file if it does not exist yet
+        PARMS_FILE="${OST_DIR}/ostserver.parms"
+        if [ ! -f "${PARMS_FILE}" ]; then
+            cat > "${PARMS_FILE}" << 'EOF'
+# ostserver startup options — one argument per line
+# This file is read at service startup and will not be overwritten on upgrade.
+# Remove the leading # to activate an option.
+
+# Web server media folder (must be writable)
+--webroot=/var/lib/osterix/media
+
+# Start embedded INDI server (Y/N)
+--indiserver=Y
+
+# Log level: 0=debug, 1=info, 2=warning, 3=error, 4=critical
+--loglevel=1
+
+# Log file path (default: ostserver_YYYY-MM-DD_hh-mm-ss.log in working directory)
+#--logfile=/home/user/.ost/ostserver.log
+
+# Security level: 0=disabled, 1=read only, 2=user grants
+--grant=0
+
+# Language (fr/en/de/it/es)
+#--lng=fr
+
+# Frontend banner text (spaces are allowed, no quoting needed)
+#--banner=Observatoire Sans tête
+
+# Load a specific configuration name (default: default)
+#--configuration=default
+
+# Modules library path (default: system path)
+#--libpath=
+
+# Database path (default: working directory)
+#--dbpath=
+
+# System resource watch interval in seconds (0 to disable)
+#--systemwatchinterval=10
+
+# Minimum free disk space before skipping image write (%, 0-99, default: 10)
+#--minfree=10
+
+# Enable SSL for WebSocket server (Y/N)
+#--ssl=N
+#--sslcert=/etc/ost/server.crt
+#--sslkey=/etc/ost/server.key
+
+# Set admin password (applied at startup, then remove this line)
+#--setadminpassword=
+EOF
+            chown "${INSTALL_USER}" "${PARMS_FILE}"
+        fi
+
+        # --- nginx (Complete package only) ---
+        #
+        # Plain HTTP, no SSL by design (Gilles, 2026-10 packaging
+        # discussion: "pas de SSL automatique pour le paquet tout-en-un"
+        # - local-network use case; SSL stays an advanced/manual choice
+        # for the plain "ostserver" package). Serves front-www/'s static
+        # files (installed by CMake's own Complete component) plus the
+        # same media webroot --webroot=/var/lib/osterix/media already
+        # points at above - no WebSocket proxying needed at all, the
+        # frontend connects directly to ws://host:9624 in its own
+        # non-SSL mode (see front/core/index.js's deriveUrlsFromHost()).
+        NGINX_SITE="/etc/nginx/sites-available/ostserver-complete"
+        cat > "${NGINX_SITE}" << 'EOF'
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name _;
+
+    root /var/www/pilost;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location /ostmedia/ {
+        alias /var/lib/osterix/media/;
+        autoindex on;
+    }
+}
+EOF
+        # The stock default site also claims `default_server` on port 80
+        # - nginx refuses to start with two. Same thing the old, now-
+        # retired install_daily.sh used to do by hand.
+        rm -f /etc/nginx/sites-enabled/default
+        ln -sf "${NGINX_SITE}" /etc/nginx/sites-enabled/ostserver-complete
+
+        # Enable and start the service (CPack builds only — debhelper uses #DEBHELPER#)
+        if [ -d /run/systemd/system ]; then
+            systemctl daemon-reload
+            systemctl enable ostserver.service
+            systemctl start ostserver.service || true
+            systemctl reload nginx 2>/dev/null || systemctl restart nginx 2>/dev/null || true
+        fi
+    ;;
+esac
+
+#DEBHELPER#

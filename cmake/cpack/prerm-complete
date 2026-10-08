@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+
+if [ -d /run/systemd/system ]; then
+    systemctl stop ostserver.service || true
+    systemctl disable ostserver.service || true
+    systemctl daemon-reload
+fi
+
+# Only remove our own site - never touch nginx itself or any other site
+# a user may have added since.
+rm -f /etc/nginx/sites-enabled/ostserver-complete
+if [ -d /run/systemd/system ]; then
+    systemctl reload nginx 2>/dev/null || true
+fi
