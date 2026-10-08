@@ -57,7 +57,10 @@ server {
         sub_filter 'data-url=/'      'data-url=/documentation/';
         sub_filter 'index_js_url="/' 'index_js_url="/documentation/';
         sub_filter_once off;
-        sub_filter_types text/html;
+        # sub_filter_types text/html is the module's own default even
+        # unset - stating it explicitly just makes nginx warn
+        # "duplicate MIME type text/html" (confirmed on Fedora), no
+        # functional difference either way.
         try_files $uri $uri/ =404;
     }
 }

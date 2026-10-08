@@ -37,6 +37,33 @@ sudo systemctl enable --now ostserver.service
 
 echo "Wiring the real nginx config (the package only ships an example)..."
 sudo dnf install -y nginx
+
+# Fedora's stock nginx.conf has its own default "server_name _;" block
+# built directly INTO the main file (not a separate conf.d file like
+# Debian's sites-enabled/default) - confirmed the hard way: pilost.conf
+# loses the "conflicting server name" fight every time (conf.d files
+# load after nginx.conf's own inline block, and nginx just keeps
+# whichever one it saw first). nginx.conf is %config(noreplace) in
+# Fedora's own packaging - editing it is the expected, supported way
+# to customize it, not something we're reaching past our lane for.
+# Brace-counting awk instead of a fixed line range: robust regardless
+# of exact formatting, and a no-op if already removed (idempotent).
+sudo awk '
+/^[[:space:]]*server[[:space:]]*\{/ && !done {
+    depth = 1; skip = 1; next
+}
+skip {
+    if ($0 ~ /\{/) depth++
+    if ($0 ~ /\}/) depth--
+    if (depth == 0) { skip = 0; done = 1 }
+    next
+}
+{ print }
+' /etc/nginx/nginx.conf > /tmp/nginx.conf.new
+sudo mv /tmp/nginx.conf.new /etc/nginx/nginx.conf
+sudo chown root:root /etc/nginx/nginx.conf
+sudo chmod 644 /etc/nginx/nginx.conf
+
 sudo cp /usr/share/doc/ostserver-complete/pilost.conf.example /etc/nginx/conf.d/pilost.conf
 sudo systemctl enable --now nginx.service
 sudo systemctl reload nginx.service

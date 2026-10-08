@@ -59,6 +59,9 @@ The script then does everything by itself. A few things to expect:
 - It opens the web UI (80) and WebSocket (9624) ports in `firewalld`,
   which is on by default on Fedora (unlike Ubuntu/Arch) and would
   otherwise block both from any other machine on your network.
+- It removes the stock default page nginx ships with on Fedora (built
+  into `/etc/nginx/nginx.conf` itself) - otherwise it silently wins
+  over OST's own page on port 80.
 - `gsc` (INDI's CCD *simulator* star field data) has no Fedora
   package at all — the script skips it with a note. This is never
   needed for real hardware, only for the simulator.
