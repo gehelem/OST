@@ -1,0 +1,8 @@
+#!/bin/sh
+# %preun for "ostserver-complete" - $1 is 0 on final removal, 1 when
+# being replaced by an upgrade (standard RPM scriptlet convention) -
+# only tear down on final removal, same as Debian/Arch's own prerm.
+if [ "$1" -eq 0 ]; then
+    systemctl stop ostserver.service 2>/dev/null || true
+    systemctl disable ostserver.service 2>/dev/null || true
+fi

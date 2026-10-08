@@ -694,6 +694,11 @@ install(
 )
 
 include(cmake/cpack/DebianPackage.cmake)
+include(cmake/cpack/RpmPackage.cmake)
+# Single include(CPack) for every generator (issue #230) - see
+# DebianPackage.cmake's own trailing comment for why this isn't called
+# from either of those two files directly.
+include(CPack)
 
 #get_cmake_property(_variableNames VARIABLES)
 #list (SORT _variableNames)

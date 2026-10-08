@@ -1,0 +1,72 @@
+#!/bin/sh
+# %post for the "ostserver-complete" RPM (issue #230). Same hands-off
+# choice as ostserver's own post-runtime script for the service.
+#
+# nginx: Fedora's nginx package does use a conf.d convention
+# (/etc/nginx/nginx.conf's http {} block includes
+# /etc/nginx/conf.d/*.conf by default, unlike Arch's upstream-stock
+# config) - but still an EXAMPLE file here, not a live one, for the
+# same reason as Arch: this is a file we don't package ourselves,
+# silently mutating it would go against the hands-off choice above.
+set -e
+
+INSTALL_USER="${SUDO_USER:-${USER:-root}}"
+USER_HOME=$(getent passwd "${INSTALL_USER}" | cut -d: -f6)
+OST_DIR="${USER_HOME}/.ost"
+
+sed -i "s/^User=.*/User=${INSTALL_USER}/" /usr/lib/systemd/system/ostserver.service
+sed -i "s|^WorkingDirectory=.*|WorkingDirectory=${OST_DIR}|" /usr/lib/systemd/system/ostserver.service
+
+mkdir -p "${OST_DIR}"
+chown "${INSTALL_USER}" "${OST_DIR}"
+
+mkdir -p /var/lib/osterix/media
+chown -R "${INSTALL_USER}" /var/lib/osterix
+
+PARMS_FILE="${OST_DIR}/ostserver.parms"
+if [ ! -f "${PARMS_FILE}" ]; then
+    cp /usr/share/ostserver/ostserver.parms.skel "${PARMS_FILE}"
+    chown "${INSTALL_USER}" "${PARMS_FILE}"
+fi
+
+systemctl daemon-reload >/dev/null 2>&1 || true
+
+mkdir -p /usr/share/doc/ostserver-complete
+cat > /usr/share/doc/ostserver-complete/pilost.conf.example << 'EOF'
+server {
+    listen 80;
+    listen [::]:80;
+    server_name _;
+
+    root /var/www/pilost;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location /ostmedia/ {
+        alias /var/lib/osterix/media/;
+        autoindex on;
+    }
+
+    location /documentation/ {
+        sub_filter 'href=/'          'href=/documentation/';
+        sub_filter 'src=/'           'src=/documentation/';
+        sub_filter 'data-nav-id=/'   'data-nav-id=/documentation/';
+        sub_filter 'data-url=/'      'data-url=/documentation/';
+        sub_filter 'index_js_url="/' 'index_js_url="/documentation/';
+        sub_filter_once off;
+        sub_filter_types text/html;
+        try_files $uri $uri/ =404;
+    }
+}
+EOF
+
+echo "==> ostserver-complete is installed but not started/wired (Fedora convention)."
+echo "==> Enable and start the backend with:"
+echo "        systemctl enable --now ostserver.service"
+echo "==> An example nginx server block is at:"
+echo "        /usr/share/doc/ostserver-complete/pilost.conf.example"
+echo "    Copy it into /etc/nginx/conf.d/pilost.conf, then:"
+echo "        systemctl enable --now nginx.service"
