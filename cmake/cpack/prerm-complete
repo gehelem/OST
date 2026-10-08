@@ -9,7 +9,7 @@ fi
 
 # Only remove our own site - never touch nginx itself or any other site
 # a user may have added since.
-rm -f /etc/nginx/sites-enabled/ostserver-complete
+rm -f /etc/nginx/sites-enabled/pilost
 if [ -d /run/systemd/system ]; then
     systemctl reload nginx 2>/dev/null || true
 fi
