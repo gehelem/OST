@@ -41,13 +41,13 @@ fi
 echo "Computed pkgver: ${PKGVER}"
 
 # Lay out a local-source build: PKGBUILD's build() does
-# `cmake -S "${pkgbase}-${pkgver}"` relative to $srcdir (= the directory
-# the PKGBUILD itself lives in, since source=() is empty, nothing gets
-# extracted there) - so this checkout just needs to exist under that
-# exact name, no path rewriting needed.
+# `cmake -S "${pkgbase}-${pkgver}"` relative to $srcdir, which makepkg
+# always sets to "<PKGBUILD dir>/src/" - even with source=() empty,
+# confirmed from the actual build log ("source directory .../src/...
+# does not exist"), not the PKGBUILD's own directory as first assumed.
 BUILD_DIR=/tmp/build
-mkdir -p "${BUILD_DIR}/ostserver-${PKGVER}"
-cp -a . "${BUILD_DIR}/ostserver-${PKGVER}/"
+mkdir -p "${BUILD_DIR}/src/ostserver-${PKGVER}"
+cp -a . "${BUILD_DIR}/src/ostserver-${PKGVER}/"
 sed \
     -e "s/^pkgver=.*/pkgver=${PKGVER}/" \
     -e "s/^source=.*/source=()/" \
