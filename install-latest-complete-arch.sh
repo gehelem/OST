@@ -73,7 +73,12 @@ _install_aur() {
 echo "Installing astrometry.net (AUR) and whiptail..."
 sudo pacman -S --needed --noconfirm libnewt base-devel git
 _install_aur astrometry.net
-_install_aur gsc
+# Optional (INDI's CCD simulator only, not needed for real hardware) -
+# the AUR package is 1990s K&R-style C that no longer compiles under
+# modern GCC's C23 defaults (implicit function declarations are now a
+# hard error, not a warning) - a problem in that upstream AUR package,
+# not in OST. Don't let it take the whole script down.
+_install_aur gsc || echo "WARNING: gsc failed to build (optional, only used by INDI's CCD simulator) - continuing without it."
 
 # Baseline plate-solving indexes, same default set and reasoning as
 # install-latest-complete.sh.
