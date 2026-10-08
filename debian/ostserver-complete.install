@@ -13,4 +13,5 @@
 usr/bin/ostserver
 usr/lib/libost*.so*
 lib/systemd/system/ostserver.service
+usr/share/ostserver/ostserver.parms.skel
 var/www/pilost/*

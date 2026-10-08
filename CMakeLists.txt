@@ -639,6 +639,21 @@ install(
     COMPONENT Complete
 )
 
+# Default ostserver.parms content, shared by both postinst scripts (they
+# `cp` it instead of each carrying their own copy of the same heredoc -
+# was duplicated three times, including in install-latest-complete.sh,
+# until Gilles asked "on n'avait pas déjà un squelette quelque part ?").
+install(
+    FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cpack/ostserver.parms.skel"
+    DESTINATION "share/ostserver"
+    COMPONENT Runtime
+)
+install(
+    FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cpack/ostserver.parms.skel"
+    DESTINATION "share/ostserver"
+    COMPONENT Complete
+)
+
 # Generate version.cc at build time (not configure time)
 # This ensures version information is always up-to-date with each build
 

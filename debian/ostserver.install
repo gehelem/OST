@@ -17,3 +17,4 @@ usr/lib/libost*.so*
 usr/include/ost/*
 lib/systemd/system/ostserver.service
 usr/share/doc/ostserver/changelog.Debian.gz
+usr/share/ostserver/ostserver.parms.skel

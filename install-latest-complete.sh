@@ -37,67 +37,11 @@ sudo apt update
 
 echo "Installing ${DEB_FILE}..."
 sudo --preserve-env=OST_INSTALL_USER apt install -y "./${DEB_FILE}"
-
-# Belt and suspenders: the package's own postinst (cmake/cpack/complete/postinst)
-# already creates this file if missing, but we've twice found that script
-# silently not running at all (wrong maintainer-script name, then a
-# packaging quirk) - make sure it exists here too rather than trust it
-# blindly. Script runs as the invoking user (not elevated at the top),
-# so $HOME is already the right one, no SUDO_USER juggling needed.
-PARMS_FILE="${HOME}/.ost/ostserver.parms"
-if [ ! -f "${PARMS_FILE}" ]; then
-    echo "Creating ${PARMS_FILE}..."
-    mkdir -p "${HOME}/.ost"
-    cat > "${PARMS_FILE}" << 'EOF'
-# ostserver startup options — one argument per line
-# This file is read at service startup and will not be overwritten on upgrade.
-# Remove the leading # to activate an option.
-
-# Web server media folder (must be writable)
---webroot=/var/lib/osterix/media
-
-# Start embedded INDI server (Y/N)
---indiserver=Y
-
-# Log level: 0=debug, 1=info, 2=warning, 3=error, 4=critical
---loglevel=1
-
-# Log file path (default: ostserver_YYYY-MM-DD_hh-mm-ss.log in working directory)
-#--logfile=/home/user/.ost/ostserver.log
-
-# Security level: 0=disabled, 1=read only, 2=user grants
---grant=0
-
-# Language (fr/en/de/it/es)
-#--lng=fr
-
-# Frontend banner text (spaces are allowed, no quoting needed)
-#--banner=Observatoire Sans tête
-
-# Load a specific configuration name (default: default)
-#--configuration=default
-
-# Modules library path (default: system path)
-#--libpath=
-
-# Database path (default: working directory)
-#--dbpath=
-
-# System resource watch interval in seconds (0 to disable)
-#--systemwatchinterval=10
-
-# Minimum free disk space before skipping image write (%, 0-99, default: 10)
-#--minfree=10
-
-# Enable SSL for WebSocket server (Y/N)
-#--ssl=N
-#--sslcert=/etc/ost/server.crt
-#--sslkey=/etc/ost/server.key
-
-# Set admin password (applied at startup, then remove this line)
-#--setadminpassword=
-EOF
-fi
+# ostserver.parms is created by the package's own postinst
+# (cmake/cpack/complete/postinst, cp'd from the shared
+# share/ostserver/ostserver.parms.skel) if missing - no need to
+# duplicate that here now that the real bug keeping postinst from
+# running at all (wrong maintainer-script name) is fixed.
 
 # Documentation (the Hugo site built by the separate build-doc CI job,
 # see documentation/CI/CI-build.sh) rides on the same "latest" generic
