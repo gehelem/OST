@@ -16,6 +16,16 @@
 #
 set -e
 
+# Ask for the sudo password once, then keep the credential cache alive
+# for as long as this script runs instead of prompting again at every
+# `sudo` call below - the astrometry.net AUR build alone can take
+# several minutes, well past sudo's default ~15 min timeout once a
+# few steps add up.
+sudo -v
+( while kill -0 "$$" 2>/dev/null; do sudo -n true; sleep 60; done ) &
+SUDO_KEEPALIVE_PID=$!
+trap 'kill "${SUDO_KEEPALIVE_PID}" 2>/dev/null' EXIT
+
 DEB_EQUIV="ostserver-complete_latest_arch_x86_64.pkg.tar.zst"
 URL="https://gitlab.ostserver.fr/api/v4/projects/1/packages/generic/latest/latest/${DEB_EQUIV}"
 
