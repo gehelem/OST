@@ -5,7 +5,7 @@
 #
 set -e
 
-dnf -y install "./${RPM_FILE_LATEST}" libindi nodejs npm gdb
+dnf -y install "./${RPM_FILE_LATEST}" libindi nodejs npm
 
 npm install ws
 
@@ -14,39 +14,18 @@ mkdir -p media
 echo "Starting server..."
 export QT_QPA_PLATFORM=offscreen
 
-# Two things tried and ruled out already (see git log for this file):
-# - gdb -ex run alone: only traces the top-level ostserver process and
-#   detaches from every forked child, catches nothing if the crash is
-#   in a driver subprocess (indi_simulator_ccd/_guide) or indiserver.
-# - ulimit -c unlimited + scanning for a core file afterwards: this
-#   runner's core_pattern redirects wherever the HOST's does, which a
-#   container has no visibility into - confirmed, nothing ever appears.
-#
-# This time: gdb with detach-on-fork off, so it keeps tracing every
-# forked child too (as separate "inferiors") instead of letting go of
-# them - "run" then stops on a crash anywhere in the whole tree, and
-# the python loop below walks every inferior and backtraces whichever
-# one is actually sitting on a fatal signal.
-cat > /tmp/crash.gdb << 'EOF'
-set detach-on-fork off
-set schedule-multiple on
-run
-python
-import gdb
-infs = gdb.inferiors()
-print("=== %d inferior(s) alive when 'run' stopped ===" % len(infs))
-for inf in infs:
-    print("--- inferior %d, pid %s ---" % (inf.num, inf.pid))
-    try:
-        gdb.execute("inferior %d" % inf.num)
-        gdb.execute("thread apply all bt full")
-    except Exception as e:
-        print("(error backtracing inferior %d: %s)" % (inf.num, e))
-end
-quit
-EOF
-gdb -batch -x /tmp/crash.gdb --args ostserver --webroot=media --indiserver=Y \
-    > server.log 2>&1 &
+# Three diagnostics tried here and abandoned (see this file's own git
+# history for each): gdb tracing only the top-level process (detaches
+# from every forked child, catches nothing); scanning for a core dump
+# afterwards (this runner's core_pattern redirects to the host,
+# invisible from inside the container); gdb with detach-on-fork off to
+# also trace forked children ("/proc/<pid>/ns/mnt: No such file or
+# directory" - the GitLab Docker-executor container restricts /proc
+# access for processes outside gdb's direct ptrace scope, so even this
+# fails here specifically). Back to a plain run - this sandbox cannot
+# give us a backtrace; reproducing on a real VM (full gdb privileges,
+# same way the Arch side was debugged) is the next step, not CI.
+ostserver --webroot=media --indiserver=Y > server.log 2>&1 &
 SERVER_PID=$!
 
 sleep 7
