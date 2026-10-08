@@ -27,22 +27,30 @@ makedepends=(
     'libraw' 'libsecret' 'opencv' 'libindi'
 )
 # Same runtime libs for both packages (both ship the exact same binaries) -
-# nginx is ostserver-complete's own addition, see depends_ostserver-complete
-# below. libindi/gsc/astrometry.net themselves are NOT listed as hard
-# depends: libindi is in [extra] so pacman resolves it on its own, but gsc
-# and astrometry.net only exist on AUR and are only needed for plate
-# solving, not for the server to start - optdepends instead (matches the
-# Debian side's own optdepends-equivalent "Recommends", not a hard Depends).
+# nginx is ostserver-complete's own addition, set directly in its own
+# package_ostserver-complete() below. libindi/gsc/astrometry.net
+# themselves are NOT listed as hard depends: libindi is in [extra] so
+# pacman resolves it on its own, but gsc and astrometry.net only exist
+# on AUR and are only needed for plate solving, not for the server to
+# start - optdepends instead (matches the Debian side's own Recommends,
+# not a hard Depends).
+#
+# Bash variable names cannot contain a hyphen, unlike function names
+# (package_ostserver-complete() below is fine) - there is no
+# "depends_<pkgname>"-style global override for a hyphenated pkgname,
+# despite that pattern existing for plain alphanumeric ones in some
+# PKGBUILDs. Both arrays below are plain locals, read from inside each
+# package_*() function instead (confirmed the hard way: makepkg failed
+# to even source this file with the hyphenated variable name).
 _depends_common=(
     'qt6-base' 'qt6-websockets' 'qt6-scxml'
     'libnova' 'gsl' 'wcslib' 'cfitsio' 'avahi' 'libsecret' 'opencv' 'libraw'
     'libindi'
 )
-optdepends_ostserver=(
+_optdepends_common=(
     'astrometry.net: plate solving (Navigator/Polar modules)'
     'gsc: star field data for INDI'"'"'s CCD simulator'
 )
-optdepends_ostserver-complete=("${optdepends_ostserver[@]}")
 
 source=("${pkgbase}-${pkgver}.tar.gz::${url}/-/archive/${pkgver}/${pkgbase}-${pkgver}.tar.gz")
 sha256sums=('SKIP')
@@ -57,6 +65,7 @@ build() {
 package_ostserver() {
     pkgdesc='Observatoire Sans Tête - light and headless astrophotography automation tool'
     depends=("${_depends_common[@]}")
+    optdepends=("${_optdepends_common[@]}")
     install=ostserver.install
 
     DESTDIR="${pkgdir}" cmake --install build --component Runtime
@@ -65,6 +74,7 @@ package_ostserver() {
 package_ostserver-complete() {
     pkgdesc='Observatoire Sans Tête - all-in-one (backend + web UI + nginx)'
     depends=("${_depends_common[@]}" 'nginx')
+    optdepends=("${_optdepends_common[@]}")
     conflicts=('ostserver')
     provides=('ostserver')
     install=ostserver-complete.install

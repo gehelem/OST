@@ -19,7 +19,6 @@ build-job-arch:
       - "ostserver_*_x86_64.pkg.tar.zst"
       - "ostserver-complete_*_x86_64.pkg.tar.zst"
     expire_in: 4 week
-  allow_failure: true
   # YAML anchors don't carry across `include:`d files (same reason
   # CI/doc.yml inlines these same three conditions instead of reusing
   # &build-rules from .gitlab-ci.yml) - kept literally identical to it.
