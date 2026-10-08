@@ -42,7 +42,13 @@ set(STELLARSOLVER_INCLUDE_DIR
     ${CMAKE_BINARY_DIR}/libs/stellarsolver
 )
 set(STELLARSOLVER_LIBRARIES stellarsolver)
+# Installed into BOTH components, same reasoning as OST_RUNTIME_TARGETS
+# below: "Complete" ships its own full, independent copy of everything
+# Runtime needs (issue #229) - otherwise dpkg-shlibdeps can't find this
+# private/bundled .so from inside the Complete package tree and CPack
+# fails ("cannot find library libstellarsolver6.so.2", confirmed 2026-10-08).
 install(TARGETS stellarsolver LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime)
+install(TARGETS stellarsolver LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Complete)
 find_library(avahi-client-lib avahi-client REQUIRED)
 find_library(avahi-common-lib avahi-common REQUIRED)
 find_path(avahi-client-includes avahi-client/client.h REQUIRED)
