@@ -131,6 +131,10 @@ else
 fi
 
 echo "Done - ostserver-complete is installed and running."
+# hostname/hostname -I are not part of a minimal Arch install - they
+# come from inetutils (confirmed: "hostname: commande introuvable" on
+# a fresh VM), unlike Ubuntu/Debian where it's already present.
+sudo pacman -S --needed --noconfirm inetutils
 THIS_MACHINE="$(hostname -I 2>/dev/null | awk '{print $1}')"
 THIS_MACHINE="${THIS_MACHINE:-$(hostname)}"
 echo "Web UI: http://${THIS_MACHINE}/"
