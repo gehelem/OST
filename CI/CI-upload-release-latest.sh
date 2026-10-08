@@ -15,6 +15,8 @@ curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ostserver_la
 curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ostserver-complete_latest_2604_amd64.deb "${PACKAGE_REGISTRY_LATEST}/ostserver-complete_latest_2604_amd64.deb"
 [ -f ostserver_latest_fc_x86_64.rpm ] && curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ostserver_latest_fc_x86_64.rpm "${PACKAGE_REGISTRY_LATEST}/ostserver_latest_fc_x86_64.rpm"
 [ -f ostserver-devel_latest_fc_x86_64.rpm ] && curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ostserver-devel_latest_fc_x86_64.rpm "${PACKAGE_REGISTRY_LATEST}/ostserver-devel_latest_fc_x86_64.rpm"
+[ -f ostserver_latest_x86_64.pkg.tar.zst ] && curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ostserver_latest_x86_64.pkg.tar.zst "${PACKAGE_REGISTRY_LATEST}/ostserver_latest_x86_64.pkg.tar.zst"
+[ -f ostserver-complete_latest_x86_64.pkg.tar.zst ] && curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ostserver-complete_latest_x86_64.pkg.tar.zst "${PACKAGE_REGISTRY_LATEST}/ostserver-complete_latest_x86_64.pkg.tar.zst"
 [ -f documentation/${DOC_FILE_LATEST} ] && curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file documentation/${DOC_FILE_LATEST} "${PACKAGE_REGISTRY_LATEST}/${DOC_FILE_LATEST}"
 echo "create release"
 ASSETS="--assets-link {\"name\":\"ostserver_latest_2604_amd64.deb\",\"url\":\"${PACKAGE_REGISTRY_LATEST}/ostserver_latest_2604_amd64.deb\"}"
@@ -25,5 +27,7 @@ ASSETS="$ASSETS --assets-link {\"name\":\"ostserver-complete_latest_2604_amd64.d
 [ -f ostserver-complete_latest_2204_amd64.deb ] && ASSETS="$ASSETS --assets-link {\"name\":\"ostserver-complete_latest_2204_amd64.deb\",\"url\":\"${PACKAGE_REGISTRY_LATEST}/ostserver-complete_latest_2204_amd64.deb\"}"
 [ -f ostserver_latest_fc_x86_64.rpm ] && ASSETS="$ASSETS --assets-link {\"name\":\"ostserver_latest_fc_x86_64.rpm\",\"url\":\"${PACKAGE_REGISTRY_LATEST}/ostserver_latest_fc_x86_64.rpm\"}"
 [ -f ostserver-devel_latest_fc_x86_64.rpm ] && ASSETS="$ASSETS --assets-link {\"name\":\"ostserver-devel_latest_fc_x86_64.rpm\",\"url\":\"${PACKAGE_REGISTRY_LATEST}/ostserver-devel_latest_fc_x86_64.rpm\"}"
+[ -f ostserver_latest_x86_64.pkg.tar.zst ] && ASSETS="$ASSETS --assets-link {\"name\":\"ostserver_latest_x86_64.pkg.tar.zst\",\"url\":\"${PACKAGE_REGISTRY_LATEST}/ostserver_latest_x86_64.pkg.tar.zst\"}"
+[ -f ostserver-complete_latest_x86_64.pkg.tar.zst ] && ASSETS="$ASSETS --assets-link {\"name\":\"ostserver-complete_latest_x86_64.pkg.tar.zst\",\"url\":\"${PACKAGE_REGISTRY_LATEST}/ostserver-complete_latest_x86_64.pkg.tar.zst\"}"
 [ -f documentation/${DOC_FILE_LATEST} ] && ASSETS="$ASSETS --assets-link {\"name\":\"${DOC_FILE_LATEST}\",\"url\":\"${PACKAGE_REGISTRY_LATEST}/${DOC_FILE_LATEST}\"}"
 release-cli create --name "latest" --tag-name latest $ASSETS

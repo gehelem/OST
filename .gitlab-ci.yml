@@ -1,6 +1,7 @@
 include:
   - local: CI/ci-images.yml
   - local: CI/fedora.yml
+  - local: CI/arch.yml
   - local: CI/doc.yml
 
 stages:
@@ -52,6 +53,11 @@ build-job-2204:
   rules:
     - when: never
 
+# TEMPORARILY SUSPENDED 2026-10-08 (Gilles): reviewing the new Arch job
+# (issue #230), wants pipelines fast while looking at it. build-job-2604
+# stays active - the upload scripts reference its artifacts
+# unconditionally (no `[ -f ] &&` guard, unlike this one and 2204's).
+# Re-enable by restoring `<<: *build-rules` once done reviewing.
 build-job-2404:
   stage: build
   image: $CI_REGISTRY_IMAGE/ci-build:24.04
@@ -71,7 +77,8 @@ build-job-2404:
       - "ostserver-complete_*_2404_amd64.deb"
     expire_in: 4 week
   allow_failure: true
-  <<: *build-rules
+  rules:
+    - when: never
 
 build-job-2604:
   stage: build
@@ -112,6 +119,7 @@ test-job-2204:
   rules:
     - when: never
 
+# TEMPORARILY SUSPENDED alongside build-job-2404 above.
 test-job-2404:
   stage: test
   image: $CI_REGISTRY_IMAGE/ci-build:24.04
@@ -127,7 +135,8 @@ test-job-2404:
       - ws.log
     expire_in: 4 week
   allow_failure: true
-  <<: *test-rules
+  rules:
+    - when: never
 
 test-job-2604:
   stage: test
@@ -152,6 +161,7 @@ release-job-tag:
     - build-job-2404
     - build-job-2604
     - build-job-fedora
+    - build-job-arch
     - build-doc
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   script:
@@ -166,6 +176,7 @@ release-job-latest:
     - build-job-2404
     - build-job-2604
     - build-job-fedora
+    - build-job-arch
     - build-doc
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   variables:
