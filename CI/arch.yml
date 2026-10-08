@@ -26,3 +26,22 @@ build-job-arch:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
     - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
     - if: '$CI_PIPELINE_SOURCE == "push"'
+
+test-job-arch:
+  stage: test
+  image: archlinux:latest
+  dependencies:
+    - build-job-arch
+  variables:
+    PKG_FILE_LATEST: "ostserver_latest_arch_x86_64.pkg.tar.zst"
+  script:
+    - ./CI/CI-test-arch.sh
+  artifacts:
+    paths:
+      - server.log
+      - ws.log
+    expire_in: 4 week
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
+    - if: '$CI_PIPELINE_SOURCE == "push"'
