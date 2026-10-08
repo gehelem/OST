@@ -5,7 +5,7 @@
 #
 set -e
 
-dnf -y install "./${RPM_FILE_LATEST}" libindi nodejs npm
+dnf -y install "./${RPM_FILE_LATEST}" libindi nodejs npm gdb
 
 npm install ws
 
@@ -13,7 +13,15 @@ mkdir -p media
 
 echo "Starting server..."
 export QT_QPA_PLATFORM=offscreen
-ostserver --webroot=media --indiserver=Y > server.log 2>&1 &
+# Run under gdb (batch mode) instead of bare - sidesteps core_pattern/
+# systemd-coredump entirely (a plain core file may not even land where
+# we can read it on a GitLab Docker-executor runner), gdb catches the
+# fault itself via ptrace and prints a real backtrace straight into
+# server.log. Harmless if nothing crashes: "run" just returns and
+# "bt full" prints "No stack." once ostserver exits/gets killed below.
+gdb -batch -ex run -ex "bt full" -ex quit \
+    --args ostserver --webroot=media --indiserver=Y \
+    > server.log 2>&1 &
 SERVER_PID=$!
 
 sleep 7
