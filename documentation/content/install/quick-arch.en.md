@@ -13,9 +13,10 @@ This single script installs everything needed on one machine: the OST
 backend, the web interface, nginx, INDI, `astrometry.net` and the
 documentation you are reading right now.
 
-{{% notice style="note" title="Using Ubuntu instead?" %}}
-This page is for Arch Linux specifically. On Ubuntu, follow
-[Quick install (Ubuntu Resolute)](../quick/) instead.
+{{% notice style="note" title="Using Ubuntu or Fedora instead?" %}}
+This page is for Arch Linux specifically. See
+[Quick install (Ubuntu Resolute)](../quick/) or
+[Quick install (Fedora)](../quick-fedora/) instead.
 {{% /notice %}}
 
 ---

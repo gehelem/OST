@@ -1,0 +1,116 @@
+#!/bin/bash
+#
+# Fedora equivalent of install-latest-complete.sh/-arch.sh (issue #230).
+#
+# The RPM package itself (cmake/cpack/RpmPackage.cmake + cmake/cpack/
+# rpm/post-*) deliberately does NOT enable the systemd service or wire
+# a live nginx config - Fedora's own packaging guidelines mandate this
+# hands-off behaviour (the %systemd_post macro's own documentation),
+# same choice already made for Arch. This script is the separate, more
+# opinionated "just make it work" path, same split as the other two.
+#
+# Unlike Arch, Fedora packages `astrometry` directly (no AUR-style
+# local build needed) - but its own astrometry-data-* subpackages use
+# a different index series/granularity than the raw files this script
+# (and the Ubuntu/Arch ones) download straight from data.astrometry.net,
+# so those are not used here: same files, same whiptail checklist,
+# same numbers everywhere for one consistent experience regardless of
+# distro. gsc has no Fedora package at all (not even a broken one like
+# on AUR) - skipped with a note, it is optional either way (INDI's CCD
+# simulator only, irrelevant for real hardware).
+#
+set -e
+
+DEB_EQUIV="ostserver-complete_latest_fc_x86_64.rpm"
+URL="https://gitlab.ostserver.fr/api/v4/projects/1/packages/generic/latest/latest/${DEB_EQUIV}"
+
+echo "Downloading ${DEB_EQUIV}..."
+sudo dnf install -y wget >/dev/null 2>&1 || true
+wget -q "${URL}" -O "${DEB_EQUIV}" || curl --fail --location --output "${DEB_EQUIV}" "${URL}"
+
+echo "Installing ${DEB_EQUIV}..."
+sudo dnf install -y "./${DEB_EQUIV}"
+
+echo "Enabling and starting ostserver..."
+sudo systemctl daemon-reload
+sudo systemctl enable --now ostserver.service
+
+echo "Wiring the real nginx config (the package only ships an example)..."
+sudo dnf install -y nginx
+sudo cp /usr/share/doc/ostserver-complete/pilost.conf.example /etc/nginx/conf.d/pilost.conf
+sudo systemctl enable --now nginx.service
+sudo systemctl reload nginx.service
+
+# ostserver.parms is created by the package's own %post scriptlet
+# (same shared cmake/cpack/ostserver.parms.skel as the other two
+# packaging backends) if missing - nothing more to do here.
+
+# Documentation - same tarball, same destination, same reasoning as
+# the Ubuntu/Arch scripts (built by a separate CI job, not baked into
+# the package at build time).
+DOC_FILE="documentation_latest.tar.gz"
+DOC_URL="https://gitlab.ostserver.fr/api/v4/projects/1/packages/generic/latest/latest/${DOC_FILE}"
+DOC_DEST="/var/www/pilost/documentation"
+
+echo "Downloading ${DOC_FILE}..."
+wget -q "${DOC_URL}" -O "${DOC_FILE}"
+
+echo "Installing documentation to ${DOC_DEST}..."
+sudo mkdir -p "${DOC_DEST}"
+sudo tar -xzf "${DOC_FILE}" -C "${DOC_DEST}"
+
+echo "Installing astrometry.net and whiptail..."
+sudo dnf install -y astrometry newt
+
+# Baseline plate-solving indexes, same default set and reasoning as
+# the Ubuntu/Arch scripts - straight from data.astrometry.net, not
+# Fedora's own astrometry-data-* subpackages (different series/
+# granularity, would mean a different set of choices on this page
+# alone).
+echo "Downloading default astrometry.net indexes (wide field >5°, ~152 MB)..."
+sudo mkdir -p /usr/share/astrometry
+for idx in 4208 4209 4210 4211 4212 4213 4214; do
+    sudo wget -q -P /usr/share/astrometry "http://data.astrometry.net/4200/index-${idx}.fits"
+done
+
+# Narrow-field indexes (4200-4207) - same whiptail checklist, same
+# real sizes, nothing pre-selected. See install-latest-complete.sh for
+# the full derivation of these numbers.
+CHOICES=$(whiptail --title "Additional astrometry.net indexes" \
+    --checklist "Narrow-field plate-solving indexes (long focal length / small sensor).\nNothing is pre-selected - these can be several GB each.\nSpace to toggle, Tab to move, Enter to confirm." \
+    20 78 8 \
+    "4207" "22'-30'    ~158 MB  (12 files)" OFF \
+    "4206" "16'-22'    ~313 MB  (12 files)" OFF \
+    "4205" "11'-16'    ~629 MB  (12 files)" OFF \
+    "4204" " 8'-11'    ~1.2 GB  (48 files)" OFF \
+    "4203" "5.6'-8'    ~2.5 GB  (48 files)" OFF \
+    "4202" "4'-5.6'    ~4.7 GB  (48 files)" OFF \
+    "4201" "2.8'-4'    ~8.6 GB  (48 files)" OFF \
+    "4200" " 2'-2.8'   ~13.2 GB (48 files)" OFF \
+    3>&1 1>&2 2>&3) || true
+
+if [ -n "${CHOICES}" ]; then
+    eval "SELECTED_INDEXES=(${CHOICES})"
+    for idx in "${SELECTED_INDEXES[@]}"; do
+        case "${idx}" in
+            4200|4201|4202|4203|4204) last=47 ;;
+            *)                        last=11 ;;
+        esac
+        echo "Downloading index-${idx} (tiles 00-${last})..."
+        for i in $(seq -w 0 "${last}"); do
+            sudo wget -q -P /usr/share/astrometry "http://data.astrometry.net/4200/index-${idx}-${i}.fits"
+        done
+    done
+else
+    echo "No additional index selected."
+fi
+
+echo "Note: gsc (INDI's CCD simulator star field data) has no Fedora"
+echo "package at all - skipped. Optional, irrelevant for real hardware."
+
+echo "Done - ostserver-complete is installed and running."
+sudo dnf install -y hostname >/dev/null 2>&1 || true
+THIS_MACHINE="$(hostname -I 2>/dev/null | awk '{print $1}')"
+THIS_MACHINE="${THIS_MACHINE:-$(hostname)}"
+echo "Web UI: http://${THIS_MACHINE}/"
+echo "Documentation: http://${THIS_MACHINE}/documentation/"
