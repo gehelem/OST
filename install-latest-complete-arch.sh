@@ -16,7 +16,7 @@
 #
 set -e
 
-DEB_EQUIV="ostserver-complete_latest_x86_64.pkg.tar.zst"
+DEB_EQUIV="ostserver-complete_latest_arch_x86_64.pkg.tar.zst"
 URL="https://gitlab.ostserver.fr/api/v4/projects/1/packages/generic/latest/latest/${DEB_EQUIV}"
 
 echo "Downloading ${DEB_EQUIV}..."
