@@ -789,17 +789,42 @@ export function renderController(client) {
   });
 
   // ---- Load a module ----
-  // labelInput/profileInput are created once, outside any subscription —
-  // this is the field issue #231 was filed about, it must never be
-  // touched again after the user starts typing in it.
+  // labelInput is created once, outside any subscription — this is the
+  // field issue #231 was filed about, it must never be touched again
+  // after the user starts typing in it. profileSelect is a dropdown, not
+  // a free-text field, matching OstErix's own Load module dialog
+  // (global-parameters.component.ts LoadModuleDialogComponent): options
+  // come from controllerdata.profiles, keyed by the library name with its
+  // first letter uppercased and the rest lowercased (see
+  // controller.en.md's "profiles keying" warning — not a plain capitalize,
+  // and not the same string as libSelect's own stripped value).
   const libSec = el("section", { class: "panel" }, [el("h3", { text: t("views.loadAModule") })]);
   const libSelect = el("select", { class: "field-input" });
   const labelInput = el("input", { type: "text", class: "field-input", placeholder: t("views.instanceLabelPlaceholder") });
-  const profileInput = el("input", { type: "text", class: "field-input", placeholder: t("views.profileOptionalPlaceholder") });
-  libSec.appendChild(el("div", { class: "form-row" }, [libSelect, labelInput, profileInput,
-    el("button", { class: "btn btn-primary btn-sm", onclick: () => { if (labelInput.value) client.loadModule(libSelect.value, labelInput.value, profileInput.value || undefined); } }, t("views.load")),
+  const profileSelect = el("select", { class: "field-input" });
+  libSec.appendChild(el("div", { class: "form-row" }, [libSelect, labelInput, profileSelect,
+    el("button", { class: "btn btn-primary btn-sm", onclick: () => { if (labelInput.value) client.loadModule(libSelect.value, labelInput.value, profileSelect.value || undefined); } }, t("views.load")),
   ]));
   grid.appendChild(libSec);
+
+  // Rebuilds profileSelect's options for whichever library is currently
+  // selected. Called both when `profiles` itself updates and when the
+  // user switches libraries (via libSelect's own "change" listener below)
+  // — a library switch naturally resets the selection to "none" here,
+  // same as OstErix's onLibraryChange(), since the old value almost never
+  // matches an option in the new library's own profile list.
+  function renderProfiles() {
+    const profiles = client.get(client.topics.controllerData("profiles")) || {};
+    const profileKey = libSelect.value ? libSelect.value.charAt(0).toUpperCase() + libSelect.value.slice(1).toLowerCase() : "";
+    const options = Array.isArray(profiles[profileKey]) ? profiles[profileKey] : [];
+    const prevValue = profileSelect.value;
+    profileSelect.innerHTML = "";
+    profileSelect.appendChild(el("option", { value: "", text: t("views.profileOptionalPlaceholder") }));
+    for (const p of options) profileSelect.appendChild(el("option", { value: p, text: p }));
+    if (options.includes(prevValue)) profileSelect.value = prevValue;
+  }
+  libSelect.addEventListener("change", renderProfiles);
+
   scope.subscribe(client.topics.controllerData("libraries"), (libs) => {
     // libraries is static in practice (scanned once at server startup) but
     // keep the currently selected library across a redraw regardless.
@@ -810,7 +835,9 @@ export function renderController(client) {
       libSelect.appendChild(el("option", { value: stripped, text: key }));
     }
     if ([...libSelect.options].some((o) => o.value === prevValue)) libSelect.value = prevValue;
+    renderProfiles();
   });
+  scope.subscribe(client.topics.controllerData("profiles"), renderProfiles);
 
   // ---- INDI server & drivers ----
   const indiSec = el("section", { class: "panel" });
