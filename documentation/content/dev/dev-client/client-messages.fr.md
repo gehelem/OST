@@ -49,6 +49,8 @@ Toutes les clés de commandes client sont en **MAJUSCULES** (ex. `DU`, `SV`, `SA
 | [`YL`](#indi) | Charger un driver INDI |
 | [`YR`](#indi) | Recharger un driver INDI |
 | [`YS`](#indi) | Arrêter un driver INDI |
+| [`YC`](#indi) | Connecter le périphérique d'un driver INDI |
+| [`YD`](#indi) | Déconnecter le périphérique d'un driver INDI |
 
 ---
 
@@ -615,8 +617,14 @@ Ces commandes ne sont disponibles que lorsque le serveur dispose d'une instance 
 | `YL` | Charger un driver INDI (`{"YL": {"driver": "<binary>"}}`) |
 | `YR` | Recharger un driver INDI (`{"YR": {"driver": "<binary>"}}`) |
 | `YS` | Arrêter un driver INDI (`{"YS": {"driver": "<binary>"}}`) |
+| `YC` | Connecter le périphérique d'un driver INDI (`{"YC": {"driver": "<binary>"}}`) |
+| `YD` | Déconnecter le périphérique d'un driver INDI (`{"YD": {"driver": "<binary>"}}`) |
 
-`YA` et `YZ` n'ont pas de payload (`{"YA": {}}`). Pour `YL`, `YR` et `YS`, `driver` est le champ `binary` d'une entrée de `controllerdata.indidrivers`.
+`YA` et `YZ` n'ont pas de payload (`{"YA": {}}`). Pour `YL`, `YR`, `YS`, `YC` et `YD`, `driver` est le champ `binary` d'une entrée de `controllerdata.indidrivers`.
+
+{{% notice style="tip" title="Charger un driver ne connecte pas son périphérique" %}}
+`YL` ne fait que démarrer le process du driver - le périphérique doit encore être connecté avant d'être utilisable, avec `YC` (la propriété INDI `CONNECTION.CONNECT`). C'est une étape séparée volontairement : INDI modélise lui-même "process actif" et "périphérique connecté" indépendamment. Comme `YA`/`YZ`, `YC`/`YD` n'ont pas d'accusé de réception dédié (voir l'avertissement ci-dessus) : il n'existe actuellement aucun champ `controllerdata` indiquant si le périphérique d'un driver est réellement connecté, seulement si son process est actif (`indiactivedrivers`).
+{{% /notice %}}
 
 ---
 

@@ -49,6 +49,8 @@ All client command keys are **UPPERCASE** (e.g. `DU`, `SV`, `SA`, `GC`).
 | [`YL`](#indi) | Load INDI driver |
 | [`YR`](#indi) | Reload INDI driver |
 | [`YS`](#indi) | Stop INDI driver |
+| [`YC`](#indi) | Connect an INDI driver's device |
+| [`YD`](#indi) | Disconnect an INDI driver's device |
 
 ---
 
@@ -615,8 +617,14 @@ These commands are only available when the server has an embedded INDI instance.
 | `YL` | Load an INDI driver (`{"YL": {"driver": "<binary>"}}`) |
 | `YR` | Reload an INDI driver (`{"YR": {"driver": "<binary>"}}`) |
 | `YS` | Stop an INDI driver (`{"YS": {"driver": "<binary>"}}`) |
+| `YC` | Connect an INDI driver's device (`{"YC": {"driver": "<binary>"}}`) |
+| `YD` | Disconnect an INDI driver's device (`{"YD": {"driver": "<binary>"}}`) |
 
-`YA` and `YZ` have no payload (`{"YA": {}}`). For `YL`, `YR` and `YS`, `driver` is the `binary` field of an entry of `controllerdata.indidrivers`.
+`YA` and `YZ` have no payload (`{"YA": {}}`). For `YL`, `YR`, `YS`, `YC` and `YD`, `driver` is the `binary` field of an entry of `controllerdata.indidrivers`.
+
+{{% notice style="tip" title="Loading a driver does not connect its device" %}}
+`YL` only starts the driver's process - the device still has to be connected before it is usable, with `YC` (the INDI `CONNECTION.CONNECT` property). This is a separate step on purpose: INDI itself models "process running" and "device connected" independently. Like `YA`/`YZ`, `YC`/`YD` have no dedicated acknowledgment of their own (see the warning above): there is currently no `controllerdata` field reporting whether a driver's device is actually connected, only whether its process is active (`indiactivedrivers`).
+{{% /notice %}}
 
 ---
 

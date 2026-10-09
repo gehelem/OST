@@ -193,7 +193,7 @@ function boolButtonContent(e, name) {
 function buildEditControl(client, moduleName, el_, elName, buffer, opts) {
   const type = el_.type;
   const lov = client.resolveLov(moduleName, el_);
-  if (lov) {
+  if (lov && el_.lovConstrained) {
     const sel = el("select", { class: "field-input" });
     if (el_.nullable) sel.appendChild(el("option", { value: "" }, "—"));
     for (const [k, label] of Object.entries(lov)) {
@@ -206,6 +206,25 @@ function buildEditControl(client, moduleName, el_, elName, buffer, opts) {
       if (opts && opts.onChange) opts.onChange();
     });
     return sel;
+  }
+  if (lov) {
+    // lovConstrained: false (structure.en.md: "whether value must belong
+    // to the LOV" - this is the default, elementbase.h's own
+    // mLovConstrained) - free text, the LOV only offered as suggestions.
+    // A native <input list> + <datalist> gives exactly that with no
+    // custom combobox widget. Gilles, 2026-10-09: every LOV used to get
+    // the constrained <select> above regardless, including
+    // devices.camera/.mount/... (indimodule.cpp's giveMeADevice(), shared
+    // by nearly every module) - a device not yet in the catalog still has
+    // to be typeable by hand, by design, not a bug to route around.
+    const listId = "lov-opts-" + (++lovDatalistSeq);
+    const datalist = el("datalist", { id: listId });
+    for (const label of new Set(Object.values(lov))) datalist.appendChild(el("option", { value: label }));
+    const input = el("input", { type: "text", class: "field-input", list: listId, value: buffer[elName] ?? "" });
+    input.addEventListener("change", () => { buffer[elName] = input.value; if (opts && opts.onChange) opts.onChange(); });
+    const wrap = el("span", { class: "compound-input" });
+    wrap.append(input, datalist);
+    return wrap;
   }
   if (type === "int" || type === "float") {
     if (el_.slider === 1 || el_.slider === 2) {
@@ -494,6 +513,10 @@ function renderGridSection(client, moduleName, propName, prop) {
 let dialogRoot = null;
 export function setDialogRoot(node) { dialogRoot = node; }
 
+// Unique <datalist> id per unconstrained-LOV control built (buildEditControl
+// above) - several can be on screen in the same form at once.
+let lovDatalistSeq = 0;
+
 function openGridDialog(client, moduleName, propName, prop, index, row) {
   const headers = prop.gridheaders || [];
   const form = buildElementsForm(client, moduleName, prop.elements, headers, row || {});
@@ -590,7 +613,13 @@ function openPropertyEditDialog(client, moduleName, propName, prop, formable) {
 function renderPropertyBody(client, moduleName, propName, prop) {
   const body = el("div", { class: "prop-body" });
 
-  if (prop.freevalue) body.appendChild(el("div", { class: "freevalue", text: prop.freevalue }));
+  // freevalue is documented as a generic display field (structure.en.md),
+  // but in practice the only module that ever populates it is indipanel -
+  // and purely as internal plumbing (indipanel.cpp: "we keep original
+  // device name to avoid unwanted level1 device translations"), not a
+  // real annotation meant for the user. Showing it repeated the INDI
+  // device's own name under every single property's label - Gilles,
+  // 2026-10-09, on a QHY camera panel: "ne l'affiche pas".
 
   if (prop.hasGrid && (prop.showGrid || prop.hasGraph)) body.appendChild(renderGridSection(client, moduleName, propName, prop));
   // showElts (default true — same source as showGrid above) gates the

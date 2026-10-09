@@ -97,6 +97,10 @@ class Controller : public QObject
         void startIndiDriver(const QString &pDriver);
         void stopIndiDriver(const QString &pDriver);
         void reloadIndiDriver(const QString &pDriver);
+        void connectIndiDriver(const QString &pDriver);
+        void disconnectIndiDriver(const QString &pDriver);
+        QStringList resolveIndiDeviceNames(const QString &pDriver);
+        const IndiDriverInfo *bestCatalogMatchForLiveName(const QString &deviceLabel);
         void queryActiveIndiDrivers();
         QVariantList activeIndiDriversToVariant() const
         {

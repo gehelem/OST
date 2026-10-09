@@ -110,6 +110,11 @@ void Focus::onExternalEvent(OST::ExtEvent event)
 
 void Focus::updateProperty(INDI::Property p)
 {
+    // Chain up: IndiModule::updateProperty() refreshes devices.*'s own LOV
+    // on a CONNECTION change (issue #231) - overriding this method
+    // entirely, as this one does, otherwise silently skips that.
+    IndiModule::updateProperty(p);
+
     if (
         (QString(p.getDeviceName()) == getString("devices", "camera") )
         &&  (p.getState() == IPS_ALERT)

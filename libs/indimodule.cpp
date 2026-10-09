@@ -260,8 +260,26 @@ void IndiModule::newProperty(INDI::Property pProperty)
 void IndiModule::updateProperty (INDI::Property property)
 {
     //logDebug("IndiModule::updateProperty %1 %2", {property.getDeviceName(), property.getName()});
-    onUpdateProperty(property);
 
+    // A device's CONNECTION switch changing - by any client, not just this
+    // module's own connectDevice()/disconnectDevice() - is the only thing
+    // devices.<x>'s LOV (DRIVER_INTERFACE-*, see refreshDeviceslovs()) still
+    // cares about once the device itself is already known: newDevice()
+    // already refreshes it on first discovery, but a freshly-registered
+    // device is necessarily not connected yet at that point (connecting is
+    // a separate, later step), so it's excluded there on purpose and never
+    // reconsidered again without this. Confirmed live (issue #231): a
+    // module already running when another client starts+connects a new
+    // camera driver never saw it appear in its own devices.camera choices -
+    // "lc-lov create" fired for every loaded module right after the driver
+    // started (device not connected yet, correctly excluded), but nothing
+    // fired again once it actually connected.
+    if (strcmp(property.getName(), "CONNECTION") == 0)
+    {
+        refreshDeviceslovs();
+    }
+
+    onUpdateProperty(property);
 }
 void IndiModule::removeProperty(INDI::Property property)
 {

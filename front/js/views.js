@@ -705,92 +705,232 @@ export function renderController(client) {
   const root = el("div", { class: "controller-view" });
   const scope = client.scope();
 
-  // Two independent topics feed this one screen (controllerdata for most
-  // sections, the module list for "Loaded modules"/"Kill") — re-render
-  // from a single function driven by either, rather than reaching for a
-  // broader "everything" topic that doesn't exist in core by design.
-  function render() {
-    const cd = client.get(client.topics.controllerData()) || {};
-    root.innerHTML = "";
-    root.appendChild(el("h2", null, [icon("tune"), el("span", { text: " " + t("views.controller") })]));
-    if (cd.banner) root.appendChild(el("div", { class: "banner", text: cd.banner }));
-    if (cd.git) root.appendChild(el("div", { class: "muted small mono", text: `${cd.git.Gittag || ""} ${cd.git.Githash || ""} — ${cd.git.Gitdate || ""}` }));
+  // Header: git info only - Gilles, 2026-10-09: drop the "Controller"
+  // title and the banner line, both useless here. No live input lives in
+  // this slot, so a redraw on every uc is harmless - unlike the sections
+  // below, there's no need to reach for a per-key topic for git.
+  const headerSlot = el("div");
+  root.appendChild(headerSlot);
+  scope.subscribe(client.topics.controllerData(), (cd) => {
+    cd = cd || {};
+    headerSlot.innerHTML = "";
+    if (cd.git) headerSlot.appendChild(el("div", { class: "muted small mono", text: `${cd.git.Gittag || ""} ${cd.git.Githash || ""} — ${cd.git.Gitdate || ""}` }));
+  });
 
-    const grid = el("div", { class: "panel-grid" });
+  const grid = el("div", { class: "panel-grid" });
+  root.appendChild(grid);
 
-    const sw = cd.systemwatcher;
-    if (sw) {
-      const sec = el("section", { class: "panel" }, [el("h3", { text: t("views.serverLoad") })]);
-      if (sw.cpu) sec.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: t("views.cpuLabel") }), el("span", { class: "value", text: `${sw.cpu.load_1m} / ${sw.cpu.load_5m} / ${sw.cpu.load_15m}` })]));
-      if (sw.ram) sec.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: t("views.ramLabel") }), el("span", { class: "value", text: `${fmtBytes(sw.ram.used_mb)} / ${fmtBytes(sw.ram.total_mb)}` })]));
-      for (const d of sw.disks || []) sec.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: `${d.mountpoint} (${d.device})` }), el("span", { class: "value", text: `${d.used_gb.toFixed(1)} / ${d.total_gb.toFixed(1)} GB` })]));
-      for (const n of sw.network || []) sec.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: n.iface }), el("span", { class: "value", text: `↓${n.rx_kbps.toFixed(1)} ↑${n.tx_kbps.toFixed(1)} kbps` })]));
-      for (const t of sw.temperatures || []) sec.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: t.type }), el("span", { class: "value", text: `${t.temp_c.toFixed(1)} °C` })]));
-      grid.appendChild(sec);
-    }
+  // Issue #231: the previous version rebuilt the *entire* view (including
+  // the "Load a module" and "Save configuration as" <input>s) from a
+  // single render() driven by the blanket controllerData() topic — so a
+  // periodic systemwatcher tick (nothing to do with what the user was
+  // typing) wiped whatever text was in those fields. Each section below
+  // now subscribes only to the controllerdata key(s) it actually renders
+  // (client-pattern.en.md "Rendering: scope updates to the property that
+  // changed") and redraws only its own sub-container, never the inputs
+  // that live in the same panel.
 
-    const confSec = el("section", { class: "panel" }, [el("h3", { text: t("views.configurations") })]);
-    const confs = cd.availableconfs || {};
-    const confList = el("ul");
+  // ---- Server load (systemwatcher) ----
+  // Appended to the grid last (Gilles, 2026-10-09: keep this panel at the
+  // end) — created here regardless, so the subscription below is set up
+  // alongside every other section instead of out of order.
+  const swSec = el("section", { class: "panel hidden" }, [el("h3", { text: t("views.serverLoad") })]);
+  const swBody = el("div");
+  swSec.appendChild(swBody);
+  scope.subscribe(client.topics.controllerData("systemwatcher"), (sw) => {
+    swSec.classList.toggle("hidden", !sw);
+    swBody.innerHTML = "";
+    if (!sw) return;
+    if (sw.cpu) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: t("views.cpuLabel") }), el("span", { class: "value", text: `${sw.cpu.load_1m} / ${sw.cpu.load_5m} / ${sw.cpu.load_15m}` })]));
+    if (sw.ram) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: t("views.ramLabel") }), el("span", { class: "value", text: `${fmtBytes(sw.ram.used_mb)} / ${fmtBytes(sw.ram.total_mb)}` })]));
+    for (const d of sw.disks || []) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: `${d.mountpoint} (${d.device})` }), el("span", { class: "value", text: `${d.used_gb.toFixed(1)} / ${d.total_gb.toFixed(1)} GB` })]));
+    for (const n of sw.network || []) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: n.iface }), el("span", { class: "value", text: `↓${n.rx_kbps.toFixed(1)} ↑${n.tx_kbps.toFixed(1)} kbps` })]));
+    // "temp", not "t" — the latter would shadow the i18n t() used all over this file.
+    for (const temp of sw.temperatures || []) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: temp.type }), el("span", { class: "value", text: `${temp.temp_c.toFixed(1)} °C` })]));
+  });
+
+  // ---- Configurations ----
+  const confSec = el("section", { class: "panel" }, [el("h3", { text: t("views.configurations") })]);
+  const confList = el("ul");
+  confSec.appendChild(confList);
+  const nameInput = el("input", { type: "text", class: "field-input", placeholder: t("views.configNamePlaceholder") });
+  confSec.appendChild(el("div", { class: "form-row" }, [nameInput, el("button", { class: "btn btn-primary btn-sm", onclick: () => { if (nameInput.value) client.saveConfiguration(nameInput.value); } }, t("views.saveCurrentAs"))]));
+  grid.appendChild(confSec);
+  function renderConfigurations() {
+    const confs = client.get(client.topics.controllerData("availableconfs")) || {};
+    const currentconf = client.get(client.topics.controllerData("currentconf"));
+    confList.innerHTML = "";
     for (const [name, modlist] of Object.entries(confs)) {
       const li = el("li");
-      li.appendChild(el("span", { class: "spacer", text: `${name}${cd.currentconf === name ? t("views.current") : ""} — ${(modlist || []).length} ${t("views.moduleCountSuffix")}` }));
+      li.appendChild(el("span", { class: "spacer", text: `${name}${currentconf === name ? t("views.current") : ""} — ${(modlist || []).length} ${t("views.moduleCountSuffix")}` }));
       li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.loadConfiguration(name) }, t("views.load")));
       confList.appendChild(li);
     }
-    confSec.appendChild(confList);
-    const nameInput = el("input", { type: "text", class: "field-input", placeholder: t("views.configNamePlaceholder") });
-    confSec.appendChild(el("div", { class: "form-row" }, [nameInput, el("button", { class: "btn btn-primary btn-sm", onclick: () => { if (nameInput.value) client.saveConfiguration(nameInput.value); } }, t("views.saveCurrentAs"))]));
-    grid.appendChild(confSec);
+  }
+  // availableconfs and currentconf arrive as two independent uc keys (a uc
+  // only ever carries one) but both feed this same list — either one
+  // redraws it, each reading the other's latest value fresh.
+  scope.subscribe(client.topics.controllerData("availableconfs"), renderConfigurations);
+  scope.subscribe(client.topics.controllerData("currentconf"), renderConfigurations);
 
-    const modSec = el("section", { class: "panel" }, [el("h3", { text: t("views.loadedModules") })]);
-    const modList = el("ul");
-    for (const name of client.get(client.topics.modules())) {
+  // ---- Loaded modules ----
+  const modSec = el("section", { class: "panel" }, [el("h3", { text: t("views.loadedModules") })]);
+  const modList = el("ul");
+  modSec.appendChild(modList);
+  grid.appendChild(modSec);
+  scope.subscribe(client.topics.modules(), (names) => {
+    modList.innerHTML = "";
+    for (const name of names || []) {
       const li = el("li");
       li.appendChild(el("span", { class: "spacer mono small", text: name }));
       if (name !== "GlobalDatastore") li.appendChild(el("button", { class: "btn btn-sm btn-danger", onclick: () => { if (confirm(t("views.unloadConfirm", { name }))) client.killModule(name); } }, t("views.kill")));
       modList.appendChild(li);
     }
-    modSec.appendChild(modList);
-    grid.appendChild(modSec);
+  });
 
-    const libSec = el("section", { class: "panel" }, [el("h3", { text: t("views.loadAModule") })]);
-    const libs = cd.libraries || {};
-    const libSelect = el("select", { class: "field-input" });
-    for (const key of Object.keys(libs)) {
+  // ---- Load a module ----
+  // labelInput is created once, outside any subscription — this is the
+  // field issue #231 was filed about, it must never be touched again
+  // after the user starts typing in it. profileSelect is a dropdown, not
+  // a free-text field, matching OstErix's own Load module dialog
+  // (global-parameters.component.ts LoadModuleDialogComponent): options
+  // come from controllerdata.profiles, keyed by the library name with its
+  // first letter uppercased and the rest lowercased (see
+  // controller.en.md's "profiles keying" warning — not a plain capitalize,
+  // and not the same string as libSelect's own stripped value).
+  const libSec = el("section", { class: "panel" }, [el("h3", { text: t("views.loadAModule") })]);
+  const libSelect = el("select", { class: "field-input" });
+  const labelInput = el("input", { type: "text", class: "field-input", placeholder: t("views.instanceLabelPlaceholder") });
+  const profileSelect = el("select", { class: "field-input" });
+  libSec.appendChild(el("div", { class: "form-row" }, [libSelect, labelInput, profileSelect,
+    el("button", { class: "btn btn-primary btn-sm", onclick: () => { if (labelInput.value) client.loadModule(libSelect.value, labelInput.value, profileSelect.value || undefined); } }, t("views.load")),
+  ]));
+  grid.appendChild(libSec);
+
+  // Rebuilds profileSelect's options for whichever library is currently
+  // selected. Called both when `profiles` itself updates and when the
+  // user switches libraries (via libSelect's own "change" listener below)
+  // — a library switch naturally resets the selection to "none" here,
+  // same as OstErix's onLibraryChange(), since the old value almost never
+  // matches an option in the new library's own profile list.
+  function renderProfiles() {
+    const profiles = client.get(client.topics.controllerData("profiles")) || {};
+    const profileKey = libSelect.value ? libSelect.value.charAt(0).toUpperCase() + libSelect.value.slice(1).toLowerCase() : "";
+    const options = Array.isArray(profiles[profileKey]) ? profiles[profileKey] : [];
+    const prevValue = profileSelect.value;
+    profileSelect.innerHTML = "";
+    profileSelect.appendChild(el("option", { value: "", text: t("views.profileOptionalPlaceholder") }));
+    for (const p of options) profileSelect.appendChild(el("option", { value: p, text: p }));
+    if (options.includes(prevValue)) profileSelect.value = prevValue;
+  }
+  libSelect.addEventListener("change", renderProfiles);
+
+  scope.subscribe(client.topics.controllerData("libraries"), (libs) => {
+    // libraries is static in practice (scanned once at server startup) but
+    // keep the currently selected library across a redraw regardless.
+    const prevValue = libSelect.value;
+    libSelect.innerHTML = "";
+    for (const key of Object.keys(libs || {})) {
       const stripped = key.startsWith("libost") ? key.slice(6) : key;
       libSelect.appendChild(el("option", { value: stripped, text: key }));
     }
-    const labelInput = el("input", { type: "text", class: "field-input", placeholder: t("views.instanceLabelPlaceholder") });
-    const profileInput = el("input", { type: "text", class: "field-input", placeholder: t("views.profileOptionalPlaceholder") });
-    libSec.appendChild(el("div", { class: "form-row" }, [libSelect, labelInput, profileInput,
-      el("button", { class: "btn btn-primary btn-sm", onclick: () => { if (labelInput.value) client.loadModule(libSelect.value, labelInput.value, profileInput.value || undefined); } }, t("views.load")),
-    ]));
-    grid.appendChild(libSec);
+    if ([...libSelect.options].some((o) => o.value === prevValue)) libSelect.value = prevValue;
+    renderProfiles();
+  });
+  scope.subscribe(client.topics.controllerData("profiles"), renderProfiles);
 
-    const indiSec = el("section", { class: "panel" }, [el("h3", { text: t("views.indiServerPrefix") + (cd.indiserver === "Y" ? t("views.enabled") : t("views.disabled")) })]);
-    indiSec.appendChild(el("div", { class: "form-row" }, [
-      el("button", { class: "btn btn-sm", onclick: () => client.indiStart() }, t("views.startServer")),
-      el("button", { class: "btn btn-sm", onclick: () => client.indiStop() }, t("views.stopServer")),
-    ]));
-    const active = new Set((cd.indiactivedrivers || []).map((d) => d.binary));
-    const driversList = el("ul");
-    for (const d of cd.indidrivers || []) {
-      const li = el("li");
-      li.appendChild(el("span", { class: "spacer small", text: `${d.label} (${d.family})${active.has(d.binary) ? t("views.runningSuffix") : ""}` }));
-      li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.indiLoadDriver(d.binary) }, t("views.load")));
-      li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.indiReloadDriver(d.binary) }, t("views.reload")));
-      li.appendChild(el("button", { class: "btn btn-sm btn-danger", onclick: () => client.indiStopDriver(d.binary) }, t("views.stop")));
-      driversList.appendChild(li);
-    }
-    indiSec.appendChild(driversList);
-    grid.appendChild(indiSec);
+  // ---- INDI server & drivers ----
+  // indiserver reflects whether ostserver itself was launched with
+  // --indiserver, not whether some INDI server happens to be running
+  // right now (controller.en.md) — "N" means OST isn't the one managing
+  // it at all (a separately-run indiserver, or none), so there is nothing
+  // to start/stop/list here. "Y" gets the controls; more to come here
+  // per Gilles, 2026-10-09 (issue #231, second half).
+  const indiSec = el("section", { class: "panel" });
+  const indiTitle = el("h3");
+  indiSec.appendChild(indiTitle);
+  const indiExternalMsg = el("div", { class: "muted small hidden", text: t("views.indiServerManagedElsewhere") });
+  indiSec.appendChild(indiExternalMsg);
+  const indiControls = el("div", { class: "hidden" });
+  indiControls.appendChild(el("div", { class: "form-row" }, [
+    el("button", { class: "btn btn-sm", onclick: () => client.indiStart() }, t("views.startServer")),
+    el("button", { class: "btn btn-sm", onclick: () => client.indiStop() }, t("views.stopServer")),
+  ]));
+  // Top zone: drivers actually running right now (indiactivedrivers) -
+  // reload/stop only, no "load" (they're already loaded).
+  indiControls.appendChild(el("div", { class: "muted small", text: t("views.activeIndiDrivers") }));
+  const activeDriversList = el("ul");
+  indiControls.appendChild(activeDriversList);
 
-    root.appendChild(grid);
+  // Bottom zone: free-text search (driverSearchInput is created once,
+  // outside any subscription, same caution as labelInput above - never
+  // touched again after creation) over the full driver catalogue
+  // (indidrivers), each result with its own "start" button. Filtering
+  // only kicks in from 3 characters - the catalogue is in the hundreds on
+  // a full INDI install, not worth listing unfiltered.
+  indiControls.appendChild(el("div", { class: "muted small", text: t("views.startIndiDriver") }));
+  const driverSearchInput = el("input", { type: "text", class: "field-input", placeholder: t("views.indiDriverSearchPlaceholder") });
+  indiControls.appendChild(driverSearchInput);
+  const availableDriversList = el("ul");
+  indiControls.appendChild(availableDriversList);
+  indiSec.appendChild(indiControls);
+  grid.appendChild(indiSec);
+
+  // Case- and accent-insensitive: NFD-normalize then strip the combining
+  // diacritical marks Unicode splits accents into, so "é" and "e" compare
+  // equal (e.g. "Celestron" / "télescope").
+  function normalizeForSearch(s) {
+    return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
   }
 
-  scope.subscribe(client.topics.controllerData(), render);
-  scope.subscribe(client.topics.modules(), render);
+  function renderAvailableDrivers() {
+    const query = normalizeForSearch(driverSearchInput.value.trim());
+    availableDriversList.innerHTML = "";
+    if (query.length < 3) return;
+    const drivers = client.get(client.topics.controllerData("indidrivers")) || [];
+    for (const d of drivers) {
+      if (!normalizeForSearch(`${d.label} (${d.family})`).includes(query)) continue;
+      const li = el("li");
+      li.appendChild(el("span", { class: "spacer small", text: `${d.label} (${d.family})` }));
+      li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.indiLoadDriver(d.binary) }, t("views.start")));
+      availableDriversList.appendChild(li);
+    }
+  }
+  driverSearchInput.addEventListener("input", renderAvailableDrivers);
+
+  function renderIndi() {
+    const indiserver = client.get(client.topics.controllerData("indiserver"));
+    const enabled = indiserver === "Y";
+    indiTitle.textContent = t("views.indiServerPrefix") + (enabled ? t("views.enabled") : t("views.disabled"));
+    indiExternalMsg.classList.toggle("hidden", enabled);
+    indiControls.classList.toggle("hidden", !enabled);
+    if (!enabled) return;
+    const activeDrivers = client.get(client.topics.controllerData("indiactivedrivers")) || [];
+    activeDriversList.innerHTML = "";
+    for (const d of activeDrivers) {
+      // Two lines - label, then icon buttons below it - rather than
+      // cramming four buttons on the same row as the label (Gilles,
+      // 2026-10-09: that overflowed the panel on a narrow column).
+      const li = el("li", { class: "indi-driver-row" });
+      li.appendChild(el("div", { class: "small", text: `${d.label} (${d.family})` }));
+      const actions = el("div", { class: "icon-btn-row" });
+      // Connect/disconnect act on the device itself (YC/YD), separate from
+      // the driver process (reload/stop) - starting a driver doesn't
+      // connect its device on its own, see issue #231.
+      actions.appendChild(iconButton("link", t("views.connect"), () => client.indiConnectDriver(d.binary)));
+      actions.appendChild(iconButton("link_off", t("views.disconnect"), () => client.indiDisconnectDriver(d.binary)));
+      actions.appendChild(iconButton("refresh", t("views.reload"), () => client.indiReloadDriver(d.binary)));
+      actions.appendChild(iconButton("stop", t("views.stop"), () => client.indiStopDriver(d.binary), { danger: true }));
+      li.appendChild(actions);
+      activeDriversList.appendChild(li);
+    }
+  }
+  scope.subscribe(client.topics.controllerData("indiserver"), renderIndi);
+  scope.subscribe(client.topics.controllerData("indidrivers"), renderIndi);
+  scope.subscribe(client.topics.controllerData("indiactivedrivers"), renderIndi);
+  scope.subscribe(client.topics.controllerData("indidrivers"), renderAvailableDrivers);
+
+  grid.appendChild(swSec);
 
   return { node: root, dispose: scope.dispose };
 }

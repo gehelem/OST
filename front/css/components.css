@@ -354,7 +354,6 @@ input[type="range"]::-moz-range-thumb {
  * right instead, wrapping to a new line once they run out of room. */
 .elt-button-row { display: flex; flex-wrap: wrap; gap: 6px; }
 .readonly-val { font-family: var(--font-mono); color: var(--text-secondary); }
-.freevalue { font-style: italic; color: var(--text-muted); margin-bottom: var(--space-2); }
 
 /* ------------------------------------------------------------------ grid */
 .grid-section { margin-top: var(--space-2); }
@@ -421,7 +420,16 @@ input[type="range"]::-moz-range-thumb {
 /* ---------------------------------------------------------------- panel lists */
 .panel h3 { margin-top: 0; }
 .panel ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
-.panel li { display: flex; align-items: center; gap: var(--space-2); padding: 4px 0; }
+/* flex-wrap: wrap, same as .form-row above - a generic safety net on a
+   narrow column (panel-grid's own 260px minimum) for any list row with
+   more than one button. */
+.panel li { display: flex; align-items: center; gap: var(--space-2); padding: 4px 0; flex-wrap: wrap; }
+/* Controller's active INDI drivers (Connect/Disconnect/Reload/Stop):
+   label on its own line, icon buttons below it, rather than wrapping
+   four buttons onto the same row as the label - Gilles, 2026-10-09,
+   after the wrapped version still looked bad ("c'est moche"). */
+.panel li.indi-driver-row { flex-direction: column; align-items: stretch; gap: 4px; }
+.icon-btn-row { display: flex; gap: var(--space-2); }
 
 /* ---------------------------------------------------------------- files */
 .files-layout { display: flex; gap: var(--space-4); align-items: flex-start; }

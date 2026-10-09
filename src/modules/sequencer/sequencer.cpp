@@ -746,6 +746,12 @@ void Sequencer::newProperty(INDI::Property property)
 
 void Sequencer::updateProperty(INDI::Property property)
 {
+    // Chain up: IndiModule::updateProperty() refreshes devices.*'s own LOV
+    // on a CONNECTION change (issue #231) - overriding this method
+    // entirely, as this one does, otherwise silently skips that. Kept
+    // ahead of the early returns below.
+    IndiModule::updateProperty(property);
+
     if (strcmp(property.getName(), "CCD1") == 0)
     {
         newBLOB(property);

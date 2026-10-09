@@ -49,6 +49,8 @@ Tutte le chiavi dei comandi client sono in **MAIUSCOLO** (es. `DU`, `SV`, `SA`, 
 | [`YL`](#indi) | Caricare un driver INDI |
 | [`YR`](#indi) | Ricaricare un driver INDI |
 | [`YS`](#indi) | Arrestare un driver INDI |
+| [`YC`](#indi) | Connettere il device di un driver INDI |
+| [`YD`](#indi) | Disconnettere il device di un driver INDI |
 
 ---
 
@@ -615,8 +617,14 @@ Questi comandi sono disponibili solo quando il server dispone di un'istanza INDI
 | `YL` | Caricare un driver INDI (`{"YL": {"driver": "<binary>"}}`) |
 | `YR` | Ricaricare un driver INDI (`{"YR": {"driver": "<binary>"}}`) |
 | `YS` | Arrestare un driver INDI (`{"YS": {"driver": "<binary>"}}`) |
+| `YC` | Connettere il device di un driver INDI (`{"YC": {"driver": "<binary>"}}`) |
+| `YD` | Disconnettere il device di un driver INDI (`{"YD": {"driver": "<binary>"}}`) |
 
-`YA` e `YZ` non hanno payload (`{"YA": {}}`). Per `YL`, `YR` e `YS`, `driver` è il campo `binary` di una voce di `controllerdata.indidrivers`.
+`YA` e `YZ` non hanno payload (`{"YA": {}}`). Per `YL`, `YR`, `YS`, `YC` e `YD`, `driver` è il campo `binary` di una voce di `controllerdata.indidrivers`.
+
+{{% notice style="tip" title="Caricare un driver non connette il suo device" %}}
+`YL` avvia solo il processo del driver - il device deve ancora essere connesso prima di essere utilizzabile, con `YC` (la proprietà INDI `CONNECTION.CONNECT`). È un passaggio separato di proposito: INDI stesso modella "processo attivo" e "device connesso" in modo indipendente. Come `YA`/`YZ`, `YC`/`YD` non hanno un riscontro dedicato (vedi l'avviso sopra): al momento non esiste alcun campo `controllerdata` che indichi se il device di un driver è effettivamente connesso, solo se il suo processo è attivo (`indiactivedrivers`).
+{{% /notice %}}
 
 ---
 
