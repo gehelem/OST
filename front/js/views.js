@@ -856,10 +856,48 @@ export function renderController(client) {
     el("button", { class: "btn btn-sm", onclick: () => client.indiStart() }, t("views.startServer")),
     el("button", { class: "btn btn-sm", onclick: () => client.indiStop() }, t("views.stopServer")),
   ]));
-  const driversList = el("ul");
-  indiControls.appendChild(driversList);
+  // Top zone: drivers actually running right now (indiactivedrivers) -
+  // reload/stop only, no "load" (they're already loaded).
+  indiControls.appendChild(el("div", { class: "muted small", text: t("views.activeIndiDrivers") }));
+  const activeDriversList = el("ul");
+  indiControls.appendChild(activeDriversList);
+
+  // Bottom zone: free-text search (driverSearchInput is created once,
+  // outside any subscription, same caution as labelInput above - never
+  // touched again after creation) over the full driver catalogue
+  // (indidrivers), each result with its own "start" button. Filtering
+  // only kicks in from 3 characters - the catalogue is in the hundreds on
+  // a full INDI install, not worth listing unfiltered.
+  indiControls.appendChild(el("div", { class: "muted small", text: t("views.startIndiDriver") }));
+  const driverSearchInput = el("input", { type: "text", class: "field-input", placeholder: t("views.indiDriverSearchPlaceholder") });
+  indiControls.appendChild(driverSearchInput);
+  const availableDriversList = el("ul");
+  indiControls.appendChild(availableDriversList);
   indiSec.appendChild(indiControls);
   grid.appendChild(indiSec);
+
+  // Case- and accent-insensitive: NFD-normalize then strip the combining
+  // diacritical marks Unicode splits accents into, so "é" and "e" compare
+  // equal (e.g. "Celestron" / "télescope").
+  function normalizeForSearch(s) {
+    return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  }
+
+  function renderAvailableDrivers() {
+    const query = normalizeForSearch(driverSearchInput.value.trim());
+    availableDriversList.innerHTML = "";
+    if (query.length < 3) return;
+    const drivers = client.get(client.topics.controllerData("indidrivers")) || [];
+    for (const d of drivers) {
+      if (!normalizeForSearch(`${d.label} (${d.family})`).includes(query)) continue;
+      const li = el("li");
+      li.appendChild(el("span", { class: "spacer small", text: `${d.label} (${d.family})` }));
+      li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.indiLoadDriver(d.binary) }, t("views.start")));
+      availableDriversList.appendChild(li);
+    }
+  }
+  driverSearchInput.addEventListener("input", renderAvailableDrivers);
+
   function renderIndi() {
     const indiserver = client.get(client.topics.controllerData("indiserver"));
     const enabled = indiserver === "Y";
@@ -867,22 +905,20 @@ export function renderController(client) {
     indiExternalMsg.classList.toggle("hidden", enabled);
     indiControls.classList.toggle("hidden", !enabled);
     if (!enabled) return;
-    const drivers = client.get(client.topics.controllerData("indidrivers")) || [];
     const activeDrivers = client.get(client.topics.controllerData("indiactivedrivers")) || [];
-    const active = new Set(activeDrivers.map((d) => d.binary));
-    driversList.innerHTML = "";
-    for (const d of drivers) {
+    activeDriversList.innerHTML = "";
+    for (const d of activeDrivers) {
       const li = el("li");
-      li.appendChild(el("span", { class: "spacer small", text: `${d.label} (${d.family})${active.has(d.binary) ? t("views.runningSuffix") : ""}` }));
-      li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.indiLoadDriver(d.binary) }, t("views.load")));
+      li.appendChild(el("span", { class: "spacer small", text: `${d.label} (${d.family})` }));
       li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.indiReloadDriver(d.binary) }, t("views.reload")));
       li.appendChild(el("button", { class: "btn btn-sm btn-danger", onclick: () => client.indiStopDriver(d.binary) }, t("views.stop")));
-      driversList.appendChild(li);
+      activeDriversList.appendChild(li);
     }
   }
   scope.subscribe(client.topics.controllerData("indiserver"), renderIndi);
   scope.subscribe(client.topics.controllerData("indidrivers"), renderIndi);
   scope.subscribe(client.topics.controllerData("indiactivedrivers"), renderIndi);
+  scope.subscribe(client.topics.controllerData("indidrivers"), renderAvailableDrivers);
 
   return { node: root, dispose: scope.dispose };
 }
