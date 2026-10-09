@@ -590,7 +590,13 @@ function openPropertyEditDialog(client, moduleName, propName, prop, formable) {
 function renderPropertyBody(client, moduleName, propName, prop) {
   const body = el("div", { class: "prop-body" });
 
-  if (prop.freevalue) body.appendChild(el("div", { class: "freevalue", text: prop.freevalue }));
+  // freevalue is documented as a generic display field (structure.en.md),
+  // but in practice the only module that ever populates it is indipanel -
+  // and purely as internal plumbing (indipanel.cpp: "we keep original
+  // device name to avoid unwanted level1 device translations"), not a
+  // real annotation meant for the user. Showing it repeated the INDI
+  // device's own name under every single property's label - Gilles,
+  // 2026-10-09, on a QHY camera panel: "ne l'affiche pas".
 
   if (prop.hasGrid && (prop.showGrid || prop.hasGraph)) body.appendChild(renderGridSection(client, moduleName, propName, prop));
   // showElts (default true — same source as showGrid above) gates the

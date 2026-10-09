@@ -354,7 +354,6 @@ input[type="range"]::-moz-range-thumb {
  * right instead, wrapping to a new line once they run out of room. */
 .elt-button-row { display: flex; flex-wrap: wrap; gap: 6px; }
 .readonly-val { font-family: var(--font-mono); color: var(--text-secondary); }
-.freevalue { font-style: italic; color: var(--text-muted); margin-bottom: var(--space-2); }
 
 /* ------------------------------------------------------------------ grid */
 .grid-section { margin-top: var(--space-2); }
