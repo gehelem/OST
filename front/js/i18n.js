@@ -140,6 +140,8 @@ const STRINGS = {
   "views.stopServer": { en: "Stop server", fr: "Arrêter le serveur", de: "Server stoppen", it: "Ferma server", es: "Detener servidor" },
   "views.reload": { en: "Reload", fr: "Recharger", de: "Neu laden", it: "Ricarica", es: "Recargar" },
   "views.stop": { en: "Stop", fr: "Arrêter", de: "Stoppen", it: "Ferma", es: "Detener" },
+  "views.connect": { en: "Connect", fr: "Connecter", de: "Verbinden", it: "Connetti", es: "Conectar" },
+  "views.disconnect": { en: "Disconnect", fr: "Déconnecter", de: "Trennen", it: "Disconnetti", es: "Desconectar" },
   "views.runningSuffix": { en: " ● running", fr: " ● en cours", de: " ● läuft", it: " ● in esecuzione", es: " ● en ejecución" },
   "views.activeIndiDrivers": { en: "Active drivers", fr: "Drivers actifs", de: "Aktive Treiber", it: "Driver attivi", es: "Controladores activos" },
   "views.start": { en: "Start", fr: "Démarrer", de: "Starten", it: "Avvia", es: "Iniciar" },

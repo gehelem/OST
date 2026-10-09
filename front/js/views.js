@@ -910,6 +910,11 @@ export function renderController(client) {
     for (const d of activeDrivers) {
       const li = el("li");
       li.appendChild(el("span", { class: "spacer small", text: `${d.label} (${d.family})` }));
+      // Connect/disconnect act on the device itself (YC/YD), separate from
+      // the driver process (reload/stop) - starting a driver doesn't
+      // connect its device on its own, see issue #231.
+      li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.indiConnectDriver(d.binary) }, t("views.connect")));
+      li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.indiDisconnectDriver(d.binary) }, t("views.disconnect")));
       li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.indiReloadDriver(d.binary) }, t("views.reload")));
       li.appendChild(el("button", { class: "btn btn-sm btn-danger", onclick: () => client.indiStopDriver(d.binary) }, t("views.stop")));
       activeDriversList.appendChild(li);

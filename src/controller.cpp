@@ -732,6 +732,26 @@ void Controller::onExternalEvent(OST::ExtEvent event)
             reloadIndiDriver(event.data["driver"].toString());
             return;
         }
+        case OST::ExtEvType::YC:
+        {
+            if (!event.data.contains("driver"))
+            {
+                logError("Controller::onExternalEvent - invalid event data content - %1", {OST::ExtEvToString(event.ev)});
+                return;
+            };
+            connectIndiDriver(event.data["driver"].toString());
+            return;
+        }
+        case OST::ExtEvType::YD:
+        {
+            if (!event.data.contains("driver"))
+            {
+                logError("Controller::onExternalEvent - invalid event data content - %1", {OST::ExtEvToString(event.ev)});
+                return;
+            };
+            disconnectIndiDriver(event.data["driver"].toString());
+            return;
+        }
         default:
         {
             if (!event.data.contains("m"))
@@ -1163,6 +1183,71 @@ void Controller::reloadIndiDriver(const QString &pDriver)
         startIndiDriver(pDriver);
     });
     mLogger->info("Reload requested for driver: " + pDriver);
+}
+
+// Resolves a driver binary (what YL/YR/YS/YC/YD identify a driver by, same
+// as controllerdata.indidrivers' own "binary" field) to the live INDI
+// device name(s) it is actually running under on the bus right now - not
+// the same string for mdpd ("multiple devices per driver") drivers, which
+// rename themselves to "<catalog label> <model>" once connected to real
+// hardware (see queryActiveIndiDrivers()'s own comment for the confirmed
+// example: indi_qhy_ccd → "QHY CCD QHYminiCam8M"). Queried live via
+// DRIVER_INFO.DRIVER_EXEC rather than reused from _activeIndiDrivers,
+// which only ever stores the generic catalog label, not the live name
+// CONNECTION.CONNECT/DISCONNECT actually needs. A driver can in principle
+// expose more than one device at once (mdpd), hence a list.
+QStringList Controller::resolveIndiDeviceNames(const QString &pDriver)
+{
+    QStringList names;
+
+    QProcess proc;
+    proc.start("indi_getprop", {"-t", "2", "*.DRIVER_INFO.DRIVER_EXEC"});
+    proc.waitForFinished(4000);
+
+    for (const QString &line : QString(proc.readAllStandardOutput()).split('\n'))
+    {
+        QString trimmed = line.trimmed();
+        if (trimmed.isEmpty()) continue;
+
+        int eq = trimmed.indexOf('=');
+        if (eq < 0) continue;
+        if (trimmed.mid(eq + 1).trimmed() != pDriver) continue;
+
+        QString deviceName = trimmed.left(eq).section('.', 0, 0);
+        if (!deviceName.isEmpty()) names << deviceName;
+    }
+
+    return names;
+}
+
+void Controller::connectIndiDriver(const QString &pDriver)
+{
+    const QStringList devices = resolveIndiDeviceNames(pDriver);
+    if (devices.isEmpty())
+    {
+        mLogger->warning("Cannot connect " + pDriver + ": no live INDI device found for it");
+        return;
+    }
+    for (const QString &device : devices)
+    {
+        QProcess::execute("indi_setprop", {"-t", "2", device + ".CONNECTION.CONNECT=On"});
+        mLogger->info("Sent connect command for device: " + device);
+    }
+}
+
+void Controller::disconnectIndiDriver(const QString &pDriver)
+{
+    const QStringList devices = resolveIndiDeviceNames(pDriver);
+    if (devices.isEmpty())
+    {
+        mLogger->warning("Cannot disconnect " + pDriver + ": no live INDI device found for it");
+        return;
+    }
+    for (const QString &device : devices)
+    {
+        QProcess::execute("indi_setprop", {"-t", "2", device + ".CONNECTION.DISCONNECT=On"});
+        mLogger->info("Sent disconnect command for device: " + device);
+    }
 }
 
 void Controller::queryActiveIndiDrivers()
