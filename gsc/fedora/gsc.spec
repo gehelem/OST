@@ -33,8 +33,14 @@ with a realistic star field. Not needed for real hardware.
 
 %build
 cd src
-make clean
-make CC="gcc -std=gnu17"
+# See gsc/arch/PKGBUILD's own comment for both of these - the
+# upstream Makefile's own CC bakes in -I. (gsc.c et al use
+# #include <gsc.h> with angle brackets, genuinely needs it to find
+# the header at all), and modern GCC defaults
+# -Wimplicit-function-declaration to a hard error regardless of
+# -std=gnu17 (isspace/ispunct/read/lseek/close, 1990s C) - both
+# confirmed the hard way, not guessed.
+make CC="gcc -I. -std=gnu17 -Wno-error=implicit-function-declaration"
 
 %install
 for f in $(find [NS]* -type f); do

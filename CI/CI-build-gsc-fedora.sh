@@ -8,7 +8,10 @@ set -e
 
 dnf -y install rpm-build make gcc wget
 
-mkdir -p ~/rpmbuild/SPECS
+# Full standard tree, not just SPECS - rpmbuild's own Source0 fetch
+# writes into SOURCES, confirmed failing outright when that directory
+# doesn't exist ("curl: (23) client returned ERROR on write").
+mkdir -p ~/rpmbuild/{SPECS,SOURCES,BUILD,RPMS,SRPMS,BUILDROOT}
 cp "${CI_PROJECT_DIR}/gsc/fedora/gsc.spec" ~/rpmbuild/SPECS/
 # %undefine _disable_source_fetch in the spec lets rpmbuild fetch
 # Source0 (a plain URL) itself - no need to pre-download here.

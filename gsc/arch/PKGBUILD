@@ -31,8 +31,16 @@ sha256sums=('SKIP')
 
 build() {
     cd "${srcdir}/src"
-    make clean
-    make CC="gcc -std=gnu17"
+    # The upstream Makefile's own CC ("cc -I. -O") bakes in -I. -
+    # gsc.c et al use #include <gsc.h> (angle brackets, not quotes),
+    # so it genuinely depends on that flag to find the header at all.
+    # Overriding CC must keep it, confirmed the hard way ("gsc.h: No
+    # such file or directory" the first time this dropped it).
+    # -Wno-error=implicit-function-declaration: modern GCC defaults
+    # this to a hard error regardless of -std=gnu17 (isspace/ispunct/
+    # read/lseek/close called without their headers, 1990s C) -
+    # -std=gnu17 alone still leaves it fatal, confirmed the hard way.
+    make CC="gcc -I. -std=gnu17 -Wno-error=implicit-function-declaration"
 }
 
 package() {
