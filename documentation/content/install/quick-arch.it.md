@@ -14,9 +14,10 @@ macchina: il back-end OST, l'interfaccia web, nginx, INDI,
 `astrometry.net` e la documentazione che stai leggendo in questo
 momento.
 
-{{% notice style="note" title="Usi Ubuntu invece?" %}}
+{{% notice style="note" title="Usi Ubuntu o Fedora invece?" %}}
 Questa pagina è specifica per Arch Linux. Su Ubuntu, segui invece
-[Installazione rapida (Ubuntu Resolute)](../quick/).
+[Installazione rapida (Ubuntu Resolute)](../quick/) oppure, su
+Fedora, [Installazione rapida (Fedora)](../quick-fedora/).
 {{% /notice %}}
 
 ---

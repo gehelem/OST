@@ -14,10 +14,10 @@ Dieses einzige Skript installiert alles Nötige auf einer Maschine: das
 OST-Backend, die Weboberfläche, nginx, INDI, `astrometry.net` und die
 Dokumentation, die Sie gerade lesen.
 
-{{% notice style="note" title="Verwenden Sie stattdessen Arch Linux?" %}}
-Diese Seite ist speziell für Ubuntu. Unter Arch Linux folgen Sie
-stattdessen der
-[Schnellinstallation (Arch Linux)](../quick-arch/).
+{{% notice style="note" title="Verwenden Sie stattdessen Arch Linux oder Fedora?" %}}
+Diese Seite ist speziell für Ubuntu. Sehen Sie stattdessen die
+[Schnellinstallation (Arch Linux)](../quick-arch/) oder die
+[Schnellinstallation (Fedora)](../quick-fedora/).
 {{% /notice %}}
 
 ---
