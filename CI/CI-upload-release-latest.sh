@@ -19,6 +19,10 @@ curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ostserver-co
 [ -f ostserver_latest_arch_x86_64.pkg.tar.zst ] && curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ostserver_latest_arch_x86_64.pkg.tar.zst "${PACKAGE_REGISTRY_LATEST}/ostserver_latest_arch_x86_64.pkg.tar.zst"
 [ -f ostserver-complete_latest_arch_x86_64.pkg.tar.zst ] && curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ostserver-complete_latest_arch_x86_64.pkg.tar.zst "${PACKAGE_REGISTRY_LATEST}/ostserver-complete_latest_arch_x86_64.pkg.tar.zst"
 [ -f documentation/${DOC_FILE_LATEST} ] && curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file documentation/${DOC_FILE_LATEST} "${PACKAGE_REGISTRY_LATEST}/${DOC_FILE_LATEST}"
+# Only built on a push to main (CI/android.yml's own rules - never during
+# an MR, so this is routinely absent on an MR's own release-job-latest
+# run), same [ -f ... ] guard as every other optional asset above.
+[ -f ${APK_FILE_LATEST} ] && curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${APK_FILE_LATEST} "${PACKAGE_REGISTRY_LATEST}/${APK_FILE_LATEST}"
 echo "create release"
 ASSETS="--assets-link {\"name\":\"ostserver_latest_2604_amd64.deb\",\"url\":\"${PACKAGE_REGISTRY_LATEST}/ostserver_latest_2604_amd64.deb\"}"
 [ -f ostserver_latest_2404_amd64.deb ] && ASSETS="$ASSETS --assets-link {\"name\":\"ostserver_latest_2404_amd64.deb\",\"url\":\"${PACKAGE_REGISTRY_LATEST}/ostserver_latest_2404_amd64.deb\"}"
@@ -32,4 +36,5 @@ ASSETS="$ASSETS --assets-link {\"name\":\"ostserver-complete_latest_2604_amd64.d
 [ -f ostserver_latest_arch_x86_64.pkg.tar.zst ] && ASSETS="$ASSETS --assets-link {\"name\":\"ostserver_latest_arch_x86_64.pkg.tar.zst\",\"url\":\"${PACKAGE_REGISTRY_LATEST}/ostserver_latest_arch_x86_64.pkg.tar.zst\"}"
 [ -f ostserver-complete_latest_arch_x86_64.pkg.tar.zst ] && ASSETS="$ASSETS --assets-link {\"name\":\"ostserver-complete_latest_arch_x86_64.pkg.tar.zst\",\"url\":\"${PACKAGE_REGISTRY_LATEST}/ostserver-complete_latest_arch_x86_64.pkg.tar.zst\"}"
 [ -f documentation/${DOC_FILE_LATEST} ] && ASSETS="$ASSETS --assets-link {\"name\":\"${DOC_FILE_LATEST}\",\"url\":\"${PACKAGE_REGISTRY_LATEST}/${DOC_FILE_LATEST}\"}"
+[ -f ${APK_FILE_LATEST} ] && ASSETS="$ASSETS --assets-link {\"name\":\"${APK_FILE_LATEST}\",\"url\":\"${PACKAGE_REGISTRY_LATEST}/${APK_FILE_LATEST}\"}"
 release-cli create --name "latest" --tag-name latest $ASSETS
