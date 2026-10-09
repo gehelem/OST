@@ -39,10 +39,11 @@ makedepends=(
 # nginx is ostserver-complete's own addition, set directly in its own
 # package_ostserver-complete() below. libindi/gsc/astrometry.net
 # themselves are NOT listed as hard depends: libindi is in [extra] so
-# pacman resolves it on its own, but gsc and astrometry.net only exist
-# on AUR and are only needed for plate solving, not for the server to
-# start - optdepends instead (matches the Debian side's own Recommends,
-# not a hard Depends).
+# pacman resolves it on its own; astrometry.net is AUR-only, and gsc
+# isn't in any repo at all (pacman or AUR - see gsc/arch/PKGBUILD, our
+# own standalone package, issue #230 follow-up) - neither is needed
+# for the server to start, just optdepends (matches the Debian side's
+# own Recommends, not a hard Depends).
 #
 # Bash variable names cannot contain a hyphen, unlike function names
 # (package_ostserver-complete() below is fine) - there is no
@@ -58,7 +59,7 @@ _depends_common=(
 )
 _optdepends_common=(
     'astrometry.net: plate solving (Navigator/Polar modules)'
-    'gsc: star field data for INDI'"'"'s CCD simulator'
+    'gsc: star field data for INDI'"'"'s CCD simulator (our own package, not in any repo - see install-latest-complete-arch.sh)'
 )
 
 source=("${pkgbase}-${pkgver}.tar.gz::${url}/-/archive/${pkgver}/${pkgbase}-${pkgver}.tar.gz")

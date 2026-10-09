@@ -21,7 +21,7 @@ set -e
 # Note: the password may be asked for repeatedly during this script.
 # A sudo credential-cache keepalive was tried here and removed again -
 # it doesn't reliably cover makepkg's own internal sudo calls (pacman
-# -U/-S) during the astrometry.net/gsc AUR builds further down, so it
+# -U/-S) during the astrometry.net AUR build further down, so it
 # wasn't actually fixing anything, just adding a background process
 # for no benefit.
 
