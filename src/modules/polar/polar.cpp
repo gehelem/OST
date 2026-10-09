@@ -99,6 +99,12 @@ void Polar::onExternalEvent(OST::ExtEvent event)
 
 void Polar::updateProperty(INDI::Property property)
 {
+    // Chain up: IndiModule::updateProperty() refreshes devices.*'s own LOV
+    // on a CONNECTION change (issue #231) - overriding this method
+    // entirely, as this one does, otherwise silently skips that. Kept
+    // ahead of the early return below so it still runs while idle.
+    IndiModule::updateProperty(property);
+
     if (!_machine.isRunning()) return;
 
     if (strcmp(property.getName(), "CCD1") == 0)

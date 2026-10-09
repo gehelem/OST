@@ -110,12 +110,20 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool setFocalLengthAndDiameter();
         bool setFocalLengthAndDiameter(QString device, double fl, double diam);
 
+    protected:
+        // Not private like the rest of this libindi-level override block
+        // below: several modules (focus, polar, sequencer, allsky, meteo,
+        // dummy) override this same method themselves instead of the
+        // onUpdateProperty() hook, and need to chain up to it so the base
+        // class's own CONNECTION-driven devices.* LOV refresh (issue
+        // #231) still runs for them too.
+        void updateProperty (INDI::Property property) override;
+
     private:
         void newDevice      (INDI::BaseDevice dp) override;
         void removeDevice   (INDI::BaseDevice dp) override;
         void newProperty    (INDI::Property property) override;
         void removeProperty (INDI::Property property) override;
-        void updateProperty (INDI::Property property) override;
 
 
         bool mIsFocuser = false;
