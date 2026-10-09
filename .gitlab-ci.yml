@@ -4,6 +4,7 @@ include:
   - local: CI/arch.yml
   - local: CI/gsc.yml
   - local: CI/doc.yml
+  - local: CI/android.yml
 
 stages:
   - images
@@ -16,6 +17,11 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
   PACKAGE_REGISTRY_LATEST: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/latest/latest"
   PACKAGE_REGISTRY_TAG: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${CI_COMMIT_TAG}/${CI_COMMIT_TAG}"
+  # Global (not job-local like RPM_FILE_LATEST/co. elsewhere in this file)
+  # - needed in both build-job-android (CI/android.yml) and
+  # release-job-latest below, unlike those other variables which only ever
+  # get read back by their own single build job's artifact step.
+  APK_FILE_LATEST: "ostcore_latest.apk"
 
 .build-rules: &build-rules
   rules:
@@ -171,6 +177,7 @@ release-job-latest:
     - build-job-fedora
     - build-job-arch
     - build-doc
+    - build-job-android
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   variables:
     DOC_FILE_LATEST: "documentation_latest.tar.gz"
