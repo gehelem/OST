@@ -705,17 +705,15 @@ export function renderController(client) {
   const root = el("div", { class: "controller-view" });
   const scope = client.scope();
 
-  root.appendChild(el("h2", null, [icon("tune"), el("span", { text: " " + t("views.controller") })]));
-
-  // Header (banner/git): no live input lives here, so a redraw on every uc
-  // is harmless — unlike the sections below, there's no need to reach for
-  // a per-key topic for these two.
+  // Header: git info only - Gilles, 2026-10-09: drop the "Controller"
+  // title and the banner line, both useless here. No live input lives in
+  // this slot, so a redraw on every uc is harmless - unlike the sections
+  // below, there's no need to reach for a per-key topic for git.
   const headerSlot = el("div");
   root.appendChild(headerSlot);
   scope.subscribe(client.topics.controllerData(), (cd) => {
     cd = cd || {};
     headerSlot.innerHTML = "";
-    if (cd.banner) headerSlot.appendChild(el("div", { class: "banner", text: cd.banner }));
     if (cd.git) headerSlot.appendChild(el("div", { class: "muted small mono", text: `${cd.git.Gittag || ""} ${cd.git.Githash || ""} — ${cd.git.Gitdate || ""}` }));
   });
 
@@ -733,10 +731,12 @@ export function renderController(client) {
   // that live in the same panel.
 
   // ---- Server load (systemwatcher) ----
+  // Appended to the grid last (Gilles, 2026-10-09: keep this panel at the
+  // end) — created here regardless, so the subscription below is set up
+  // alongside every other section instead of out of order.
   const swSec = el("section", { class: "panel hidden" }, [el("h3", { text: t("views.serverLoad") })]);
   const swBody = el("div");
   swSec.appendChild(swBody);
-  grid.appendChild(swSec);
   scope.subscribe(client.topics.controllerData("systemwatcher"), (sw) => {
     swSec.classList.toggle("hidden", !sw);
     swBody.innerHTML = "";
@@ -919,6 +919,8 @@ export function renderController(client) {
   scope.subscribe(client.topics.controllerData("indidrivers"), renderIndi);
   scope.subscribe(client.topics.controllerData("indiactivedrivers"), renderIndi);
   scope.subscribe(client.topics.controllerData("indidrivers"), renderAvailableDrivers);
+
+  grid.appendChild(swSec);
 
   return { node: root, dispose: scope.dispose };
 }
