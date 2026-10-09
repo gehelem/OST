@@ -135,6 +135,7 @@ const STRINGS = {
   "views.indiServerPrefix": { en: "INDI server — ", fr: "Serveur INDI — ", de: "INDI-Server — ", it: "Server INDI — ", es: "Servidor INDI — " },
   "views.enabled": { en: "enabled", fr: "activé", de: "aktiviert", it: "attivo", es: "activado" },
   "views.disabled": { en: "disabled", fr: "désactivé", de: "deaktiviert", it: "disattivato", es: "desactivado" },
+  "views.indiServerManagedElsewhere": { en: "The INDI server is managed outside OST — nothing to do here.", fr: "Le serveur INDI est géré en dehors d'OST — rien à faire ici.", de: "Der INDI-Server wird außerhalb von OST verwaltet — hier ist nichts zu tun.", it: "Il server INDI è gestito fuori da OST — niente da fare qui.", es: "El servidor INDI se gestiona fuera de OST — no hay nada que hacer aquí." },
   "views.startServer": { en: "Start server", fr: "Démarrer le serveur", de: "Server starten", it: "Avvia server", es: "Iniciar servidor" },
   "views.stopServer": { en: "Stop server", fr: "Arrêter le serveur", de: "Server stoppen", it: "Ferma server", es: "Detener servidor" },
   "views.reload": { en: "Reload", fr: "Recharger", de: "Neu laden", it: "Ricarica", es: "Recargar" },

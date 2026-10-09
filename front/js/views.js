@@ -840,19 +840,33 @@ export function renderController(client) {
   scope.subscribe(client.topics.controllerData("profiles"), renderProfiles);
 
   // ---- INDI server & drivers ----
+  // indiserver reflects whether ostserver itself was launched with
+  // --indiserver, not whether some INDI server happens to be running
+  // right now (controller.en.md) — "N" means OST isn't the one managing
+  // it at all (a separately-run indiserver, or none), so there is nothing
+  // to start/stop/list here. "Y" gets the controls; more to come here
+  // per Gilles, 2026-10-09 (issue #231, second half).
   const indiSec = el("section", { class: "panel" });
   const indiTitle = el("h3");
   indiSec.appendChild(indiTitle);
-  indiSec.appendChild(el("div", { class: "form-row" }, [
+  const indiExternalMsg = el("div", { class: "muted small hidden", text: t("views.indiServerManagedElsewhere") });
+  indiSec.appendChild(indiExternalMsg);
+  const indiControls = el("div", { class: "hidden" });
+  indiControls.appendChild(el("div", { class: "form-row" }, [
     el("button", { class: "btn btn-sm", onclick: () => client.indiStart() }, t("views.startServer")),
     el("button", { class: "btn btn-sm", onclick: () => client.indiStop() }, t("views.stopServer")),
   ]));
   const driversList = el("ul");
-  indiSec.appendChild(driversList);
+  indiControls.appendChild(driversList);
+  indiSec.appendChild(indiControls);
   grid.appendChild(indiSec);
   function renderIndi() {
     const indiserver = client.get(client.topics.controllerData("indiserver"));
-    indiTitle.textContent = t("views.indiServerPrefix") + (indiserver === "Y" ? t("views.enabled") : t("views.disabled"));
+    const enabled = indiserver === "Y";
+    indiTitle.textContent = t("views.indiServerPrefix") + (enabled ? t("views.enabled") : t("views.disabled"));
+    indiExternalMsg.classList.toggle("hidden", enabled);
+    indiControls.classList.toggle("hidden", !enabled);
+    if (!enabled) return;
     const drivers = client.get(client.topics.controllerData("indidrivers")) || [];
     const activeDrivers = client.get(client.topics.controllerData("indiactivedrivers")) || [];
     const active = new Set(activeDrivers.map((d) => d.binary));
