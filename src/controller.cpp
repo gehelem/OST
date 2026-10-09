@@ -1181,15 +1181,32 @@ void Controller::queryActiveIndiDrivers()
         QString deviceLabel = trimmed.section('.', 0, 0);
         if (deviceLabel.isEmpty()) continue;
 
-        auto it = std::find_if(_indiDrivers.begin(), _indiDrivers.end(),
-                               [&](const IndiDriverInfo & d)
+        // mdpd ("multiple devices per driver") drivers rename themselves at
+        // runtime to "<catalog label> <model>" once they know which actual
+        // hardware they're talking to - confirmed live: indi_qhy_ccd
+        // connected to a real camera reports itself on the bus as
+        // "QHY CCD QHYminiCam8M", not the XML catalog's generic "QHY CCD"
+        // label (indi_qhy.xml: <device label="QHY CCD" mdpd="true">). An
+        // exact match only ever catches non-mdpd drivers (simulators, most
+        // single-model devices) - this is why a QHY camera recovered from
+        // an orphaned indiserver silently dropped out of indiactivedrivers
+        // while the CCD Simulator (loaded normally, tracked by binary in
+        // startIndiDriver() instead) kept showing up fine. Pick the
+        // longest-matching catalog label among candidates, to stay
+        // unambiguous if two mdpd families' generic labels could otherwise
+        // both prefix-match the same live device name.
+        const IndiDriverInfo *best = nullptr;
+        for (const IndiDriverInfo &d : _indiDrivers)
         {
-            return d.label == deviceLabel;
-        });
-        if (it != _indiDrivers.end())
+            bool match = (d.label == deviceLabel) ||
+                         (d.mdpd && deviceLabel.startsWith(d.label + " "));
+            if (match && (!best || d.label.length() > best->label.length()))
+                best = &d;
+        }
+        if (best)
         {
-            _activeIndiDrivers.append(*it);
-            mLogger->info("Recovered active driver: " + it->label + " (" + it->binary + ")");
+            _activeIndiDrivers.append(*best);
+            mLogger->info("Recovered active driver: " + deviceLabel + " (" + best->binary + ")");
         }
         else
         {
