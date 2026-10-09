@@ -67,15 +67,13 @@ Le script fait alors tout lui-même. Voici ce à quoi vous attendre :
 - Il va demander **votre mot de passe** plusieurs fois (`sudo`) —
   c'est normal, il a besoin de la permission d'installer des paquets
   système.
-- Il compile deux paquets depuis AUR (`astrometry.net` et `gsc`) -
-  cela compile du vrai code sur votre machine et peut prendre quelques
-  minutes. Il est normal de voir défiler des pages de sortie du
-  compilateur.
-- `gsc` est connu pour actuellement échouer à la compilation (un
-  vieux paquet AUR non maintenu - ce n'est pas un problème d'OST). Le
-  script affiche un avertissement et continue sans lui : `gsc` ne fait
-  qu'alimenter le *simulateur* de caméra CCD d'INDI avec un champ
-  d'étoiles réaliste, il n'est jamais nécessaire pour du matériel réel.
+- Il compile `astrometry.net` depuis AUR - cela compile du vrai code
+  sur votre machine et peut prendre quelques minutes. Il est normal de
+  voir défiler des pages de sortie du compilateur.
+- Il installe `gsc` (données de champ d'étoiles réaliste pour le
+  *simulateur* de caméra CCD d'INDI uniquement, jamais nécessaire pour
+  du matériel réel) depuis un paquet précompilé maison - le paquet AUR
+  ne compile plus sur les Arch actuelles, sans rapport avec OST.
 - Un écran bleu peut apparaître, demandant quels fichiers d'index
   `astrometry.net` télécharger en plus de ceux par défaut. Utilisez
   les **flèches** pour vous déplacer, **Espace** pour cocher/décocher,

@@ -62,13 +62,13 @@ The script then does everything by itself. A few things to expect:
 
 - It will ask for **your password** a few times (`sudo`) — this is
   normal, it needs permission to install system packages.
-- It builds two packages from AUR (`astrometry.net` and `gsc`) -
-  this compiles real code on your machine and can take a few minutes.
-  It is normal to see pages of compiler output scroll by.
-- `gsc` is known to currently fail to build (an old, unmaintained AUR
-  package - not an OST problem). The script prints a warning and
-  carries on without it: `gsc` only feeds INDI's CCD *simulator* with
-  a realistic star field, it is never needed for real hardware.
+- It builds `astrometry.net` from AUR - this compiles real code on
+  your machine and can take a few minutes. It is normal to see pages
+  of compiler output scroll by.
+- It installs `gsc` (realistic star field data for INDI's CCD
+  *simulator* only, never needed for real hardware) from a prebuilt
+  package of our own - the AUR package for it doesn't compile on
+  current Arch, unrelated to OST.
 - A blue screen may appear asking which `astrometry.net` index files
   to download in addition to the default ones. Use the **arrow
   keys** to move, **Space** to check/uncheck, **Tab** then **Enter**

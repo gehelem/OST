@@ -15,9 +15,10 @@
 # (and the Ubuntu/Arch ones) download straight from data.astrometry.net,
 # so those are not used here: same files, same whiptail checklist,
 # same numbers everywhere for one consistent experience regardless of
-# distro. gsc has no Fedora package at all (not even a broken one like
-# on AUR) - skipped with a note, it is optional either way (INDI's CCD
-# simulator only, irrelevant for real hardware).
+# distro. gsc has no official Fedora package (and the one third-party
+# COPR repo that briefly had one has since lost that build) - installed
+# from our own prebuilt package instead (issue #230 follow-up,
+# CI/gsc.yml).
 #
 set -e
 
@@ -154,8 +155,17 @@ else
     echo "No additional index selected."
 fi
 
-echo "Note: gsc (INDI's CCD simulator star field data) has no Fedora"
-echo "package at all - skipped. Optional, irrelevant for real hardware."
+# gsc (optional - only feeds INDI's CCD/Guide simulator with a
+# realistic star field, irrelevant for real hardware): no official
+# package, and the one third-party COPR repo that briefly had a
+# fedora-44 build has since lost it (see
+# notes/NOTES-ci-packaging-arch-fedora.md). Our own prebuilt package
+# instead, same upstream source, built with the flags that actually
+# work.
+echo "Installing gsc..."
+GSC_RPM="gsc_fc_x86_64.rpm"
+wget -q "https://gitlab.ostserver.fr/api/v4/projects/1/packages/generic/gsc/1.2/${GSC_RPM}" -O "${GSC_RPM}"
+sudo dnf install -y "./${GSC_RPM}"
 
 echo "Done - ostserver-complete is installed and running."
 sudo dnf install -y hostname >/dev/null 2>&1 || true

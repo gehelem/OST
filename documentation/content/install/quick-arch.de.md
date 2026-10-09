@@ -68,15 +68,14 @@ rechnen sollten:
 
 - Es fragt mehrmals nach **Ihrem Passwort** (`sudo`) — das ist normal,
   es braucht die Berechtigung, um Systempakete zu installieren.
-- Es baut zwei Pakete aus dem AUR (`astrometry.net` und `gsc`) -
-  dabei wird echter Code auf Ihrer Maschine kompiliert, was ein paar
-  Minuten dauern kann. Es ist normal, dass dabei seitenweise
-  Compiler-Ausgaben über den Bildschirm laufen.
-- Es ist bekannt, dass `gsc` derzeit beim Bauen fehlschlägt (ein altes,
-  nicht mehr gepflegtes AUR-Paket - kein OST-Problem). Das Skript gibt
-  eine Warnung aus und macht ohne `gsc` weiter: `gsc` versorgt nur den
-  CCD-*Simulator* von INDI mit einem realistischen Sternfeld, es wird
-  für echte Hardware nie benötigt.
+- Es baut `astrometry.net` aus dem AUR - dabei wird echter Code auf
+  Ihrer Maschine kompiliert, was ein paar Minuten dauern kann. Es ist
+  normal, dass dabei seitenweise Compiler-Ausgaben über den Bildschirm
+  laufen.
+- Es installiert `gsc` (realistische Sternfelddaten nur für den
+  CCD-*Simulator* von INDI, für echte Hardware nie benötigt) aus einem
+  eigenen vorgebauten Paket - das AUR-Paket dafür lässt sich auf
+  aktuellem Arch nicht mehr bauen, unabhängig von OST.
 - Möglicherweise erscheint ein blauer Bildschirm, der fragt, welche
   zusätzlichen `astrometry.net`-Indexdateien Sie zu den
   Standard-Dateien herunterladen möchten. Verwenden Sie die

@@ -62,9 +62,9 @@ The script then does everything by itself. A few things to expect:
 - It removes the stock default page nginx ships with on Fedora (built
   into `/etc/nginx/nginx.conf` itself) - otherwise it silently wins
   over OST's own page on port 80.
-- `gsc` (INDI's CCD *simulator* star field data) has no Fedora
-  package at all — the script skips it with a note. This is never
-  needed for real hardware, only for the simulator.
+- It installs `gsc` (realistic star field data for INDI's CCD
+  *simulator* only, never needed for real hardware) from a prebuilt
+  package of our own - no official Fedora package exists for it.
 - A blue screen may appear asking which `astrometry.net` index files
   to download in addition to the default ones. Use the **arrow
   keys** to move, **Space** to check/uncheck, **Tab** then **Enter**

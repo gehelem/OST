@@ -11,8 +11,10 @@
 # doing the rest) - it is allowed to be more heavy-handed about it.
 #
 # Unlike Debian, Arch's official repos already carry libindi (in
-# [extra]) - no PPA-equivalent needed for that. Only astrometry.net and
-# gsc are AUR-only, built locally with makepkg.
+# [extra]) - no PPA-equivalent needed for that. astrometry.net is
+# AUR-only, built locally with makepkg; gsc comes from our own
+# prebuilt package instead (see below - the AUR "gsc" package itself
+# doesn't compile under modern GCC, issue #230 follow-up).
 #
 set -e
 
@@ -80,12 +82,18 @@ _install_aur() {
 echo "Installing astrometry.net (AUR) and whiptail..."
 sudo pacman -S --needed --noconfirm libnewt base-devel git
 _install_aur astrometry.net
-# Optional (INDI's CCD simulator only, not needed for real hardware) -
-# the AUR package is 1990s K&R-style C that no longer compiles under
-# modern GCC's C23 defaults (implicit function declarations are now a
-# hard error, not a warning) - a problem in that upstream AUR package,
-# not in OST. Don't let it take the whole script down.
-_install_aur gsc || echo "WARNING: gsc failed to build (optional, only used by INDI's CCD simulator) - continuing without it."
+
+# gsc (optional - only feeds INDI's CCD/Guide simulator with a
+# realistic star field, irrelevant for real hardware): AUR's own
+# package is 1990s K&R-style C that fails under modern GCC's defaults
+# - a problem in that upstream package, not OST (see
+# notes/NOTES-ci-packaging-arch-fedora.md). Installed from our own
+# prebuilt package instead, same upstream source, built with the
+# flags that actually work (issue #230 follow-up, CI/gsc.yml).
+GSC_PKG="gsc_arch_x86_64.pkg.tar.zst"
+curl --fail --location --output "${GSC_PKG}" \
+    "https://gitlab.ostserver.fr/api/v4/projects/1/packages/generic/gsc/1.2/${GSC_PKG}"
+sudo pacman -U --noconfirm "./${GSC_PKG}"
 
 # wget isn't part of a minimal Arch install either (same gap as
 # hostname/inetutils above) - needed from here on for the index files.

@@ -64,15 +64,13 @@ Lo script farà poi tutto da solo. Ecco alcune cose da aspettarsi:
 
 - Chiederà **la tua password** alcune volte (`sudo`) — è normale, ha
   bisogno dei permessi per installare i pacchetti di sistema.
-- Compila due pacchetti da AUR (`astrometry.net` e `gsc`) - questo
-  compila codice reale sulla tua macchina e può richiedere alcuni
-  minuti. È normale vedere pagine di output del compilatore scorrere
-  sullo schermo.
-- È noto che `gsc` al momento non riesce a compilare (un vecchio
-  pacchetto AUR non più mantenuto - non è un problema di OST). Lo
-  script stampa un avviso e continua senza di esso: `gsc` serve solo
-  ad alimentare il *simulatore* di CCD di INDI con un campo stellare
-  realistico, non è mai necessario per un hardware reale.
+- Compila `astrometry.net` da AUR - questo compila codice reale sulla
+  tua macchina e può richiedere alcuni minuti. È normale vedere
+  pagine di output del compilatore scorrere sullo schermo.
+- Installa `gsc` (dati di campo stellare realistico solo per il
+  *simulatore* di CCD di INDI, mai necessario per un hardware reale)
+  da un pacchetto precompilato nostro - il pacchetto AUR non compila
+  più sulle Arch attuali, indipendentemente da OST.
 - Potrebbe apparire una schermata blu che chiede quali file indice di
   `astrometry.net` scaricare in aggiunta a quelli predefiniti. Usa le
   **freccette** per spostarti, **Spazio** per selezionare/deselezionare,
