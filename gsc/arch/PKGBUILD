@@ -1,0 +1,48 @@
+# Maintainer: Gilles <gilles@joag.fr>
+#
+# Separate, optional package (issue #230 follow-up) - feeds INDI's
+# CCD/Guide simulator driver with a realistic star field from the
+# real Guide Star Catalog I (STScI). Never needed for real hardware.
+#
+# Our own build, not the AUR "gsc" package: that one fails to compile
+# under modern GCC's C23 defaults (1990s K&R-style C - implicit
+# function declarations, an old-style empty-parens `fabs()` forward
+# declaration conflicting with math.h's real prototype - all of that
+# used to be tolerated, is now a hard error). -std=gnu17 below
+# restores the old tolerance; confirmed this is the actual fix, not
+# just a guess, by reading GCC's own C23 migration notes against the
+# exact errors the AUR package produces.
+#
+# The upstream tarball has no top-level wrapping directory (just N*/,
+# S*/, bin/, src/ straight at the root) - unlike most PKGBUILDs,
+# nothing unusual about that here, source=() below just names the
+# downloaded file, makepkg extracts it into $srcdir as-is.
+
+pkgname=gsc
+pkgver=1.2
+pkgrel=1
+pkgdesc='Guide Star Catalog I (STScI) query tool + data - feeds INDI simulator drivers with a realistic star field'
+url='http://gsss.stsci.edu/Catalogs/GSC/GSC1/GSC1.htm'
+license=('custom')
+arch=('x86_64')
+depends=()
+source=("gsc-${pkgver}.tar.gz::http://cdsarc.u-strasbg.fr/viz-bin/nph-Cat/tar.gz?bincats/GSC_${pkgver}")
+sha256sums=('SKIP')
+
+build() {
+    cd "${srcdir}/src"
+    make clean
+    make CC="gcc -std=gnu17"
+}
+
+package() {
+    cd "${srcdir}"
+    for f in $(find [NS]* -type f); do
+        install -D -m644 "${f}" "${pkgdir}/usr/share/GSC/${f}"
+    done
+    install -D -m755 src/gsc.exe "${pkgdir}/usr/share/GSC/bin/gsc"
+    install -D -m644 bin/regions.bin "${pkgdir}/usr/share/GSC/bin/regions.bin"
+    install -D -m644 bin/regions.ind "${pkgdir}/usr/share/GSC/bin/regions.ind"
+    install -d -m755 "${pkgdir}/usr/bin"
+    ln -s /usr/share/GSC/bin/gsc "${pkgdir}/usr/bin/gsc"
+}
