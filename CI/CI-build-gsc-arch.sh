@@ -12,7 +12,7 @@ pacman -Syu --noconfirm --needed base-devel git wget
 # same pattern as CI-build-arch.sh.
 useradd -m builder
 mkdir -p /tmp/build
-cp "${CI_PROJECT_DIR}/gsc/arch/PKGBUILD" /tmp/build/
+cp "${CI_PROJECT_DIR}/gsc/arch/PKGBUILD" "${CI_PROJECT_DIR}/gsc/arch/gsc.install" /tmp/build/
 chown -R builder:builder /tmp/build
 cd /tmp/build
 su builder -c "makepkg --noconfirm"

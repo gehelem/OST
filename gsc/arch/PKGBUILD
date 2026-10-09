@@ -26,6 +26,7 @@ url='http://gsss.stsci.edu/Catalogs/GSC/GSC1/GSC1.htm'
 license=('custom')
 arch=('x86_64')
 depends=()
+install=gsc.install
 source=("gsc-${pkgver}.tar.gz::http://cdsarc.u-strasbg.fr/viz-bin/nph-Cat/tar.gz?bincats/GSC_${pkgver}")
 sha256sums=('SKIP')
 

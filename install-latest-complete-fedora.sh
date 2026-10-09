@@ -166,6 +166,10 @@ echo "Installing gsc..."
 GSC_RPM="gsc_fc_x86_64.rpm"
 wget -q "https://gitlab.ostserver.fr/api/v4/projects/1/packages/generic/gsc/1.2/${GSC_RPM}" -O "${GSC_RPM}"
 sudo dnf install -y "./${GSC_RPM}"
+# gsc's own %post wires GSCDAT via a systemd drop-in, but ostserver is
+# already running by this point in the script (started further up) -
+# restart it so gsc actually works without a manual step.
+sudo systemctl restart ostserver.service
 
 echo "Done - ostserver-complete is installed and running."
 sudo dnf install -y hostname >/dev/null 2>&1 || true

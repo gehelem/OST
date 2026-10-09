@@ -67,6 +67,32 @@ install -D -m644 bin/regions.ind %{buildroot}/usr/share/GSC/bin/regions.ind
 mkdir -p %{buildroot}/usr/bin
 ln -s /usr/share/GSC/bin/gsc %{buildroot}/usr/bin/gsc
 
+# gsc itself reads the GSCDAT environment variable to find its own
+# catalog data (/usr/share/GSC, confirmed from indilib/indi's own
+# sky_renderer.cpp: it just calls popen() on "gsc -c ..." with no path
+# argument at all). ostserver spawns indiserver, which spawns
+# indi_simulator_ccd/_guide, which does that popen() - the variable
+# has to be set somewhere in that chain. A systemd drop-in for
+# ostserver.service rather than editing that shared file directly -
+# it is used by every packaging backend, not just when gsc happens to
+# be installed too.
+%post
+mkdir -p /etc/systemd/system/ostserver.service.d
+cat > /etc/systemd/system/ostserver.service.d/gsc.conf << 'EOF'
+[Service]
+Environment=GSCDAT=/usr/share/GSC
+EOF
+systemctl daemon-reload 2>/dev/null || true
+echo "==> gsc installed. If ostserver is already running, restart it"
+echo "    to pick up GSCDAT:"
+echo "        sudo systemctl restart ostserver.service"
+
+%postun
+if [ "$1" -eq 0 ]; then
+    rm -f /etc/systemd/system/ostserver.service.d/gsc.conf
+    systemctl daemon-reload 2>/dev/null || true
+fi
+
 %files
 /usr/share/GSC/
 /usr/bin/gsc

@@ -94,6 +94,10 @@ GSC_PKG="gsc_arch_x86_64.pkg.tar.zst"
 curl --fail --location --output "${GSC_PKG}" \
     "https://gitlab.ostserver.fr/api/v4/projects/1/packages/generic/gsc/1.2/${GSC_PKG}"
 sudo pacman -U --noconfirm "./${GSC_PKG}"
+# gsc's own .install hook wires GSCDAT via a systemd drop-in, but
+# ostserver is already running by this point in the script (started
+# further up) - restart it so gsc actually works without a manual step.
+sudo systemctl restart ostserver.service
 
 # wget isn't part of a minimal Arch install either (same gap as
 # hostname/inetutils above) - needed from here on for the index files.
