@@ -908,15 +908,20 @@ export function renderController(client) {
     const activeDrivers = client.get(client.topics.controllerData("indiactivedrivers")) || [];
     activeDriversList.innerHTML = "";
     for (const d of activeDrivers) {
-      const li = el("li");
-      li.appendChild(el("span", { class: "spacer small", text: `${d.label} (${d.family})` }));
+      // Two lines - label, then icon buttons below it - rather than
+      // cramming four buttons on the same row as the label (Gilles,
+      // 2026-10-09: that overflowed the panel on a narrow column).
+      const li = el("li", { class: "indi-driver-row" });
+      li.appendChild(el("div", { class: "small", text: `${d.label} (${d.family})` }));
+      const actions = el("div", { class: "icon-btn-row" });
       // Connect/disconnect act on the device itself (YC/YD), separate from
       // the driver process (reload/stop) - starting a driver doesn't
       // connect its device on its own, see issue #231.
-      li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.indiConnectDriver(d.binary) }, t("views.connect")));
-      li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.indiDisconnectDriver(d.binary) }, t("views.disconnect")));
-      li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.indiReloadDriver(d.binary) }, t("views.reload")));
-      li.appendChild(el("button", { class: "btn btn-sm btn-danger", onclick: () => client.indiStopDriver(d.binary) }, t("views.stop")));
+      actions.appendChild(iconButton("link", t("views.connect"), () => client.indiConnectDriver(d.binary)));
+      actions.appendChild(iconButton("link_off", t("views.disconnect"), () => client.indiDisconnectDriver(d.binary)));
+      actions.appendChild(iconButton("refresh", t("views.reload"), () => client.indiReloadDriver(d.binary)));
+      actions.appendChild(iconButton("stop", t("views.stop"), () => client.indiStopDriver(d.binary), { danger: true }));
+      li.appendChild(actions);
       activeDriversList.appendChild(li);
     }
   }
