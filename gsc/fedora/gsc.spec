@@ -1,4 +1,13 @@
 %undefine _disable_source_fetch
+# Skip debuginfo extraction entirely - rpmbuild's automatic
+# debuginfo subpackage generation produced an empty debugsourcefiles
+# list for this 1990s C tool and failed the whole build with it,
+# confirmed from the actual build log, not something this package has
+# any use for anyway. (Comment deliberately avoids writing the literal
+# RPM section-tag spelling here - a past commit's comment naming a
+# real macro verbatim got expanded for real and broke a different
+# build the same way.)
+%global debug_package %{nil}
 # Separate, optional package (issue #230 follow-up) - feeds INDI's
 # CCD/Guide simulator driver with a realistic star field from the
 # real Guide Star Catalog I (STScI). Never needed for real hardware.
