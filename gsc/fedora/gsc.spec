@@ -33,14 +33,20 @@ with a realistic star field. Not needed for real hardware.
 
 %build
 cd src
-# See gsc/arch/PKGBUILD's own comment for both of these - the
-# upstream Makefile's own CC bakes in -I. (gsc.c et al use
-# #include <gsc.h> with angle brackets, genuinely needs it to find
-# the header at all), and modern GCC defaults
-# -Wimplicit-function-declaration to a hard error regardless of
-# -std=gnu17 (isspace/ispunct/read/lseek/close, 1990s C) - both
-# confirmed the hard way, not guessed.
-make CC="gcc -I. -std=gnu17 -Wno-error=implicit-function-declaration"
+# See gsc/arch/PKGBUILD's own comment for the full rationale - same
+# fix on both. -I. because gsc.c et al use #include <gsc.h> (angle
+# brackets); the -Wno-error=* flags because modern GCC defaults
+# several legacy-C warning categories to hard errors regardless of
+# -std=gnu17 (confirmed one at a time: implicit-function-declaration,
+# implicit-int; builtin-declaration-mismatch/int-conversion/
+# incompatible-pointer-types added defensively, not yet individually
+# confirmed necessary).
+make CC="gcc -I. -std=gnu17 \
+    -Wno-error=implicit-function-declaration \
+    -Wno-error=implicit-int \
+    -Wno-error=builtin-declaration-mismatch \
+    -Wno-error=int-conversion \
+    -Wno-error=incompatible-pointer-types"
 
 %install
 for f in $(find [NS]* -type f); do

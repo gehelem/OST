@@ -36,11 +36,24 @@ build() {
     # so it genuinely depends on that flag to find the header at all.
     # Overriding CC must keep it, confirmed the hard way ("gsc.h: No
     # such file or directory" the first time this dropped it).
-    # -Wno-error=implicit-function-declaration: modern GCC defaults
-    # this to a hard error regardless of -std=gnu17 (isspace/ispunct/
-    # read/lseek/close called without their headers, 1990s C) -
-    # -std=gnu17 alone still leaves it fatal, confirmed the hard way.
-    make CC="gcc -I. -std=gnu17 -Wno-error=implicit-function-declaration"
+    # Modern GCC defaults several legacy-C warning categories to hard
+    # errors regardless of -std=gnu17 - confirmed one at a time, the
+    # hard way, across several CI round-trips:
+    #   - implicit-function-declaration: isspace/ispunct/read/lseek/
+    #     close called without their headers.
+    #   - implicit-int: main(argc,argv) with no explicit `int` before it.
+    # Added defensively, not yet individually confirmed necessary:
+    #   - builtin-declaration-mismatch: dtos.c's own K&R-style
+    #     "double ... fabs();" forward declaration vs math.h's real
+    #     prototype.
+    #   - int-conversion / incompatible-pointer-types: common fallout
+    #     from the same family of old-style, unprototyped declarations.
+    make CC="gcc -I. -std=gnu17 \
+        -Wno-error=implicit-function-declaration \
+        -Wno-error=implicit-int \
+        -Wno-error=builtin-declaration-mismatch \
+        -Wno-error=int-conversion \
+        -Wno-error=incompatible-pointer-types"
 }
 
 package() {
