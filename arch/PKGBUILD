@@ -1,0 +1,93 @@
+# Maintainer: Gilles <gilles@joag.fr>
+#
+# Split package, mirrors the Debian side (cmake/cpack/DebianPackage.cmake,
+# debian/control): "ostserver" (backend only) and "ostserver-complete"
+# (same binaries installed a second time + front/'s web UI + nginx wiring,
+# Conflicts/Replaces "ostserver" - never Depends, see that file's own
+# header comment for why).
+#
+# pkgver is pinned to this project's real version tags (issue #230 - kept
+# homogeneous with the Debian/CPack side, which derives its own version
+# the same way via `git describe`). Bump pkgver + pkgrel=1 by hand on each
+# new tag. CI also builds this unpinned, straight off `main`'s HEAD, for
+# the rolling "latest" artifact (see CI/CI-build-arch.sh) - same two-track
+# approach as ostserver_latest_*.deb vs the tagged release ones.
+
+pkgbase=ostserver
+pkgname=('ostserver' 'ostserver-complete')
+pkgver=0.0.15
+pkgrel=1
+arch=('x86_64')
+url='https://gitlab.ostserver.fr/ost/ostserver'
+# Arch's makepkg.conf enables LTO by default, unlike the Ubuntu CI
+# images this project otherwise builds on - confirmed the hard way:
+# "relocation ... can not be used when making a shared object; recompile
+# with -fPIC" on libostbasemodule.so, despite -fPIC already being set
+# project-wide (CMakeLists.txt) - GCC's LTO bytecode wasn't carrying it
+# through consistently across this module/stellarsolver-static-lib
+# combination. Disabling LTO for this package only, rather than
+# chasing down which translation unit lost the flag project-wide.
+options=('!lto')
+license=('GPL-3.0-or-later')
+makedepends=(
+    'cmake' 'git' 'extra-cmake-modules'
+    'qt6-base' 'qt6-tools' 'qt6-scxml' 'qt6-websockets'
+    'mesa' 'libnova' 'gsl' 'wcslib' 'cfitsio' 'avahi' 'eigen'
+    'libraw' 'libsecret' 'opencv' 'libindi'
+)
+# Same runtime libs for both packages (both ship the exact same binaries) -
+# nginx is ostserver-complete's own addition, set directly in its own
+# package_ostserver-complete() below. libindi/gsc/astrometry.net
+# themselves are NOT listed as hard depends: libindi is in [extra] so
+# pacman resolves it on its own; astrometry.net is AUR-only, and gsc
+# isn't in any repo at all (pacman or AUR - see gsc/arch/PKGBUILD, our
+# own standalone package, issue #230 follow-up) - neither is needed
+# for the server to start, just optdepends (matches the Debian side's
+# own Recommends, not a hard Depends).
+#
+# Bash variable names cannot contain a hyphen, unlike function names
+# (package_ostserver-complete() below is fine) - there is no
+# "depends_<pkgname>"-style global override for a hyphenated pkgname,
+# despite that pattern existing for plain alphanumeric ones in some
+# PKGBUILDs. Both arrays below are plain locals, read from inside each
+# package_*() function instead (confirmed the hard way: makepkg failed
+# to even source this file with the hyphenated variable name).
+_depends_common=(
+    'qt6-base' 'qt6-websockets' 'qt6-scxml'
+    'libnova' 'gsl' 'wcslib' 'cfitsio' 'avahi' 'libsecret' 'opencv' 'libraw'
+    'libindi'
+)
+_optdepends_common=(
+    'astrometry.net: plate solving (Navigator/Polar modules)'
+    'gsc: star field data for INDI'"'"'s CCD simulator (our own package, not in any repo - see install-latest-complete-arch.sh)'
+)
+
+source=("${pkgbase}-${pkgver}.tar.gz::${url}/-/archive/${pkgver}/${pkgbase}-${pkgver}.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+    cmake -B build -S "${pkgbase}-${pkgver}" \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr
+    cmake --build build
+}
+
+package_ostserver() {
+    pkgdesc='Observatoire Sans Tête - light and headless astrophotography automation tool'
+    depends=("${_depends_common[@]}")
+    optdepends=("${_optdepends_common[@]}")
+    install=ostserver.install
+
+    DESTDIR="${pkgdir}" cmake --install build --component Runtime
+}
+
+package_ostserver-complete() {
+    pkgdesc='Observatoire Sans Tête - all-in-one (backend + web UI + nginx)'
+    depends=("${_depends_common[@]}" 'nginx')
+    optdepends=("${_optdepends_common[@]}")
+    conflicts=('ostserver')
+    provides=('ostserver')
+    install=ostserver-complete.install
+
+    DESTDIR="${pkgdir}" cmake --install build --component Complete
+}

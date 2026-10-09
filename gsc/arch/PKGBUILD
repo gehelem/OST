@@ -1,0 +1,70 @@
+# Maintainer: Gilles <gilles@joag.fr>
+#
+# Separate, optional package (issue #230 follow-up) - feeds INDI's
+# CCD/Guide simulator driver with a realistic star field from the
+# real Guide Star Catalog I (STScI). Never needed for real hardware.
+#
+# Our own build, not the AUR "gsc" package: that one fails to compile
+# under modern GCC's C23 defaults (1990s K&R-style C - implicit
+# function declarations, an old-style empty-parens `fabs()` forward
+# declaration conflicting with math.h's real prototype - all of that
+# used to be tolerated, is now a hard error). -std=gnu17 below
+# restores the old tolerance; confirmed this is the actual fix, not
+# just a guess, by reading GCC's own C23 migration notes against the
+# exact errors the AUR package produces.
+#
+# The upstream tarball has no top-level wrapping directory (just N*/,
+# S*/, bin/, src/ straight at the root) - unlike most PKGBUILDs,
+# nothing unusual about that here, source=() below just names the
+# downloaded file, makepkg extracts it into $srcdir as-is.
+
+pkgname=gsc
+pkgver=1.2
+pkgrel=1
+pkgdesc='Guide Star Catalog I (STScI) query tool + data - feeds INDI simulator drivers with a realistic star field'
+url='http://gsss.stsci.edu/Catalogs/GSC/GSC1/GSC1.htm'
+license=('custom')
+arch=('x86_64')
+depends=()
+install=gsc.install
+source=("gsc-${pkgver}.tar.gz::http://cdsarc.u-strasbg.fr/viz-bin/nph-Cat/tar.gz?bincats/GSC_${pkgver}")
+sha256sums=('SKIP')
+
+build() {
+    cd "${srcdir}/src"
+    # The upstream Makefile's own CC ("cc -I. -O") bakes in -I. -
+    # gsc.c et al use #include <gsc.h> (angle brackets, not quotes),
+    # so it genuinely depends on that flag to find the header at all.
+    # Overriding CC must keep it, confirmed the hard way ("gsc.h: No
+    # such file or directory" the first time this dropped it).
+    # Modern GCC defaults several legacy-C warning categories to hard
+    # errors regardless of -std=gnu17 - confirmed one at a time, the
+    # hard way, across several CI round-trips:
+    #   - implicit-function-declaration: isspace/ispunct/read/lseek/
+    #     close called without their headers.
+    #   - implicit-int: main(argc,argv) with no explicit `int` before it.
+    # Added defensively, not yet individually confirmed necessary:
+    #   - builtin-declaration-mismatch: dtos.c's own K&R-style
+    #     "double ... fabs();" forward declaration vs math.h's real
+    #     prototype.
+    #   - int-conversion / incompatible-pointer-types: common fallout
+    #     from the same family of old-style, unprototyped declarations.
+    make CC="gcc -I. -std=gnu17 \
+        -Wno-error=implicit-function-declaration \
+        -Wno-error=implicit-int \
+        -Wno-error=builtin-declaration-mismatch \
+        -Wno-error=int-conversion \
+        -Wno-error=incompatible-pointer-types"
+}
+
+package() {
+    cd "${srcdir}"
+    for f in $(find [NS]* -type f); do
+        install -D -m644 "${f}" "${pkgdir}/usr/share/GSC/${f}"
+    done
+    install -D -m755 src/gsc.exe "${pkgdir}/usr/share/GSC/bin/gsc"
+    install -D -m644 bin/regions.bin "${pkgdir}/usr/share/GSC/bin/regions.bin"
+    install -D -m644 bin/regions.ind "${pkgdir}/usr/share/GSC/bin/regions.ind"
+    install -d -m755 "${pkgdir}/usr/bin"
+    ln -s /usr/share/GSC/bin/gsc "${pkgdir}/usr/bin/gsc"
+}

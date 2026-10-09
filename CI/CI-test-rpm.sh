@@ -13,6 +13,18 @@ mkdir -p media
 
 echo "Starting server..."
 export QT_QPA_PLATFORM=offscreen
+
+# Three diagnostics tried here and abandoned (see this file's own git
+# history for each): gdb tracing only the top-level process (detaches
+# from every forked child, catches nothing); scanning for a core dump
+# afterwards (this runner's core_pattern redirects to the host,
+# invisible from inside the container); gdb with detach-on-fork off to
+# also trace forked children ("/proc/<pid>/ns/mnt: No such file or
+# directory" - the GitLab Docker-executor container restricts /proc
+# access for processes outside gdb's direct ptrace scope, so even this
+# fails here specifically). Back to a plain run - this sandbox cannot
+# give us a backtrace; reproducing on a real VM (full gdb privileges,
+# same way the Arch side was debugged) is the next step, not CI.
 ostserver --webroot=media --indiserver=Y > server.log 2>&1 &
 SERVER_PID=$!
 

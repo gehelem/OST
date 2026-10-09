@@ -1,10 +1,18 @@
 # Fedora RPM build + test + release input.
 #
-# SUSPENDED 2026-09-17 (Gilles): more noise than signal for now. Target
-# architectures/distros are an open question, currently Ubuntu-only in
-# practice - see notes/NOTES-ci-overview.md and
-# notes/NOTES-process-release-lifecycle.md. Kept intact (rules: never)
-# rather than deleted, for a cheap re-enable once that's settled.
+# RE-ENABLED 2026-10-09 (Gilles, issue #230): was suspended since
+# 2026-09-17 ("more noise than signal for now"); now extended with the
+# ostserver-complete component (see cmake/cpack/RpmPackage.cmake).
+# build-job-fedora itself builds cleanly and reliably. test-job-fedora
+# keeps allow_failure permanently, not provisionally: it segfaults on
+# this specific GitLab runner's sandbox (missing CAP_SYS_PTRACE,
+# confirmed via /etc/gitlab-runner/config.toml - no cap_add, privileged
+# = false) every time, while the exact same invocation
+# (QT_QPA_PLATFORM=offscreen ostserver --indiserver=Y) runs cleanly on
+# a real VM - a sandbox limitation, not an OST bug. See
+# notes/NOTES-ci-packaging-arch-fedora.md for the full diagnostic
+# trail (three abandoned attempts at getting a backtrace out of this
+# same sandbox).
 #
 # Inline dnf for now (no prebuilt image): the C++ compile dominates the job
 # time, the dnf layer is ~1-2 min. Bake a CI/Dockerfile.build.rpm + a matrix
@@ -19,16 +27,24 @@ build-job-fedora:
     RPM_FILE_TAG: "ostserver_${CI_COMMIT_TAG}_fc_x86_64.rpm"
     RPM_FILE_DEV_LATEST: "ostserver-devel_latest_fc_x86_64.rpm"
     RPM_FILE_DEV_TAG: "ostserver-devel_${CI_COMMIT_TAG}_fc_x86_64.rpm"
+    RPM_FILE_COMPLETE_LATEST: "ostserver-complete_latest_fc_x86_64.rpm"
+    RPM_FILE_COMPLETE_TAG: "ostserver-complete_${CI_COMMIT_TAG}_fc_x86_64.rpm"
   script:
     - ./CI/CI-build-rpm.sh
   artifacts:
     paths:
       - "ostserver_*_fc_x86_64.rpm"
       - "ostserver-devel_*_fc_x86_64.rpm"
+      - "ostserver-complete_*_fc_x86_64.rpm"
     expire_in: 4 week
   allow_failure: true
+  # YAML anchors don't carry across `include:`d files (same reason
+  # CI/arch.yml inlines these same three conditions instead of reusing
+  # &build-rules from .gitlab-ci.yml) - kept literally identical to it.
   rules:
-    - when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
+    - if: '$CI_PIPELINE_SOURCE == "push"'
 
 test-job-fedora:
   stage: test
@@ -46,4 +62,6 @@ test-job-fedora:
     expire_in: 4 week
   allow_failure: true
   rules:
-    - when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
+    - if: '$CI_PIPELINE_SOURCE == "push"'

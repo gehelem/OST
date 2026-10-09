@@ -17,25 +17,30 @@ echo "libindi-devel $(rpm -q --qf '%{VERSION}' libindi-devel)"
 cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
 cmake --build build -j"$(nproc)"
 
+# Package definitions (names, Requires, %post/%preun scripts) now live
+# in cmake/cpack/RpmPackage.cmake, same as the Debian side's own
+# DebianPackage.cmake - only the generator selection stays here.
 cd build
-cpack -G RPM \
-    -D CPACK_RPM_COMPONENT_INSTALL=ON \
-    -D CPACK_RPM_RUNTIME_PACKAGE_NAME=ostserver \
-    -D CPACK_RPM_DEVELOPMENT_PACKAGE_NAME=ostserver-devel \
-    -D CPACK_RPM_PACKAGE_URL=https://gitlab.ostserver.fr/ost/ostserver/
+cpack -G RPM
 cd ..
 
-RPM_DEV=$(ls build/*devel*.rpm | head -1)
-RPM_RUNTIME=$(ls build/*.rpm | grep -v devel | head -1)
-echo "RPMs built: ${RPM_RUNTIME}  ${RPM_DEV}"
+# Fixed names (CPACK_RPM_<COMPONENT>_FILE_NAME in RpmPackage.cmake) -
+# the default would have been CPACK_PACKAGE_NAME-based ("OST-...-Linux-
+# <Component>.rpm"), not matching any of these, confirmed the hard way.
+RPM_RUNTIME="build/ostserver.rpm"
+RPM_DEV="build/ostserver-devel.rpm"
+RPM_COMPLETE="build/ostserver-complete.rpm"
+echo "RPMs built: ${RPM_RUNTIME}  ${RPM_DEV}  ${RPM_COMPLETE}"
 rpm -qpi "${RPM_RUNTIME}"
 rpm -qp --requires "${RPM_RUNTIME}"
 
-cp "${RPM_RUNTIME}" "./${RPM_FILE_LATEST}"
-cp "${RPM_DEV}"     "./${RPM_FILE_DEV_LATEST}"
+cp "${RPM_RUNTIME}"  "./${RPM_FILE_LATEST}"
+cp "${RPM_DEV}"      "./${RPM_FILE_DEV_LATEST}"
+cp "${RPM_COMPLETE}" "./${RPM_FILE_COMPLETE_LATEST}"
 if [ -n "${CI_COMMIT_TAG}" ]; then
-    cp "${RPM_RUNTIME}" "./${RPM_FILE_TAG}"
-    cp "${RPM_DEV}"     "./${RPM_FILE_DEV_TAG}"
+    cp "${RPM_RUNTIME}"  "./${RPM_FILE_TAG}"
+    cp "${RPM_DEV}"      "./${RPM_FILE_DEV_TAG}"
+    cp "${RPM_COMPLETE}" "./${RPM_FILE_COMPLETE_TAG}"
 fi
 
-echo "Build complete: ${RPM_RUNTIME}  ${RPM_DEV}"
+echo "Build complete: ${RPM_RUNTIME}  ${RPM_DEV}  ${RPM_COMPLETE}"

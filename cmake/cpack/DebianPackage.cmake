@@ -183,4 +183,8 @@ set(CPACK_DEBIAN_COMPLETE_PACKAGE_CONTROL_EXTRA
     "${CMAKE_CURRENT_LIST_DIR}/complete/postinst"
     "${CMAKE_CURRENT_LIST_DIR}/complete/prerm")
 
-include(CPack)
+# include(CPack) is deferred to CMakeLists.txt, after RpmPackage.cmake
+# also had a chance to set its own CPACK_RPM_* variables (issue #230) -
+# it only needs to run once, with every generator's variables already
+# in place; CPack reads only the namespace matching whichever
+# generator `cpack -G <DEB|RPM>` is actually invoked with.

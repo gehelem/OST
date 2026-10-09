@@ -1,0 +1,43 @@
+#!/bin/sh
+# %post for the "ostserver" RPM (issue #230) - $1 is numeric here
+# (1=fresh install, 2=upgrade), not dpkg's "configure" string; this
+# logic is idempotent so it runs the same for both, no branching needed.
+set -e
+
+INSTALL_USER="${SUDO_USER:-${USER:-root}}"
+USER_HOME=$(getent passwd "${INSTALL_USER}" | cut -d: -f6)
+OST_DIR="${USER_HOME}/.ost"
+
+sed -i "s/^User=.*/User=${INSTALL_USER}/" /usr/lib/systemd/system/ostserver.service
+sed -i "s|^WorkingDirectory=.*|WorkingDirectory=${OST_DIR}|" /usr/lib/systemd/system/ostserver.service
+
+mkdir -p "${OST_DIR}"
+chown "${INSTALL_USER}" "${OST_DIR}"
+
+mkdir -p /var/lib/osterix/media
+chown -R "${INSTALL_USER}" /var/lib/osterix
+
+# Shared skeleton (cmake/cpack/ostserver.parms.skel), same file as the
+# Debian/Arch sides - one source of truth.
+PARMS_FILE="${OST_DIR}/ostserver.parms"
+if [ ! -f "${PARMS_FILE}" ]; then
+    cp /usr/share/ostserver/ostserver.parms.skel "${PARMS_FILE}"
+    chown "${INSTALL_USER}" "${PARMS_FILE}"
+fi
+
+systemctl daemon-reload >/dev/null 2>&1 || true
+
+# Hands-off on purpose (Fedora packaging guidelines: services are not
+# auto-enabled by convention) - same choice already made for Arch.
+#
+# NOTE: this file's content is embedded verbatim into the generated
+# RPM spec file. rpmbuild expands any percent-prefixed identifier
+# wherever it appears, including inside a "#" comment like this one -
+# confirmed the hard way: an earlier version of this very comment
+# named a real systemd macro in prose, rpmbuild invoked it for real
+# with no arguments, and the whole build failed. Never write a bare
+# percent sign followed by a word anywhere in this file, comments
+# included.
+echo "==> ostserver is installed but not started (Fedora convention)."
+echo "==> Enable and start it with:"
+echo "        systemctl enable --now ostserver.service"

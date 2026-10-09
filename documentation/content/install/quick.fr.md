@@ -1,5 +1,5 @@
 ---
-title: Installation rapide (recommandée)
+title: Installation rapide (Ubuntu Resolute)
 weight: 5
 description: "La façon la plus rapide de faire fonctionner OST : une machine Ubuntu 26.04 vierge, un script"
 ---
@@ -13,6 +13,12 @@ l'ordre.
 Ce script unique installe tout ce qui est nécessaire sur une seule
 machine : le back-end OST, l'interface web, nginx, INDI,
 `astrometry.net` et la documentation que vous êtes en train de lire.
+
+{{% notice style="note" title="Vous utilisez Arch Linux ou Fedora plutôt ?" %}}
+Cette page concerne spécifiquement Ubuntu. Suivez plutôt
+l'[Installation rapide (Arch Linux)](../quick-arch/) ou
+l'[Installation rapide (Fedora)](../quick-fedora/).
+{{% /notice %}}
 
 ---
 

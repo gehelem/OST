@@ -1,0 +1,43 @@
+# One-shot gsc package builds (issue #230 follow-up) - NOT part of the
+# normal push/MR/tag pipeline. gsc (STScI Guide Star Catalog I query
+# tool + data) only feeds INDI's CCD/Guide simulator with a realistic
+# star field - optional, irrelevant for real hardware - and its
+# source essentially never changes, so there is no reason to rebuild
+# it on every OST commit. Separate, dedicated packages rather than
+# baked into install-latest-complete-<distro>.sh (would need to
+# download ~236 MB + compile on every install otherwise).
+#
+# Triggered manually: Pipelines -> Run pipeline -> set
+# BUILD_GSC_PACKAGES=true (same convention as build-ci-image's own
+# BUILD_CI_IMAGES, see CI/ci-images.yml). Publishes to the generic
+# package registry under gsc/1.2/ - same registry already used for
+# the indi-deps bundle.
+#
+# Neither the AUR "gsc" package nor Fedora's valnyz/gsc COPR actually
+# work today (see notes/NOTES-ci-packaging-arch-fedora.md) - our own
+# PKGBUILD/spec here build the same upstream source with the fix that
+# actually works (-std=gnu17, see gsc/arch/PKGBUILD's own comment).
+
+build-job-gsc-arch:
+  stage: build
+  image: archlinux:latest
+  rules:
+    - if: '$BUILD_GSC_PACKAGES == "true"'
+  script:
+    - ./CI/CI-build-gsc-arch.sh
+  artifacts:
+    paths:
+      - "gsc_arch_x86_64.pkg.tar.zst"
+    expire_in: never
+
+build-job-gsc-fedora:
+  stage: build
+  image: fedora:latest
+  rules:
+    - if: '$BUILD_GSC_PACKAGES == "true"'
+  script:
+    - ./CI/CI-build-gsc-fedora.sh
+  artifacts:
+    paths:
+      - "gsc_fc_x86_64.rpm"
+    expire_in: never

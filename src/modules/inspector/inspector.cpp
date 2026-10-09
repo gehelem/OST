@@ -1,6 +1,16 @@
 #include "inspector.h"
 #include <QPainter>
 #include <opencv2/opencv.hpp>
+// OpenCV 5.0 (confirmed: Arch's current opencv package) moved
+// contourArea()/boundingRect() out of imgproc entirely, into a brand
+// new "geometry" module (opencv2/geometry/2d.hpp) - that module does
+// not exist at all on OpenCV 4.x (Ubuntu's version), hence the version
+// guard rather than just including both unconditionally.
+#if CV_VERSION_MAJOR >= 5
+#include <opencv2/geometry.hpp>
+#else
+#include <opencv2/imgproc.hpp>
+#endif
 #include <algorithm>
 #include <cmath>
 #include "version.cc"
