@@ -1135,22 +1135,63 @@ void Controller::startIndiDriver(const QString &pDriver)
     QByteArray cmd = ("start " + pDriver + "\n").toLocal8Bit();
     ::write(fd, cmd.constData(), cmd.size());
     ::close(fd);
-
-    auto it = std::find_if(_indiDrivers.begin(), _indiDrivers.end(),
-                           [&](const IndiDriverInfo & d)
-    {
-        return d.binary == pDriver;
-    });
-    if (it != _indiDrivers.end() &&
-            std::find_if(_activeIndiDrivers.begin(), _activeIndiDrivers.end(),
-                         [&](const IndiDriverInfo & d)
-{
-    return d.binary == pDriver;
-}) == _activeIndiDrivers.end())
-    _activeIndiDrivers.append(*it);
-
     mLogger->info("Sent start command for driver: " + pDriver);
-    updateControllerData("indiactivedrivers", activeIndiDriversToVariant());
+
+    QList<IndiDriverInfo> candidates;
+    for (const IndiDriverInfo &d : _indiDrivers)
+        if (d.binary == pDriver) candidates.append(d);
+
+    if (candidates.isEmpty())
+    {
+        mLogger->warning("Started driver not found in XML registry: " + pDriver);
+        return;
+    }
+
+    if (candidates.size() == 1)
+    {
+        // The common, unambiguous case: this binary maps to exactly one
+        // catalog entry, resolved and published right away.
+        _activeIndiDrivers.append(candidates.first());
+        updateControllerData("indiactivedrivers", activeIndiDriversToVariant());
+        return;
+    }
+
+    // Some mdpd ("multiple devices per driver") drivers register several
+    // catalog device entries under the SAME binary - confirmed live:
+    // indi_qhy.xml lists both "QHY CCD" and "Orion SSAG" for
+    // indi_qhy_ccd. The catalog alone can't tell which of them the server
+    // is actually about to run (picking the first match would be an
+    // alphabetical accident, not a real answer - this is exactly how
+    // starting "QHY CCD" ended up reported as "Orion SSAG"), so the right
+    // entry is only resolved after the fact, from the live bus (same
+    // technique as queryActiveIndiDrivers(), via DRIVER_INFO.DRIVER_EXEC -
+    // available as soon as the driver registers, no need to wait for an
+    // actual device connection). A 500ms delay, same as reloadIndiDriver()
+    // already uses, gives it time to show up.
+    QTimer::singleShot(500, this, [this, pDriver]()
+    {
+        bool resolved = false;
+        for (const QString &device : resolveIndiDeviceNames(pDriver))
+        {
+            const IndiDriverInfo *best = bestCatalogMatchForLiveName(device);
+            if (!best) continue;
+            bool alreadyThere = std::find_if(_activeIndiDrivers.begin(), _activeIndiDrivers.end(),
+                                              [&](const IndiDriverInfo & d)
+            {
+                return d.binary == best->binary && d.label == best->label;
+            }) != _activeIndiDrivers.end();
+            if (!alreadyThere)
+            {
+                _activeIndiDrivers.append(*best);
+                mLogger->info("Resolved started driver " + pDriver + " as live device " + device + " -> catalog entry " + best->label);
+                resolved = true;
+            }
+        }
+        if (resolved)
+            updateControllerData("indiactivedrivers", activeIndiDriversToVariant());
+        else
+            mLogger->warning("Could not resolve which catalog entry driver " + pDriver + " actually started as");
+    });
 }
 void Controller::stopIndiDriver(const QString &pDriver)
 {
@@ -1250,6 +1291,31 @@ void Controller::disconnectIndiDriver(const QString &pDriver)
     }
 }
 
+// mdpd ("multiple devices per driver") drivers rename themselves at
+// runtime to "<catalog label> <model>" once they know which actual
+// hardware they're talking to - confirmed live: indi_qhy_ccd connected to
+// a real camera reports itself on the bus as "QHY CCD QHYminiCam8M", not
+// the XML catalog's generic "QHY CCD" label (indi_qhy.xml: <device
+// label="QHY CCD" mdpd="true">). An exact match only ever catches
+// non-mdpd drivers (simulators, most single-model devices). Picks the
+// longest-matching catalog label among candidates, to stay unambiguous if
+// two mdpd families' generic labels could otherwise both prefix-match the
+// same live device name. Shared by queryActiveIndiDrivers() (orphaned
+// indiserver recovery) and startIndiDriver()'s own delayed resolution for
+// an ambiguous binary (see there).
+const IndiDriverInfo *Controller::bestCatalogMatchForLiveName(const QString &deviceLabel)
+{
+    const IndiDriverInfo *best = nullptr;
+    for (const IndiDriverInfo &d : _indiDrivers)
+    {
+        bool match = (d.label == deviceLabel) ||
+                     (d.mdpd && deviceLabel.startsWith(d.label + " "));
+        if (match && (!best || d.label.length() > best->label.length()))
+            best = &d;
+    }
+    return best;
+}
+
 void Controller::queryActiveIndiDrivers()
 {
     _activeIndiDrivers.clear();
@@ -1266,28 +1332,7 @@ void Controller::queryActiveIndiDrivers()
         QString deviceLabel = trimmed.section('.', 0, 0);
         if (deviceLabel.isEmpty()) continue;
 
-        // mdpd ("multiple devices per driver") drivers rename themselves at
-        // runtime to "<catalog label> <model>" once they know which actual
-        // hardware they're talking to - confirmed live: indi_qhy_ccd
-        // connected to a real camera reports itself on the bus as
-        // "QHY CCD QHYminiCam8M", not the XML catalog's generic "QHY CCD"
-        // label (indi_qhy.xml: <device label="QHY CCD" mdpd="true">). An
-        // exact match only ever catches non-mdpd drivers (simulators, most
-        // single-model devices) - this is why a QHY camera recovered from
-        // an orphaned indiserver silently dropped out of indiactivedrivers
-        // while the CCD Simulator (loaded normally, tracked by binary in
-        // startIndiDriver() instead) kept showing up fine. Pick the
-        // longest-matching catalog label among candidates, to stay
-        // unambiguous if two mdpd families' generic labels could otherwise
-        // both prefix-match the same live device name.
-        const IndiDriverInfo *best = nullptr;
-        for (const IndiDriverInfo &d : _indiDrivers)
-        {
-            bool match = (d.label == deviceLabel) ||
-                         (d.mdpd && deviceLabel.startsWith(d.label + " "));
-            if (match && (!best || d.label.length() > best->label.length()))
-                best = &d;
-        }
+        const IndiDriverInfo *best = bestCatalogMatchForLiveName(deviceLabel);
         if (best)
         {
             _activeIndiDrivers.append(*best);
