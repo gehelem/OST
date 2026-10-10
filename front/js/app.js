@@ -391,6 +391,13 @@ if (zeroconf.isAvailable()) {
         // d'usage que si on est en reseau local, donc sans SSL") - always off.
         setSsl(false);
         discoverResultsEl.innerHTML = "";
+        // Same as picking a history entry below (serverHostInput.value = ...
+        // document.getElementById("connect-btn").click()) - selecting a
+        // discovered server used to only fill the host field, the panel
+        // then looked like nothing happened until Connect was pressed by
+        // hand (Gilles, 2026-10-10: had to reopen the settings panel to
+        // find the click still needed).
+        document.getElementById("connect-btn").click();
       });
       discoverResultsEl.appendChild(btn);
     }
