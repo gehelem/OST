@@ -15,6 +15,7 @@ import { setBgLayer } from "./imagelayer.js";
 import { templates } from "./templates/index.js";
 import { setLanguage, t } from "./i18n.js";
 import * as zeroconf from "./zeroconf.js";
+import { showToast } from "./toast.js";
 
 const client = createClient();
 
@@ -589,6 +590,14 @@ client.subscribe(client.topics.controllerData(), (cd) => {
 // WORST level currently in the log buffer (server-messages.en.md's "l"
 // field: 0 Debug ... 4 Critical), independent of whatever the log panel's
 // own module/level filter happens to be set to right now.
+// Toast (js/toast.js) for any genuinely new critical-level entry - Gilles,
+// 2026-10-10, after a module crash (issue #234) only showed up as a log
+// line nobody would necessarily notice: "ça permettra de rendre ce type
+// d'évènement plus visible". `logs` is the WHOLE buffer every time (up to
+// 1000 entries, see datastore.js), so only the tail past what was already
+// seen last call is actually new - and the very first call (the initial
+// dump/history on connect) must not toast the server's entire backlog.
+let seenLogsCount = -1;
 client.subscribe(client.topics.logs(), (logs) => {
   let worst = 0;
   for (const entry of logs || []) if ((entry.l | 0) > worst) worst = entry.l | 0;
@@ -597,6 +606,14 @@ client.subscribe(client.topics.logs(), (logs) => {
   if (worst === 2) logBadgeDotEl.classList.add("level-warning");
   else if (worst === 3) logBadgeDotEl.classList.add("level-error");
   else if (worst >= 4) logBadgeDotEl.classList.add("level-critical");
+
+  const count = (logs || []).length;
+  if (seenLogsCount >= 0) {
+    for (const entry of (logs || []).slice(seenLogsCount)) {
+      if ((entry.l | 0) >= 4) showToast(entry.t, entry.l | 0);
+    }
+  }
+  seenLogsCount = count;
 });
 
 client.subscribe(client.topics.session(), (session) => {
