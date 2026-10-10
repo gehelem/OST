@@ -1,0 +1,33 @@
+# Zipped www/ build (front/'s plain web output - no Android, no Gradle) -
+# ported from the old standalone ostcore repo's own .gitlab-ci.yml
+# (superseded by front/ here since issue #229), for a direct web deploy
+# without cloning/building the whole repo. Gilles, 2026-10-10.
+#
+# Lightweight (just npm + zip), unlike build-job-android (CI/android.yml) -
+# no reason to keep this off the MR pipeline, same build-rules as every
+# other build job here.
+
+build-web-zip:
+  stage: build
+  image: node:20
+  variables:
+    WWW_ZIP_LATEST: "ostcore_latest_www.zip"
+  before_script:
+    # node:20 (Debian) doesn't ship zip by default.
+    - apt-get update -qq
+    - apt-get install -y -qq zip
+  script:
+    - cd front
+    - npm ci
+    - npm run prepare-www
+    - cd www && zip -r "../${WWW_ZIP_LATEST}" . && cd ..
+    # Same latest-then-copy-for-tag idiom as documentation/CI/CI-build.sh.
+    - if [ -n "$CI_COMMIT_TAG" ]; then cp "${WWW_ZIP_LATEST}" "ostcore_${CI_COMMIT_TAG}_www.zip"; fi
+  artifacts:
+    paths:
+      - "front/ostcore_*_www.zip"
+    expire_in: 4 week
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
+    - if: '$CI_PIPELINE_SOURCE == "push"'

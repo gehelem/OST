@@ -5,6 +5,7 @@ include:
   - local: CI/gsc.yml
   - local: CI/doc.yml
   - local: CI/android.yml
+  - local: CI/web-zip.yml
 
 stages:
   - images
@@ -162,6 +163,7 @@ release-job-tag:
     - build-job-fedora
     - build-job-arch
     - build-doc
+    - build-web-zip
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   script:
     - sh ./CI/CI-upload-release-tag.sh
@@ -178,9 +180,11 @@ release-job-latest:
     - build-job-arch
     - build-doc
     - build-job-android
+    - build-web-zip
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   variables:
     DOC_FILE_LATEST: "documentation_latest.tar.gz"
+    WWW_ZIP_LATEST: "ostcore_latest_www.zip"
   script:
     - sh ./CI/CI-upload-release-latest.sh
   rules:
