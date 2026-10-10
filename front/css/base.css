@@ -77,6 +77,10 @@ a { color: var(--accent); }
 
 .brand { display: flex; align-items: center; gap: 6px; font-weight: 700; letter-spacing: 0.3px; color: var(--text); }
 .brand .material-icons { color: var(--accent); }
+/* Real app logo (assets/favicon-192.png) replacing the generic "stars"
+   icon, same 20px box as .material-icons' own default font-size so it
+   drops in at the same visual weight (Gilles, 2026-10-10). */
+.brand-icon { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; }
 
 /* #canvas, #panel-layer, #docked-view, #modbar, #top-right, #conn-widget:
    see panels.css. */

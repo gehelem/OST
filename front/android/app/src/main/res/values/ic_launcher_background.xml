@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#FFFFFF</color>
+    <!-- Sampled from the actual logo artwork's own deep-space background
+         (Gilles, 2026-10-10) - was the Android Studio template's plain
+         white, left over from before there was a real icon. -->
+    <color name="ic_launcher_background">#030B19</color>
 </resources>
