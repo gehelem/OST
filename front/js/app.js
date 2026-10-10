@@ -559,12 +559,17 @@ function selectView(key) {
 // module just disappeared" (also the module list). Everything else is the
 // concern of whichever screen is currently rendered — see render.js/views.js.
 
-client.subscribe(client.topics.modules(), () => {
-  // The module bar always needs the fresh module list. The active module
-  // view does NOT need a poke here: renderModuleView (render.js) already
-  // subscribes to topics.module(name) directly and renders its own
-  // "not found" state when a module is removed — see its module doc.
+client.subscribe(client.topics.modules(), (names) => {
+  // The module bar always needs the fresh module list.
   renderModbarNow();
+  // The active module just disappeared (a normal kill, or a crash under
+  // issue #234's process isolation) - navigate back to Home instead of
+  // leaving render.js's own "Module not found" fallback panel
+  // (moduleLifecycle()) on screen until the user picks something else by
+  // hand. Gilles, 2026-10-10, after seeing that fallback for the first
+  // time (a crashed module disappearing while its view was open): "Auto
+  // vers Home, c'est plus propre".
+  if (isModuleView() && !names.includes(activeView)) selectView("__home");
 });
 
 // Gilles, 2026-10-03: "la quand je navigue l'onglet chrome indique
