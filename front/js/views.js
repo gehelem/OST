@@ -731,9 +731,23 @@ export function buildIndiPanel(client, scope, onChange) {
   ]));
   // Top zone: drivers actually running right now (indiactivedrivers) -
   // reload/stop only, no "load" (they're already loaded).
-  indiControls.appendChild(el("div", { class: "muted small", text: t("views.activeIndiDrivers") }));
+  const connectAllBtn = el("button", { class: "btn btn-sm", onclick: connectAll }, t("views.connectAll"));
+  indiControls.appendChild(el("div", { class: "panel-header-row" }, [
+    el("div", { class: "muted small", text: t("views.activeIndiDrivers") }),
+    connectAllBtn,
+  ]));
   const activeDriversList = el("ul");
   indiControls.appendChild(activeDriversList);
+
+  // Gilles, 2026-10-13 (both here and the setup wizard's own step 1, which
+  // reuses this same panel - see this function's own doc comment): one
+  // click to connect every currently active driver's device, instead of
+  // each one individually. Same indiConnectDriver() the per-driver button
+  // already calls, just looped.
+  function connectAll() {
+    const activeDrivers = client.get(client.topics.controllerData("indiactivedrivers")) || [];
+    for (const d of activeDrivers) client.indiConnectDriver(d.binary);
+  }
 
   // Bottom zone: free-text search (driverSearchInput is created once,
   // outside any subscription, same caution as labelInput above - never
@@ -781,6 +795,7 @@ export function buildIndiPanel(client, scope, onChange) {
       return;
     }
     const activeDrivers = client.get(client.topics.controllerData("indiactivedrivers")) || [];
+    connectAllBtn.disabled = activeDrivers.length === 0;
     activeDriversList.innerHTML = "";
     for (const d of activeDrivers) {
       // Two lines - label, then icon buttons below it - rather than
@@ -882,12 +897,30 @@ export function renderController(client) {
   scope.subscribe(client.topics.controllerData("currentconf"), renderConfigurations);
 
   // ---- Loaded modules ----
-  const modSec = el("section", { class: "panel" }, [el("h3", { text: t("views.loadedModules") })]);
+  // "Kill all" (Gilles, 2026-10-13, Controller screen only - explicitly
+  // NOT the setup wizard) - same client.killModule() loop a user would do
+  // by hand one row at a time, GlobalDatastore excluded same as the
+  // per-row button below (the backend itself refuses to kill it anyway,
+  // Controller::onExternalEvent's MK case). Disabled whenever there is
+  // nothing to kill, kept in sync by the same subscription that redraws
+  // the list.
+  const killAllBtn = el("button", { class: "btn btn-sm btn-danger", text: t("views.killAll"), onclick: killAll });
+  const modSec = el("section", { class: "panel" }, [
+    el("div", { class: "panel-header-row" }, [el("h3", { text: t("views.loadedModules") }), killAllBtn]),
+  ]);
   const modList = el("ul");
   modSec.appendChild(modList);
   grid.appendChild(modSec);
+  function killAll() {
+    const names = (client.get(client.topics.modules()) || []).filter((n) => n !== "GlobalDatastore");
+    if (names.length === 0) return;
+    if (!confirm(t("views.killAllConfirm", { count: String(names.length) }))) return;
+    for (const name of names) client.killModule(name);
+  }
   scope.subscribe(client.topics.modules(), (names) => {
     modList.innerHTML = "";
+    const killable = (names || []).filter((n) => n !== "GlobalDatastore");
+    killAllBtn.disabled = killable.length === 0;
     for (const name of names || []) {
       const li = el("li");
       li.appendChild(el("span", { class: "spacer mono small", text: name }));

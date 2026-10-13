@@ -443,6 +443,17 @@ input[type="range"]::-moz-range-thumb {
 .wizard-body { min-height: 180px; }
 .wizard-module-checklist { display: flex; flex-direction: column; gap: 4px; margin: var(--space-2) 0; }
 .wizard-module-check { display: flex; align-items: center; gap: 8px; font-size: 12.5px; cursor: pointer; }
+/* "set slaves" (issue #238) - pushed to the far right of its module's own
+   row, slightly muted (it's a secondary/optional refinement of the main
+   checkbox to its left, not an equally-weighted choice). */
+.wizard-module-setslaves { display: flex; align-items: center; gap: 4px; margin-left: auto; color: var(--text-muted); font-size: 11px; }
+
+/* A panel's own <h3> title plus one action button, side by side (e.g. the
+   Controller screen's "Loaded modules" header + its "Kill all" button) -
+   same flex/space-between shape as .params-dialog .dialog-header above,
+   generalized since this one isn't scoped to a dialog. */
+.panel-header-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.panel-header-row h3 { margin: 0; }
 
 /* ---------------------------------------------------------------- panel lists */
 .panel h3 { margin-top: 0; }

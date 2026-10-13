@@ -223,6 +223,30 @@ function renderSimpleGridStep(client, container, setValid, { propName, introKey,
   return { dispose: scope.dispose };
 }
 
+// Mirrors each module's own "slaves" property definition (<lib>.json,
+// slaves.*.listOfValues: "loadedModules-X" or "loadedFamilies-X") - Gilles,
+// 2026-10-13: "si on dit S1-Sequence il faut lui attribuer les slaves
+// S1-Focus et S1-Guider, et aussi forcer les coches de selection de ces
+// modules". No generic protocol message exposes a library's own property
+// schema before it is actually loaded (controllerdata.libraries' metadata
+// is just getModuleInfo() - label/families/etc, never an "e" element list),
+// so this has to be kept in sync by hand with each module's own slaves
+// property if it ever changes. A "loadedFamilies-X" reference (focus,
+// guiding) is resolved here to one specific library that provides that
+// family (guider for "guiding" - blindpec provides it too, but isn't the
+// default any wizard-driven batch-load should assume).
+const SLAVE_SCHEMA = {
+  planner: [{ elt: "sequencemodule", lib: "sequencer" }, { elt: "navigatormodule", lib: "navigator" }],
+  sequencer: [{ elt: "focusmodule", lib: "focus" }, { elt: "guidermodule", lib: "guider" }],
+  navigator: [{ elt: "plannermodule", lib: "planner" }],
+  parkmanager: [{ elt: "plannermodule", lib: "planner" }],
+  monitor: [
+    { elt: "guider", lib: "guider" }, { elt: "sequencer", lib: "sequencer" }, { elt: "focus", lib: "focus" },
+    { elt: "navigator", lib: "navigator" }, { elt: "planner", lib: "planner" }, { elt: "parkmanager", lib: "parkmanager" },
+    { elt: "polar", lib: "polar" }, { elt: "inspector", lib: "inspector" },
+  ],
+};
+
 // ---- Step 4: modules under a common prefix --------------------------------
 // The one genuinely new piece (Gilles's point 4: "S1 : S1-Navigator
 // S1-Planner etc etc") - today's "Load a module" section (renderController())
@@ -241,7 +265,8 @@ function renderModulesStep(client, container, setValid) {
   const createBtn = el("button", { class: "btn btn-primary btn-sm", text: t("wizard.modules.create"), onclick: createChecked });
   container.appendChild(createBtn);
 
-  const checkboxes = new Map(); // stripped lib name -> <input type=checkbox>
+  const checkboxes = new Map(); // stripped lib name -> <input type=checkbox> ("load this one")
+  const setSlavesCheckboxes = new Map(); // stripped lib name -> <input type=checkbox> ("wire its slaves too")
 
   function capitalize(s) {
     return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s;
@@ -261,25 +286,80 @@ function renderModulesStep(client, container, setValid) {
 
   prefixInput.addEventListener("input", () => { refreshCreateEnabled(); checkValid(); });
 
+  // Checking "set slaves" force-checks every module it depends on (Gilles:
+  // "forcer les coches de selection de ces modules") - never the reverse,
+  // unchecking a dependency doesn't touch "set slaves". Unchecking the
+  // module itself turns "set slaves" back off too - wiring slaves onto an
+  // instance that won't exist makes no sense.
+  function onMainToggle(stripped, cb) {
+    if (!cb.checked) {
+      const setCb = setSlavesCheckboxes.get(stripped);
+      if (setCb) setCb.checked = false;
+    }
+    refreshCreateEnabled();
+  }
+  function onSetSlavesToggle(stripped) {
+    if (!setSlavesCheckboxes.get(stripped).checked) return;
+    for (const { lib } of SLAVE_SCHEMA[stripped] || []) {
+      const depCb = checkboxes.get(lib);
+      if (depCb && !depCb.checked) depCb.checked = true;
+    }
+    refreshCreateEnabled();
+  }
+
   function createChecked() {
     const prefix = prefixInput.value.trim();
     if (!prefix) return;
     for (const [lib, cb] of checkboxes) {
       if (cb.checked) client.loadModule(lib, `${prefix}-${capitalize(lib)}`);
     }
+    // Slave wiring has to wait for loadModule() to actually produce each
+    // instance (async - neither the module being configured nor the
+    // slaves it points at are guaranteed to exist yet the instant
+    // loadModule() returns). One subscription per "set slaves" module,
+    // applying client.setValue() as soon as both sides of each link exist,
+    // disposing itself once every link for that module is done - no
+    // polling/setTimeout, same event-driven shape as the rest of this app.
+    for (const [lib, setCb] of setSlavesCheckboxes) {
+      if (!setCb.checked) continue;
+      const ownName = `${prefix}-${capitalize(lib)}`;
+      const pending = new Map((SLAVE_SCHEMA[lib] || []).map((s) => [s.elt, `${prefix}-${capitalize(s.lib)}`]));
+      const unsub = scope.subscribe(client.topics.modules(), (names) => {
+        if (!(names || []).includes(ownName)) return;
+        for (const [elt, slaveName] of [...pending]) {
+          if ((names || []).includes(slaveName)) {
+            client.setValue(ownName, "slaves", elt, slaveName);
+            pending.delete(elt);
+          }
+        }
+        if (pending.size === 0) unsub();
+      });
+    }
   }
 
   scope.subscribe(client.topics.controllerData("libraries"), (libs) => {
     const prevChecked = new Set([...checkboxes].filter(([, cb]) => cb.checked).map(([k]) => k));
+    const prevSetSlaves = new Set([...setSlavesCheckboxes].filter(([, cb]) => cb.checked).map(([k]) => k));
     checklistEl.innerHTML = "";
     checkboxes.clear();
+    setSlavesCheckboxes.clear();
     for (const key of Object.keys(libs || {})) {
       const stripped = key.startsWith("libost") ? key.slice(6) : key;
       const cb = el("input", { type: "checkbox" });
       if (prevChecked.has(stripped)) cb.checked = true;
-      cb.addEventListener("change", refreshCreateEnabled);
+      cb.addEventListener("change", () => onMainToggle(stripped, cb));
       checkboxes.set(stripped, cb);
-      checklistEl.appendChild(el("label", { class: "wizard-module-check" }, [cb, el("span", { text: capitalize(stripped) })]));
+      const rowChildren = [cb, el("span", { text: capitalize(stripped) })];
+      // Only modules that actually declare a "slaves" property get the
+      // extra checkbox - see SLAVE_SCHEMA above.
+      if (SLAVE_SCHEMA[stripped]) {
+        const setCb = el("input", { type: "checkbox" });
+        if (prevSetSlaves.has(stripped)) setCb.checked = true;
+        setCb.addEventListener("change", () => onSetSlavesToggle(stripped));
+        setSlavesCheckboxes.set(stripped, setCb);
+        rowChildren.push(el("span", { class: "wizard-module-setslaves" }, [setCb, el("span", { text: t("wizard.modules.setSlaves") })]));
+      }
+      checklistEl.appendChild(el("label", { class: "wizard-module-check" }, rowChildren));
     }
     refreshCreateEnabled();
   });

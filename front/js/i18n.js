@@ -132,6 +132,8 @@ const STRINGS = {
   "views.load": { en: "Load", fr: "Charger", de: "Laden", it: "Carica", es: "Cargar" },
   "views.kill": { en: "Kill", fr: "Arrêter", de: "Beenden", it: "Termina", es: "Detener" },
   "views.unloadConfirm": { en: "Unload {name}?", fr: "Décharger {name} ?", de: "{name} entladen?", it: "Scaricare {name}?", es: "¿Descargar {name}?" },
+  "views.killAll": { en: "Kill all", fr: "Tout arrêter", de: "Alle beenden", it: "Termina tutti", es: "Detener todos" },
+  "views.killAllConfirm": { en: "Unload all {count} loaded modules?", fr: "Décharger les {count} modules chargés ?", de: "Alle {count} geladenen Module entladen?", it: "Scaricare tutti i {count} moduli caricati?", es: "¿Descargar los {count} módulos cargados?" },
   "views.indiServerPrefix": { en: "INDI server — ", fr: "Serveur INDI — ", de: "INDI-Server — ", it: "Server INDI — ", es: "Servidor INDI — " },
   "views.enabled": { en: "enabled", fr: "activé", de: "aktiviert", it: "attivo", es: "activado" },
   "views.disabled": { en: "disabled", fr: "désactivé", de: "deaktiviert", it: "disattivato", es: "desactivado" },
@@ -141,6 +143,7 @@ const STRINGS = {
   "views.reload": { en: "Reload", fr: "Recharger", de: "Neu laden", it: "Ricarica", es: "Recargar" },
   "views.stop": { en: "Stop", fr: "Arrêter", de: "Stoppen", it: "Ferma", es: "Detener" },
   "views.connect": { en: "Connect", fr: "Connecter", de: "Verbinden", it: "Connetti", es: "Conectar" },
+  "views.connectAll": { en: "Connect all", fr: "Tout connecter", de: "Alle verbinden", it: "Connetti tutti", es: "Conectar todos" },
   "views.disconnect": { en: "Disconnect", fr: "Déconnecter", de: "Trennen", it: "Disconnetti", es: "Desconectar" },
   "views.runningSuffix": { en: " ● running", fr: " ● en cours", de: " ● läuft", it: " ● in esecuzione", es: " ● en ejecución" },
   "views.activeIndiDrivers": { en: "Active drivers", fr: "Drivers actifs", de: "Aktive Treiber", it: "Driver attivi", es: "Controladores activos" },
@@ -283,6 +286,7 @@ const STRINGS = {
   "wizard.modules.intro": { en: "Pick a common prefix (e.g. \"S1\") and which modules to load under it (e.g. \"S1-Navigator\", \"S1-Planner\"...). At least one module with this prefix is needed to continue.", fr: "Choisissez un préfixe commun (ex. « S1 ») et les modules à charger sous ce préfixe (ex. « S1-Navigator », « S1-Planner »...). Au moins un module avec ce préfixe est nécessaire pour continuer.", de: "Wählen Sie ein gemeinsames Präfix (z. B. „S1“) und die darunter zu ladenden Module (z. B. „S1-Navigator“, „S1-Planner“...). Mindestens ein Modul mit diesem Präfix ist erforderlich, um fortzufahren.", it: "Scegli un prefisso comune (es. \"S1\") e quali moduli caricare con quel prefisso (es. \"S1-Navigator\", \"S1-Planner\"...). È necessario almeno un modulo con questo prefisso per continuare.", es: "Elija un prefijo común (p. ej. «S1») y qué módulos cargar con ese prefijo (p. ej. «S1-Navigator», «S1-Planner»...). Se necesita al menos un módulo con este prefijo para continuar." },
   "wizard.modules.prefixPlaceholder": { en: "prefix, e.g. S1", fr: "préfixe, ex. S1", de: "Präfix, z. B. S1", it: "prefisso, es. S1", es: "prefijo, p. ej. S1" },
   "wizard.modules.create": { en: "Load selected modules", fr: "Charger les modules sélectionnés", de: "Ausgewählte Module laden", it: "Carica i moduli selezionati", es: "Cargar los módulos seleccionados" },
+  "wizard.modules.setSlaves": { en: "set slaves", fr: "attribuer les esclaves", de: "Slaves zuweisen", it: "assegna slave", es: "asignar esclavos" },
   "wizard.save.intro": { en: "Save this setup as a named configuration so it can be reloaded later.", fr: "Enregistrez cette configuration sous un nom pour pouvoir la recharger plus tard.", de: "Speichern Sie diese Einrichtung als benannte Konfiguration, um sie später erneut zu laden.", it: "Salva questa configurazione con un nome per poterla ricaricare in seguito.", es: "Guarde esta configuración con un nombre para poder volver a cargarla más tarde." },
 };
 
