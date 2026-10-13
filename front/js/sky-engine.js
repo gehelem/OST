@@ -1004,10 +1004,19 @@ export class SkyEngine {
         ctx.clip();
         // Restore the normal sky background within the clipped (sky-only)
         // region - the ground fill above covered the whole disk, this
-        // repaints just the sky portion back over it. Same showHips
-        // exception as the main background fill above - skip it so Aladin
-        // shows through here too.
-        if (!this.showHips) {
+        // undoes it back over just the sky portion. showHips: Gilles,
+        // 2026-10-14, "lorsque je selectionne true horizon ca masque tout
+        // le hips" - a real bug in the first pass, not just "leave it
+        // opaque": SKIPPING this step (what the first pass did) left the
+        // ground fill's own opaque paint sitting over the sky region too,
+        // since that fill happens BEFORE this clip even exists - merely
+        // not re-painting it never undid it. clearRect (not fillRect) is
+        // what's actually needed to punch it back to transparent within
+        // this clip, same as the main background's own clearRect at the
+        // very top of render() does for the whole canvas.
+        if (this.showHips) {
+          ctx.clearRect(0, 0, w, h);
+        } else {
           ctx.fillStyle = bgColor;
           ctx.fillRect(0, 0, w, h);
         }
