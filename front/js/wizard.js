@@ -45,6 +45,13 @@ export function openSetupWizard(client) {
   let stepIndex = 0;
   let stepDispose = null;
   let valid = false;
+  // Which existing GlobalDatastore row "is the one to use", one per grid -
+  // set by steps 2/3/4's own radio pick, read back by step 5 to prefill its
+  // per-module selects (Gilles, 2026-10-14: "je veux pouvoir faire une
+  // selection ... dont il faut tenir compte au 5"). Lives here, not inside
+  // any one step's own closure, since steps are rebuilt from scratch every
+  // time renderStep() runs (including going back and forward again).
+  const wizardSelection = { optics: null, equipments: null, locations: null };
 
   const stepperEl = el("div", { class: "wizard-stepper" });
   const bodyEl = el("div", { class: "wizard-body" });
@@ -113,7 +120,7 @@ export function openSetupWizard(client) {
     backBtn.disabled = stepIndex === 0;
     nextBtn.textContent = stepIndex === STEPS.length - 1 ? t("wizard.finish") : t("wizard.next");
     setValid(false);
-    const result = STEPS[stepIndex].render(client, bodyEl, setValid);
+    const result = STEPS[stepIndex].render(client, bodyEl, setValid, wizardSelection);
     stepDispose = result && result.dispose;
   }
 
@@ -167,8 +174,8 @@ function renderIndiStep(client, container, setValid) {
 // needed, so the generic row-form (buildElementsForm(), render.js - same
 // one openGridDialog() uses for every module's own "Add row" dialog) is
 // reused directly instead of a bespoke form.
-function renderOpticsStep(client, container, setValid) {
-  return renderSimpleGridStep(client, container, setValid, {
+function renderOpticsStep(client, container, setValid, wizardSelection) {
+  return renderSimpleGridStep(client, container, setValid, wizardSelection, {
     propName: "optics",
     introKey: "wizard.optics.intro",
     addLabelKey: "wizard.optics.add",
@@ -185,8 +192,8 @@ function renderOpticsStep(client, container, setValid) {
 // and buildElementsForm() already renders a LOV-constrained string element
 // as a dropdown (render.js) - so this step gets the "pick from detected
 // devices" behaviour for free, same as step 2, no new logic needed for it.
-function renderEquipmentStep(client, container, setValid) {
-  return renderSimpleGridStep(client, container, setValid, {
+function renderEquipmentStep(client, container, setValid, wizardSelection) {
+  return renderSimpleGridStep(client, container, setValid, wizardSelection, {
     propName: "equipments",
     introKey: "wizard.equipment.intro",
     addLabelKey: "wizard.equipment.add",
@@ -201,8 +208,8 @@ function renderEquipmentStep(client, container, setValid) {
 // 2026-10-13: "il nous manque une etape ... pour choisir le lieu dans le
 // globaldatastore" - inserted right after equipment (3), before the module
 // checklist (now 5).
-function renderLocationStep(client, container, setValid) {
-  return renderSimpleGridStep(client, container, setValid, {
+function renderLocationStep(client, container, setValid, wizardSelection) {
+  return renderSimpleGridStep(client, container, setValid, wizardSelection, {
     propName: "locations",
     introKey: "wizard.location.intro",
     addLabelKey: "wizard.location.add",
@@ -212,12 +219,14 @@ function renderLocationStep(client, container, setValid) {
 
 // Shared by steps 2, 3 and 4 - all three are "list GlobalDatastore.<propName>'s
 // rows, offer an 'Add' form built from the property's own live element
-// defs, done once there is at least one row" with nothing else different
-// between them.
-function renderSimpleGridStep(client, container, setValid, { propName, introKey, addLabelKey, rowLabel }) {
+// defs, and a radio pick for 'the one to use' (Gilles, 2026-10-14: "je veux
+// pouvoir faire une selection ... dont il faut tenir compte au 5" - read
+// back from wizardSelection[propName] by step 5), done once there is at
+// least one row" with nothing else different between them.
+function renderSimpleGridStep(client, container, setValid, wizardSelection, { propName, introKey, addLabelKey, rowLabel }) {
   const scope = client.scope();
   container.appendChild(el("p", { class: "muted small", text: t(introKey) }));
-  const list = el("ul");
+  const list = el("ul", { class: "wizard-select-list" });
   container.appendChild(list);
   const formSlot = el("div", { class: "hidden" });
   const addBtn = el("button", { class: "btn btn-sm", text: t(addLabelKey), onclick: openForm });
@@ -243,8 +252,21 @@ function renderSimpleGridStep(client, container, setValid, { propName, introKey,
   function refresh() {
     const prop = client.get(client.topics.property("GlobalDatastore", propName));
     const rows = (prop && prop.rows) || [];
+    const names = rows.map((r) => r.name).filter(Boolean);
+    // Keep whatever is already picked as long as it still exists; default
+    // to the first row the moment there is one (so there's always a usable
+    // selection for step 5 to prefill from), clear it once there are none.
+    if (names.length === 0) wizardSelection[propName] = null;
+    else if (!names.includes(wizardSelection[propName])) wizardSelection[propName] = names[0];
     list.innerHTML = "";
-    for (const row of rows) list.appendChild(el("li", { class: "small", text: rowLabel(row) }));
+    for (const row of rows) {
+      const radio = el("input", { type: "radio", name: `wizard-select-${propName}` });
+      radio.checked = row.name === wizardSelection[propName];
+      radio.addEventListener("change", () => { wizardSelection[propName] = row.name; });
+      list.appendChild(el("li", { class: "small" }, [
+        el("label", { class: "wizard-select-row" }, [radio, el("span", { text: rowLabel(row) })]),
+      ]));
+    }
     setValid(rows.length > 0);
   }
   scope.subscribe(client.topics.property("GlobalDatastore", propName), refresh);
@@ -309,12 +331,21 @@ const DEVICE_ROLES = {
 // property panel would trigger - nothing new to replicate here.
 const HAS_OPTIC = new Set(["focus", "guider", "blindpec", "sequencer", "navigator", "inspector", "polar", "allsky"]);
 
+// Which module types get a "location" property (giveMeALocation(), reached
+// via defineMeAsPlanner()/defineMeAsNavigator(), plus parkmanager's own
+// direct call - libs/indimodule.cpp). Same mechanism as HAS_OPTIC above:
+// one client.setValue(ownName, "location", "location", <row name>) call,
+// IndiModule's own "location" property (lat/lon/alt) is filled from the
+// matching GlobalDatastore "locations" row the same way optic.fl/optic.diam
+// are filled from "optics".
+const HAS_LOCATION = new Set(["planner", "navigator", "parkmanager"]);
+
 // ---- Step 5: modules under a common prefix --------------------------------
 // The one genuinely new piece (Gilles's point 4: "S1 : S1-Navigator
 // S1-Planner etc etc") - today's "Load a module" section (renderController())
 // loads one instance at a time, by hand; this adds a batch layer over the
 // exact same primitive (client.loadModule()), nothing new server-side.
-function renderModulesStep(client, container, setValid) {
+function renderModulesStep(client, container, setValid, wizardSelection) {
   const scope = client.scope();
   container.appendChild(el("p", { class: "muted small", text: t("wizard.modules.intro") }));
 
@@ -329,8 +360,10 @@ function renderModulesStep(client, container, setValid) {
   // GlobalDatastore rows, kept in sync by the same refresh functions.
   const globalEquipmentSelect = el("select", { class: "field-input" });
   const globalOpticsSelect = el("select", { class: "field-input" });
+  const globalLocationSelect = el("select", { class: "field-input" });
   globalEquipmentSelect.addEventListener("change", () => applyGlobalSelect(equipmentSelects, globalEquipmentSelect.value));
   globalOpticsSelect.addEventListener("change", () => applyGlobalSelect(opticsSelects, globalOpticsSelect.value));
+  globalLocationSelect.addEventListener("change", () => applyGlobalSelect(locationSelects, globalLocationSelect.value));
   function applyGlobalSelect(selectsMap, value) {
     if (!value) return;
     for (const [lib, sel] of selectsMap) {
@@ -342,19 +375,22 @@ function renderModulesStep(client, container, setValid) {
     prefixInput,
     el("label", { class: "wizard-module-picker" }, [el("span", { text: t("wizard.modules.equipment") }), globalEquipmentSelect]),
     el("label", { class: "wizard-module-picker" }, [el("span", { text: t("wizard.modules.optics") }), globalOpticsSelect]),
+    el("label", { class: "wizard-module-picker" }, [el("span", { text: t("wizard.modules.location") }), globalLocationSelect]),
   ]));
 
   // A real table (Gilles, 2026-10-13: "organise plutot le panneau 4 en
   // tableau avec des entetes module/equipment/optics/slaves") - one row
-  // per library, the Equipment/Optics/Slaves cells left empty for a
-  // module that doesn't declare the matching device roles / optic /
-  // slaves property (see DEVICE_ROLES/HAS_OPTIC/SLAVE_SCHEMA) rather than
-  // skipping the cell, so every row stays aligned under its column.
+  // per library, the Equipment/Optics/Location/Slaves cells left empty for
+  // a module that doesn't declare the matching device roles / optic /
+  // location / slaves property (see DEVICE_ROLES/HAS_OPTIC/HAS_LOCATION/
+  // SLAVE_SCHEMA) rather than skipping the cell, so every row stays
+  // aligned under its column.
   const checklistTable = el("table", { class: "wizard-module-table" }, [
     el("thead", null, [el("tr", null, [
       el("th", { text: t("wizard.modules.colModule") }),
       el("th", { text: t("wizard.modules.equipment") }),
       el("th", { text: t("wizard.modules.optics") }),
+      el("th", { text: t("wizard.modules.location") }),
       el("th", { text: t("wizard.modules.colSlaves") }),
     ])]),
   ]);
@@ -369,6 +405,7 @@ function renderModulesStep(client, container, setValid) {
   const setSlavesCheckboxes = new Map(); // stripped lib name -> <input type=checkbox> ("wire its slaves too")
   const equipmentSelects = new Map(); // stripped lib name -> <select> (GlobalDatastore.equipments row name, or "")
   const opticsSelects = new Map(); // stripped lib name -> <select> (GlobalDatastore.optics row name, or "")
+  const locationSelects = new Map(); // stripped lib name -> <select> (GlobalDatastore.locations row name, or "")
 
   function capitalize(s) {
     return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s;
@@ -388,35 +425,48 @@ function renderModulesStep(client, container, setValid) {
 
   prefixInput.addEventListener("input", () => { refreshCreateEnabled(); checkValid(); });
 
-  // Equipment/optics <select>s (Gilles, 2026-10-13: "il faut aussi assigner
-  // les differents devices selon les modules, selon la liste 'equipment' -
-  // idem avec optics ! => des listes de choix en face de chaque module") -
-  // both read from the exact same GlobalDatastore rows steps 2-4 of this
-  // wizard just created (or whatever already existed before it was
-  // opened). A blank first option always means "don't touch this".
+  // Equipment/optics/location <select>s (Gilles, 2026-10-13: "il faut aussi
+  // assigner les differents devices selon les modules, selon la liste
+  // 'equipment' - idem avec optics ! => des listes de choix en face de
+  // chaque module") - all three read from the exact same GlobalDatastore
+  // rows steps 2-4 of this wizard just created (or whatever already
+  // existed before it was opened). Prefilled from wizardSelection[propName]
+  // (the row picked by radio on steps 2-4, Gilles 2026-10-14: "je veux
+  // pouvoir faire une selection ... dont il faut tenir compte au 5") when
+  // there is one; the blank "—" option stays available for "don't set
+  // this" and any value the user picks here directly is kept for as long
+  // as it remains valid, overriding that prefill.
   function rowNames(propName) {
     const prop = client.get(client.topics.property("GlobalDatastore", propName));
     return ((prop && prop.rows) || []).map((r) => r.name).filter(Boolean);
   }
-  function refreshSelectOptions(select, names) {
+  function refreshSelectOptions(select, names, preferred) {
     const prev = select.value;
     select.innerHTML = "";
     select.appendChild(el("option", { value: "" }, "—"));
     for (const n of names) select.appendChild(el("option", { value: n, text: n }));
     if (names.includes(prev)) select.value = prev;
+    else if (preferred && names.includes(preferred)) select.value = preferred;
+    else if (names.length > 0) select.value = names[0];
   }
   function refreshAllEquipmentSelects() {
     const names = rowNames("equipments");
-    refreshSelectOptions(globalEquipmentSelect, names);
-    for (const sel of equipmentSelects.values()) refreshSelectOptions(sel, names);
+    refreshSelectOptions(globalEquipmentSelect, names, wizardSelection.equipments);
+    for (const sel of equipmentSelects.values()) refreshSelectOptions(sel, names, wizardSelection.equipments);
   }
   function refreshAllOpticsSelects() {
     const names = rowNames("optics");
-    refreshSelectOptions(globalOpticsSelect, names);
-    for (const sel of opticsSelects.values()) refreshSelectOptions(sel, names);
+    refreshSelectOptions(globalOpticsSelect, names, wizardSelection.optics);
+    for (const sel of opticsSelects.values()) refreshSelectOptions(sel, names, wizardSelection.optics);
+  }
+  function refreshAllLocationSelects() {
+    const names = rowNames("locations");
+    refreshSelectOptions(globalLocationSelect, names, wizardSelection.locations);
+    for (const sel of locationSelects.values()) refreshSelectOptions(sel, names, wizardSelection.locations);
   }
   scope.subscribe(client.topics.property("GlobalDatastore", "equipments"), refreshAllEquipmentSelects);
   scope.subscribe(client.topics.property("GlobalDatastore", "optics"), refreshAllOpticsSelects);
+  scope.subscribe(client.topics.property("GlobalDatastore", "locations"), refreshAllLocationSelects);
 
   // Checking "set slaves" force-checks every module it depends on (Gilles:
   // "forcer les coches de selection de ces modules") - never the reverse,
@@ -467,15 +517,16 @@ function renderModulesStep(client, container, setValid) {
         if (pending.size === 0) unsub();
       });
     }
-    // Equipment/optics - same "wait for the instance to actually exist"
-    // reasoning as slave wiring above, just a single module to wait for
-    // instead of a module-plus-its-slaves set.
+    // Equipment/optics/location - same "wait for the instance to actually
+    // exist" reasoning as slave wiring above, just a single module to wait
+    // for instead of a module-plus-its-slaves set.
     for (const [lib, cb] of checkboxes) {
       if (!cb.checked) continue;
       const ownName = `${prefix}-${capitalize(lib)}`;
       const equipment = equipmentSelects.get(lib) ? equipmentSelects.get(lib).value : "";
       const optics = opticsSelects.get(lib) ? opticsSelects.get(lib).value : "";
-      if (!equipment && !optics) continue;
+      const location = locationSelects.get(lib) ? locationSelects.get(lib).value : "";
+      if (!equipment && !optics && !location) continue;
       const unsub = scope.subscribe(client.topics.modules(), (names) => {
         if (!(names || []).includes(ownName)) return;
         if (equipment) {
@@ -487,6 +538,7 @@ function renderModulesStep(client, container, setValid) {
           }
         }
         if (optics) client.setValue(ownName, "optic", "optic", optics);
+        if (location) client.setValue(ownName, "location", "location", location);
         unsub();
       });
     }
@@ -509,6 +561,7 @@ function renderModulesStep(client, container, setValid) {
     setSlavesCheckboxes.clear();
     equipmentSelects.clear();
     opticsSelects.clear();
+    locationSelects.clear();
     for (const key of Object.keys(libs || {})) {
       const stripped = key.startsWith("libost") ? key.slice(6) : key;
       const cb = el("input", { type: "checkbox" });
@@ -516,14 +569,15 @@ function renderModulesStep(client, container, setValid) {
       cb.addEventListener("change", () => onMainToggle(stripped, cb));
       checkboxes.set(stripped, cb);
       const moduleCell = el("td", null, [el("label", { class: "wizard-module-check" }, [cb, el("span", { text: capitalize(stripped) })])]);
-      // Equipment/optics/slaves cells (Gilles: "des listes de choix en
-      // face de chaque module" + une 4e colonne "slaves") - only modules
-      // that actually declare the matching device roles / optic / slaves
-      // property get real content (DEVICE_ROLES/HAS_OPTIC/SLAVE_SCHEMA);
-      // every other module still gets the empty cell, so columns stay
-      // aligned. Select options filled in by refreshAllEquipmentSelects()/
-      // refreshAllOpticsSelects() right after this loop, not here - a
-      // freshly (re)built <select> starts with just the blank placeholder.
+      // Equipment/optics/location/slaves cells (Gilles: "des listes de
+      // choix en face de chaque module" + une colonne "slaves") - only
+      // modules that actually declare the matching device roles / optic /
+      // location / slaves property get real content (DEVICE_ROLES/
+      // HAS_OPTIC/HAS_LOCATION/SLAVE_SCHEMA); every other module still
+      // gets the empty cell, so columns stay aligned. Select options
+      // filled in by refreshAllEquipmentSelects()/refreshAllOpticsSelects()/
+      // refreshAllLocationSelects() right after this loop, not here - a
+      // freshly (re)built <select> starts out empty.
       const equipmentCell = el("td");
       if (DEVICE_ROLES[stripped]) {
         const sel = el("select", { class: "field-input" });
@@ -536,6 +590,12 @@ function renderModulesStep(client, container, setValid) {
         opticsSelects.set(stripped, sel);
         opticsCell.appendChild(sel);
       }
+      const locationCell = el("td");
+      if (HAS_LOCATION.has(stripped)) {
+        const sel = el("select", { class: "field-input" });
+        locationSelects.set(stripped, sel);
+        locationCell.appendChild(sel);
+      }
       const slavesCell = el("td");
       if (SLAVE_SCHEMA[stripped]) {
         const setCb = el("input", { type: "checkbox" });
@@ -544,7 +604,7 @@ function renderModulesStep(client, container, setValid) {
         setSlavesCheckboxes.set(stripped, setCb);
         slavesCell.appendChild(el("label", { class: "wizard-module-setslaves" }, [setCb, el("span", { text: t("wizard.modules.setSlaves") })]));
       }
-      checklistEl.appendChild(el("tr", null, [moduleCell, equipmentCell, opticsCell, slavesCell]));
+      checklistEl.appendChild(el("tr", null, [moduleCell, equipmentCell, opticsCell, locationCell, slavesCell]));
     }
     // A "set slaves" default-check still needs its own dependencies
     // force-checked, same as a user clicking it would get via
@@ -555,6 +615,7 @@ function renderModulesStep(client, container, setValid) {
     firstBuild = false;
     refreshAllEquipmentSelects();
     refreshAllOpticsSelects();
+    refreshAllLocationSelects();
     refreshCreateEnabled();
   });
   scope.subscribe(client.topics.modules(), checkValid);

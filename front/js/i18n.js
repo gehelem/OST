@@ -295,6 +295,7 @@ const STRINGS = {
   "wizard.modules.colModule": { en: "Module", fr: "Module", de: "Modul", it: "Modulo", es: "Módulo" },
   "wizard.modules.equipment": { en: "Equipment", fr: "Équipement", de: "Ausrüstung", it: "Attrezzatura", es: "Equipo" },
   "wizard.modules.optics": { en: "Optics", fr: "Optique", de: "Optik", it: "Ottica", es: "Óptica" },
+  "wizard.modules.location": { en: "Location", fr: "Lieu", de: "Standort", it: "Luogo", es: "Ubicación" },
   "wizard.modules.colSlaves": { en: "Slaves", fr: "Esclaves", de: "Slaves", it: "Slave", es: "Esclavos" },
   "wizard.save.intro": { en: "Save this setup as a named configuration so it can be reloaded later.", fr: "Enregistrez cette configuration sous un nom pour pouvoir la recharger plus tard.", de: "Speichern Sie diese Einrichtung als benannte Konfiguration, um sie später erneut zu laden.", it: "Salva questa configurazione con un nome per poterla ricaricare in seguito.", es: "Guarde esta configuración con un nombre para poder volver a cargarla más tarde." },
 };

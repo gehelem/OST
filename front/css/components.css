@@ -466,6 +466,11 @@ input[type="range"]::-moz-range-thumb {
    (it's a secondary/optional refinement of the module checkbox, not an
    equally-weighted choice). */
 .wizard-module-setslaves { display: flex; align-items: center; gap: 4px; color: var(--text-muted); font-size: 11px; white-space: nowrap; }
+/* Steps 2/3/4's own "pick the one to use" radio (issue #238, Gilles,
+   2026-10-14: "je veux pouvoir faire une selection ... dont il faut tenir
+   compte au 5") - same row shape as .wizard-module-check above. */
+.wizard-select-list { list-style: none; padding: 0; margin: 0; }
+.wizard-select-row { display: flex; align-items: center; gap: 8px; font-size: 12.5px; cursor: pointer; }
 
 /* A panel's own <h3> title plus one action button, side by side (e.g. the
    Controller screen's "Loaded modules" header + its "Kill all" button) -
