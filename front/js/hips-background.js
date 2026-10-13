@@ -116,6 +116,17 @@ export function createHipsBackground(container) {
           showContextMenu: false,
           showCooGrid: false,
           showCooGridControl: false,
+          // Gilles, 2026-10-14: "des boites monochromes qui apparaissent
+          // sous mes fenetres de controle" / "des petites vignettes pour
+          // faire la pub de Aladin" - these 6 default to true in
+          // lib/aladin.js (grepped its own DEFAULT_OPTIONS directly) and
+          // were simply missed in the first pass above.
+          showCatalog: false,
+          showCooLocation: false,
+          showFov: false,
+          showLabels: false,
+          showProjectionControl: false,
+          showStatusBar: false,
         });
         if (pendingView) apply(pendingView);
       }

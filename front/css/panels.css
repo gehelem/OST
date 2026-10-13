@@ -268,6 +268,16 @@
    never flashes anything of its own. */
 .hips-bg { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
 .hips-bg.active { display: block; }
+/* Aladin's own logo/toolbar (js/hips-background.js's init options already
+   disable every chrome piece that HAS a documented toggle - these two
+   don't, grepped lib/aladin.js directly to confirm). Gilles, 2026-10-14:
+   "des petites vignettes pour faire la pub de Aladin ... des boites
+   monochromes qui apparaissent sous mes fenetres de controle" - masked
+   for now; a general "credits" box covering every third-party data
+   source this app uses (CDS/Aladin included) is a separate future piece,
+   not yet built (Gilles: "ensuite on ajoute une boite plus generale pour
+   tous les credits"). */
+.hips-bg .aladin-logo, .hips-bg .aladin-widgets-toolbar { display: none !important; }
 #panel-layer, #docked-view { position: absolute; inset: 0; overflow: auto; }
 /* #panel-layer now stays visible even over a docked view (Home/Controller/
    Files/Logs - see app.js's renderContentNow(), Gilles, 2026-10-06: "on
