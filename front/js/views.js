@@ -701,6 +701,114 @@ function fmtBytes(mb) {
   return mb.toFixed(0) + " MB";
 }
 
+// ---- INDI server & drivers panel -----------------------------------------
+// Extracted out of renderController() (issue #238) so the setup wizard's own
+// first step (wizard.js) can reuse the exact same controls instead of
+// duplicating them - a second copy would drift the moment one of the two
+// got a fix/tweak the other didn't. `scope` is the caller's own
+// client.scope() (its subscriptions are torn down together with the rest of
+// the caller's own screen/step, not separately). `onChange` (optional) fires
+// every time this panel's own live data redraws - the wizard step uses it to
+// know when to recompute "is there at least one active driver yet" (see its
+// own `canProceed` gate), renderController() has no use for it and omits it.
+//
+// indiserver reflects whether ostserver itself was launched with
+// --indiserver, not whether some INDI server happens to be running right
+// now (controller.en.md) — "N" means OST isn't the one managing it at all
+// (a separately-run indiserver, or none), so there is nothing to
+// start/stop/list here. "Y" gets the controls; more to come here per
+// Gilles, 2026-10-09 (issue #231, second half).
+export function buildIndiPanel(client, scope, onChange) {
+  const indiSec = el("section", { class: "panel" });
+  const indiTitle = el("h3");
+  indiSec.appendChild(indiTitle);
+  const indiExternalMsg = el("div", { class: "muted small hidden", text: t("views.indiServerManagedElsewhere") });
+  indiSec.appendChild(indiExternalMsg);
+  const indiControls = el("div", { class: "hidden" });
+  indiControls.appendChild(el("div", { class: "form-row" }, [
+    el("button", { class: "btn btn-sm", onclick: () => client.indiStart() }, t("views.startServer")),
+    el("button", { class: "btn btn-sm", onclick: () => client.indiStop() }, t("views.stopServer")),
+  ]));
+  // Top zone: drivers actually running right now (indiactivedrivers) -
+  // reload/stop only, no "load" (they're already loaded).
+  indiControls.appendChild(el("div", { class: "muted small", text: t("views.activeIndiDrivers") }));
+  const activeDriversList = el("ul");
+  indiControls.appendChild(activeDriversList);
+
+  // Bottom zone: free-text search (driverSearchInput is created once,
+  // outside any subscription, same caution as labelInput above - never
+  // touched again after creation) over the full driver catalogue
+  // (indidrivers), each result with its own "start" button. Filtering
+  // only kicks in from 3 characters - the catalogue is in the hundreds on
+  // a full INDI install, not worth listing unfiltered.
+  indiControls.appendChild(el("div", { class: "muted small", text: t("views.startIndiDriver") }));
+  const driverSearchInput = el("input", { type: "text", class: "field-input", placeholder: t("views.indiDriverSearchPlaceholder") });
+  indiControls.appendChild(driverSearchInput);
+  const availableDriversList = el("ul");
+  indiControls.appendChild(availableDriversList);
+  indiSec.appendChild(indiControls);
+
+  // Case- and accent-insensitive: NFD-normalize then strip the combining
+  // diacritical marks Unicode splits accents into, so "é" and "e" compare
+  // equal (e.g. "Celestron" / "télescope").
+  function normalizeForSearch(s) {
+    return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  }
+
+  function renderAvailableDrivers() {
+    const query = normalizeForSearch(driverSearchInput.value.trim());
+    availableDriversList.innerHTML = "";
+    if (query.length < 3) return;
+    const drivers = client.get(client.topics.controllerData("indidrivers")) || [];
+    for (const d of drivers) {
+      if (!normalizeForSearch(`${d.label} (${d.family})`).includes(query)) continue;
+      const li = el("li");
+      li.appendChild(el("span", { class: "spacer small", text: `${d.label} (${d.family})` }));
+      li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.indiLoadDriver(d.binary) }, t("views.start")));
+      availableDriversList.appendChild(li);
+    }
+  }
+  driverSearchInput.addEventListener("input", renderAvailableDrivers);
+
+  function renderIndi() {
+    const indiserver = client.get(client.topics.controllerData("indiserver"));
+    const enabled = indiserver === "Y";
+    indiTitle.textContent = t("views.indiServerPrefix") + (enabled ? t("views.enabled") : t("views.disabled"));
+    indiExternalMsg.classList.toggle("hidden", enabled);
+    indiControls.classList.toggle("hidden", !enabled);
+    if (!enabled) {
+      if (onChange) onChange();
+      return;
+    }
+    const activeDrivers = client.get(client.topics.controllerData("indiactivedrivers")) || [];
+    activeDriversList.innerHTML = "";
+    for (const d of activeDrivers) {
+      // Two lines - label, then icon buttons below it - rather than
+      // cramming four buttons on the same row as the label (Gilles,
+      // 2026-10-09: that overflowed the panel on a narrow column).
+      const li = el("li", { class: "indi-driver-row" });
+      li.appendChild(el("div", { class: "small", text: `${d.label} (${d.family})` }));
+      const actions = el("div", { class: "icon-btn-row" });
+      // Connect/disconnect act on the device itself (YC/YD), separate from
+      // the driver process (reload/stop) - starting a driver doesn't
+      // connect its device on its own, see issue #231.
+      actions.appendChild(iconButton("link", t("views.connect"), () => client.indiConnectDriver(d.binary)));
+      actions.appendChild(iconButton("link_off", t("views.disconnect"), () => client.indiDisconnectDriver(d.binary)));
+      actions.appendChild(iconButton("refresh", t("views.reload"), () => client.indiReloadDriver(d.binary)));
+      actions.appendChild(iconButton("stop", t("views.stop"), () => client.indiStopDriver(d.binary), { danger: true }));
+      li.appendChild(actions);
+      activeDriversList.appendChild(li);
+    }
+    if (onChange) onChange();
+  }
+  scope.subscribe(client.topics.controllerData("indiserver"), renderIndi);
+  scope.subscribe(client.topics.controllerData("indidrivers"), renderIndi);
+  scope.subscribe(client.topics.controllerData("indiactivedrivers"), renderIndi);
+  scope.subscribe(client.topics.controllerData("indidrivers"), renderAvailableDrivers);
+
+  return indiSec;
+}
+
 export function renderController(client) {
   const root = el("div", { class: "controller-view" });
   const scope = client.scope();
@@ -840,95 +948,7 @@ export function renderController(client) {
   scope.subscribe(client.topics.controllerData("profiles"), renderProfiles);
 
   // ---- INDI server & drivers ----
-  // indiserver reflects whether ostserver itself was launched with
-  // --indiserver, not whether some INDI server happens to be running
-  // right now (controller.en.md) — "N" means OST isn't the one managing
-  // it at all (a separately-run indiserver, or none), so there is nothing
-  // to start/stop/list here. "Y" gets the controls; more to come here
-  // per Gilles, 2026-10-09 (issue #231, second half).
-  const indiSec = el("section", { class: "panel" });
-  const indiTitle = el("h3");
-  indiSec.appendChild(indiTitle);
-  const indiExternalMsg = el("div", { class: "muted small hidden", text: t("views.indiServerManagedElsewhere") });
-  indiSec.appendChild(indiExternalMsg);
-  const indiControls = el("div", { class: "hidden" });
-  indiControls.appendChild(el("div", { class: "form-row" }, [
-    el("button", { class: "btn btn-sm", onclick: () => client.indiStart() }, t("views.startServer")),
-    el("button", { class: "btn btn-sm", onclick: () => client.indiStop() }, t("views.stopServer")),
-  ]));
-  // Top zone: drivers actually running right now (indiactivedrivers) -
-  // reload/stop only, no "load" (they're already loaded).
-  indiControls.appendChild(el("div", { class: "muted small", text: t("views.activeIndiDrivers") }));
-  const activeDriversList = el("ul");
-  indiControls.appendChild(activeDriversList);
-
-  // Bottom zone: free-text search (driverSearchInput is created once,
-  // outside any subscription, same caution as labelInput above - never
-  // touched again after creation) over the full driver catalogue
-  // (indidrivers), each result with its own "start" button. Filtering
-  // only kicks in from 3 characters - the catalogue is in the hundreds on
-  // a full INDI install, not worth listing unfiltered.
-  indiControls.appendChild(el("div", { class: "muted small", text: t("views.startIndiDriver") }));
-  const driverSearchInput = el("input", { type: "text", class: "field-input", placeholder: t("views.indiDriverSearchPlaceholder") });
-  indiControls.appendChild(driverSearchInput);
-  const availableDriversList = el("ul");
-  indiControls.appendChild(availableDriversList);
-  indiSec.appendChild(indiControls);
-  grid.appendChild(indiSec);
-
-  // Case- and accent-insensitive: NFD-normalize then strip the combining
-  // diacritical marks Unicode splits accents into, so "é" and "e" compare
-  // equal (e.g. "Celestron" / "télescope").
-  function normalizeForSearch(s) {
-    return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
-  }
-
-  function renderAvailableDrivers() {
-    const query = normalizeForSearch(driverSearchInput.value.trim());
-    availableDriversList.innerHTML = "";
-    if (query.length < 3) return;
-    const drivers = client.get(client.topics.controllerData("indidrivers")) || [];
-    for (const d of drivers) {
-      if (!normalizeForSearch(`${d.label} (${d.family})`).includes(query)) continue;
-      const li = el("li");
-      li.appendChild(el("span", { class: "spacer small", text: `${d.label} (${d.family})` }));
-      li.appendChild(el("button", { class: "btn btn-sm", onclick: () => client.indiLoadDriver(d.binary) }, t("views.start")));
-      availableDriversList.appendChild(li);
-    }
-  }
-  driverSearchInput.addEventListener("input", renderAvailableDrivers);
-
-  function renderIndi() {
-    const indiserver = client.get(client.topics.controllerData("indiserver"));
-    const enabled = indiserver === "Y";
-    indiTitle.textContent = t("views.indiServerPrefix") + (enabled ? t("views.enabled") : t("views.disabled"));
-    indiExternalMsg.classList.toggle("hidden", enabled);
-    indiControls.classList.toggle("hidden", !enabled);
-    if (!enabled) return;
-    const activeDrivers = client.get(client.topics.controllerData("indiactivedrivers")) || [];
-    activeDriversList.innerHTML = "";
-    for (const d of activeDrivers) {
-      // Two lines - label, then icon buttons below it - rather than
-      // cramming four buttons on the same row as the label (Gilles,
-      // 2026-10-09: that overflowed the panel on a narrow column).
-      const li = el("li", { class: "indi-driver-row" });
-      li.appendChild(el("div", { class: "small", text: `${d.label} (${d.family})` }));
-      const actions = el("div", { class: "icon-btn-row" });
-      // Connect/disconnect act on the device itself (YC/YD), separate from
-      // the driver process (reload/stop) - starting a driver doesn't
-      // connect its device on its own, see issue #231.
-      actions.appendChild(iconButton("link", t("views.connect"), () => client.indiConnectDriver(d.binary)));
-      actions.appendChild(iconButton("link_off", t("views.disconnect"), () => client.indiDisconnectDriver(d.binary)));
-      actions.appendChild(iconButton("refresh", t("views.reload"), () => client.indiReloadDriver(d.binary)));
-      actions.appendChild(iconButton("stop", t("views.stop"), () => client.indiStopDriver(d.binary), { danger: true }));
-      li.appendChild(actions);
-      activeDriversList.appendChild(li);
-    }
-  }
-  scope.subscribe(client.topics.controllerData("indiserver"), renderIndi);
-  scope.subscribe(client.topics.controllerData("indidrivers"), renderIndi);
-  scope.subscribe(client.topics.controllerData("indiactivedrivers"), renderIndi);
-  scope.subscribe(client.topics.controllerData("indidrivers"), renderAvailableDrivers);
+  grid.appendChild(buildIndiPanel(client, scope));
 
   grid.appendChild(swSec);
 
