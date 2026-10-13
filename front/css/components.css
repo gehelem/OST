@@ -421,8 +421,15 @@ input[type="range"]::-moz-range-thumb {
    width reasoning as .params-dialog above (several steps' worth of
    controls, not a small confirm/edit form). */
 .dialog.wizard-dialog { width: 560px; }
-.wizard-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3); }
-.wizard-header h3 { margin: 0; }
+/* Fullscreen toggle (issue #238) - step 4's checklist (module + "set
+   slaves" + equipment/optics pickers per row) outgrows the default size.
+   overflow switches from the dialog itself (default .dialog behavior) to
+   .wizard-body alone, so the header/stepper/actions stay pinned while
+   only the step content scrolls. */
+.dialog.wizard-dialog.fullscreen { width: 95vw; max-width: 95vw; height: 90vh; max-height: 90vh; display: flex; flex-direction: column; overflow-y: hidden; }
+.wizard-dialog.fullscreen .wizard-body { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
+.wizard-header { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3); }
+.wizard-header h3 { margin: 0; flex: 1 1 auto; }
 .wizard-stepper { display: flex; gap: 4px; margin-bottom: var(--space-4); flex-wrap: wrap; }
 .wizard-step-btn {
   display: flex; align-items: center; gap: 6px;
@@ -441,12 +448,24 @@ input[type="range"]::-moz-range-thumb {
 }
 .wizard-step-btn.active .wizard-step-num { background: var(--accent); }
 .wizard-body { min-height: 180px; }
-.wizard-module-checklist { display: flex; flex-direction: column; gap: 4px; margin: var(--space-2) 0; }
+/* Step 4's module/equipment/optics table (issue #238, Gilles: "organise
+   plutot le panneau 4 en tableau avec des entetes module/equipment/
+   optics"). */
+.wizard-module-table { width: 100%; margin: var(--space-2) 0; border-collapse: collapse; }
+.wizard-module-table th { text-align: left; font-size: 11px; color: var(--text-muted); font-weight: 600; padding: 2px 6px 4px 0; border-bottom: 1px solid var(--border); }
+.wizard-module-table td { padding: 3px 6px 3px 0; vertical-align: middle; }
+.wizard-module-table td select { font-size: 11px; padding: 2px 4px; width: 100%; }
+/* The global equipment/optics pickers next to the prefix field (issue
+   #238, Gilles: "a droite de la zone prefix ... quand on les change ca
+   met a jour les lignes de tous les modules selectionnes") - a bulk-apply
+   shortcut, not a persistent extra row. */
+.wizard-module-picker { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+.wizard-module-picker select { font-size: 11px; padding: 2px 4px; }
 .wizard-module-check { display: flex; align-items: center; gap: 8px; font-size: 12.5px; cursor: pointer; }
-/* "set slaves" (issue #238) - pushed to the far right of its module's own
-   row, slightly muted (it's a secondary/optional refinement of the main
-   checkbox to its left, not an equally-weighted choice). */
-.wizard-module-setslaves { display: flex; align-items: center; gap: 4px; margin-left: auto; color: var(--text-muted); font-size: 11px; }
+/* "set slaves" (issue #238) - its own table column (4th), slightly muted
+   (it's a secondary/optional refinement of the module checkbox, not an
+   equally-weighted choice). */
+.wizard-module-setslaves { display: flex; align-items: center; gap: 4px; color: var(--text-muted); font-size: 11px; white-space: nowrap; }
 
 /* A panel's own <h3> title plus one action button, side by side (e.g. the
    Controller screen's "Loaded modules" header + its "Kill all" button) -

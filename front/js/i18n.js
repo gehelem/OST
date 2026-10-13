@@ -273,6 +273,8 @@ const STRINGS = {
   "wizard.next": { en: "Next", fr: "Suivant", de: "Weiter", it: "Avanti", es: "Siguiente" },
   "wizard.finish": { en: "Finish", fr: "Terminer", de: "Fertigstellen", it: "Termina", es: "Finalizar" },
   "wizard.add": { en: "Add", fr: "Ajouter", de: "Hinzufügen", it: "Aggiungi", es: "Añadir" },
+  "wizard.fullscreen": { en: "Fullscreen", fr: "Plein écran", de: "Vollbild", it: "Schermo intero", es: "Pantalla completa" },
+  "wizard.exitFullscreen": { en: "Exit fullscreen", fr: "Quitter le plein écran", de: "Vollbild verlassen", it: "Esci da schermo intero", es: "Salir de pantalla completa" },
   "wizard.step.indi": { en: "INDI drivers", fr: "Pilotes INDI", de: "INDI-Treiber", it: "Driver INDI", es: "Controladores INDI" },
   "wizard.step.optics": { en: "Optics", fr: "Optiques", de: "Optik", it: "Ottiche", es: "Ópticas" },
   "wizard.step.equipment": { en: "Equipment", fr: "Équipement", de: "Ausrüstung", it: "Attrezzatura", es: "Equipo" },
@@ -287,6 +289,10 @@ const STRINGS = {
   "wizard.modules.prefixPlaceholder": { en: "prefix, e.g. S1", fr: "préfixe, ex. S1", de: "Präfix, z. B. S1", it: "prefisso, es. S1", es: "prefijo, p. ej. S1" },
   "wizard.modules.create": { en: "Load selected modules", fr: "Charger les modules sélectionnés", de: "Ausgewählte Module laden", it: "Carica i moduli selezionati", es: "Cargar los módulos seleccionados" },
   "wizard.modules.setSlaves": { en: "set slaves", fr: "attribuer les esclaves", de: "Slaves zuweisen", it: "assegna slave", es: "asignar esclavos" },
+  "wizard.modules.colModule": { en: "Module", fr: "Module", de: "Modul", it: "Modulo", es: "Módulo" },
+  "wizard.modules.equipment": { en: "Equipment", fr: "Équipement", de: "Ausrüstung", it: "Attrezzatura", es: "Equipo" },
+  "wizard.modules.optics": { en: "Optics", fr: "Optique", de: "Optik", it: "Ottica", es: "Óptica" },
+  "wizard.modules.colSlaves": { en: "Slaves", fr: "Esclaves", de: "Slaves", it: "Slave", es: "Esclavos" },
   "wizard.save.intro": { en: "Save this setup as a named configuration so it can be reloaded later.", fr: "Enregistrez cette configuration sous un nom pour pouvoir la recharger plus tard.", de: "Speichern Sie diese Einrichtung als benannte Konfiguration, um sie später erneut zu laden.", it: "Salva questa configurazione con un nome per poterla ricaricare in seguito.", es: "Guarde esta configuración con un nombre para poder volver a cargarla más tarde." },
 };
 

@@ -49,14 +49,25 @@ export function openSetupWizard(client) {
   const bodyEl = el("div", { class: "wizard-body" });
   const backBtn = el("button", { class: "btn btn-sm", onclick: goBack }, t("wizard.back"));
   const nextBtn = el("button", { class: "btn btn-primary btn-sm", onclick: goNext });
+  // Fullscreen toggle (Gilles, 2026-10-13: step 4's own checklist - module
+  // + "set slaves" + equipment/optics pickers per row - "ça commence a
+  // faire du monde sur ce panneau") - a plain CSS class swap, no layout
+  // logic of its own; every step's content already reflows into
+  // .wizard-body's available height either way.
+  const fullscreenBtn = el("button", { class: "btn-icon", title: t("wizard.fullscreen"), onclick: toggleFullscreen }, [icon("open_in_full")]);
   const closeBtn = el("button", { class: "btn-icon", title: t("common.close"), onclick: close }, [icon("close")]);
 
   const dialog = el("div", { class: "dialog wizard-dialog" }, [
-    el("div", { class: "wizard-header" }, [el("h3", { text: t("wizard.title") }), closeBtn]),
+    el("div", { class: "wizard-header" }, [el("h3", { text: t("wizard.title") }), fullscreenBtn, closeBtn]),
     stepperEl,
     bodyEl,
     el("div", { class: "dialog-actions" }, [backBtn, nextBtn]),
   ]);
+  function toggleFullscreen() {
+    const full = dialog.classList.toggle("fullscreen");
+    fullscreenBtn.querySelector(".material-icons").textContent = full ? "close_fullscreen" : "open_in_full";
+    fullscreenBtn.title = full ? t("wizard.exitFullscreen") : t("wizard.fullscreen");
+  }
   const overlay = el("div", { class: "dialog-overlay" }, [dialog]);
   // Clicking the backdrop does NOT close this one (unlike openGridDialog's
   // single-form dialogs) - every step's own actions already apply for
@@ -247,6 +258,40 @@ const SLAVE_SCHEMA = {
   ],
 };
 
+// Same reasoning/limitation as SLAVE_SCHEMA above (no protocol message
+// exposes a library's device roles before it's loaded) - mirrors each
+// module's own giveMeADevice(name, ...) calls (<lib>.cpp constructor),
+// mapped to the matching GlobalDatastore "equipments" column. Most roles
+// share the exact same name on both sides; the guiding-family modules
+// (guider, blindpec) name their own roles from the guiding module's own
+// point of view ("camera" = the GUIDE camera, "guider" = the ST4/guide
+// port) rather than matching equipments' column names directly - see
+// src/globaldatastore.json's own "equipments" columns (guidecamera,
+// guidest4) vs. guider.cpp/blindpec.cpp's own giveMeADevice() calls.
+// allsky's "meteo" role (GENERAL_INTERFACE) has no equipments column at
+// all and is deliberately left unmapped.
+const DEVICE_ROLES = {
+  focus: { camera: "camera", focuser: "focuser", filter: "filter" },
+  guider: { camera: "guidecamera", guider: "guidest4" },
+  blindpec: { camera: "guidecamera", guider: "guidest4" },
+  sequencer: { camera: "camera", filter: "filter" },
+  navigator: { camera: "camera", mount: "mount", gps: "gps" },
+  inspector: { camera: "camera", focuser: "focuser" },
+  polar: { camera: "camera", mount: "mount", gps: "gps" },
+  allsky: { camera: "camera", gps: "gps" },
+  parkmanager: { dome: "dome", mount: "mount", weather: "weather" },
+};
+
+// Which module types get an "optic" property (giveMeAnOptic(), reached via
+// defineMeAsImager() - every real imaging-chain module except planner/
+// monitor). Picking a name here only needs one client.setValue() call -
+// IndiModule::onExternalEvent() already copies focal/diameter from the
+// matching GlobalDatastore "optics" row onto the module's own optic.fl/
+// optic.diam itself (libs/indimodule.cpp) the moment "optic.optic" is set,
+// same mechanism a user picking it by hand through the module's own
+// property panel would trigger - nothing new to replicate here.
+const HAS_OPTIC = new Set(["focus", "guider", "blindpec", "sequencer", "navigator", "inspector", "polar", "allsky"]);
+
 // ---- Step 4: modules under a common prefix --------------------------------
 // The one genuinely new piece (Gilles's point 4: "S1 : S1-Navigator
 // S1-Planner etc etc") - today's "Load a module" section (renderController())
@@ -257,16 +302,56 @@ function renderModulesStep(client, container, setValid) {
   container.appendChild(el("p", { class: "muted small", text: t("wizard.modules.intro") }));
 
   const prefixInput = el("input", { type: "text", class: "field-input", placeholder: t("wizard.modules.prefixPlaceholder") });
-  container.appendChild(el("div", { class: "form-row" }, [prefixInput]));
+  // Global equipment/optics pickers (Gilles, 2026-10-13: "a droite de la
+  // zone prefix ... quand on les change ca met a jour les lignes de tous
+  // les modules selectionnes") - a bulk-apply shortcut over the per-row
+  // <select>s below, not a separate state of their own: picking one here
+  // just sets every currently CHECKED module row's own select to this
+  // value (skipping rows that don't have one - a module with no device
+  // roles has no equipment <select> to set). Options are the exact same
+  // GlobalDatastore rows, kept in sync by the same refresh functions.
+  const globalEquipmentSelect = el("select", { class: "field-input" });
+  const globalOpticsSelect = el("select", { class: "field-input" });
+  globalEquipmentSelect.addEventListener("change", () => applyGlobalSelect(equipmentSelects, globalEquipmentSelect.value));
+  globalOpticsSelect.addEventListener("change", () => applyGlobalSelect(opticsSelects, globalOpticsSelect.value));
+  function applyGlobalSelect(selectsMap, value) {
+    if (!value) return;
+    for (const [lib, sel] of selectsMap) {
+      const cb = checkboxes.get(lib);
+      if (cb && cb.checked && [...sel.options].some((o) => o.value === value)) sel.value = value;
+    }
+  }
+  container.appendChild(el("div", { class: "form-row" }, [
+    prefixInput,
+    el("label", { class: "wizard-module-picker" }, [el("span", { text: t("wizard.modules.equipment") }), globalEquipmentSelect]),
+    el("label", { class: "wizard-module-picker" }, [el("span", { text: t("wizard.modules.optics") }), globalOpticsSelect]),
+  ]));
 
-  const checklistEl = el("div", { class: "wizard-module-checklist" });
-  container.appendChild(checklistEl);
+  // A real table (Gilles, 2026-10-13: "organise plutot le panneau 4 en
+  // tableau avec des entetes module/equipment/optics/slaves") - one row
+  // per library, the Equipment/Optics/Slaves cells left empty for a
+  // module that doesn't declare the matching device roles / optic /
+  // slaves property (see DEVICE_ROLES/HAS_OPTIC/SLAVE_SCHEMA) rather than
+  // skipping the cell, so every row stays aligned under its column.
+  const checklistTable = el("table", { class: "wizard-module-table" }, [
+    el("thead", null, [el("tr", null, [
+      el("th", { text: t("wizard.modules.colModule") }),
+      el("th", { text: t("wizard.modules.equipment") }),
+      el("th", { text: t("wizard.modules.optics") }),
+      el("th", { text: t("wizard.modules.colSlaves") }),
+    ])]),
+  ]);
+  const checklistEl = el("tbody");
+  checklistTable.appendChild(checklistEl);
+  container.appendChild(checklistTable);
 
   const createBtn = el("button", { class: "btn btn-primary btn-sm", text: t("wizard.modules.create"), onclick: createChecked });
   container.appendChild(createBtn);
 
   const checkboxes = new Map(); // stripped lib name -> <input type=checkbox> ("load this one")
   const setSlavesCheckboxes = new Map(); // stripped lib name -> <input type=checkbox> ("wire its slaves too")
+  const equipmentSelects = new Map(); // stripped lib name -> <select> (GlobalDatastore.equipments row name, or "")
+  const opticsSelects = new Map(); // stripped lib name -> <select> (GlobalDatastore.optics row name, or "")
 
   function capitalize(s) {
     return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s;
@@ -285,6 +370,36 @@ function renderModulesStep(client, container, setValid) {
   }
 
   prefixInput.addEventListener("input", () => { refreshCreateEnabled(); checkValid(); });
+
+  // Equipment/optics <select>s (Gilles, 2026-10-13: "il faut aussi assigner
+  // les differents devices selon les modules, selon la liste 'equipment' -
+  // idem avec optics ! => des listes de choix en face de chaque module") -
+  // both read from the exact same GlobalDatastore rows steps 2/3 of this
+  // wizard just created (or whatever already existed before it was
+  // opened). A blank first option always means "don't touch this".
+  function rowNames(propName) {
+    const prop = client.get(client.topics.property("GlobalDatastore", propName));
+    return ((prop && prop.rows) || []).map((r) => r.name).filter(Boolean);
+  }
+  function refreshSelectOptions(select, names) {
+    const prev = select.value;
+    select.innerHTML = "";
+    select.appendChild(el("option", { value: "" }, "—"));
+    for (const n of names) select.appendChild(el("option", { value: n, text: n }));
+    if (names.includes(prev)) select.value = prev;
+  }
+  function refreshAllEquipmentSelects() {
+    const names = rowNames("equipments");
+    refreshSelectOptions(globalEquipmentSelect, names);
+    for (const sel of equipmentSelects.values()) refreshSelectOptions(sel, names);
+  }
+  function refreshAllOpticsSelects() {
+    const names = rowNames("optics");
+    refreshSelectOptions(globalOpticsSelect, names);
+    for (const sel of opticsSelects.values()) refreshSelectOptions(sel, names);
+  }
+  scope.subscribe(client.topics.property("GlobalDatastore", "equipments"), refreshAllEquipmentSelects);
+  scope.subscribe(client.topics.property("GlobalDatastore", "optics"), refreshAllOpticsSelects);
 
   // Checking "set slaves" force-checks every module it depends on (Gilles:
   // "forcer les coches de selection de ces modules") - never the reverse,
@@ -335,7 +450,39 @@ function renderModulesStep(client, container, setValid) {
         if (pending.size === 0) unsub();
       });
     }
+    // Equipment/optics - same "wait for the instance to actually exist"
+    // reasoning as slave wiring above, just a single module to wait for
+    // instead of a module-plus-its-slaves set.
+    for (const [lib, cb] of checkboxes) {
+      if (!cb.checked) continue;
+      const ownName = `${prefix}-${capitalize(lib)}`;
+      const equipment = equipmentSelects.get(lib) ? equipmentSelects.get(lib).value : "";
+      const optics = opticsSelects.get(lib) ? opticsSelects.get(lib).value : "";
+      if (!equipment && !optics) continue;
+      const unsub = scope.subscribe(client.topics.modules(), (names) => {
+        if (!(names || []).includes(ownName)) return;
+        if (equipment) {
+          const row = (client.get(client.topics.property("GlobalDatastore", "equipments")).rows || [])
+            .find((r) => r.name === equipment);
+          const roles = DEVICE_ROLES[lib] || {};
+          if (row) for (const [ownRole, equipCol] of Object.entries(roles)) {
+            if (row[equipCol]) client.setValue(ownName, "devices", ownRole, row[equipCol]);
+          }
+        }
+        if (optics) client.setValue(ownName, "optic", "optic", optics);
+        unsub();
+      });
+    }
   }
+
+  // Gilles, 2026-10-13: "coche par defaut sur le[s] focus/guider/
+  // navigator/sequencer/planner" - the 5 "core" modules of a typical
+  // setup, pre-checked the first time this step builds its table (and
+  // only then - a later rebuild, e.g. libraries reported again, must
+  // respect whatever the user already chose, never silently re-check
+  // something they unchecked).
+  const DEFAULT_CHECKED = new Set(["focus", "guider", "navigator", "sequencer", "planner"]);
+  let firstBuild = true;
 
   scope.subscribe(client.topics.controllerData("libraries"), (libs) => {
     const prevChecked = new Set([...checkboxes].filter(([, cb]) => cb.checked).map(([k]) => k));
@@ -343,24 +490,54 @@ function renderModulesStep(client, container, setValid) {
     checklistEl.innerHTML = "";
     checkboxes.clear();
     setSlavesCheckboxes.clear();
+    equipmentSelects.clear();
+    opticsSelects.clear();
     for (const key of Object.keys(libs || {})) {
       const stripped = key.startsWith("libost") ? key.slice(6) : key;
       const cb = el("input", { type: "checkbox" });
-      if (prevChecked.has(stripped)) cb.checked = true;
+      if (firstBuild ? DEFAULT_CHECKED.has(stripped) : prevChecked.has(stripped)) cb.checked = true;
       cb.addEventListener("change", () => onMainToggle(stripped, cb));
       checkboxes.set(stripped, cb);
-      const rowChildren = [cb, el("span", { text: capitalize(stripped) })];
-      // Only modules that actually declare a "slaves" property get the
-      // extra checkbox - see SLAVE_SCHEMA above.
+      const moduleCell = el("td", null, [el("label", { class: "wizard-module-check" }, [cb, el("span", { text: capitalize(stripped) })])]);
+      // Equipment/optics/slaves cells (Gilles: "des listes de choix en
+      // face de chaque module" + une 4e colonne "slaves") - only modules
+      // that actually declare the matching device roles / optic / slaves
+      // property get real content (DEVICE_ROLES/HAS_OPTIC/SLAVE_SCHEMA);
+      // every other module still gets the empty cell, so columns stay
+      // aligned. Select options filled in by refreshAllEquipmentSelects()/
+      // refreshAllOpticsSelects() right after this loop, not here - a
+      // freshly (re)built <select> starts with just the blank placeholder.
+      const equipmentCell = el("td");
+      if (DEVICE_ROLES[stripped]) {
+        const sel = el("select", { class: "field-input" });
+        equipmentSelects.set(stripped, sel);
+        equipmentCell.appendChild(sel);
+      }
+      const opticsCell = el("td");
+      if (HAS_OPTIC.has(stripped)) {
+        const sel = el("select", { class: "field-input" });
+        opticsSelects.set(stripped, sel);
+        opticsCell.appendChild(sel);
+      }
+      const slavesCell = el("td");
       if (SLAVE_SCHEMA[stripped]) {
         const setCb = el("input", { type: "checkbox" });
-        if (prevSetSlaves.has(stripped)) setCb.checked = true;
+        if (firstBuild ? DEFAULT_CHECKED.has(stripped) : prevSetSlaves.has(stripped)) setCb.checked = true;
         setCb.addEventListener("change", () => onSetSlavesToggle(stripped));
         setSlavesCheckboxes.set(stripped, setCb);
-        rowChildren.push(el("span", { class: "wizard-module-setslaves" }, [setCb, el("span", { text: t("wizard.modules.setSlaves") })]));
+        slavesCell.appendChild(el("label", { class: "wizard-module-setslaves" }, [setCb, el("span", { text: t("wizard.modules.setSlaves") })]));
       }
-      checklistEl.appendChild(el("label", { class: "wizard-module-check" }, rowChildren));
+      checklistEl.appendChild(el("tr", null, [moduleCell, equipmentCell, opticsCell, slavesCell]));
     }
+    // A "set slaves" default-check still needs its own dependencies
+    // force-checked, same as a user clicking it would get via
+    // onSetSlavesToggle() - e.g. defaulting "sequencer"'s slaves on must
+    // still force "focus"/"guider" on even though they're already
+    // defaulted on anyway in this particular set.
+    if (firstBuild) for (const stripped of setSlavesCheckboxes.keys()) onSetSlavesToggle(stripped);
+    firstBuild = false;
+    refreshAllEquipmentSelects();
+    refreshAllOpticsSelects();
     refreshCreateEnabled();
   });
   scope.subscribe(client.topics.modules(), checkValid);
