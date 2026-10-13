@@ -15,6 +15,7 @@ import { setBgLayer } from "./imagelayer.js";
 import { templates } from "./templates/index.js";
 import { setLanguage, t } from "./i18n.js";
 import * as zeroconf from "./zeroconf.js";
+import { showToast } from "./toast.js";
 
 const client = createClient();
 
@@ -559,12 +560,17 @@ function selectView(key) {
 // module just disappeared" (also the module list). Everything else is the
 // concern of whichever screen is currently rendered — see render.js/views.js.
 
-client.subscribe(client.topics.modules(), () => {
-  // The module bar always needs the fresh module list. The active module
-  // view does NOT need a poke here: renderModuleView (render.js) already
-  // subscribes to topics.module(name) directly and renders its own
-  // "not found" state when a module is removed — see its module doc.
+client.subscribe(client.topics.modules(), (names) => {
+  // The module bar always needs the fresh module list.
   renderModbarNow();
+  // The active module just disappeared (a normal kill, or a crash under
+  // issue #234's process isolation) - navigate back to Home instead of
+  // leaving render.js's own "Module not found" fallback panel
+  // (moduleLifecycle()) on screen until the user picks something else by
+  // hand. Gilles, 2026-10-10, after seeing that fallback for the first
+  // time (a crashed module disappearing while its view was open): "Auto
+  // vers Home, c'est plus propre".
+  if (isModuleView() && !names.includes(activeView)) selectView("__home");
 });
 
 // Gilles, 2026-10-03: "la quand je navigue l'onglet chrome indique
@@ -584,6 +590,24 @@ client.subscribe(client.topics.controllerData(), (cd) => {
 // WORST level currently in the log buffer (server-messages.en.md's "l"
 // field: 0 Debug ... 4 Critical), independent of whatever the log panel's
 // own module/level filter happens to be set to right now.
+// Toast (js/toast.js) for any genuinely new error/critical-level entry -
+// Gilles, 2026-10-10, after a module crash (issue #234) only showed up as
+// a log line nobody would necessarily notice: "ça permettra de rendre ce
+// type d'évènement plus visible". Error-level included too (orange,
+// toast.js's own LEVEL_CLASS/panels.css already had the style ready for
+// it from the start - just never triggered until now). `logs` is the
+// WHOLE buffer every time (up to 1000 entries, see datastore.js), so only
+// the tail past what was already seen last call is actually new.
+//
+// Bug fixed 2026-10-13 (Gilles: a page refresh replayed every toast in
+// the whole history): comparing against the *count* seen last call isn't
+// enough on its own - this subscribe() call itself fires once immediately
+// with whatever's already in the (empty, freshly reset) datastore, then
+// again for real once the connect-time dump lands with the full history,
+// which looked exactly like "lots of genuinely new entries" to this
+// code. isDumpPending() (datastore.js) tells the two apart - true for
+// both of those calls, false for an actual single incremental log push.
+let seenLogsCount = -1;
 client.subscribe(client.topics.logs(), (logs) => {
   let worst = 0;
   for (const entry of logs || []) if ((entry.l | 0) > worst) worst = entry.l | 0;
@@ -592,6 +616,14 @@ client.subscribe(client.topics.logs(), (logs) => {
   if (worst === 2) logBadgeDotEl.classList.add("level-warning");
   else if (worst === 3) logBadgeDotEl.classList.add("level-error");
   else if (worst >= 4) logBadgeDotEl.classList.add("level-critical");
+
+  const count = (logs || []).length;
+  if (seenLogsCount >= 0 && !client.isDumpPending()) {
+    for (const entry of (logs || []).slice(seenLogsCount)) {
+      if ((entry.l | 0) >= 3) showToast(entry.t, entry.l | 0);
+    }
+  }
+  seenLogsCount = count;
 });
 
 client.subscribe(client.topics.session(), (session) => {

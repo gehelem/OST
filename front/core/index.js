@@ -107,6 +107,7 @@ export function createClient() {
     scope: () => datastore.scope(),
     subscribeRaw: (cb) => datastore.subscribeRaw(cb),
     subscribeQueryAnswers: (cb) => datastore.subscribeQueryAnswers(cb),
+    isDumpPending: () => datastore.isDumpPending(),
     resolveLov: (moduleName, element) => datastore.resolveLov(moduleName, element),
     topics,
 

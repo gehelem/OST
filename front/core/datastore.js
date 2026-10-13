@@ -92,10 +92,30 @@ export class Datastore {
     this.logs = [];
     this.controllerdata = {};
     this.lovs = {};
+    // Set here, cleared at the end of _applyFullDump() (the only other
+    // writer) - lets a consumer with a one-shot side effect on a topic's
+    // *change* (e.g. app.js's log-level toast) tell "this update is the
+    // dump replaying history/state that already existed" apart from "this
+    // is a genuinely new change" - both look identical otherwise (one
+    // subscribe() call growing a list is indistinguishable from another
+    // without this). See isDumpPending().
+    this._dumpPending = true;
     // A reset is the one moment where "everything changed" is actually
     // true (nothing survives a disconnect, per client-pattern.en.md) —
     // tell every currently-subscribed topic so nothing renders stale data.
     this._emitAllSubscribed();
+  }
+
+  /**
+   * True from reset() (disconnect, or the very start of connect() per
+   * connection.js) until the matching full dump has actually been applied
+   * - i.e. true for the whole window where state is either stale/cleared
+   * or in the middle of being replaced wholesale, never for a genuine
+   * single incremental change. See reset()'s own comment for why this
+   * exists.
+   */
+  isDumpPending() {
+    return this._dumpPending;
   }
 
   // ---- public subscription API -------------------------------------
@@ -292,6 +312,11 @@ export class Datastore {
     this.controllerdata = d.controllerdata || {};
     this.lovs = d.lovs || {};
     this._emitAllSubscribed();
+    // Cleared after the emit above, not before - any subscriber reading
+    // isDumpPending() from inside its own callback for *this* dump must
+    // still see true (see reset()'s comment). Only a later, genuinely
+    // incremental change sees false.
+    this._dumpPending = false;
   }
 
   _applyModuleDump(payload) {

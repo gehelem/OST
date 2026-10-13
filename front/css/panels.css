@@ -375,3 +375,32 @@
   position: absolute; left: var(--space-5); top: var(--space-5);
   padding: 14px 18px; opacity: 0.75; max-width: 340px;
 }
+
+/* ------------------------------------------------------------------ toast
+ * js/toast.js's own showToast() - transient notifications for log
+ * entries that deserve more visibility than the log panel alone (first
+ * use: a critical-level module crash, issue #234). Above everything
+ * else on screen, including the fullscreen image viewer (z-index 9999)
+ * and every dialog (50) - a critical notification should never be
+ * hidden behind whatever else happens to be open. */
+#toast-stack {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+  display: flex; flex-direction: column-reverse; gap: 8px; align-items: center;
+  z-index: 10000; pointer-events: none;
+}
+.toast {
+  padding: 10px 18px; border-radius: var(--radius);
+  font-size: 13px; max-width: min(420px, 80vw); text-align: center;
+  border: 1px solid var(--border);
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.toast-in { opacity: 1; transform: translateY(0); }
+/* Same 4-tier palette as the log panel's own .log-warning/.log-error/
+ * .log-critical rows (components.css) - warning yellow, error orange,
+ * critical red. */
+.toast-critical { border-color: var(--error); color: var(--error); }
+.toast-error { border-color: var(--orange); color: var(--orange); }
+.toast-warning { border-color: var(--warn); color: var(--warn); }
+.toast-info { border-color: var(--border); color: var(--text); }
+.toast-debug { border-color: var(--border); color: var(--text-muted); }

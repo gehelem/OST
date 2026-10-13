@@ -119,6 +119,8 @@ class Controller : public QObject
         void logInfo(const QString &message, const QVariantList &args);
         void logError(const QString &message);
         void logError(const QString &message, const QVariantList &args);
+        void logCritical(const QString &message);
+        void logCritical(const QString &message, const QVariantList &args);
         void logDebug(const QString &message);
         void logDebug(const QString &message, const QVariantList &args);
         void updateControllerData(QString key, QVariant data);
