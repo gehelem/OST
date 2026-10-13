@@ -125,6 +125,7 @@ void Planner::startPlanner()
     {
         logError("INDI server not connected");
         getProperty("actions")->setState(OST::Error, true);
+        setStateEvent(OST::Error, "error", "noindi", "INDI server not connected");
         abortPlanner();
         return;
     }
@@ -135,6 +136,7 @@ void Planner::startPlanner()
     {
         logError("No GPS selected");
         getProperty("actions")->setState(OST::Error, true);
+        setStateEvent(OST::Error, "error", "nogps", "no GPS selected");
         abortPlanner();
         return;
     }
@@ -148,6 +150,7 @@ void Planner::startPlanner()
     {
         logError("No Sequence module selected");
         getProperty("actions")->setState(OST::Error, true);
+        setStateEvent(OST::Error, "error", "noslave", "no sequence module selected");
         abortPlanner();
         return;
     }
@@ -156,6 +159,7 @@ void Planner::startPlanner()
     {
         logError("No Sequence module selected");
         getProperty("actions")->setState(OST::Error, true);
+        setStateEvent(OST::Error, "error", "noslave", "no navigator module selected");
         abortPlanner();
         return;
     }
@@ -165,6 +169,7 @@ void Planner::startPlanner()
     {
         logError("Planning grid is empty");
         getProperty("actions")->setState(OST::Error, true);
+        setStateEvent(OST::Error, "error", "emptygrid", "planning grid is empty");
         abortPlanner();
         return;
     }
@@ -173,6 +178,7 @@ void Planner::startPlanner()
     mIsRunning = true;
 
     //getProperty("actions")->setState(OST::Busy, true);
+    setStateEvent(OST::Busy, "running", "start", "planner started");
     logInfo("Starting planner...");
 
     // Disable properties during operation (optional)
@@ -223,6 +229,7 @@ void Planner::abortPlanner()
     getEltPrg("progress", "global")->setDynLabel("Aborted", true);
 
     getProperty("actions")->setState(OST::Ok, true);
+    setStateEvent(OST::Ok, "idle", "abort", "planner aborted");
 }
 
 void Planner::onOperationComplete()
@@ -240,6 +247,7 @@ void Planner::onOperationComplete()
     getEltPrg("progress", "global")->setDynLabel("Completed", true);
 
     getProperty("actions")->setState(OST::Ok, true);
+    setStateEvent(OST::Ok, "ready", "done", "planning completed");
 }
 
 void Planner::sequenceComplete()
