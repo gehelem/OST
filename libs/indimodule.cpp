@@ -1209,10 +1209,10 @@ bool IndiModule::defineMeAsImager()
     if (!getStore()["parms"]->getElts()->contains("exposure"))
     {
         OST::ElementFloat* f = new  OST::ElementFloat("exposure", "Exposure", "exp000", "");
-        f->setValue(0, false);
+        f->setValue(1, false);
         f->setDirectEdit(true);
         f->setAutoUpdate(true);
-        f->setMinMax(0.00001, 300, false);
+        f->setMinMax(0.00001, 900, false);
         f->setStep(0.001, false);
         f->setSlider(OST::SliderAndValue, false);
         pm->addElt(f);
@@ -1223,10 +1223,10 @@ bool IndiModule::defineMeAsImager()
     if (!getStore()["parms"]->getElts()->contains("gain"))
     {
         OST::ElementInt* i  = new  OST::ElementInt("gain", "Gain", "exp020", "");
-        i->setValue(0, false);
+        i->setValue(50, false);
         i->setDirectEdit(true);
         i->setAutoUpdate(true);
-        i->setMinMax(0, 500, false);
+        i->setMinMax(0, 1000, false);
         i->setStep(1, false);
         i->setSlider(OST::SliderAndValue, false);
         pm->addElt(i);
@@ -1235,10 +1235,10 @@ bool IndiModule::defineMeAsImager()
     if (!getStore()["parms"]->getElts()->contains("offset"))
     {
         OST::ElementInt* i  = new  OST::ElementInt("offset", "Offset", "exp030", "");
-        i->setValue(0, false);
+        i->setValue(50, false);
         i->setDirectEdit(true);
         i->setAutoUpdate(true);
-        i->setMinMax(0, 500, false);
+        i->setMinMax(0, 1000, false);
         i->setStep(1, false);
         i->setSlider(OST::SliderAndValue, false);
         pm->addElt(i);
@@ -1251,12 +1251,12 @@ bool IndiModule::defineMeAsImager()
         // CCD_CAPTURE_FORMAT when the driver supports it -- see
         // setCaptureFormat(). Cameras without it keep their native depth.
         OST::ElementInt* i = new  OST::ElementInt("bitdepth", "Bit depth", "exp040", "");
-        i->setValue(16, false);
-        i->setDirectEdit(true);
-        i->setAutoUpdate(true);
         i->lovAdd(8, "8 bits");
         i->lovAdd(16, "16 bits");
         i->setLovConstrained(true);
+        i->setValue(16, false);
+        i->setDirectEdit(true);
+        i->setAutoUpdate(true);
         pm->addElt(i);
     }
 
