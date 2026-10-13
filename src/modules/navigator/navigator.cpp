@@ -82,33 +82,55 @@ void Navigator::onExternalEvent(OST::ExtEvent event)
 
     if (event.ev == OST::ExtEvType::SV && event.prpkey == "actions")
     {
+        // Issue #237 - none of these 3 buttons ever reflected their own
+        // click: the underlying action ran, but the bool's value never
+        // changed, unlike every other module's action buttons (focus.cpp/
+        // guider.cpp's reference pattern). getEltBool(...)->setValue(true,
+        // true) is what actually applies/broadcasts the click - mAutoUpdate
+        // defaults to false (ElementBase), so the base class never does
+        // this automatically.
         if (event.eltkey == "gototarget")
         {
-            mState = "running";
-            mCurrentIteration = 0;
-            convertSelection();
-            // Load centering parameters from properties
-            mMaxIterations = getInt("centeringparams", "maxiterations");
-            mToleranceArcsec = getFloat("centeringparams", "tolerance");
-            // Store target coordinates for centering loop
-            mTargetRAnow = getFloat("selectnow", "RA");
-            mTargetDECnow = getFloat("selectnow", "DEC");
-            logInfo(QString("Starting goto with centering: max %1 iterations, tolerance %2\"")
-                    .arg(mMaxIterations).arg(mToleranceArcsec, 0, 'f', 1));
-            initIndi();
-            slewToSelection();
+            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
+            {
+                mState = "running";
+                mCurrentIteration = 0;
+                convertSelection();
+                // Load centering parameters from properties
+                mMaxIterations = getInt("centeringparams", "maxiterations");
+                mToleranceArcsec = getFloat("centeringparams", "tolerance");
+                // Store target coordinates for centering loop
+                mTargetRAnow = getFloat("selectnow", "RA");
+                mTargetDECnow = getFloat("selectnow", "DEC");
+                logInfo(QString("Starting goto with centering: max %1 iterations, tolerance %2\"")
+                        .arg(mMaxIterations).arg(mToleranceArcsec, 0, 'f', 1));
+                initIndi();
+                slewToSelection();
+            }
         }
         if (event.eltkey == "abortnavigator")
         {
-            stellarSolver.abort();
-            mState = "idle";
-            mCurrentIteration = 0;
-            getProperty(event.prpkey)->setState(OST::Ok, true);
+            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
+            {
+                stellarSolver.abort();
+                mState = "idle";
+                mCurrentIteration = 0;
+                getProperty(event.prpkey)->setState(OST::Ok, true);
+                // Momentary action, and cancels any in-flight goto too -
+                // same reset-both-buttons pattern as OnSucessSolve()'s own
+                // completion handling further down.
+                getEltBool("actions", "gototarget")->setValue(false, false);
+                getEltBool("actions", "abortnavigator")->setValue(false, true);
+            }
         }
         if (event.eltkey == "addtoplanner")
         {
-            getProperty(event.prpkey)->setState(OST::Ok, true);
-            addTargeToPlanner();
+            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
+            {
+                getProperty(event.prpkey)->setState(OST::Ok, true);
+                addTargeToPlanner();
+                getEltBool(event.prpkey, event.eltkey)->setValue(false, true);
+            }
         }
     }
 
@@ -298,9 +320,19 @@ void Navigator::onUpdateProperty(INDI::Property property)
     )
     {
         // Update mount position
+        // Issue #237 - findWidgetByName() can return nullptr even on a
+        // property matched by name: a non-compliant/transient driver
+        // update isn't guaranteed to carry every widget the standard
+        // defines (same lesson as parkmanager.cpp's own fix, issue #227).
         INDI::PropertyNumber prop = property;
-        getEltFloat("mountposition", "RA")->setValue(prop.findWidgetByName("RA")->value, false);
-        getEltFloat("mountposition", "DEC")->setValue(prop.findWidgetByName("DEC")->value, true);
+        auto *raW = prop.isValid() ? prop.findWidgetByName("RA") : nullptr;
+        auto *decW = prop.isValid() ? prop.findWidgetByName("DEC") : nullptr;
+        if (raW && decW)
+        {
+            getEltFloat("mountposition", "RA")->setValue(raW->value, false);
+            getEltFloat("mountposition", "DEC")->setValue(decW->value, true);
+        }
+        else logWarning("EQUATORIAL_EOD_COORD update missing RA/DEC widget, skipping");
     }
     if (
         (property.getDeviceName() == getString("devices", "gps"))
@@ -309,9 +341,16 @@ void Navigator::onUpdateProperty(INDI::Property property)
     {
         // Update GPS Coords
         INDI::PropertyNumber prop = property;
-        getEltFloat("gpslocation", "alt")->setValue(prop.findWidgetByName("ELEV")->value, false);
-        getEltFloat("gpslocation", "lat")->setValue(prop.findWidgetByName("LAT")->value, false);
-        getEltFloat("gpslocation", "lon")->setValue(prop.findWidgetByName("LONG")->value, true);
+        auto *altW = prop.isValid() ? prop.findWidgetByName("ELEV") : nullptr;
+        auto *latW = prop.isValid() ? prop.findWidgetByName("LAT") : nullptr;
+        auto *lonW = prop.isValid() ? prop.findWidgetByName("LONG") : nullptr;
+        if (altW && latW && lonW)
+        {
+            getEltFloat("gpslocation", "alt")->setValue(altW->value, false);
+            getEltFloat("gpslocation", "lat")->setValue(latW->value, false);
+            getEltFloat("gpslocation", "lon")->setValue(lonW->value, true);
+        }
+        else logWarning("GEOGRAPHIC_COORD update missing ELEV/LAT/LONG widget, skipping");
     }
     if (
         (property.getDeviceName() == getString("devices", "gps"))
@@ -320,13 +359,19 @@ void Navigator::onUpdateProperty(INDI::Property property)
     {
         // Update GPS Time and date
         INDI::PropertyText prop = property;
-        QDateTime dt;
-        QString strdt = prop.findWidgetByName("UTC")->text;
-        QString offset = prop.findWidgetByName("OFFSET")->text;
-        dt = dt.fromString(strdt, Qt::ISODate);
-        getEltDate("gpstime", "date")->setValue(dt.date(), false);
-        getEltTime("gpstime", "time")->setValue(dt.time(), false);
-        getEltFloat("gpstime", "offset")->setValue(offset.toFloat(), true);
+        auto *utcW = prop.isValid() ? prop.findWidgetByName("UTC") : nullptr;
+        auto *offsetW = prop.isValid() ? prop.findWidgetByName("OFFSET") : nullptr;
+        if (utcW && offsetW)
+        {
+            QDateTime dt;
+            QString strdt = utcW->text;
+            QString offset = offsetW->text;
+            dt = dt.fromString(strdt, Qt::ISODate);
+            getEltDate("gpstime", "date")->setValue(dt.date(), false);
+            getEltTime("gpstime", "time")->setValue(dt.time(), false);
+            getEltFloat("gpstime", "offset")->setValue(offset.toFloat(), true);
+        }
+        else logWarning("TIME_UTC update missing UTC/OFFSET widget, skipping");
     }
     if (
         (property.getDeviceName() == getString("devices", "mount"))
@@ -372,23 +417,39 @@ void Navigator::initIndi()
     enableDirectBlobAccess(getString("devices", "camera").toStdString().c_str(), nullptr);
 
     // Update GPS Coords
+    // Issue #237 - getProperty() here can return an invalid property
+    // (GPS not connected/reachable yet, or the device just doesn't have
+    // this property at all) - unlike onUpdateProperty()'s callback, this
+    // is a direct fetch with no guarantee the property even exists right
+    // now. Same findWidgetByName() nullptr risk as the callback above on
+    // top of that.
     INDI::PropertyNumber pn = getDevice(getString("devices", "gps").toStdString().c_str()).getProperty("GEOGRAPHIC_COORD",
                               INDI_NUMBER);
-    getEltFloat("gpslocation", "alt")->setValue(pn.findWidgetByName("ELEV")->value, false);
-    getEltFloat("gpslocation", "lat")->setValue(pn.findWidgetByName("LAT")->value, false);
-    getEltFloat("gpslocation", "lon")->setValue(pn.findWidgetByName("LONG")->value, true);
+    auto *altW = pn.isValid() ? pn.findWidgetByName("ELEV") : nullptr;
+    auto *latW = pn.isValid() ? pn.findWidgetByName("LAT") : nullptr;
+    auto *lonW = pn.isValid() ? pn.findWidgetByName("LONG") : nullptr;
+    if (altW && latW && lonW)
+    {
+        getEltFloat("gpslocation", "alt")->setValue(altW->value, false);
+        getEltFloat("gpslocation", "lat")->setValue(latW->value, false);
+        getEltFloat("gpslocation", "lon")->setValue(lonW->value, true);
+    }
+    else logWarning("GPS device not reachable or GEOGRAPHIC_COORD not available, skipping position update");
     // Update GPS Time and date
     INDI::PropertyText pt = getDevice(getString("devices", "gps").toStdString().c_str()).getProperty("TIME_UTC", INDI_TEXT);
-    QDateTime dt;
-    QString strdt = pt.findWidgetByName("UTC")->text;
-    QString offset = pt.findWidgetByName("OFFSET")->text;
-    dt = dt.fromString(strdt, Qt::ISODate);
-    getEltDate("gpstime", "date")->setValue(dt.date(), false);
-    getEltTime("gpstime", "time")->setValue(dt.time(), false);
-    getEltFloat("gpstime", "offset")->setValue(offset.toFloat(), true);
-
-
-
+    auto *utcW = pt.isValid() ? pt.findWidgetByName("UTC") : nullptr;
+    auto *offsetW = pt.isValid() ? pt.findWidgetByName("OFFSET") : nullptr;
+    if (utcW && offsetW)
+    {
+        QDateTime dt;
+        QString strdt = utcW->text;
+        QString offset = offsetW->text;
+        dt = dt.fromString(strdt, Qt::ISODate);
+        getEltDate("gpstime", "date")->setValue(dt.date(), false);
+        getEltTime("gpstime", "time")->setValue(dt.time(), false);
+        getEltFloat("gpstime", "offset")->setValue(offset.toFloat(), true);
+    }
+    else logWarning("GPS device not reachable or TIME_UTC not available, skipping time update");
 }
 void Navigator::OnSolverLog(QString text)
 {
@@ -403,6 +464,10 @@ void Navigator::OnSucessSolve()
         stellarSolver.abort();
         getProperty("actions")->setState(OST::Error, true);
         setStateEvent(OST::Error, "error", "solverfailed", "Solver failed");
+        // Issue #237 - same reset OnSucessSolve()'s own success path does
+        // further down: an error path left these buttons stuck instead.
+        getEltBool("actions", "gototarget")->setValue(false, false);
+        getEltBool("actions", "abortnavigator")->setValue(false, true);
         mState = "idle";
         mCurrentIteration = 0;
         return;
@@ -457,6 +522,10 @@ void Navigator::OnSucessSolve()
                  .arg(mMaxIterations));
         getProperty("actions")->setState(OST::Error, true);
         setStateEvent(OST::Error, "error", "navigatorfailed", "Navigator failed");
+        // Issue #237 - same reset as the success path and the solver-
+        // failed path above.
+        getEltBool("actions", "gototarget")->setValue(false, false);
+        getEltBool("actions", "abortnavigator")->setValue(false, true);
         mState = "idle";
         mCurrentIteration = 0;
         return;
@@ -526,8 +595,16 @@ void Navigator::slewToSelection(void)
         setStateEvent(OST::Error, "error", "devicefailed", "Device failed");
         return;
     }
-    prop.findWidgetByName("RA")->value = mTargetRAnow;
-    prop.findWidgetByName("DEC")->value = mTargetDECnow;
+    auto *raW = prop.findWidgetByName("RA");
+    auto *decW = prop.findWidgetByName("DEC");
+    if (!raW || !decW)
+    {
+        logError("Error - %1/EQUATORIAL_EOD_COORD missing RA/DEC widget. Aborting.", {mount});
+        setStateEvent(OST::Error, "error", "devicefailed", "Device failed");
+        return;
+    }
+    raW->value = mTargetRAnow;
+    decW->value = mTargetDECnow;
 
     mWaitingSlew = true;
     sendNewNumber(prop);
@@ -613,16 +690,26 @@ void Navigator::correctOffset(double solvedRA, double solvedDEC)
         return;
     }
 
+    auto *raW = prop.findWidgetByName("RA");
+    auto *decW = prop.findWidgetByName("DEC");
+    if (!raW || !decW)
+    {
+        logError("Error - mount EQUATORIAL_EOD_COORD missing RA/DEC widget for correction.");
+        setStateEvent(OST::Error, "error", "devicefailed", "Device failed");
+        mState = "idle";
+        return;
+    }
+
     // Send corrected position to mount (RA in hours, DEC in degrees). RA
     // re-wrapped into [0,24) after the subtraction - deltaRA is now at most
     // 12h in magnitude (wrapRaHoursDelta() above), but the mount's own
     // current RA minus/plus that can still land just outside [0,24) right
     // at the boundary.
-    double newRA = prop.findWidgetByName("RA")->value - deltaRA;
+    double newRA = raW->value - deltaRA;
     if (newRA < 0.0) newRA += 24.0;
     if (newRA >= 24.0) newRA -= 24.0;
-    prop.findWidgetByName("RA")->value  = newRA;
-    prop.findWidgetByName("DEC")->value = prop.findWidgetByName("DEC")->value - deltaDEC;
+    raW->value = newRA;
+    decW->value = decW->value - deltaDEC;
     mWaitingSlew = true;
     sendNewNumber(prop);
 
@@ -653,6 +740,15 @@ void Navigator::syncMountIfNeeded(double solvedRA, double solvedDEC)
         setStateEvent(OST::Error, "error", "devicefailed", "Device failed");
         return;
     }
+    auto *raW = prop.findWidgetByName("RA");
+    auto *decW = prop.findWidgetByName("DEC");
+    if (!raW || !decW)
+    {
+        logError("Error - %1/EQUATORIAL_EOD_COORD missing RA/DEC widget. Aborting.", {mount});
+        setStateEvent(OST::Error, "error", "devicefailed", "Device failed");
+        return;
+    }
+
     double jd = ln_get_julian_from_sys();
     INDI::IEquatorialCoordinates j2000pos;
     INDI::IEquatorialCoordinates observed;
@@ -660,8 +756,8 @@ void Navigator::syncMountIfNeeded(double solvedRA, double solvedDEC)
     j2000pos.declination = solvedDEC;
     INDI::J2000toObserved(&j2000pos, jd, &observed);
 
-    prop.findWidgetByName("DEC")->value = observed.declination;
-    prop.findWidgetByName("RA")->value = observed.rightascension;
+    decW->value = observed.declination;
+    raW->value = observed.rightascension;
     sendNewNumber(prop);
 
     //restore slew

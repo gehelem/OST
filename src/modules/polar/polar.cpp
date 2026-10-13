@@ -63,6 +63,7 @@ void Polar::onExternalEvent(OST::ExtEvent event)
         {
             if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
             {
+                setStateEvent(OST::Busy, "running", "start", "polar alignment started");
                 connectIndi();
                 connectDevice(getString("devices", "camera"));
                 connectDevice(getString("devices", "mount"));
@@ -82,6 +83,7 @@ void Polar::onExternalEvent(OST::ExtEvent event)
         {
             if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
             {
+                setStateEvent(OST::Ok, "idle", "abort", "polar alignment aborted");
                 emit Abort();
             }
         }
@@ -89,6 +91,7 @@ void Polar::onExternalEvent(OST::ExtEvent event)
         {
             if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
             {
+                setStateEvent(OST::Busy, "testing", "test", "polar alignment test started");
                 SMComputeFinal();
             }
         }

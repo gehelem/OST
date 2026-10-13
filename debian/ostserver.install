@@ -14,6 +14,18 @@
 # asymmetry between the two packaging paths.
 usr/bin/ostserver
 usr/lib/libost*.so*
+# StellarSolver (libs/stellarsolver, vendored) is installed to
+# CMAKE_INSTALL_LIBDIR by the top-level CMakeLists.txt itself (its own
+# comment: "fails - cannot find library libstellarsolver6.so.2,
+# confirmed 2026-10-08") - ostserver links against it, so it's a real
+# runtime dependency, not an optional extra. Missed by the libost*
+# glob above (different prefix), left unclaimed until this fix
+# (Launchpad build failure, dh_missing, 2026-10-13). Wildcarded
+# directory component, not a literal x86_64-linux-gnu path - debhelper
+# itself installs OST's own libs without the multiarch triplet
+# (usr/lib/ above matches directly), but StellarSolver's own CMakeLists
+# resolves CMAKE_INSTALL_LIBDIR independently and does use it.
+usr/lib/*/libstellarsolver6.so*
 usr/include/ost/*
 usr/lib/systemd/system/ostserver.service
 usr/share/doc/ostserver/changelog.Debian.gz

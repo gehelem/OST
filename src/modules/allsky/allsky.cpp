@@ -117,18 +117,21 @@ void Allsky::onExternalEvent(OST::ExtEvent event)
         {
             if (getBool(event.prpkey, event.eltkey)) enableParms(false);
             getProperty("actions")->setState(OST::Busy, true);
+            setStateEvent(OST::Busy, "paused", "pause", "allsky capture paused");
             //startTimelapseBatch();
         }
         if (event.eltkey == "loop")
         {
             if (getBool(event.prpkey, event.eltkey)) enableParms(false);
             getProperty("actions")->setState(OST::Busy, true);
+            setStateEvent(OST::Busy, "looping", "loop", "allsky capture loop started");
             //startLoop();
         }
         if (event.eltkey == "abort")
         {
             if (getBool(event.prpkey, event.eltkey)) enableParms(true);
             getProperty("actions")->setState(OST::Ok, true);
+            setStateEvent(OST::Ok, "idle", "abort", "allsky capture aborted");
             stopLoop();
         }
     }

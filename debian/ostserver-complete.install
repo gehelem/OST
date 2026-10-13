@@ -12,6 +12,10 @@
 # that yet, left as a known rough edge rather than solved here).
 usr/bin/ostserver
 usr/lib/libost*.so*
+# Same runtime dependency as ostserver.install - see its own comment
+# for the full rationale (Launchpad build failure, dh_missing,
+# 2026-10-13).
+usr/lib/*/libstellarsolver6.so*
 usr/lib/systemd/system/ostserver.service
 usr/share/ostserver/ostserver.parms.skel
 var/www/pilost/*
