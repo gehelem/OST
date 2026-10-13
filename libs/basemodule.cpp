@@ -348,7 +348,19 @@ void Basemodule::onAfterInit(void)
 
 void Basemodule::killMe()
 {
-    this->~Basemodule();
+    // Issue #233 - was `this->~Basemodule();`: calling the destructor
+    // directly runs the full chain (QObject detaches cleanly from its
+    // parent/signals, which is why nothing looked wrong at the Qt
+    // bookkeeping level) but never frees the memory block the module's
+    // own `new` (in createmodule(), the module library's "initialize"
+    // entry point) allocated - a guaranteed leak on every MK, cumulative
+    // on a long-running server that gets modules reconfigured/reloaded
+    // repeatedly. deleteLater() actually frees it, and - unlike a plain
+    // `delete this` - defers the real destruction to the next event loop
+    // iteration, safe even though the only caller today (Controller's MK
+    // handler) is itself in the middle of iterating the very
+    // findChildren<Basemodule*>() list this object is part of.
+    this->deleteLater();
 }
 void Basemodule::setWebroot(QString webroot)
 {

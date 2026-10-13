@@ -535,7 +535,14 @@ void Datastore::deleteOstProperty(const QString &pPropertyName)
         logWarning("Can't delete inexistant property %1", {pPropertyName});
         return;
     }
-    mStore.remove(pPropertyName);
+    // Issue #233 - was `mStore.remove(pPropertyName)`: QMap::remove()
+    // only drops the map entry, it never calls delete on the pointer
+    // that was in it - take() gets the same removal plus the pointer
+    // back, so it can actually be freed. PropertyMulti's own destructor
+    // (fixed alongside this one) now frees its elements in turn, so this
+    // one delete cascades correctly instead of leaking the whole
+    // property/element subtree on every deletion, not just a module kill.
+    delete mStore.take(pPropertyName);
     emit datastoreEvent(OST::EvType::dp, pPropertyName, nullptr,  nullptr, nullptr, this);
 }
 
