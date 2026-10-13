@@ -22,7 +22,13 @@ PropertyMulti::PropertyMulti(const QString &key, const QString &label, const Per
 }
 PropertyMulti::~PropertyMulti()
 {
-
+    // Issue #233 - mElts held raw ElementBase* never owned by Qt
+    // parent/child (addElt() never calls setParent()), and this
+    // destructor used to be empty: every element of every property
+    // leaked, on top of the property itself, whenever a property was
+    // deleted (Datastore::deleteOstProperty(), fixed alongside this one).
+    for (auto it = mElts.constBegin(); it != mElts.constEnd(); ++it) delete it.value();
+    mElts.clear();
 }
 [[nodiscard]] SwitchsRule PropertyMulti::rule() const
 {
@@ -256,7 +262,10 @@ void  PropertyMulti::deleteElt(QString key)
         qDebug() << label() << " - deleteElt - element " << key << " doesn't exist";
         return;
     }
-    mElts.remove(key);
+    // Issue #233 - same QMap::remove()-never-deletes pattern as
+    // Datastore::deleteOstProperty() - take() to get the pointer back so
+    // it can actually be freed, instead of leaking it.
+    delete mElts.take(key);
     mGrid.clear();
     emit prpEvent(OST::EvType::de, key, nullptr,  this);
 
