@@ -1,0 +1,15 @@
+# Files legitimately built/staged under debian/tmp but not shipped in
+# any ostserver binary package - see debian/ostserver.install's own
+# comment on usr/lib/*/libstellarsolver6.so* for the companion runtime
+# fix (Launchpad build failure, dh_missing, 2026-10-13).
+#
+# StellarSolver (libs/stellarsolver, vendored) is built in-tree and
+# linked directly by ostserver's own CMake targets - nothing outside
+# this source package ever does `find_package(StellarSolver)` against
+# it, so its dev package surface (public headers, CMake config,
+# pkg-config file) has no consumer here. Only the runtime .so itself
+# (claimed in debian/ostserver*.install) is actually needed.
+usr/include/libstellarsolver/*
+usr/include/libstellarsolver/astrometry/*
+usr/lib/*/cmake/StellarSolver/*
+usr/lib/*/pkgconfig/stellarsolver.pc

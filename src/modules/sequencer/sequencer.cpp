@@ -797,8 +797,19 @@ void Sequencer::updateProperty(INDI::Property property)
 
 void Sequencer::newExp(INDI::PropertyNumber exp)
 {
+    // Issue #237 - findWidgetByName() can return nullptr even on a
+    // property matched by name, if the actual driver update doesn't
+    // carry this widget (non-compliant/transient driver state) - same
+    // class of bug already fixed in parkmanager.cpp (issue #227) and
+    // navigator.cpp.
+    auto *expW = exp.findWidgetByName("CCD_EXPOSURE_VALUE");
+    if (!expW)
+    {
+        logWarning("CCD_EXPOSURE_VALUE widget missing, skipping exposure progress update");
+        return;
+    }
     double etot = getFloat("sequence", "exposure");
-    double ex   = exp.findWidgetByName("CCD_EXPOSURE_VALUE")->value;
+    double ex   = expW->value;
     double elapsedInShot = etot - ex;
     getEltPrg("progress", "exposure")->setPrgValue(100.0 * elapsedInShot / etot, true);
 

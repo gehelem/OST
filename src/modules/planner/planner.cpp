@@ -125,6 +125,7 @@ void Planner::startPlanner()
     {
         logError("INDI server not connected");
         getProperty("actions")->setState(OST::Error, true);
+        setStateEvent(OST::Error, "error", "noindi", "INDI server not connected");
         abortPlanner();
         return;
     }
@@ -135,6 +136,7 @@ void Planner::startPlanner()
     {
         logError("No GPS selected");
         getProperty("actions")->setState(OST::Error, true);
+        setStateEvent(OST::Error, "error", "nogps", "no GPS selected");
         abortPlanner();
         return;
     }
@@ -148,6 +150,7 @@ void Planner::startPlanner()
     {
         logError("No Sequence module selected");
         getProperty("actions")->setState(OST::Error, true);
+        setStateEvent(OST::Error, "error", "noslave", "no sequence module selected");
         abortPlanner();
         return;
     }
@@ -156,6 +159,7 @@ void Planner::startPlanner()
     {
         logError("No Sequence module selected");
         getProperty("actions")->setState(OST::Error, true);
+        setStateEvent(OST::Error, "error", "noslave", "no navigator module selected");
         abortPlanner();
         return;
     }
@@ -165,6 +169,7 @@ void Planner::startPlanner()
     {
         logError("Planning grid is empty");
         getProperty("actions")->setState(OST::Error, true);
+        setStateEvent(OST::Error, "error", "emptygrid", "planning grid is empty");
         abortPlanner();
         return;
     }
@@ -173,6 +178,7 @@ void Planner::startPlanner()
     mIsRunning = true;
 
     //getProperty("actions")->setState(OST::Busy, true);
+    setStateEvent(OST::Busy, "running", "start", "planner started");
     logInfo("Starting planner...");
 
     // Disable properties during operation (optional)
@@ -223,6 +229,7 @@ void Planner::abortPlanner()
     getEltPrg("progress", "global")->setDynLabel("Aborted", true);
 
     getProperty("actions")->setState(OST::Ok, true);
+    setStateEvent(OST::Ok, "idle", "abort", "planner aborted");
 }
 
 void Planner::onOperationComplete()
@@ -230,6 +237,11 @@ void Planner::onOperationComplete()
     logInfo("Operation completed successfully");
 
     mIsRunning = false;
+
+    // Issue reported by Gilles, 2026-10-13: "start" was never reset here
+    // (only abortPlanner() did it) - stuck true, same symptom class as
+    // the devices/actions reset just below.
+    getEltBool("actions", "start")->setValue(false, true);
 
     // Re-enable properties
     //getProperty("parms")->enable();
@@ -240,6 +252,7 @@ void Planner::onOperationComplete()
     getEltPrg("progress", "global")->setDynLabel("Completed", true);
 
     getProperty("actions")->setState(OST::Ok, true);
+    setStateEvent(OST::Ok, "ready", "done", "planning completed");
 }
 
 void Planner::sequenceComplete()
@@ -388,10 +401,17 @@ void Planner::advanceToNextLine()
         }
     }
 
-    logInfo("Planning completed");
-    getEltPrg("progress", "global")->setPrgValue(100, true);
-    getEltPrg("progress", "global")->setDynLabel("Finished", true);
-    mIsRunning = false;
+    // Bug reported by Gilles, 2026-10-13: every line skipped/failed (e.g.
+    // a visibility problem affecting every object) landed here, which
+    // used to just set mIsRunning = false inline - duplicating
+    // onOperationComplete() below, but without its devices->enable()/
+    // actions->setState(Ok)/setStateEvent() - "devices" properties stayed
+    // disabled and the status stuck on Busy forever, not even recoverable
+    // by clicking "stop" afterwards (abortPlanner() early-returns once
+    // mIsRunning is already false). onOperationComplete() was already
+    // written to do all of this correctly, it just wasn't called from
+    // anywhere.
+    onOperationComplete();
 }
 
 bool Planner::checkVisibility(double ra, double dec, double durationSeconds, QString &reason)

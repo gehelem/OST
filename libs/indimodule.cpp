@@ -1123,6 +1123,10 @@ bool IndiModule::defineMeAsPlanner()
     // ces commandes doivent etre definies dans les DefineMeAsXXX").
     giveMeAnActions();
     giveMeALocation();
+    // Issue #237 - every other defineMeAsXXX() (Focuser/Guider/Sequencer/
+    // Navigator) gives its module a "signals"/state property; this one
+    // never did, so Planner had no state capability at all.
+    giveMeAState();
 
     OST::PropertyMulti* pm = getProperty("actions");
     OST::ElementBool* b = new  OST::ElementBool("start", "Start", "010", "");
@@ -1140,6 +1144,12 @@ bool IndiModule::defineMeAsPlanner()
 bool IndiModule::defineMeAsImager()
 {
     giveMeAParms();
+    // Issue #237 - every other defineMeAsXXX() (Focuser/Guider/
+    // Sequencer/Navigator) also gives its module a "signals"/state
+    // property right after giveMeAParms(); this one never did, so
+    // every imager-only module (Inspector, Polar) had no state
+    // capability at all.
+    giveMeAState();
     giveMeAnOptic();
 
     if (!getStore().contains("image"))
