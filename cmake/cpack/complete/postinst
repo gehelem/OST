@@ -65,8 +65,31 @@ case "$1" in
         # backend package ("ostserver-complete") - Gilles: lets other
         # frontends coexist/be managed the same legible way later, e.g.
         # /etc/nginx/sites-enabled/osterix alongside this one.
+        # HiPS tile cache dir (Complete only) - created/owned here, not
+        # left for nginx to create lazily on first write, since the
+        # worker runs as www-data and this is a fresh path under
+        # /var/cache it may not otherwise have rights to create itself.
+        mkdir -p /var/cache/nginx/hips
+        chown -R www-data:www-data /var/cache/nginx/hips
+
         NGINX_SITE="/etc/nginx/sites-available/pilost"
         cat > "${NGINX_SITE}" << 'EOF'
+# HiPS sky-survey tile cache (Gilles, 2026-10-14: fond de ciel HiPS du
+# planetarium - front/js/hips-background.js) - proxies/caches the one
+# default survey this app uses (DSS2/color) through this server instead
+# of every client fetching the CDS's own alasky.cds.unistra.fr directly:
+# the first request for a given tile fetches+stores it here, every later
+# request (from any client hitting this server, not just the one that
+# asked first) is served locally. Still needs internet for a genuine
+# cache MISS (a tile nobody has ever viewed through this server yet) -
+# an on-demand cache, not a full offline mirror (the complete DSS2 survey
+# is several TB, not realistic to pre-download). proxy_cache_path must
+# live at the http{} level, not inside the server{} block below - valid
+# here anyway since Debian's own nginx.conf includes sites-enabled/* at
+# that same level, right alongside conf.d/*.conf (confirmed before
+# adding this - no second file needed).
+proxy_cache_path /var/cache/nginx/hips levels=1:2 keys_zone=hips_cache:10m max_size=2g inactive=90d use_temp_path=off;
+
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
@@ -77,6 +100,18 @@ server {
 
     location / {
         try_files $uri $uri/ =404;
+    }
+
+    # See the proxy_cache_path comment above - this is the only survey
+    # js/hips-background.js's own DEFAULT_SURVEY actually requests.
+    location /hips-proxy/dss2color/ {
+        proxy_pass https://alasky.cds.unistra.fr/DSS/DSSColor/;
+        proxy_ssl_server_name on;
+        proxy_set_header Host alasky.cds.unistra.fr;
+        proxy_cache hips_cache;
+        proxy_cache_valid 200 90d;
+        proxy_cache_valid 404 10m;
+        add_header X-Cache-Status $upstream_cache_status always;
     }
 
     location /ostmedia/ {

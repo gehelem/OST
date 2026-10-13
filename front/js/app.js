@@ -10,6 +10,7 @@ import { createClient, deriveUrlsFromHost, cleanHost, normalizeMediaUrl } from "
 import { renderModuleView, buildParamsPanel, setMediaBaseUrl, getMediaBaseUrl, setDialogRoot, setQuickNavRoot, getDisableTemplates } from "./render.js";
 import { renderModbar, renderSystemViews, renderHome, renderController, renderFiles, renderLogs, renderLogin, renderLogPanel } from "./views.js";
 import { openSetupWizard } from "./wizard.js";
+import { openCreditsDialog } from "./credits.js";
 import { el, icon, iconButton } from "./dom.js";
 import * as Panels from "./panels.js";
 import { setBgLayer } from "./imagelayer.js";
@@ -77,6 +78,8 @@ const discoverBtnLabelEl = document.getElementById("discover-btn-label");
 const discoverResultsEl = document.getElementById("discover-results");
 const setupWizardBtnEl = document.getElementById("setup-wizard-btn");
 const setupWizardBtnLabelEl = document.getElementById("setup-wizard-btn-label");
+const creditsBtnEl = document.getElementById("credits-btn");
+const creditsBtnLabelEl = document.getElementById("credits-btn-label");
 
 // Static chrome (this file's own top-right icon chips + the connect bar) is
 // never rebuilt from a server dump the way a module's panels are, so a
@@ -95,6 +98,7 @@ function applyStaticLabels() {
   connectBtnLabelEl.textContent = t("chrome.connect");
   disconnectBtnLabelEl.textContent = t("chrome.disconnect");
   clearCacheBtnLabelEl.textContent = t("chrome.clearCache");
+  creditsBtnLabelEl.textContent = t("credits.title");
   discoverBtnLabelEl.textContent = t("chrome.discover");
   connToggleEl.title = t("status." + client.connection.status);
   setupWizardBtnLabelEl.textContent = t("wizard.title");
@@ -444,6 +448,13 @@ applyStaticLabels();
 setupWizardBtnEl.addEventListener("click", () => {
   setConnPanelOpen(false);
   openSetupWizard(client);
+});
+
+// Credits (Gilles, 2026-10-14) - same "close the settings dropdown first"
+// convention as the wizard button right above.
+creditsBtnEl.addEventListener("click", () => {
+  setConnPanelOpen(false);
+  openCreditsDialog();
 });
 
 // ---- build/version info (Settings, after the connection info) ----------

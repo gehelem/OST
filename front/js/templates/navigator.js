@@ -35,6 +35,7 @@ import { renderProperty, updateQuickNav, getMediaBaseUrl, moduleLifecycle, rende
 import { el, iconButton } from "../dom.js";
 import * as Panels from "../panels.js";
 import { SkyEngine, ZOOM_MIN, ZOOM_MAX } from "../sky-engine.js";
+import { createHipsBackground } from "../hips-background.js";
 import { STAR_DEPTHS } from "../sky-catalog.js";
 import { sunAltitudeCurve, altitudeCurve } from "../sky-projection.js";
 import { t } from "../i18n.js";
@@ -263,6 +264,7 @@ function saveDisplaySettings(engine) {
       showMountPosition: engine.showMountPosition,
       showSensorFov: engine.showSensorFov,
       showSensorImage: engine.showSensorImage,
+      showHips: engine.showHips,
       dayMode: engine.dayMode,
       zoom: engine.zoom,
       rotation: engine.rotation, // pan/trackball state - a plain {w,x,y,z} quaternion, see js/quaternion.js
@@ -282,7 +284,7 @@ function saveDisplaySettings(engine) {
  * applied to `engine` by buildSkyDome() before this is even called (so the
  * very first render is correct, not a flash-then-jump) — this only needs
  * to reflect that starting state in the controls themselves. */
-function buildSettingsPanel(engine) {
+function buildSettingsPanel(engine, hipsBg) {
   const wrap = el("div");
 
   function persistAndRender() {
@@ -377,6 +379,23 @@ function buildSettingsPanel(engine) {
   wrap.appendChild(checkboxRow(t("navigator.sensorImage"), "showSensorImage"));
   wrap.appendChild(checkboxRow(t("navigator.dayMode"), "dayMode"));
 
+  // Not a plain checkboxRow() (it also needs to flip the Aladin layer's
+  // own visibility, not just this engine field + a re-render) - Gilles,
+  // 2026-10-13: "ajouter les images de fond 'hips'". See js/hips-
+  // background.js's own header for what this actually turns on/off.
+  const hipsCb = el("input", { type: "checkbox" });
+  hipsCb.checked = engine.showHips;
+  hipsCb.addEventListener("change", () => {
+    engine.showHips = hipsCb.checked;
+    hipsBg.setEnabled(engine.showHips);
+    persistAndRender();
+  });
+  wrap.appendChild(el("label", { class: "form-row", style: "cursor:pointer" }, [hipsCb, el("span", { text: t("navigator.hipsBackground") })]));
+  // Keeps this checkbox in sync if hipsBg.onFailure (buildSkyDome) rolls
+  // engine.showHips back off because Aladin actually failed to load -
+  // same "one listener reflects every path" idea as onZoomChange above.
+  engine.onHipsFailure = () => { hipsCb.checked = false; };
+
   // Not a plain boolean engine field (it's the string "orthographic"/
   // "stereographic", see sky-engine.js's own `projection` doc comment) -
   // checkboxRow() above only knows how to flip a boolean field directly,
@@ -391,7 +410,7 @@ function buildSettingsPanel(engine) {
   });
   wrap.appendChild(el("label", { class: "form-row", style: "cursor:pointer" }, [projCb, el("span", { text: t("navigator.stereographic") })]));
 
-  wrap._dispose = () => { engine.onZoomChange = null; engine.onRotationChange = null; };
+  wrap._dispose = () => { engine.onZoomChange = null; engine.onRotationChange = null; engine.onHipsFailure = null; };
   return wrap;
 }
 
@@ -747,6 +766,11 @@ function buildSkyDome(client, moduleName, onSelect, getTime) {
   if (!bgLayer) return { dispose: () => {}, engine: null };
   bgLayer.classList.add("sky-active");
   bgLayer.innerHTML = "";
+  // Created before the canvas (js/hips-background.js's own
+  // createHipsBackground() inserts itself as bgLayer's first child
+  // either way, but this keeps the actual DOM order - and therefore the
+  // visual stacking, background behind canvas - obvious at a glance too).
+  const hipsBg = createHipsBackground(bgLayer);
   const canvas = el("canvas", { id: "sky-canvas" });
   bgLayer.appendChild(canvas);
 
@@ -757,6 +781,19 @@ function buildSkyDome(client, moduleName, onSelect, getTime) {
     lightUI: document.documentElement.getAttribute("data-theme") === "light",
     uiZoom: readUiZoom(),
   });
+  engine.onViewChange = (view) => hipsBg.sync(view);
+  // Rolls the setting back off if Aladin actually failed to load/init
+  // (js/hips-background.js's own onFailure - e.g. WebGL2 unavailable,
+  // confirmed live 2026-10-13 on Chrome specifically) - without this,
+  // engine.showHips (and the settings checkbox) would keep claiming "on"
+  // while render() still skips its own opaque background fill for
+  // nothing, leaving the dome visibly blank instead of just reverting.
+  hipsBg.onFailure = () => {
+    engine.showHips = false;
+    saveDisplaySettings(engine);
+    engine.render();
+    if (engine.onHipsFailure) engine.onHipsFailure();
+  };
   // Applied before the catalog/first render below, not in the settings
   // panel (built later, after this function returns) — so the very first
   // frame already reflects saved settings instead of a brief flash at the
@@ -764,6 +801,7 @@ function buildSkyDome(client, moduleName, onSelect, getTime) {
   // wheel-zoom -> persist wiring (engine.onZoomChange).
   const savedSettings = loadDisplaySettings();
   Object.assign(engine, savedSettings);
+  hipsBg.setEnabled(engine.showHips);
   // "leger par defaut, mais parametrable" (Gilles, 2026-09-29) - defaults
   // to "light" same as before, but now actually reads back whichever
   // depth was last chosen (buildSettingsPanel()'s own selector, added
@@ -886,6 +924,7 @@ function buildSkyDome(client, moduleName, onSelect, getTime) {
 
   return {
     engine,
+    hips: hipsBg,
     dispose: () => {
       unsub();
       unsubMount();
@@ -894,6 +933,7 @@ function buildSkyDome(client, moduleName, onSelect, getTime) {
       themeObserver.disconnect();
       clearInterval(timer);
       engine.destroy();
+      hipsBg.dispose();
       bgLayer.innerHTML = "";
       bgLayer.classList.remove("sky-active");
     },
@@ -978,7 +1018,7 @@ export function mount(client, moduleName) {
 
     if (sky.engine) {
       const settingsPanel = Panels.make({ id: "settings", title: t("navigator.displaySettings"), x: 660, y: 92, w: 260, collapsed: true });
-      settingsPanel.appendChild(track(buildSettingsPanel(sky.engine)));
+      settingsPanel.appendChild(track(buildSettingsPanel(sky.engine, sky.hips)));
       // Icon-only (Gilles, 2026-10-03: "boutons 'settings' et 'time' :
       // juste les icones aussi (qui y sont deja), plus de libelle" - same
       // icon/iconOnly fields as the Stats/Guiding graph/Drift buttons just

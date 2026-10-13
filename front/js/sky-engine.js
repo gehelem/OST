@@ -461,6 +461,15 @@ export class SkyEngine {
     this.showSensorImage = false;
     this._sensorImageUrl = null;
     this._sensorImageEl = null;
+    // HiPS sky-survey background (js/hips-background.js, Gilles,
+    // 2026-10-13: "ajouter les images de fond 'hips'") - default OFF, same
+    // reasoning as showSensorImage above (heavier/speculative, and this
+    // one also needs live internet access to show anything at all). Only
+    // decides whether render() paints its own background opaque (false)
+    // or leaves it transparent so templates/navigator.js's own Aladin
+    // layer underneath shows through (true) - the actual Aladin
+    // view/visibility is owned by hips-background.js, not this field.
+    this.showHips = false;
     this.dayMode = false;
     // "orthographic" (default) or "stereographic" - see sky-projection.js's
     // own vectorToScreen()/screenToVector() doc comment for the actual
@@ -500,6 +509,14 @@ export class SkyEngine {
     this.onSelect = opts.onSelect || null; // called on a tap/click that isn't a drag - see _handlePointerUp()
     this.onZoomChange = opts.onZoomChange || null; // called after wheel-zoom specifically (not pan/drag) - e.g. to persist it, see templates/navigator.js
     this.onRotationChange = opts.onRotationChange || null; // called once a pan/drag gesture ends and actually moved something - e.g. to persist it, see templates/navigator.js
+    // Called at the end of EVERY render() (not just on a gesture end, unlike
+    // onZoomChange/onRotationChange above) with {ra, dec, fovDeg, rotationDeg}
+    // (degrees, J2000) describing the current view's center/extent/screen
+    // orientation - js/hips-background.js's own sync() consumes this to
+    // keep the Aladin layer lined up with whatever this engine is actually
+    // showing, including the periodic 30s time-refresh (templates/
+    // navigator.js) which moves the sky without any gesture at all.
+    this.onViewChange = opts.onViewChange || null;
     this.catalog = { stars: [], constellationLines: [], messier: [], milkyWay: [] };
     this._domeRadius = 1; // recomputed every render(), read by the drag/tap handlers to convert screen<->vector
     this._drag = null; // { grabVector (fixed-frame), rotationAtDragStart, startOffset, moved } while a gesture is in progress (mouse or touch)
@@ -855,8 +872,17 @@ export class SkyEngine {
     // independent of any CSS/canvas timing.
     const isLightBg = this.dayMode || this.lightUI;
     const bgColor = this.dayMode ? "#8ec8e8" : (this.lightUI ? "#e4e9ee" : "#05070c");
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, w, h);
+    // showHips: leave the canvas transparent instead (clearRect above
+    // already did that) so templates/navigator.js's own Aladin layer,
+    // sitting right underneath in #bg-layer, shows through - see
+    // js/hips-background.js's own header comment. The ground mask below
+    // still paints its own opaque fg.ground regardless (Aladin has no
+    // concept of "below the local horizon", it would just show whatever
+    // sky is in that direction - exactly what the mask exists to hide).
+    if (!this.showHips) {
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, w, h);
+    }
     const fg = isLightBg
       ? { dome: "rgba(0,0,0,0.28)", cardinal: "rgba(0,0,0,0.6)", constellation: "rgba(40,80,140,0.45)", star: "#15181c", messier: "rgba(27,94,32,0.85)", horizon: "rgba(180,110,0,0.65)", equator: "rgba(0,121,107,0.6)", equatorLine: "rgba(198,40,40,0.9)", azimuthal: "rgba(123,31,162,0.6)", meridian: "rgba(13,71,161,0.95)", milkyway: "rgba(60,80,110,0.35)", milkywayFill: "rgba(70,75,85,0.10)", ecliptic: "rgba(230,140,20,0.75)", grad: "rgba(0,0,0,0.55)", ground: "#cdbb95" }
       : { dome: "rgba(255,255,255,0.25)", cardinal: "rgba(255,255,255,0.55)", constellation: "rgba(100,160,220,0.35)", star: "#fff", messier: "rgba(129,199,132,0.85)", horizon: "rgba(255,193,7,0.55)", equator: "rgba(77,208,225,0.6)", equatorLine: "rgba(255,82,82,0.9)", azimuthal: "rgba(206,147,216,0.6)", meridian: "rgba(41,121,255,0.95)", milkyway: "rgba(200,215,235,0.18)", milkywayFill: "rgba(200,205,215,0.08)", ecliptic: "rgba(255,183,77,0.85)", grad: "rgba(255,255,255,0.75)", ground: "#241b12" };
@@ -978,9 +1004,22 @@ export class SkyEngine {
         ctx.clip();
         // Restore the normal sky background within the clipped (sky-only)
         // region - the ground fill above covered the whole disk, this
-        // repaints just the sky portion back over it.
-        ctx.fillStyle = bgColor;
-        ctx.fillRect(0, 0, w, h);
+        // undoes it back over just the sky portion. showHips: Gilles,
+        // 2026-10-14, "lorsque je selectionne true horizon ca masque tout
+        // le hips" - a real bug in the first pass, not just "leave it
+        // opaque": SKIPPING this step (what the first pass did) left the
+        // ground fill's own opaque paint sitting over the sky region too,
+        // since that fill happens BEFORE this clip even exists - merely
+        // not re-painting it never undid it. clearRect (not fillRect) is
+        // what's actually needed to punch it back to transparent within
+        // this clip, same as the main background's own clearRect at the
+        // very top of render() does for the whole canvas.
+        if (this.showHips) {
+          ctx.clearRect(0, 0, w, h);
+        } else {
+          ctx.fillStyle = bgColor;
+          ctx.fillRect(0, 0, w, h);
+        }
         groundClipActive = true;
       }
       // skyPoly === null: whole visible dome is real sky, nothing to mask.
@@ -1602,5 +1641,70 @@ export class SkyEngine {
     }
 
     if (groundClipActive) ctx.restore(); // matches the ctx.save() in the ground-mask block above
+
+    // HiPS background sync (js/hips-background.js) - fires every render(),
+    // not just showHips-gated, so Aladin is already caught up the instant
+    // it's switched on rather than waiting for the next pan/zoom/30s
+    // refresh. Center: the screen center's own pre-rotation vector is
+    // always {0,0,1} (vectorToScreen(0,0,...) with no offset), "undone"
+    // the same way _select() above turns an arbitrary tapped screen point
+    // back into a fixed-frame vector. Field of view: solves
+    // vectorToScreen()'s own r=R*sin(theta) (orthographic) / r=R*tan(theta/2)
+    // (stereographic) for theta at the screen edge (r=edgePx) instead of
+    // at a given point - capped at 90deg either way, since this engine
+    // never shows more than one hemisphere (same "visible iff v.z>=0" rule
+    // the ground mask/vectorToScreen itself already enforce).
+    if (this.onViewChange) {
+      const fixed = rotateVector(conjugate(this.rotation), { x: 0, y: 0, z: 1 });
+      const { azimuth, altitude } = vectorToHorizontal(fixed);
+      const { ra, dec } = horizontalToEquatorial(azimuth, altitude, this.observer, date);
+      // Gilles, 2026-10-14, after the first pass: "l'echelle n'est pas
+      // bonne, le HIPS est plus zoome 1.5x ou 2x environ" - lib/aladin.js's
+      // own getFov() (grepped directly: `E = height/width * fov`) confirms
+      // its `fov` parameter is specifically the WIDTH-axis angle, deriving
+      // the height-axis one FROM it - not "whichever axis is smaller" like
+      // domeRadius above (our OWN dome always touches the SHORTER screen
+      // axis). On any non-square/landscape canvas those two differ by
+      // exactly the aspect ratio, matching the reported 1.5-2x - fixed by
+      // computing the angle at the WIDTH edge specifically for Aladin
+      // (domeRadius itself, min(w,h)-based, still drives our OWN star
+      // rendering elsewhere in this method, untouched).
+      const hipsRatio = (w / 2) / domeRadius;
+      const hipsFovDeg = 2 * Math.min(90, this.projection === "stereographic"
+        ? (2 * Math.atan(hipsRatio) * 180) / Math.PI
+        : (Math.asin(Math.min(1, hipsRatio)) * 180) / Math.PI);
+      // Position angle of the North Celestial Pole as WE actually draw it
+      // on screen (Gilles, 2026-10-13, after seeing the background drift
+      // during a pan: "les mouvements sont inverses sur l'image de fond")
+      // - found in lib/aladin.js itself (grepped the vendored bundle
+      // directly, not left unimplemented like the first pass's doc
+      // comment said - a real public method exists, aliased
+      // setViewCenter2NorthPoleAngle, exactly "the angle between view
+      // center and the North pole"). Computed the same way every other
+      // screen position in this file already is - project the NCP's own
+      // horizontal-of-date direction through the current rotation +
+      // vectorToScreen, same projection/rotation the stars themselves go
+      // through - then read its angle off from screen-up, CLOCKWISE
+      // (atan2(x,-y): 0=up, 90=right, 180=down, 270/-90=left).
+      //
+      // Negated below: fetched Aladin's own JSDoc straight from its GitHub
+      // source (github.com/cds-astro/aladin-lite, src/js/Aladin.js) rather
+      // than keep guessing after Gilles reported "pas generalisable a tous
+      // les endroits" following the first (un-negated) attempt - degrees,
+      // "positive angles rotate the view in counter clockwise order (or
+      // towards the east) ... the east lies in the left direction of the
+      // view". Positive = NCP moving LEFT = counterclockwise - the exact
+      // opposite rotational sense from this engine's own clockwise-from-up
+      // measurement above, hence the sign flip. A pure sign error (as
+      // opposed to a fixed offset) produces a positiondependent-looking
+      // symptom - matches "pas generalisable" exactly, since negating an
+      // angle shifts it by 2x itself, not a constant, in the wrong
+      // direction.
+      const ncpHor = equatorialToHorizontal(0, 90, this.observer, date);
+      const ncpVec = rotateVector(this.rotation, horizontalToVector(ncpHor.azimuth, ncpHor.altitude));
+      const ncpScreen = vectorToScreen(ncpVec, domeRadius, this.projection);
+      const rotationDeg = -(Math.atan2(ncpScreen.x, -ncpScreen.y) * 180) / Math.PI;
+      this.onViewChange({ ra, dec, fovDeg: hipsFovDeg, rotationDeg });
+    }
   }
 }
