@@ -597,9 +597,16 @@ client.subscribe(client.topics.controllerData(), (cd) => {
 // toast.js's own LEVEL_CLASS/panels.css already had the style ready for
 // it from the start - just never triggered until now). `logs` is the
 // WHOLE buffer every time (up to 1000 entries, see datastore.js), so only
-// the tail past what was already seen last call is actually new - and the
-// very first call (the initial dump/history on connect) must not toast
-// the server's entire backlog.
+// the tail past what was already seen last call is actually new.
+//
+// Bug fixed 2026-10-13 (Gilles: a page refresh replayed every toast in
+// the whole history): comparing against the *count* seen last call isn't
+// enough on its own - this subscribe() call itself fires once immediately
+// with whatever's already in the (empty, freshly reset) datastore, then
+// again for real once the connect-time dump lands with the full history,
+// which looked exactly like "lots of genuinely new entries" to this
+// code. isDumpPending() (datastore.js) tells the two apart - true for
+// both of those calls, false for an actual single incremental log push.
 let seenLogsCount = -1;
 client.subscribe(client.topics.logs(), (logs) => {
   let worst = 0;
@@ -611,7 +618,7 @@ client.subscribe(client.topics.logs(), (logs) => {
   else if (worst >= 4) logBadgeDotEl.classList.add("level-critical");
 
   const count = (logs || []).length;
-  if (seenLogsCount >= 0) {
+  if (seenLogsCount >= 0 && !client.isDumpPending()) {
     for (const entry of (logs || []).slice(seenLogsCount)) {
       if ((entry.l | 0) >= 3) showToast(entry.t, entry.l | 0);
     }
