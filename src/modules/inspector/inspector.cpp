@@ -229,6 +229,7 @@ void Inspector::onExternalEvent(OST::ExtEvent event)
             {
                 mState = "single";
                 getEltLight("states", "idle")->setValue(OST::Idle, false);
+                setStateEvent(OST::Busy, "shooting", "shoot", "single shot started");
                 initIndi();
                 Shoot();
             }
@@ -239,6 +240,7 @@ void Inspector::onExternalEvent(OST::ExtEvent event)
             {
                 mState = "loop";
                 getEltLight("states", "idle")->setValue(OST::Idle, false);
+                setStateEvent(OST::Busy, "shooting", "loop", "loop shooting started");
                 initIndi();
                 Shoot();
             }
@@ -261,6 +263,7 @@ void Inspector::onExternalEvent(OST::ExtEvent event)
             getEltLight("states", "analyzing")->setValue(OST::Idle, false);
             getEltLight("states", "idle")->setValue(OST::Ok, true);
             getProperty("actions")->setState(OST::Ok, true);
+            setStateEvent(OST::Ok, "idle", "stop", "inspector stopped");
         }
         if (event.eltkey == "sethome")
         {
@@ -409,6 +412,7 @@ void Inspector::finishSingle(void)
     getEltLight("states", "analyzing")->setValue(OST::Idle, false);
     getEltLight("states", "idle")->setValue(OST::Ok, true);
     getProperty("actions")->setState(OST::Ok, true);
+    setStateEvent(OST::Ok, "ready", "shootdone", "shot finished");
     mState = "idle";
 }
 
