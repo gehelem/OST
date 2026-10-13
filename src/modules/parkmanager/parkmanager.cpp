@@ -230,11 +230,22 @@ void Parkmanager::processPhase(void)
         case Phase::OpeningDome:
             logInfo("Opening dome shutter");
             {
+                // Issue #237 - same unguarded findWidgetByName() crash
+                // risk already fixed elsewhere in this file
+                // (refreshDriversData(), below): DOME_SHUTTER being
+                // configured doesn't guarantee these two switches are
+                // actually there right now.
                 INDI::BaseDevice dp = getDevice(dome.toStdString().c_str());
                 INDI::PropertySwitch prop = dp.getSwitch("DOME_SHUTTER");
-                prop.findWidgetByName("SHUTTER_CLOSE")->setState(ISS_OFF);
-                prop.findWidgetByName("SHUTTER_OPEN")->setState(ISS_ON);
-                sendNewSwitch(prop);
+                auto *closeW = prop.isValid() ? prop.findWidgetByName("SHUTTER_CLOSE") : nullptr;
+                auto *openW = prop.isValid() ? prop.findWidgetByName("SHUTTER_OPEN") : nullptr;
+                if (closeW && openW)
+                {
+                    closeW->setState(ISS_OFF);
+                    openW->setState(ISS_ON);
+                    sendNewSwitch(prop);
+                }
+                else logError("Dome device missing DOME_SHUTTER widgets, can't open");
             }
             mPhase = Phase::WaitingDomeOpen;
             break;
@@ -326,11 +337,18 @@ void Parkmanager::processPhase(void)
         case Phase::ClosingDome:
             logInfo("Closing dome shutter");
             {
+                // Issue #237 - same fix as Phase::OpeningDome above.
                 INDI::BaseDevice dp = getDevice(dome.toStdString().c_str());
                 INDI::PropertySwitch prop = dp.getSwitch("DOME_SHUTTER");
-                prop.findWidgetByName("SHUTTER_CLOSE")->setState(ISS_ON);
-                prop.findWidgetByName("SHUTTER_OPEN")->setState(ISS_OFF);
-                sendNewSwitch(prop);
+                auto *closeW = prop.isValid() ? prop.findWidgetByName("SHUTTER_CLOSE") : nullptr;
+                auto *openW = prop.isValid() ? prop.findWidgetByName("SHUTTER_OPEN") : nullptr;
+                if (closeW && openW)
+                {
+                    closeW->setState(ISS_ON);
+                    openW->setState(ISS_OFF);
+                    sendNewSwitch(prop);
+                }
+                else logError("Dome device missing DOME_SHUTTER widgets, can't close");
             }
             mPhase = Phase::WaitingDomeClose;
             break;
