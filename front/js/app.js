@@ -590,13 +590,16 @@ client.subscribe(client.topics.controllerData(), (cd) => {
 // WORST level currently in the log buffer (server-messages.en.md's "l"
 // field: 0 Debug ... 4 Critical), independent of whatever the log panel's
 // own module/level filter happens to be set to right now.
-// Toast (js/toast.js) for any genuinely new critical-level entry - Gilles,
-// 2026-10-10, after a module crash (issue #234) only showed up as a log
-// line nobody would necessarily notice: "ça permettra de rendre ce type
-// d'évènement plus visible". `logs` is the WHOLE buffer every time (up to
-// 1000 entries, see datastore.js), so only the tail past what was already
-// seen last call is actually new - and the very first call (the initial
-// dump/history on connect) must not toast the server's entire backlog.
+// Toast (js/toast.js) for any genuinely new error/critical-level entry -
+// Gilles, 2026-10-10, after a module crash (issue #234) only showed up as
+// a log line nobody would necessarily notice: "ça permettra de rendre ce
+// type d'évènement plus visible". Error-level included too (orange,
+// toast.js's own LEVEL_CLASS/panels.css already had the style ready for
+// it from the start - just never triggered until now). `logs` is the
+// WHOLE buffer every time (up to 1000 entries, see datastore.js), so only
+// the tail past what was already seen last call is actually new - and the
+// very first call (the initial dump/history on connect) must not toast
+// the server's entire backlog.
 let seenLogsCount = -1;
 client.subscribe(client.topics.logs(), (logs) => {
   let worst = 0;
@@ -610,7 +613,7 @@ client.subscribe(client.topics.logs(), (logs) => {
   const count = (logs || []).length;
   if (seenLogsCount >= 0) {
     for (const entry of (logs || []).slice(seenLogsCount)) {
-      if ((entry.l | 0) >= 4) showToast(entry.t, entry.l | 0);
+      if ((entry.l | 0) >= 3) showToast(entry.t, entry.l | 0);
     }
   }
   seenLogsCount = count;

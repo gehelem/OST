@@ -6,7 +6,7 @@
 // de rendre ce type d'évènement plus visible pour l'utilisateur" - a box
 // that appears then disappears on its own after a second or two.
 //
-// Currently triggered only for critical-level log entries (app.js's own
+// Currently triggered for error/critical-level log entries (app.js's own
 // topics.logs() subscription) - exported generically (any level) in case
 // a future use wants to toast something else.
 
