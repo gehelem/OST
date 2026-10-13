@@ -198,6 +198,8 @@ const STRINGS = {
   "navigator.objectNames": { en: "Object names", fr: "Noms des objets", de: "Objektnamen", it: "Nomi degli oggetti", es: "Nombres de objetos" },
   "navigator.sensorImage": { en: "Captured image in frame", fr: "Image capturée dans le cadre", de: "Aufgenommenes Bild im Rahmen", it: "Immagine catturata nel riquadro", es: "Imagen capturada en el marco" },
   "navigator.dayMode": { en: "Day mode", fr: "Mode jour", de: "Tagmodus", it: "Modalità giorno", es: "Modo día" },
+  "navigator.hipsBackground": { en: "HiPS sky background", fr: "Fond de ciel HiPS", de: "HiPS-Himmelshintergrund", it: "Sfondo cielo HiPS", es: "Fondo de cielo HiPS" },
+  "navigator.hipsBackgroundFailed": { en: "HiPS background failed to load", fr: "Le fond de ciel HiPS n'a pas pu se charger", de: "HiPS-Hintergrund konnte nicht geladen werden", it: "Impossibile caricare lo sfondo HiPS", es: "No se pudo cargar el fondo HiPS" },
   "navigator.stereographic": { en: "Stereographic projection", fr: "Projection stéréographique", de: "Stereografische Projektion", it: "Proiezione stereografica", es: "Proyección estereográfica" },
   "navigator.catalogDepth": { en: "Star catalog", fr: "Catalogue d'étoiles", de: "Sternkatalog", it: "Catalogo stellare", es: "Catálogo de estrellas" },
   "navigator.catalogDepth.light": { en: "Light (mag ≤ 6.5, ~8.9k stars)", fr: "Léger (mag ≤ 6,5, ~8,9k étoiles)", de: "Leicht (mag ≤ 6,5, ~8.900 Sterne)", it: "Leggero (mag ≤ 6,5, ~8,9k stelle)", es: "Ligero (mag ≤ 6,5, ~8,9k estrellas)" },

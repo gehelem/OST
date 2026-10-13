@@ -261,6 +261,13 @@
 #bg-layer.sky-active { background: #05070c; }
 #sky-canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; }
 #sky-canvas.dragging { cursor: grabbing; }
+/* HiPS background (js/hips-background.js, Gilles, 2026-10-13: "ajouter
+   les images de fond 'hips'") - sits behind #sky-canvas (DOM order, see
+   that file's own header), hidden until actually switched on in the
+   display settings panel so an uninitialized/empty Aladin container
+   never flashes anything of its own. */
+.hips-bg { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
+.hips-bg.active { display: block; }
 #panel-layer, #docked-view { position: absolute; inset: 0; overflow: auto; }
 /* #panel-layer now stays visible even over a docked view (Home/Controller/
    Files/Logs - see app.js's renderContentNow(), Gilles, 2026-10-06: "on
