@@ -200,8 +200,10 @@ Inspector::Inspector(QString name, QString label, QString profile, QVariantMap a
     getEltLight("states", "idle")->setValue(OST::Ok, true);
     getEltLight("focushome", "defined")->setValue(OST::Idle, true);
 
-    connectIndi();
-    connectAllDevices();
+    // Was unconditional here, ignoring "startup" entirely - now decided by
+    // IndiModule::onAfterInit() (indiatstart/devatstart/confsatstart),
+    // called after the constructor finishes anyway (Controller::loadModule()/
+    // ModuleWorker::start()).
 
     connect(this, &Inspector::newImage, this, &Inspector::OnNewImage);
 }

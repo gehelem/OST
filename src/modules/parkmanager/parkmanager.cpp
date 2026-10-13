@@ -62,8 +62,8 @@ Parkmanager::Parkmanager(QString name, QString label, QString profile, QVariantM
     giveMeADevice("mount", "Mount", INDI::BaseDevice::TELESCOPE_INTERFACE);
     giveMeADevice("weather", "Weather", INDI::BaseDevice::WEATHER_INTERFACE);
 
-    connectIndi();
-    connectAllDevices();
+    // Was unconditional here, ignoring "startup" entirely - now decided by
+    // IndiModule::onAfterInit() below (indiatstart/devatstart/confsatstart).
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Parkmanager::onTimer);
@@ -72,7 +72,10 @@ Parkmanager::Parkmanager(QString name, QString label, QString profile, QVariantM
 
 Parkmanager::~Parkmanager() {}
 
-void Parkmanager::onAfterInit(void) {}
+void Parkmanager::onAfterInit(void)
+{
+    IndiModule::onAfterInit();
+}
 
 // ---------------------------------------------------------------------------
 // Helpers

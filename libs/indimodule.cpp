@@ -294,6 +294,39 @@ void IndiModule::onRemoveProperty (INDI::Property property) {} ;
 void IndiModule::onUpdateProperty (INDI::Property property) {} ;
 
 /*!
+ * "startup" (indiatstart/devatstart/confsatstart, libs/indimodule.json) -
+ * each flag gates the next, same priority Gilles described: no point
+ * asking devices to connect if the server itself was never asked to
+ * connect (devatstart without indiatstart does nothing), no point loading
+ * device configs on devices that were never asked to connect either
+ * (confsatstart without devatstart does nothing).
+ */
+void IndiModule::onAfterInit()
+{
+    if (!getBool("startup", "indiatstart")) return;
+    connectIndi();
+    // connectIndi() itself already schedules OnAfterIndiConnectIndiTimer()
+    // 500ms out (device enumeration isn't complete the instant
+    // connectServer() returns - INDI streams defDevice/defProperty
+    // progressively) - OnStartupConnectDevices() rides the same delay
+    // rather than acting on a still-empty device list, but is its own
+    // separate one-shot: OnAfterIndiConnectIndiTimer() already
+    // unconditionally connects every device on *any* connectIndi() call
+    // (startup or a later manual reconnect alike) - devatstart/
+    // confsatstart must not also change that standing behavior, only
+    // decide what happens specifically right after this instantiation.
+    if (getBool("startup", "devatstart") || getBool("startup", "confsatstart"))
+        QTimer::singleShot(500, this, &IndiModule::OnStartupConnectDevices);
+}
+
+void IndiModule::OnStartupConnectDevices()
+{
+    if (!getBool("startup", "devatstart")) return;
+    connectAllDevices();
+    if (getBool("startup", "confsatstart")) loadDevicesConfs();
+}
+
+/*!
  * Connects to indi server
  * Should we add host/port ??
  * IMHO this would be overkill as headless instance of OST and indiserver should be 99% hosted on the same machine
