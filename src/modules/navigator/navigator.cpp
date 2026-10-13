@@ -82,33 +82,55 @@ void Navigator::onExternalEvent(OST::ExtEvent event)
 
     if (event.ev == OST::ExtEvType::SV && event.prpkey == "actions")
     {
+        // Issue #237 - none of these 3 buttons ever reflected their own
+        // click: the underlying action ran, but the bool's value never
+        // changed, unlike every other module's action buttons (focus.cpp/
+        // guider.cpp's reference pattern). getEltBool(...)->setValue(true,
+        // true) is what actually applies/broadcasts the click - mAutoUpdate
+        // defaults to false (ElementBase), so the base class never does
+        // this automatically.
         if (event.eltkey == "gototarget")
         {
-            mState = "running";
-            mCurrentIteration = 0;
-            convertSelection();
-            // Load centering parameters from properties
-            mMaxIterations = getInt("centeringparams", "maxiterations");
-            mToleranceArcsec = getFloat("centeringparams", "tolerance");
-            // Store target coordinates for centering loop
-            mTargetRAnow = getFloat("selectnow", "RA");
-            mTargetDECnow = getFloat("selectnow", "DEC");
-            logInfo(QString("Starting goto with centering: max %1 iterations, tolerance %2\"")
-                    .arg(mMaxIterations).arg(mToleranceArcsec, 0, 'f', 1));
-            initIndi();
-            slewToSelection();
+            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
+            {
+                mState = "running";
+                mCurrentIteration = 0;
+                convertSelection();
+                // Load centering parameters from properties
+                mMaxIterations = getInt("centeringparams", "maxiterations");
+                mToleranceArcsec = getFloat("centeringparams", "tolerance");
+                // Store target coordinates for centering loop
+                mTargetRAnow = getFloat("selectnow", "RA");
+                mTargetDECnow = getFloat("selectnow", "DEC");
+                logInfo(QString("Starting goto with centering: max %1 iterations, tolerance %2\"")
+                        .arg(mMaxIterations).arg(mToleranceArcsec, 0, 'f', 1));
+                initIndi();
+                slewToSelection();
+            }
         }
         if (event.eltkey == "abortnavigator")
         {
-            stellarSolver.abort();
-            mState = "idle";
-            mCurrentIteration = 0;
-            getProperty(event.prpkey)->setState(OST::Ok, true);
+            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
+            {
+                stellarSolver.abort();
+                mState = "idle";
+                mCurrentIteration = 0;
+                getProperty(event.prpkey)->setState(OST::Ok, true);
+                // Momentary action, and cancels any in-flight goto too -
+                // same reset-both-buttons pattern as OnSucessSolve()'s own
+                // completion handling further down.
+                getEltBool("actions", "gototarget")->setValue(false, false);
+                getEltBool("actions", "abortnavigator")->setValue(false, true);
+            }
         }
         if (event.eltkey == "addtoplanner")
         {
-            getProperty(event.prpkey)->setState(OST::Ok, true);
-            addTargeToPlanner();
+            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
+            {
+                getProperty(event.prpkey)->setState(OST::Ok, true);
+                addTargeToPlanner();
+                getEltBool(event.prpkey, event.eltkey)->setValue(false, true);
+            }
         }
     }
 
@@ -442,6 +464,10 @@ void Navigator::OnSucessSolve()
         stellarSolver.abort();
         getProperty("actions")->setState(OST::Error, true);
         setStateEvent(OST::Error, "error", "solverfailed", "Solver failed");
+        // Issue #237 - same reset OnSucessSolve()'s own success path does
+        // further down: an error path left these buttons stuck instead.
+        getEltBool("actions", "gototarget")->setValue(false, false);
+        getEltBool("actions", "abortnavigator")->setValue(false, true);
         mState = "idle";
         mCurrentIteration = 0;
         return;
@@ -496,6 +522,10 @@ void Navigator::OnSucessSolve()
                  .arg(mMaxIterations));
         getProperty("actions")->setState(OST::Error, true);
         setStateEvent(OST::Error, "error", "navigatorfailed", "Navigator failed");
+        // Issue #237 - same reset as the success path and the solver-
+        // failed path above.
+        getEltBool("actions", "gototarget")->setValue(false, false);
+        getEltBool("actions", "abortnavigator")->setValue(false, true);
         mState = "idle";
         mCurrentIteration = 0;
         return;
