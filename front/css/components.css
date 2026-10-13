@@ -472,6 +472,11 @@ input[type="range"]::-moz-range-thumb {
 .wizard-select-list { list-style: none; padding: 0; margin: 0; }
 .wizard-select-row { display: flex; align-items: center; gap: 8px; font-size: 12.5px; cursor: pointer; }
 
+/* Last log line under a module's own "actions" button row (render.js's
+   renderLastLogLine(), issue cosmetic request Gilles 2026-10-14). Panels
+   are narrow, so this truncates instead of wrapping over several lines. */
+.actions-last-log { margin-top: var(--space-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
 /* A panel's own <h3> title plus one action button, side by side (e.g. the
    Controller screen's "Loaded modules" header + its "Kill all" button) -
    same flex/space-between shape as .params-dialog .dialog-header above,

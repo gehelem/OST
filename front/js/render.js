@@ -145,7 +145,28 @@ export function renderActionsPanel(client, moduleName, mod, track, quickNavEntri
   const label = mod.properties.actions.label || t("common.actions");
   const b = Panels.make({ id: "actions", title: label, x: p.x, y: p.y, w: p.w });
   b.appendChild(track(renderProperty(client, moduleName, "actions", { framed: false })));
+  b.appendChild(track(renderLastLogLine(client, moduleName)));
   quickNavEntries.push({ id: "actions", label, icon: "apps", iconOnly: true });
+}
+
+/**
+ * This module's own last log line, shown right under its "actions" button
+ * row (Gilles, 2026-10-14: "en dessous des boutons on affiche le dernier
+ * message de log du module"). Same {d,c,t,l} entries the floating log
+ * panel/full Logs view already read (core/datastore.js's `logs` array),
+ * filtered to this module's own `c` (source) field, keeping just the
+ * latest one.
+ */
+function renderLastLogLine(client, moduleName) {
+  const line = el("div", { class: "actions-last-log muted small" });
+  function refresh(logs) {
+    const entry = (logs || []).filter((e) => e.c === moduleName).pop();
+    line.textContent = entry ? entry.t || "" : "";
+    line.title = entry ? String(entry.d || "") : "";
+  }
+  const unsubscribe = client.subscribe(client.topics.logs(), refresh);
+  line._dispose = unsubscribe;
+  return line;
 }
 
 // ---- element value formatting / editing --------------------------------
