@@ -294,6 +294,39 @@ void IndiModule::onRemoveProperty (INDI::Property property) {} ;
 void IndiModule::onUpdateProperty (INDI::Property property) {} ;
 
 /*!
+ * "startup" (indiatstart/devatstart/confsatstart, libs/indimodule.json) -
+ * each flag gates the next, same priority Gilles described: no point
+ * asking devices to connect if the server itself was never asked to
+ * connect (devatstart without indiatstart does nothing), no point loading
+ * device configs on devices that were never asked to connect either
+ * (confsatstart without devatstart does nothing).
+ */
+void IndiModule::onAfterInit()
+{
+    if (!getBool("startup", "indiatstart")) return;
+    connectIndi();
+    // connectIndi() itself already schedules OnAfterIndiConnectIndiTimer()
+    // 500ms out (device enumeration isn't complete the instant
+    // connectServer() returns - INDI streams defDevice/defProperty
+    // progressively) - OnStartupConnectDevices() rides the same delay
+    // rather than acting on a still-empty device list, but is its own
+    // separate one-shot: OnAfterIndiConnectIndiTimer() already
+    // unconditionally connects every device on *any* connectIndi() call
+    // (startup or a later manual reconnect alike) - devatstart/
+    // confsatstart must not also change that standing behavior, only
+    // decide what happens specifically right after this instantiation.
+    if (getBool("startup", "devatstart") || getBool("startup", "confsatstart"))
+        QTimer::singleShot(500, this, &IndiModule::OnStartupConnectDevices);
+}
+
+void IndiModule::OnStartupConnectDevices()
+{
+    if (!getBool("startup", "devatstart")) return;
+    connectAllDevices();
+    if (getBool("startup", "confsatstart")) loadDevicesConfs();
+}
+
+/*!
  * Connects to indi server
  * Should we add host/port ??
  * IMHO this would be overkill as headless instance of OST and indiserver should be 99% hosted on the same machine
@@ -1176,10 +1209,10 @@ bool IndiModule::defineMeAsImager()
     if (!getStore()["parms"]->getElts()->contains("exposure"))
     {
         OST::ElementFloat* f = new  OST::ElementFloat("exposure", "Exposure", "exp000", "");
-        f->setValue(0, false);
+        f->setValue(1, false);
         f->setDirectEdit(true);
         f->setAutoUpdate(true);
-        f->setMinMax(0.00001, 300, false);
+        f->setMinMax(0.00001, 900, false);
         f->setStep(0.001, false);
         f->setSlider(OST::SliderAndValue, false);
         pm->addElt(f);
@@ -1190,10 +1223,10 @@ bool IndiModule::defineMeAsImager()
     if (!getStore()["parms"]->getElts()->contains("gain"))
     {
         OST::ElementInt* i  = new  OST::ElementInt("gain", "Gain", "exp020", "");
-        i->setValue(0, false);
+        i->setValue(50, false);
         i->setDirectEdit(true);
         i->setAutoUpdate(true);
-        i->setMinMax(0, 500, false);
+        i->setMinMax(0, 1000, false);
         i->setStep(1, false);
         i->setSlider(OST::SliderAndValue, false);
         pm->addElt(i);
@@ -1202,10 +1235,10 @@ bool IndiModule::defineMeAsImager()
     if (!getStore()["parms"]->getElts()->contains("offset"))
     {
         OST::ElementInt* i  = new  OST::ElementInt("offset", "Offset", "exp030", "");
-        i->setValue(0, false);
+        i->setValue(50, false);
         i->setDirectEdit(true);
         i->setAutoUpdate(true);
-        i->setMinMax(0, 500, false);
+        i->setMinMax(0, 1000, false);
         i->setStep(1, false);
         i->setSlider(OST::SliderAndValue, false);
         pm->addElt(i);
@@ -1218,12 +1251,12 @@ bool IndiModule::defineMeAsImager()
         // CCD_CAPTURE_FORMAT when the driver supports it -- see
         // setCaptureFormat(). Cameras without it keep their native depth.
         OST::ElementInt* i = new  OST::ElementInt("bitdepth", "Bit depth", "exp040", "");
-        i->setValue(16, false);
-        i->setDirectEdit(true);
-        i->setAutoUpdate(true);
         i->lovAdd(8, "8 bits");
         i->lovAdd(16, "16 bits");
         i->setLovConstrained(true);
+        i->setValue(16, false);
+        i->setDirectEdit(true);
+        i->setAutoUpdate(true);
         pm->addElt(i);
     }
 

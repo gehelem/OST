@@ -59,8 +59,10 @@ Navigator::Navigator(QString name, QString label, QString profile, QVariantMap a
 
     defineMeAsNavigator();
 
-    connectIndi();
-    connectAllDevices();
+    // Was unconditional here, ignoring "startup" entirely - now decided by
+    // IndiModule::onAfterInit() (indiatstart/devatstart/confsatstart),
+    // called after the constructor finishes anyway (Controller::loadModule()/
+    // ModuleWorker::start()).
 
     connect(this, &Navigator::newImage, this, &Navigator::OnNewImage);
 

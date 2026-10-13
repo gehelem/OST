@@ -417,6 +417,73 @@ input[type="range"]::-moz-range-thumb {
 .params-dialog .dialog-header h3 { margin: 0; }
 .form-table td { padding: 5px 6px; }
 
+/* The setup wizard (js/wizard.js, issue #238) - same roomier-than-default
+   width reasoning as .params-dialog above (several steps' worth of
+   controls, not a small confirm/edit form). */
+.dialog.wizard-dialog { width: 560px; }
+/* Fullscreen toggle (issue #238) - step 4's checklist (module + "set
+   slaves" + equipment/optics pickers per row) outgrows the default size.
+   overflow switches from the dialog itself (default .dialog behavior) to
+   .wizard-body alone, so the header/stepper/actions stay pinned while
+   only the step content scrolls. */
+.dialog.wizard-dialog.fullscreen { width: 95vw; max-width: 95vw; height: 90vh; max-height: 90vh; display: flex; flex-direction: column; overflow-y: hidden; }
+.wizard-dialog.fullscreen .wizard-body { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
+.wizard-header { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3); }
+.wizard-header h3 { margin: 0; flex: 1 1 auto; }
+.wizard-stepper { display: flex; gap: 4px; margin-bottom: var(--space-4); flex-wrap: wrap; }
+.wizard-step-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 999px;
+  background: none; border: 1px solid var(--border); color: var(--text-muted);
+  font: inherit; font-size: 11.5px; cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.wizard-step-btn:disabled { cursor: default; opacity: 0.5; }
+.wizard-step-btn.active { border-color: var(--accent); color: var(--accent-strong); background: var(--accent-subtle); font-weight: 600; }
+.wizard-step-btn.done { border-color: var(--border-strong); color: var(--text-secondary); }
+.wizard-step-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--border-strong); color: var(--bg-panel-solid); font-size: 10px; font-weight: 600; flex-shrink: 0;
+}
+.wizard-step-btn.active .wizard-step-num { background: var(--accent); }
+.wizard-body { min-height: 180px; }
+/* Step 4's module/equipment/optics table (issue #238, Gilles: "organise
+   plutot le panneau 4 en tableau avec des entetes module/equipment/
+   optics"). */
+.wizard-module-table { width: 100%; margin: var(--space-2) 0; border-collapse: collapse; }
+.wizard-module-table th { text-align: left; font-size: 11px; color: var(--text-muted); font-weight: 600; padding: 2px 6px 4px 0; border-bottom: 1px solid var(--border); }
+.wizard-module-table td { padding: 3px 6px 3px 0; vertical-align: middle; }
+.wizard-module-table td select { font-size: 11px; padding: 2px 4px; width: 100%; }
+/* The global equipment/optics pickers next to the prefix field (issue
+   #238, Gilles: "a droite de la zone prefix ... quand on les change ca
+   met a jour les lignes de tous les modules selectionnes") - a bulk-apply
+   shortcut, not a persistent extra row. */
+.wizard-module-picker { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+.wizard-module-picker select { font-size: 11px; padding: 2px 4px; }
+.wizard-module-check { display: flex; align-items: center; gap: 8px; font-size: 12.5px; cursor: pointer; }
+/* "set slaves" (issue #238) - its own table column (4th), slightly muted
+   (it's a secondary/optional refinement of the module checkbox, not an
+   equally-weighted choice). */
+.wizard-module-setslaves { display: flex; align-items: center; gap: 4px; color: var(--text-muted); font-size: 11px; white-space: nowrap; }
+/* Steps 2/3/4's own "pick the one to use" radio (issue #238, Gilles,
+   2026-10-14: "je veux pouvoir faire une selection ... dont il faut tenir
+   compte au 5") - same row shape as .wizard-module-check above. */
+.wizard-select-list { list-style: none; padding: 0; margin: 0; }
+.wizard-select-row { display: flex; align-items: center; gap: 8px; font-size: 12.5px; cursor: pointer; }
+
+/* Last log line under a module's own "actions" button row (render.js's
+   renderLastLogLine(), issue cosmetic request Gilles 2026-10-14). Panels
+   are narrow, so this truncates instead of wrapping over several lines. */
+.actions-last-log { margin-top: var(--space-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* A panel's own <h3> title plus one action button, side by side (e.g. the
+   Controller screen's "Loaded modules" header + its "Kill all" button) -
+   same flex/space-between shape as .params-dialog .dialog-header above,
+   generalized since this one isn't scoped to a dialog. */
+.panel-header-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.panel-header-row h3 { margin: 0; }
+
 /* ---------------------------------------------------------------- panel lists */
 .panel h3 { margin-top: 0; }
 .panel ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }

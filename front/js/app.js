@@ -9,6 +9,7 @@
 import { createClient, deriveUrlsFromHost, cleanHost, normalizeMediaUrl } from "../core/index.js";
 import { renderModuleView, buildParamsPanel, setMediaBaseUrl, getMediaBaseUrl, setDialogRoot, setQuickNavRoot, getDisableTemplates } from "./render.js";
 import { renderModbar, renderSystemViews, renderHome, renderController, renderFiles, renderLogs, renderLogin, renderLogPanel } from "./views.js";
+import { openSetupWizard } from "./wizard.js";
 import { el, icon, iconButton } from "./dom.js";
 import * as Panels from "./panels.js";
 import { setBgLayer } from "./imagelayer.js";
@@ -74,6 +75,8 @@ const discoverRowEl = document.getElementById("discover-row");
 const discoverBtnEl = document.getElementById("discover-btn");
 const discoverBtnLabelEl = document.getElementById("discover-btn-label");
 const discoverResultsEl = document.getElementById("discover-results");
+const setupWizardBtnEl = document.getElementById("setup-wizard-btn");
+const setupWizardBtnLabelEl = document.getElementById("setup-wizard-btn-label");
 
 // Static chrome (this file's own top-right icon chips + the connect bar) is
 // never rebuilt from a server dump the way a module's panels are, so a
@@ -94,6 +97,7 @@ function applyStaticLabels() {
   clearCacheBtnLabelEl.textContent = t("chrome.clearCache");
   discoverBtnLabelEl.textContent = t("chrome.discover");
   connToggleEl.title = t("status." + client.connection.status);
+  setupWizardBtnLabelEl.textContent = t("wizard.title");
 }
 
 // A button, not a checkbox (render.js's own boolean-element convention,
@@ -430,6 +434,17 @@ client.onStatus((s) => {
   if (s === "connecting" || s === "disconnected") { activeView = null; renderModbarNow(); renderContentNow(); }
 });
 applyStaticLabels();
+
+// Setup wizard (issue #238) - a modal, opened straight from Settings, not a
+// renderSystemViews() entry (those replace the main content area instead -
+// see index.html's own comment on this button). Closes the settings
+// dropdown first, same as picking a system view already does just below
+// (selectView()'s own "__controller"/"__files"/"__logs" handling) - no
+// reason to leave it open behind the modal.
+setupWizardBtnEl.addEventListener("click", () => {
+  setConnPanelOpen(false);
+  openSetupWizard(client);
+});
 
 // ---- build/version info (Settings, after the connection info) ----------
 // Gilles, 2026-10-06: "ajoute un fichier 'gitdata' ... pour afficher la

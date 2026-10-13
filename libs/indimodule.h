@@ -20,6 +20,14 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         void requestProfile(QString profileName);
         void setProfile(QVariantMap profiledata);
         bool connectIndi(void);
+        // Implements "startup" (indiatstart/devatstart/confsatstart,
+        // libs/indimodule.json) - declared and editable in the UI for a
+        // long time, but never actually read anywhere (Gilles, 2026-10-14:
+        // "j'ai l'impression que ce n'est tout simplement pas implemente").
+        // A concrete module overriding onAfterInit() itself (Allsky,
+        // Parkmanager) MUST call IndiModule::onAfterInit() from its own
+        // override, or this is skipped entirely for it.
+        void onAfterInit(void) override;
         virtual void onNewDevice      (INDI::BaseDevice dp)     ;
         virtual void onRemoveDevice   (INDI::BaseDevice dp)     ;
         virtual void onNewProperty    (INDI::Property property) ;
@@ -28,6 +36,13 @@ class IndiModule : public Basemodule, public INDI::BaseClient
     public slots:
         void connectIndiTimer(void);
         void OnAfterIndiConnectIndiTimer(void);
+        // One-shot, scheduled by onAfterInit() only (not by connectIndi()
+        // itself, unlike OnAfterIndiConnectIndiTimer() above which fires on
+        // *every* connect, startup or a later manual reconnect alike) -
+        // devatstart/confsatstart are specifically an "after instantiation"
+        // behavior (Gilles' own wording), not a standing rule for every
+        // future reconnect.
+        void OnStartupConnectDevices(void);
 
     protected:
         /**

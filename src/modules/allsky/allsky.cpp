@@ -89,10 +89,10 @@ Allsky::Allsky(QString name, QString label, QString profile, QVariantMap availab
     getProperty("gps")->disable();
     getProperty("geogps")->disable();
 
-    connectIndi();
-    if (getString("devices", "camera") != "") connectDevice(getString("devices", "camera"));
-    if (getString("devices", "gps") != "") connectDevice(getString("devices", "gps"));
-    if (getString("devices", "meteo") != "") connectDevice(getString("devices", "meteo"));
+    // Was unconditional here, ignoring "startup" entirely - now decided by
+    // IndiModule::onAfterInit() (indiatstart/devatstart/confsatstart),
+    // called after the constructor finishes anyway (Controller::loadModule()/
+    // ModuleWorker::start()).
 
     calculateSunset();
 
@@ -105,6 +105,7 @@ Allsky::~Allsky()
 
 void Allsky::onAfterInit(void)
 {
+    IndiModule::onAfterInit();
     checkArchives();
 };
 

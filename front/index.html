@@ -110,6 +110,14 @@
         <div id="conn-panel" class="glass conn-panel">
           <div class="brand"><img src="assets/favicon-192.png" class="brand-icon" alt="OST"><span>OST — UI3</span></div>
           <nav id="system-views"></nav>
+          <!-- Setup wizard (issue #238) - a modal, not a view switch, so it
+               lives as its own button rather than a renderSystemViews()
+               entry (those replace the main content area; app.js wires
+               this one to wizard.js's openSetupWizard() instead). -->
+          <button id="setup-wizard-btn" class="settings-nav-item" type="button">
+            <span class="material-icons">auto_fix_high</span>
+            <span id="setup-wizard-btn-label"></span>
+          </button>
           <div class="settings-sep"></div>
           <!-- Gilles, 2026-10-06: "les deux zones qui servent a fixer
                l'url dans les settings sont lourdes et redondantes ...
