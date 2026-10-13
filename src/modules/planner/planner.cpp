@@ -238,6 +238,11 @@ void Planner::onOperationComplete()
 
     mIsRunning = false;
 
+    // Issue reported by Gilles, 2026-10-13: "start" was never reset here
+    // (only abortPlanner() did it) - stuck true, same symptom class as
+    // the devices/actions reset just below.
+    getEltBool("actions", "start")->setValue(false, true);
+
     // Re-enable properties
     //getProperty("parms")->enable();
     getProperty("devices")->enable();
@@ -396,10 +401,17 @@ void Planner::advanceToNextLine()
         }
     }
 
-    logInfo("Planning completed");
-    getEltPrg("progress", "global")->setPrgValue(100, true);
-    getEltPrg("progress", "global")->setDynLabel("Finished", true);
-    mIsRunning = false;
+    // Bug reported by Gilles, 2026-10-13: every line skipped/failed (e.g.
+    // a visibility problem affecting every object) landed here, which
+    // used to just set mIsRunning = false inline - duplicating
+    // onOperationComplete() below, but without its devices->enable()/
+    // actions->setState(Ok)/setStateEvent() - "devices" properties stayed
+    // disabled and the status stuck on Busy forever, not even recoverable
+    // by clicking "stop" afterwards (abortPlanner() early-returns once
+    // mIsRunning is already false). onOperationComplete() was already
+    // written to do all of this correctly, it just wasn't called from
+    // anywhere.
+    onOperationComplete();
 }
 
 bool Planner::checkVisibility(double ra, double dec, double durationSeconds, QString &reason)
