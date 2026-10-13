@@ -13,15 +13,18 @@
 // chrome is disabled wholesale at init — it never shows its own
 // controls, reticle, coordinate frame etc., just the sky image.
 //
-// Rotation is NOT synced — a search result mentioned Aladin Lite v3
-// having a setRotation(), but it never appears in the actual reference
-// API doc (https://aladin.cds.unistra.fr/AladinLite/doc/API/), so it's
-// left unimplemented rather than guessed blindly. Our own dome allows an
-// arbitrary pan orientation (trackball), not just North-up, so the HiPS
-// background can visibly drift out of rotational alignment with our own
-// stars/grid during a pan — acceptable for a first pass (it's an ambience
-// backdrop, not meant to pixel-align with the vector overlay), to revisit
-// live once Gilles can actually see it.
+// Rotation: Gilles, 2026-10-13, after the first pass (no rotation sync at
+// all) shipped: "les mouvements sont inverses sur l'image de fond" - the
+// public reference API doc never lists a setRotation(), but grepping the
+// vendored bundle itself (lib/aladin.js) directly found a real one
+// (aliased setViewCenter2NorthPoleAngle - "the angle between view center
+// and the North pole"), now wired via sky-engine.js's own onViewChange
+// (its own rotationDeg field). Sign/zero-point convention against
+// Aladin's own is UNVERIFIED - a first attempt, not yet confirmed live
+// (see that computation's own doc comment in sky-engine.js) - may still
+// need correction once Gilles can actually compare it live, the same way
+// the sensor-FOV orientation feature needed several rounds of live sign
+// fixing before it matched a real plate-solve.
 //
 // Network: HiPS tiles are fetched live from the CDS's own alasky.*
 // servers the moment this is enabled — this feature does nothing useful
@@ -67,10 +70,11 @@ function loadAladin() {
  *   as SkyEngine's onViewChange/onZoomChange/etc.) - so it can also reset
  *   whatever UI state (a checkbox, engine.showHips) led here, otherwise
  *   that state keeps claiming "on" while nothing is actually showing.
- * - sync({ra, dec, fovDeg}) — degrees, J2000 — re-centers/re-zooms Aladin
- *   to match our own current view; a no-op while disabled or before
- *   Aladin has actually finished loading (the most recent view is kept
- *   and applied the moment it becomes ready instead of being lost).
+ * - sync({ra, dec, fovDeg, rotationDeg}) — degrees, J2000 — re-centers/
+ *   re-zooms/re-rotates Aladin to match our own current view; a no-op
+ *   while disabled or before Aladin has actually finished loading (the
+ *   most recent view is kept and applied the moment it becomes ready
+ *   instead of being lost).
  */
 export function createHipsBackground(container) {
   const div = el("div", { class: "hips-bg" });
@@ -107,6 +111,12 @@ export function createHipsBackground(container) {
   function apply(view) {
     aladin.gotoRaDec(view.ra, view.dec);
     aladin.setFov(view.fovDeg);
+    // setRotation(0) is silently rejected by lib/aladin.js itself (its own
+    // `if (!g) { console.warn(...); return; }` guard - 0 is falsy in JS,
+    // a real bug in the vendored library, not something to fix there) -
+    // nudged off exact zero so "no rotation" still actually applies
+    // instead of silently keeping whatever rotation was set previously.
+    aladin.setRotation(view.rotationDeg || 1e-6);
   }
 
   const api = {

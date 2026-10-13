@@ -510,12 +510,12 @@ export class SkyEngine {
     this.onZoomChange = opts.onZoomChange || null; // called after wheel-zoom specifically (not pan/drag) - e.g. to persist it, see templates/navigator.js
     this.onRotationChange = opts.onRotationChange || null; // called once a pan/drag gesture ends and actually moved something - e.g. to persist it, see templates/navigator.js
     // Called at the end of EVERY render() (not just on a gesture end, unlike
-    // onZoomChange/onRotationChange above) with {ra, dec, fovDeg} (degrees,
-    // J2000) describing the current view's center/extent - js/hips-
-    // background.js's own sync() consumes this to keep the Aladin layer
-    // lined up with whatever this engine is actually showing, including
-    // the periodic 30s time-refresh (templates/navigator.js) which moves
-    // the sky without any gesture at all.
+    // onZoomChange/onRotationChange above) with {ra, dec, fovDeg, rotationDeg}
+    // (degrees, J2000) describing the current view's center/extent/screen
+    // orientation - js/hips-background.js's own sync() consumes this to
+    // keep the Aladin layer lined up with whatever this engine is actually
+    // showing, including the periodic 30s time-refresh (templates/
+    // navigator.js) which moves the sky without any gesture at all.
     this.onViewChange = opts.onViewChange || null;
     this.catalog = { stars: [], constellationLines: [], messier: [], milkyWay: [] };
     this._domeRadius = 1; // recomputed every render(), read by the drag/tap handlers to convert screen<->vector
@@ -1649,12 +1649,53 @@ export class SkyEngine {
       const fixed = rotateVector(conjugate(this.rotation), { x: 0, y: 0, z: 1 });
       const { azimuth, altitude } = vectorToHorizontal(fixed);
       const { ra, dec } = horizontalToEquatorial(azimuth, altitude, this.observer, date);
-      const edgePx = Math.min(w, h) / 2;
-      const ratio = edgePx / domeRadius;
-      const halfAngleDeg = Math.min(90, this.projection === "stereographic"
-        ? (2 * Math.atan(ratio) * 180) / Math.PI
-        : (Math.asin(Math.min(1, ratio)) * 180) / Math.PI);
-      this.onViewChange({ ra, dec, fovDeg: 2 * halfAngleDeg });
+      // Gilles, 2026-10-14, after the first pass: "l'echelle n'est pas
+      // bonne, le HIPS est plus zoome 1.5x ou 2x environ" - lib/aladin.js's
+      // own getFov() (grepped directly: `E = height/width * fov`) confirms
+      // its `fov` parameter is specifically the WIDTH-axis angle, deriving
+      // the height-axis one FROM it - not "whichever axis is smaller" like
+      // domeRadius above (our OWN dome always touches the SHORTER screen
+      // axis). On any non-square/landscape canvas those two differ by
+      // exactly the aspect ratio, matching the reported 1.5-2x - fixed by
+      // computing the angle at the WIDTH edge specifically for Aladin
+      // (domeRadius itself, min(w,h)-based, still drives our OWN star
+      // rendering elsewhere in this method, untouched).
+      const hipsRatio = (w / 2) / domeRadius;
+      const hipsFovDeg = 2 * Math.min(90, this.projection === "stereographic"
+        ? (2 * Math.atan(hipsRatio) * 180) / Math.PI
+        : (Math.asin(Math.min(1, hipsRatio)) * 180) / Math.PI);
+      // Position angle of the North Celestial Pole as WE actually draw it
+      // on screen (Gilles, 2026-10-13, after seeing the background drift
+      // during a pan: "les mouvements sont inverses sur l'image de fond")
+      // - found in lib/aladin.js itself (grepped the vendored bundle
+      // directly, not left unimplemented like the first pass's doc
+      // comment said - a real public method exists, aliased
+      // setViewCenter2NorthPoleAngle, exactly "the angle between view
+      // center and the North pole"). Computed the same way every other
+      // screen position in this file already is - project the NCP's own
+      // horizontal-of-date direction through the current rotation +
+      // vectorToScreen, same projection/rotation the stars themselves go
+      // through - then read its angle off from screen-up, CLOCKWISE
+      // (atan2(x,-y): 0=up, 90=right, 180=down, 270/-90=left).
+      //
+      // Negated below: fetched Aladin's own JSDoc straight from its GitHub
+      // source (github.com/cds-astro/aladin-lite, src/js/Aladin.js) rather
+      // than keep guessing after Gilles reported "pas generalisable a tous
+      // les endroits" following the first (un-negated) attempt - degrees,
+      // "positive angles rotate the view in counter clockwise order (or
+      // towards the east) ... the east lies in the left direction of the
+      // view". Positive = NCP moving LEFT = counterclockwise - the exact
+      // opposite rotational sense from this engine's own clockwise-from-up
+      // measurement above, hence the sign flip. A pure sign error (as
+      // opposed to a fixed offset) produces a positiondependent-looking
+      // symptom - matches "pas generalisable" exactly, since negating an
+      // angle shifts it by 2x itself, not a constant, in the wrong
+      // direction.
+      const ncpHor = equatorialToHorizontal(0, 90, this.observer, date);
+      const ncpVec = rotateVector(this.rotation, horizontalToVector(ncpHor.azimuth, ncpHor.altitude));
+      const ncpScreen = vectorToScreen(ncpVec, domeRadius, this.projection);
+      const rotationDeg = -(Math.atan2(ncpScreen.x, -ncpScreen.y) * 180) / Math.PI;
+      this.onViewChange({ ra, dec, fovDeg: hipsFovDeg, rotationDeg });
     }
   }
 }
