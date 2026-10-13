@@ -19,25 +19,40 @@
 // vendored bundle itself (lib/aladin.js) directly found a real one
 // (aliased setViewCenter2NorthPoleAngle - "the angle between view center
 // and the North pole"), now wired via sky-engine.js's own onViewChange
-// (its own rotationDeg field). Sign/zero-point convention against
-// Aladin's own is UNVERIFIED - a first attempt, not yet confirmed live
-// (see that computation's own doc comment in sky-engine.js) - may still
-// need correction once Gilles can actually compare it live, the same way
-// the sensor-FOV orientation feature needed several rounds of live sign
-// fixing before it matched a real plate-solve.
+// (its own rotationDeg field, negated there - degrees, positive
+// counter-clockwise per Aladin's own source JSDoc, the opposite sense
+// from this engine's own clockwise-from-up measurement). Confirmed
+// correct live by Gilles, 2026-10-14, after that sign fix.
 //
-// Network: HiPS tiles are fetched live from the CDS's own alasky.*
-// servers the moment this is enabled — this feature does nothing useful
-// without internet access at the time it's switched on, and there is no
-// bundled/offline survey data. No persistent (Cache Storage/IndexedDB)
-// tile caching yet either — see the notes file's own "Mise en cache des
-// tuiles" section for that separate follow-up.
+// Network: HiPS tiles are fetched through this app's own server (see
+// DEFAULT_SURVEY below) rather than hitting the CDS's alasky.* servers
+// directly - an nginx proxy+cache (cmake/cpack/complete/postinst's own
+// "/hips-proxy/dss2color/" location) means a tile already viewed by ANY
+// client through this server is served locally afterward. A genuine
+// cache MISS (a tile nobody has ever viewed through this server yet)
+// still needs live internet, and there is no bundled/pre-downloaded
+// survey data (the full DSS2 survey is several TB) - this is an
+// on-demand, shared cache, not an offline mirror.
 
 import { el } from "./dom.js";
 import { showToast } from "./toast.js";
 import { t } from "./i18n.js";
 
-const DEFAULT_SURVEY = "P/DSS2/color";
+// A relative path (resolved against this app's own origin), not a CDS
+// preset id - Aladin Lite accepts either (its own doc: "an http url
+// towards a HiPS" or "a relative path to your HiPS"). Routed through
+// this server's own nginx proxy+cache (cmake/cpack/complete/postinst's
+// own "/hips-proxy/dss2color/" location, proxying/caching
+// alasky.cds.unistra.fr/DSS/DSSColor/) rather than hitting the CDS
+// directly - Gilles, 2026-10-14: "possibilite de telecharger tout ou
+// partie des ressources sur notre serveur web local ?" - every tile,
+// once fetched by ANY client through this server, is served locally to
+// every later request instead of going back to the internet. Still
+// needs this app to actually be served BEHIND that nginx (true for
+// ostserver-complete once (re)installed - not for a bare dev/static
+// server with no such proxy route, where this 404s and the onFailure
+// path below reports it instead of staying silently blank).
+const DEFAULT_SURVEY = "/hips-proxy/dss2color";
 
 // lib/aladin.js is an ES module with a single default export (the `A`
 // namespace the upstream README calls `A.aladin()`/`A.init` on) — a plain
