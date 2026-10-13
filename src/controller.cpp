@@ -1512,6 +1512,18 @@ void Controller::logError(const QString &message, const QVariantList &args)
     // Broadcast to WebSocket clients (each in their language)
     wshandler->onLog(OST::LogLevel::Error, message, args, "CT");
 }
+void Controller::logCritical(const QString &message)
+{
+    logCritical(message, {});
+}
+void Controller::logCritical(const QString &message, const QVariantList &args)
+{
+    // Log to console (server language)
+    mLogger->onLog(OST::LogLevel::Critical, message, args, "CT");
+
+    // Broadcast to WebSocket clients (each in their language)
+    wshandler->onLog(OST::LogLevel::Critical, message, args, "CT");
+}
 QJsonObject Controller::getModulesDump(QString clientgrant, QString clientLanguage)
 {
     QJsonObject result, dump, files, modules;
