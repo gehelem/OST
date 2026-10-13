@@ -268,6 +268,25 @@
    never flashes anything of its own. */
 .hips-bg { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
 .hips-bg.active { display: block; }
+/* Root-caused with a real Chromium browser (Playwright spike, not a
+   guess - 4 earlier blind attempts in a row all failed): Gilles,
+   2026-10-14, "le Tt general ... ne doit pas influer ... quand je le
+   bouge ca deconne". Aladin's own canvas(es) (lib/aladin.js's own
+   fixLayoutDimensions()) get their CSS size set as a LITERAL pixel
+   string ("1879px"), not a percentage - and body's own CSS `zoom` (Tt,
+   app.js's applyZoom()) visually stretches a literal-px box by that
+   same factor while leaving its backing/drawing-buffer resolution
+   untouched (confirmed measured in-browser: the canvas's own
+   getBoundingClientRect() grew by exactly the zoom factor while its
+   width/height attributes and even its own .style.width/height never
+   changed) - a pure visual over-magnification of the SAME pixels,
+   unrelated to any RA/Dec/FOV math (already proven Tt-independent
+   separately). #sky-canvas never shows this because its own CSS is
+   percentage-based (width:100%), which stays stable under zoom - this
+   just forces Aladin's canvas(es) to the same percentage sizing,
+   !important since Aladin re-asserts its own inline px style on every
+   resize/redraw and a plain override would lose that race. */
+.hips-bg canvas { width: 100% !important; height: 100% !important; }
 /* Aladin's own logo/toolbar (js/hips-background.js's init options already
    disable every chrome piece that HAS a documented toggle - these two
    don't, grepped lib/aladin.js directly to confirm). Gilles, 2026-10-14:
