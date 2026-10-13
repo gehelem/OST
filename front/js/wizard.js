@@ -5,11 +5,11 @@
 //
 // Gilles, 2026-10-13: "je pense que tu as toutes les infos necessaires deja
 // sur le front dans les settings generales, il faut les centraliser dans cet
-// assistant" - confirmed true for 4 of the 5 steps below (INDI drivers,
-// optics, equipment/device assignment, save/load configuration all reuse
-// the exact same controls/primitives views.js's renderController() and
-// render.js's generic grid-row form already use - no new backend wiring).
-// Only the "modules under a common prefix" step (4) is genuinely new UI; a
+// assistant" - confirmed true for 5 of the 6 steps below (INDI drivers,
+// optics, equipment/device assignment, location, save/load configuration
+// all reuse the exact same controls/primitives views.js's renderController()
+// and render.js's generic grid-row form already use - no new backend
+// wiring). Only the "modules under a common prefix" step (5) is genuinely new UI; a
 // single INDI driver listing/display path is deliberately deferred (1B,
 // "serveur INDI non integre" - Gilles: "on affinera ce cas dans un second
 // temps").
@@ -36,6 +36,7 @@ const STEPS = [
   { titleKey: "wizard.step.indi", render: renderIndiStep },
   { titleKey: "wizard.step.optics", render: renderOpticsStep },
   { titleKey: "wizard.step.equipment", render: renderEquipmentStep },
+  { titleKey: "wizard.step.location", render: renderLocationStep },
   { titleKey: "wizard.step.modules", render: renderModulesStep },
   { titleKey: "wizard.step.save", render: renderSaveStep },
 ];
@@ -49,7 +50,7 @@ export function openSetupWizard(client) {
   const bodyEl = el("div", { class: "wizard-body" });
   const backBtn = el("button", { class: "btn btn-sm", onclick: goBack }, t("wizard.back"));
   const nextBtn = el("button", { class: "btn btn-primary btn-sm", onclick: goNext });
-  // Fullscreen toggle (Gilles, 2026-10-13: step 4's own checklist - module
+  // Fullscreen toggle (Gilles, 2026-10-13: step 5's own checklist - module
   // + "set slaves" + equipment/optics pickers per row - "ça commence a
   // faire du monde sur ce panneau") - a plain CSS class swap, no layout
   // logic of its own; every step's content already reflows into
@@ -193,7 +194,23 @@ function renderEquipmentStep(client, container, setValid) {
   });
 }
 
-// Shared by steps 2 and 3 - both are "list GlobalDatastore.<propName>'s
+// ---- Step 4: location ------------------------------------------------------
+// GlobalDatastore's own "locations" grid (name/lat/lon/alt, see
+// src/globaldatastore.json) - just like optics/equipment above, no
+// cross-reference needed, the generic row-form covers it. Gilles,
+// 2026-10-13: "il nous manque une etape ... pour choisir le lieu dans le
+// globaldatastore" - inserted right after equipment (3), before the module
+// checklist (now 5).
+function renderLocationStep(client, container, setValid) {
+  return renderSimpleGridStep(client, container, setValid, {
+    propName: "locations",
+    introKey: "wizard.location.intro",
+    addLabelKey: "wizard.location.add",
+    rowLabel: (row) => `${row.name || "—"} — ${row.lat ?? "?"}, ${row.lon ?? "?"}`,
+  });
+}
+
+// Shared by steps 2, 3 and 4 - all three are "list GlobalDatastore.<propName>'s
 // rows, offer an 'Add' form built from the property's own live element
 // defs, done once there is at least one row" with nothing else different
 // between them.
@@ -292,7 +309,7 @@ const DEVICE_ROLES = {
 // property panel would trigger - nothing new to replicate here.
 const HAS_OPTIC = new Set(["focus", "guider", "blindpec", "sequencer", "navigator", "inspector", "polar", "allsky"]);
 
-// ---- Step 4: modules under a common prefix --------------------------------
+// ---- Step 5: modules under a common prefix --------------------------------
 // The one genuinely new piece (Gilles's point 4: "S1 : S1-Navigator
 // S1-Planner etc etc") - today's "Load a module" section (renderController())
 // loads one instance at a time, by hand; this adds a batch layer over the
@@ -374,7 +391,7 @@ function renderModulesStep(client, container, setValid) {
   // Equipment/optics <select>s (Gilles, 2026-10-13: "il faut aussi assigner
   // les differents devices selon les modules, selon la liste 'equipment' -
   // idem avec optics ! => des listes de choix en face de chaque module") -
-  // both read from the exact same GlobalDatastore rows steps 2/3 of this
+  // both read from the exact same GlobalDatastore rows steps 2-4 of this
   // wizard just created (or whatever already existed before it was
   // opened). A blank first option always means "don't touch this".
   function rowNames(propName) {
@@ -545,7 +562,7 @@ function renderModulesStep(client, container, setValid) {
   return { dispose: scope.dispose };
 }
 
-// ---- Step 5: save as a named configuration ---------------------------------
+// ---- Step 6: save as a named configuration ---------------------------------
 // Same primitive renderController()'s own "Configurations" section already
 // uses (client.saveConfiguration()/loadConfiguration()) - last step, no
 // "Next" to gate (setValid(true) unconditionally - Finish just closes the
