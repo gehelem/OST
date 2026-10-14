@@ -34,7 +34,13 @@ case "$1" in
             chown "${INSTALL_USER}" "${PARMS_FILE}"
         fi
 
-        # Enable and start the service (CPack builds only — debhelper uses #DEBHELPER#)
+        # Enable and start the service (CPack builds only - the real
+        # debhelper substitution token lives at the very end of this
+        # file, standalone on its own line - never spell it out inline
+        # in a comment like this again: the substitution step matches
+        # any LINE containing that exact string, not just the dedicated
+        # one, and broke the Complete package's own build the same way,
+        # 2026-10-14).
         if [ -d /run/systemd/system ]; then
             systemctl daemon-reload
             systemctl enable ostserver.service
