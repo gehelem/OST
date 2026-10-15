@@ -8,14 +8,6 @@
 #include <algorithm>
 #include "version.cc"
 
-// Write to a .tmp file then rename() atomically so nginx never serves a partially-written file.
-static void atomicSaveJpeg(const QImage &img, const QString &finalPath)
-{
-    const QString tmp = finalPath + ".tmp";
-    if (img.save(tmp, "JPG", 100))
-        ::rename(tmp.toLocal8Bit().constData(), finalPath.toLocal8Bit().constData());
-}
-
 Allsky *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
     Allsky *basemodule = new Allsky(name, label, profile, availableModuleLibs);
@@ -339,7 +331,7 @@ void Allsky::newBLOB(INDI::PropertyBlob pblob)
 {
     if
     (
-        (QString(pblob.getDeviceName()) == getString("devices", "camera"))
+        (QString(pblob.getDeviceName()) == getString("devices", "camera")) && mIsLooping
     )
     {
         QStorageInfo storage(getWebroot());
@@ -499,9 +491,8 @@ void Allsky::newBLOB(INDI::PropertyBlob pblob)
 
         p.end();
 
-
-
-        atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + QString(pblob.getDeviceName()) + ".jpeg");
+        int quality = getInt("parms", "jpegquality");
+        atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + QString(pblob.getDeviceName()) + ".jpeg", quality);
         OST::ImgData dta = _image->ImgStats();
         dta.mUrlJpeg = getModuleName() + QString(pblob.getDeviceName()) + ".jpeg";
         dta.mAlternates.clear();

@@ -2,13 +2,6 @@
 #include <QPainter>
 #include "version.cc"
 
-static void atomicSaveJpeg(const QImage &img, const QString &finalPath)
-{
-    const QString tmp = finalPath + ".tmp";
-    if (img.save(tmp, "JPG", 100))
-        ::rename(tmp.toLocal8Bit().constData(), finalPath.toLocal8Bit().constData());
-}
-
 // RA is circular (0-24h) - a naive subtraction of two RA values lands near
 // +/-24h whenever they straddle the 0h/24h boundary, even though the true
 // angular separation between them is tiny. Wraps into (-12h, +12h] so "how
@@ -249,7 +242,8 @@ void Navigator::newBLOB(INDI::PropertyBlob pblob)
         QImage rawImage = pImage->getRawQImage();
         QImage im = rawImage.convertToFormat(QImage::Format_RGB32);
         im.setColorTable(rawImage.colorTable());
-        atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg");
+        int quality = getInt("parms", "jpegquality");
+        atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg", quality);
         OST::ImgData dta = pImage->ImgStats();
         dta.mUrlJpeg = getModuleName() + ".jpeg";
         dta.isSolved = false;

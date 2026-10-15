@@ -28,13 +28,6 @@
 #include <QRandomGenerator>
 #include <QPainter>
 
-static void atomicSaveJpeg(const QImage &img, const QString &finalPath)
-{
-    const QString tmp = finalPath + ".tmp";
-    if (img.save(tmp, "JPG", 100))
-        ::rename(tmp.toLocal8Bit().constData(), finalPath.toLocal8Bit().constData());
-}
-
 /// Convert a solver star list to the star-tracker's lightweight representation.
 static QVector<startracker::Star> toTrackStars(const QList<FITSImage::Star> &in)
 {
@@ -1595,7 +1588,8 @@ void Guider::OnSucessSEP()
             painter.drawEllipse(QPointF(star.x / 2.0, star.y / 2.0), r, r);
         }
     }
-    atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg");
+    int quality = getInt("parms", "jpegquality");
+    atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg", quality);
     dta.mUrlJpeg = getModuleName() + ".jpeg";
 
     getEltImg("image", "image")->setValue(dta, true);

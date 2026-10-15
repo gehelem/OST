@@ -3,13 +3,6 @@
 #include <QPainter>
 #include "version.cc"
 
-static void atomicSaveJpeg(const QImage &img, const QString &finalPath, int quality = 100)
-{
-    const QString tmp = finalPath + ".tmp";
-    if (img.save(tmp, "JPG", quality))
-        ::rename(tmp.toLocal8Bit().constData(), finalPath.toLocal8Bit().constData());
-}
-
 #define PI 3.14159265
 
 Polar *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
@@ -153,7 +146,8 @@ void Polar::newBLOB(INDI::PropertyBlob  bp)
         QImage im = rawImage.convertToFormat(QImage::Format_RGB32);
         im.setColorTable(rawImage.colorTable());
         _lastRawImage = im;  // keep a copy for error overlay
-        atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg");
+        int quality = getInt("parms", "jpegquality");
+        atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg", quality);
         OST::ImgData dta = image->ImgStats();
         dta.mUrlJpeg = getModuleName() + ".jpeg";
         getEltImg("image", "image")->setValue(dta, true);
