@@ -158,7 +158,7 @@ void Focus::newBLOB(INDI::PropertyBlob b)
 {
     if
     (
-        (QString(b.getDeviceName()) == getString("devices", "camera"))
+        (QString(b.getDeviceName()) == getString("devices", "camera")) && pMachine->isRunning()
     )
     {
         delete _image;

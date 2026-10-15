@@ -331,7 +331,7 @@ void Allsky::newBLOB(INDI::PropertyBlob pblob)
 {
     if
     (
-        (QString(pblob.getDeviceName()) == getString("devices", "camera"))
+        (QString(pblob.getDeviceName()) == getString("devices", "camera")) && mIsLooping
     )
     {
         QStorageInfo storage(getWebroot());
