@@ -491,7 +491,7 @@ export function buildElementsForm(client, moduleName, elementDefs, order, initia
 // does nothing" report that turned out to be a panel overlap instead -
 // this ordering bug was still real and worth fixing on its own).
 function orderedElementNames(elements) {
-  return Object.keys(elements).sort((a, b) => (elements[a].order > elements[b].order ? 1 : -1));
+  return Object.keys(elements).sort((a, b) => (String(elements[a].order) > String(elements[b].order) ? 1 : -1));
 }
 
 function editableElementNames(prop) {
@@ -512,7 +512,11 @@ function renderGridSection(client, moduleName, propName, prop) {
   const wrap = el("div", { class: "grid-section" });
 
   if (prop.showGrid) {
-    const headers = prop.gridheaders || [];
+    // gridheaders comes back alphabetical by element key (PropertyMulti::
+    // getGridHeaders() returns mElts.keys(), a QMap - same ordering bug
+    // orderedElementNames() above was already written to work around for
+    // non-grid properties) - sort by each element's own "order" instead.
+    const headers = (prop.gridheaders || []).slice().sort((a, b) => (String(prop.elements[a].order) > String(prop.elements[b].order) ? 1 : -1));
     const table = el("table", { class: "grid-table" });
     const thead = el("tr");
     for (const h of headers) {
@@ -573,7 +577,8 @@ export function setDialogRoot(node) { dialogRoot = node; }
 let lovDatalistSeq = 0;
 
 function openGridDialog(client, moduleName, propName, prop, index, row) {
-  const headers = prop.gridheaders || [];
+  // Same ordering fix as renderGridSection() above.
+  const headers = (prop.gridheaders || []).slice().sort((a, b) => (String(prop.elements[a].order) > String(prop.elements[b].order) ? 1 : -1));
   const form = buildElementsForm(client, moduleName, prop.elements, headers, row || {});
   const overlay = el("div", { class: "dialog-overlay" });
   const dialog = el("div", { class: "dialog" }, [

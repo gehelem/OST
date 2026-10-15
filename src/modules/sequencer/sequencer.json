@@ -122,7 +122,7 @@
             "filter": {
                 "type":"int",
                 "label": "Filter",
-                "order":1,
+                "order":"010",
                 "gridvalues":[],
                 "listOfValues":[
                 ]
@@ -130,7 +130,7 @@
             "exposure": {
                 "type":"float",
                 "label": "Exposure",
-                "order":2,
+                "order":"020",
                 "value":10,
                 "gridvalues":[],
                 "format": "99"
@@ -138,7 +138,7 @@
             "count": {
                 "type":"int",
                 "label": "Count",
-                "order":3,
+                "order":"030",
                 "value":5,
                 "gridvalues":[],
                 "format": "99"
@@ -149,7 +149,7 @@
                 "label": "Shots",
                 "dynlabel": "",
                 "value": 0,
-                "order":4,
+                "order":"040",
                 "gridvalues":[]
             },
             "progressduration": {
@@ -158,13 +158,13 @@
                 "label": "Duration",
                 "dynlabel": "",
                 "value": 0,
-                "order":5,
+                "order":"050",
                 "gridvalues":[]
             },
             "dithercount": {
                 "type":"int",
                 "label": "Dithers",
-                "order":6,
+                "order":"060",
                 "value":0,
                 "gridvalues":[],
                 "format": "99",
@@ -173,7 +173,7 @@
             "focuscount": {
                 "type":"int",
                 "label": "Focus runs",
-                "order":7,
+                "order":"070",
                 "value":0,
                 "gridvalues":[],
                 "format": "99",
@@ -182,7 +182,7 @@
             "recalcount": {
                 "type":"int",
                 "label": "Recalibrations",
-                "order":8,
+                "order":"080",
                 "value":0,
                 "gridvalues":[],
                 "format": "99",
@@ -191,7 +191,7 @@
             "avghfr": {
                 "type":"float",
                 "label": "Avg HFR",
-                "order":9,
+                "order":"090",
                 "value":0,
                 "gridvalues":[],
                 "format": ".9999",
@@ -200,7 +200,7 @@
             "avgsnr": {
                 "type":"float",
                 "label": "Avg SNR",
-                "order":10,
+                "order":"100",
                 "value":0,
                 "gridvalues":[],
                 "format": ".9999",
@@ -209,7 +209,7 @@
             "avgrms": {
                 "type":"float",
                 "label": "Avg guide RMS",
-                "order":11,
+                "order":"110",
                 "value":0,
                 "gridvalues":[],
                 "format": ".9999",
@@ -218,7 +218,7 @@
             "status": {
                 "type":"light",
                 "label": "Status",
-                "order":12,
+                "order":"000",
                 "gridvalues":[],
                 "hint": "Idle (queued) / busy (currently running) / ok (finished) / error (aborted/errored while this line was running)"
             }

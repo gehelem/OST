@@ -156,41 +156,41 @@
     "showGrid": true,
     "hint": "Snapshot of the planning grid taken when a run starts - not saved to the profile, just reflects progress while running",
     "e": {
+      "status": {
+          "type":"light",
+          "label": "Status",
+          "order":"000",
+          "gridvalues":[],
+          "hint": "Idle (queued) / busy (currently running) / ok (finished) / error (cancelled, or failed after exhausting its retries)"
+      },
       "object": {
           "type": "string",
           "label": "Object",
-          "order": 0
+          "order": "010"
       },
       "ra": {
           "type": "float",
           "label": "RA",
-          "order": 10
+          "order": "020"
       },
       "dec": {
           "type": "float",
           "label": "DEC",
-          "order": 20
+          "order": "030"
       },
       "profile": {
           "type": "string",
           "label": "Profile",
-          "order": 30
+          "order": "040"
       },
       "progress": {
           "type":"prg",
           "label": "Progress",
           "prgtype": "spinner",
           "dynlabel": "",
-          "order":40,
+          "order":"050",
           "value":0,
           "gridvalues":[]
-      },
-      "status": {
-          "type":"light",
-          "label": "Status",
-          "order":50,
-          "gridvalues":[],
-          "hint": "Idle (queued) / busy (currently running) / ok (finished) / error (cancelled, or failed after exhausting its retries)"
       }
     }
   }
