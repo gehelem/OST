@@ -1085,8 +1085,8 @@ void Sequencer::writeLiveSequenceStats()
         tableRows.append(QStringList{
             filterName, QString::number(exposure, 'f', 2), QString::number(count),
             shotsDone, durationDone, QString::number(dithers), QString::number(focus),
-            QString::number(recal), QString::number(avgHfr, 'f', 2),
-            QString::number(avgSnr, 'f', 2), QString::number(avgRms, 'f', 2)
+            QString::number(recal), QString::number(avgHfr, 'f', 4),
+            QString::number(avgSnr, 'f', 4), QString::number(avgRms, 'f', 4)
         });
 
         QJsonObject line;
