@@ -1189,15 +1189,16 @@ function openSaveAsProfileDialog(client, moduleName) {
 export function renderProfileBar(client, moduleName, mod, onTemplateToggle) {
   const bar = el("div", { class: "profile-bar" });
   bar.appendChild(el("span", { class: "muted", text: t("common.profile") }));
-  const nameSpan = el("span", { class: "profile-name" + (mod.profile.changed ? " changed" : ""), text: mod.profile.name || "(none)" });
+  const nameSpan = el("span", { class: "profile-name", text: mod.profile.name || "(none)" });
   bar.appendChild(nameSpan);
   // "Just save what I'm on" needs no selection/typing at all (Gilles,
   // 2026-10-15: previously had to re-pick it from a dropdown first).
-  bar.appendChild(el("button", {
+  const saveCurrentBtn = el("button", {
     class: "btn btn-sm", disabled: !mod.profile.name,
-    onclick: () => client.saveProfile(moduleName, mod.profile.name),
-  }, [icon("save", { small: true }), t("common.save")]));
-  bar.appendChild(el("button", { class: "btn btn-sm", onclick: () => openLoadProfileDialog(client, moduleName, mod) }, [icon("folder_open", { small: true }), t("common.loadProfile")]));
+    onclick: () => client.saveProfile(moduleName, currentMod.profile.name),
+  }, [icon("save", { small: true }), t("common.save")]);
+  bar.appendChild(saveCurrentBtn);
+  bar.appendChild(el("button", { class: "btn btn-sm", onclick: () => openLoadProfileDialog(client, moduleName, currentMod) }, [icon("folder_open", { small: true }), t("common.loadProfile")]));
   bar.appendChild(el("button", { class: "btn btn-sm", onclick: () => openSaveAsProfileDialog(client, moduleName) }, [icon("save", { small: true }), t("common.saveAsProfile")]));
 
   // Dev-mode "force the generic template" escape hatch - see
@@ -1215,9 +1216,22 @@ export function renderProfileBar(client, moduleName, mod, onTemplateToggle) {
     templateCb, el("span", { text: t("common.disableTemplates") }),
   ]));
 
-  // No live subscription left in the bar itself any more (moved into
-  // openLoadProfileDialog()'s own transient one above) - track() still
-  // expects a `_dispose` function to call on close, so a no-op stands in.
-  bar._dispose = () => {};
+  // The dialog this bar lives in is built once from a snapshot `mod`
+  // (app.js's openParamsDialog(), one client.get() call, no subscription)
+  // - without this, the name/dot/Save button stayed frozen on whatever
+  // profile was current when the dialog opened, never reflecting a
+  // Load/Save-as done from the very buttons right here (Gilles,
+  // 2026-10-15: "le nom du profil ... ne se met pas à jour"). topics.module()
+  // fires on profile events (fs/fl/fc - see this file's own module doc
+  // comment on it), so this alone is enough to stay live.
+  let currentMod = mod;
+  const unsubscribe = client.subscribe(client.topics.module(moduleName), (m) => {
+    if (!m) return;
+    currentMod = m;
+    nameSpan.textContent = m.profile.name || "(none)";
+    nameSpan.classList.toggle("changed", !!m.profile.changed);
+    saveCurrentBtn.disabled = !m.profile.name;
+  });
+  bar._dispose = unsubscribe;
   return bar;
 }
