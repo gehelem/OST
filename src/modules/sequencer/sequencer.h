@@ -85,6 +85,7 @@ class MODULE_INIT Sequencer: public IndiModule
         void buildLiveSequence();
         void updateLiveSequenceProgress();
         void bumpLiveSequenceCounter(const QString &column);
+        void quarantineLastFrame();
         static QString formatDuration(double seconds);
 
         QScxmlStateMachine  *pMachine     = nullptr;
@@ -104,6 +105,10 @@ class MODULE_INIT Sequencer: public IndiModule
         QString mPreviousFilter;
         QString mCurrentFrameType;
         QString mCurrentFolder;
+        // Path of the FITS just written by newBLOB(), empty if the disk-full
+        // guard skipped saving it - quarantineLastFrame() (issue #241) moves
+        // it out of the way when the shot turns out over the HFR threshold.
+        QString mLastFitsPath;
         QString mObjectName           = "default";
         QString mDate;
 

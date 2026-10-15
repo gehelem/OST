@@ -2,6 +2,8 @@
 #include <QPainter>
 #include <QTimer>
 #include <QStorageInfo>
+#include <QFile>
+#include <QFileInfo>
 #include "version.cc"
 
 Sequencer *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
@@ -380,6 +382,23 @@ void Sequencer::SMExposing()
 void Sequencer::SMEvalShot()
 {
     //qDebug() << "SMEvalShot";
+    // Checked before any bookkeeping below (issue #241): a frame over the
+    // HFR threshold is discarded and never counted towards this line's
+    // count/progress at all - not even on what would otherwise have been
+    // the line's last shot, so a bad final frame still gets a replacement
+    // instead of silently ending the line one good frame short.
+    double hfrThreshold = getFloat("focusparameters", "hfrthreshold");
+    bool isLightOrFlat  = (mCurrentFrameType == "L" || mCurrentFrameType == "F");
+    if (isLightOrFlat && hfrThreshold > 0.0 && mLastHFR > hfrThreshold)
+    {
+        logInfo("HFR %1 exceeds threshold %2 — discarding this frame and refocusing",
+        {QString::number(mLastHFR, 'f', 2), QString::number(hfrThreshold, 'f', 2)});
+        quarantineLastFrame();
+        // DoFocus: SequenceCtrl.EvalShot → WaitFocus  AND  FocusCtrl.FocusIdle → Focusing
+        pMachine->submitEvent("DoFocus");
+        return;
+    }
+
     mShotCount--;
     mShotsSinceDither++;
     mShotsCompleted++;
@@ -387,24 +406,9 @@ void Sequencer::SMEvalShot()
     updateLiveSequenceProgress();
 
     if (mShotCount > 0)
-    {
-        double hfrThreshold = getFloat("focusparameters", "hfrthreshold");
-        bool isLightOrFlat  = (mCurrentFrameType == "L" || mCurrentFrameType == "F");
-        if (isLightOrFlat && hfrThreshold > 0.0 && mLastHFR > hfrThreshold)
-        {
-            logInfo("HFR %1 exceeds threshold %2 — refocusing",
-            {QString::number(mLastHFR, 'f', 2), QString::number(hfrThreshold, 'f', 2)});
-            // DoFocus: SequenceCtrl.EvalShot → WaitFocus  AND  FocusCtrl.FocusIdle → Focusing
-            pMachine->submitEvent("DoFocus");
-            return;
-        }
-
         pMachine->submitEvent("NextShot");
-    }
     else
-    {
         pMachine->submitEvent("LineDone");
-    }
 }
 
 // =============================================================================
@@ -719,6 +723,7 @@ void Sequencer::newBLOB(INDI::PropertyBlob pblob)
     QStorageInfo storage(mCurrentFolder);
     qint64 freeBytes  = storage.bytesFree();
     qint64 totalBytes = storage.bytesTotal();
+    mLastFitsPath.clear();
     if (totalBytes > 0 && freeBytes * 100 / totalBytes < getMinFreePercent())
     {
         logWarning("Sequencer: disk too full (%1 MB free, threshold %2%) — FITS not saved: %3",
@@ -732,7 +737,8 @@ void Sequencer::newBLOB(INDI::PropertyBlob pblob)
         nameParts << mCurrentFrameType;
         if (!mCurrentFilter.isEmpty()) nameParts << mCurrentFilter;
         nameParts << tt;
-        _image->saveAsFITSSimple(mCurrentFolder + "/" + nameParts.join("-") + ".FITS");
+        mLastFitsPath = mCurrentFolder + "/" + nameParts.join("-") + ".FITS";
+        _image->saveAsFITSSimple(mLastFitsPath);
     }
 
     // newBLOB runs in the INDI thread — only do I/O here.
@@ -979,6 +985,25 @@ void Sequencer::bumpLiveSequenceCounter(const QString &column)
     int count = getGridInt("livesequence", column, mCurrentLine) + 1;
     getEltInt("livesequence", column)->setValue(count, false);
     getProperty("livesequence")->updateLine(mCurrentLine);
+}
+
+// Moves the FITS newBLOB() just wrote (mLastFitsPath) into a "rejected"
+// subfolder next to it, instead of leaving an over-threshold frame mixed
+// in with good ones under the same name scheme (issue #241).
+void Sequencer::quarantineLastFrame()
+{
+    if (mLastFitsPath.isEmpty())
+        return;
+
+    QFileInfo fi(mLastFitsPath);
+    QString rejectedDir = fi.absolutePath() + "/rejected";
+    QDir().mkpath(rejectedDir);
+    QString dest = rejectedDir + "/" + fi.fileName();
+    if (QFile::rename(mLastFitsPath, dest))
+        logInfo("Moved rejected frame to %1", {dest});
+    else
+        logWarning("Could not move rejected frame %1 to %2", {mLastFitsPath, dest});
+    mLastFitsPath.clear();
 }
 
 QVariantMap Sequencer::onModuleQuery(const QString &queryName, const QVariantMap &params)
