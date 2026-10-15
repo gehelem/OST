@@ -232,8 +232,9 @@ input[type="range"]::-moz-range-thumb {
 .profile-name.changed::after { content: " •"; color: var(--warn); }
 /* Dev-mode "disable templates" checkbox (render.js's renderProfileBar()) -
  * Gilles, 2026-10-03: "un petit toggle discret a droite du bouton save" -
- * a bit of extra left margin sets it apart from the Load/Save button
- * group it otherwise just flows after, muted/small text keeps it low-key. */
+ * a bit of extra left margin sets it apart from the Save/Load/Save-as
+ * button group it otherwise just flows after, muted/small text keeps it
+ * low-key. */
 .profile-bar-dev-toggle { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; }
 
 .tab-bar { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: var(--space-4); flex-wrap: wrap; }
@@ -429,11 +430,15 @@ input[type="range"]::-moz-range-thumb {
 .dialog.wizard-dialog.fullscreen { width: 95vw; max-width: 95vw; height: 90vh; max-height: 90vh; display: flex; flex-direction: column; overflow-y: hidden; }
 .wizard-dialog.fullscreen .wizard-body { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
 
-/* Credits dialog (js/credits.js) - a short, static list, default .dialog
-   width is already fine, just the list itself needs delisting. */
-.dialog.credits-dialog { width: 420px; }
+/* Credits dialog (js/credits.js) - grew from 2 to 11 entries (2026-10-14)
+   once Gilles confirmed d3-celestial also covers constellations.lines/
+   messier.json (not just mw.json) and asked for Capacitor/zeroconf too -
+   wider than the original 2-entry version, .dialog's own max-height:85vh/
+   overflow-y:auto (components.css) already handles the longer list. */
+.dialog.credits-dialog { width: 480px; }
 .credits-list { list-style: none; padding: 0; margin: var(--space-3) 0; }
-.credits-list li { padding: 4px 0; }
+.credits-list li { padding: 6px 0; border-bottom: 1px solid var(--border-subtle); }
+.credits-list li:last-child { border-bottom: none; }
 .wizard-header { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3); }
 .wizard-header h3 { margin: 0; flex: 1 1 auto; }
 .wizard-stepper { display: flex; gap: 4px; margin-bottom: var(--space-4); flex-wrap: wrap; }

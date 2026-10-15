@@ -18,6 +18,13 @@ npm install ws
 
 mkdir -p media
 
+# The runner's working directory isn't guaranteed to be wiped between jobs
+# (Docker executor cache/reuse) - ost.db isn't a tracked file, so a stale
+# one from a previous run (built against an older DB schema) can survive
+# and get opened as-is instead of freshly created, crashing the server on
+# a schema it no longer expects.
+rm -f ost.db
+
 echo "Starting server..."
 export QT_QPA_PLATFORM=offscreen
 ostserver --webroot=media --indiserver=Y > server.log 2>&1 &

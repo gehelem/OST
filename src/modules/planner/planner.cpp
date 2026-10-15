@@ -4,6 +4,10 @@
 #include <libnova/transform.h>
 #include <libnova/lunar.h>
 #include <libnova/angular_separation.h>
+#include <QDir>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonArray>
 
 /**
  * @brief Required export function for dynamic module loading
@@ -77,16 +81,10 @@ void Planner::onExternalEvent(OST::ExtEvent event)
         if (event.ev == OST::ExtEvType::GC)
         {
             getProperty(event.prpkey)->newLine(e.toVariantMap());
-            getEltPrg(event.prpkey, "progress")->setPrgValue(0, false);
-            getEltPrg(event.prpkey, "progress")->setDynLabel("Queued", false);
-            getProperty(event.prpkey)->updateLine(getProperty(event.prpkey)->getGrid().count() - 1);
         }
         if (event.ev == OST::ExtEvType::GU)
         {
             getStore()[event.prpkey]->updateLine(event.line, e.toVariantMap());
-            getEltPrg(event.prpkey, "progress")->setPrgValue(0, false);
-            getEltPrg(event.prpkey, "progress")->setDynLabel("Queued", false);
-            getStore()[event.prpkey]->updateLine(event.line);
         }
         if (event.ev == OST::ExtEvType::GF)
         {
@@ -188,18 +186,153 @@ void Planner::startPlanner()
     // Update progress
     getEltPrg("progress", "global")->setPrgValue(0, true);
     getEltPrg("progress", "global")->setDynLabel("Step 0/" + QString::number(lineCount), true);
-    for (int i = 0; i < getProperty("planning")->getGrid().count(); i++)
-    {
-        getProperty("planning")->fetchLine(i);
-        getEltPrg("planning", "progress")->setDynLabel("Queued", false);
-        getEltPrg("planning", "progress")->setPrgValue(0, false);
-        getProperty("planning")->updateLine(i);
-    }
+    buildLivePlanning();
 
     mCurrentLine = 0;
     mSkipCounts.clear();
     startLine();
 
+}
+
+// Snapshots the "planning" config grid into "liveplanning" - not saved to
+// the profile, this is what's read/updated while a run is in progress, so
+// editing "planning" mid-run never disturbs it. "progress" lives only on
+// "liveplanning" now (removed from "planning" entirely) - every line
+// starts queued at 0%.
+void Planner::buildLivePlanning()
+{
+    getProperty("liveplanning")->clearGrid();
+    for (int i = 0; i < getProperty("planning")->getGrid().count(); i++)
+    {
+        getProperty("planning")->fetchLine(i);
+        QVariantMap values;
+        values["object"]  = getString("planning", "object");
+        values["ra"]      = getFloat("planning", "ra");
+        values["dec"]     = getFloat("planning", "dec");
+        values["profile"] = getString("planning", "profile");
+        getProperty("liveplanning")->newLine(values);
+
+        getEltPrg("liveplanning", "progress")->setPrgValue(0, false);
+        getEltPrg("liveplanning", "progress")->setDynLabel("Queued", false);
+        getEltLight("liveplanning", "status")->setValue(OST::Idle, false);
+        getProperty("liveplanning")->updateLine(getProperty("liveplanning")->getGrid().count() - 1);
+    }
+}
+
+// Writes two files at the module's webroot, same creation/update behavior
+// as Sequencer's writeLiveSequenceStats() - "liveplanning" is never saved
+// to the profile and gets rebuilt empty by the next buildLivePlanning().
+// Called from both terminal paths (onOperationComplete()/abortPlanner(),
+// past its early "never actually started" return) - even a run cut short
+// has real data worth keeping:
+// - planning-report-<timestamp>.txt: one human-readable file per run - a
+//   plain-text table of every "liveplanning" line (object, coordinates,
+//   profile, final status).
+// - planning-history.json: one file per module, read-modify-written on
+//   every run. A single run covers several objects, not one, so unlike
+//   Sequencer's object-name-keyed history this is just an array of past
+//   runs, each with its own timestamp and lines.
+void Planner::writeLivePlanningStats()
+{
+    // Unlike Sequencer (its own "startsequence" handler mkdir()s its
+    // webroot folder already, for the FITS/JPEG files it writes there),
+    // Planner never writes anything to its own webroot - this folder has
+    // never had to exist before now.
+    QDir().mkpath(getWebroot() + "/" + getModuleName());
+
+    const QStringList headers = {"Object", "RA", "DEC", "Profile", "Status"};
+    QList<QStringList> tableRows;
+    QJsonArray lines;
+
+    int rows = getProperty("liveplanning")->getGrid().count();
+    for (int i = 0; i < rows; i++)
+    {
+        getProperty("liveplanning")->fetchLine(i);
+        QString object  = getString("liveplanning", "object");
+        double  ra      = getFloat("liveplanning", "ra");
+        double  dec     = getFloat("liveplanning", "dec");
+        QString profile = getString("liveplanning", "profile");
+        QString status  = getEltPrg("liveplanning", "progress")->value().dynlabel;
+
+        tableRows.append(QStringList{
+            object, QString::number(ra, 'f', 5), QString::number(dec, 'f', 5), profile, status
+        });
+
+        QJsonObject line;
+        line["object"]  = object;
+        line["ra"]      = ra;
+        line["dec"]     = dec;
+        line["profile"] = profile;
+        line["status"]  = status;
+        lines.append(line);
+    }
+
+    QString timestamp = QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss");
+
+    QJsonObject runEntry;
+    runEntry["timestamp"] = timestamp;
+    runEntry["lines"]     = lines;
+
+    // ---- One human-readable report per run ----
+    QList<int> widths(headers.size(), 0);
+    auto measure = [&](const QStringList &row)
+    {
+        for (int c = 0; c < row.size(); c++) widths[c] = qMax(widths[c], row[c].length());
+    };
+    measure(headers);
+    for (const QStringList &r : tableRows) measure(r);
+
+    auto formatRow = [&](const QStringList &row)
+    {
+        QString s;
+        for (int c = 0; c < row.size(); c++) s += row[c].leftJustified(widths[c] + 2);
+        return s;
+    };
+
+    QStringList textLines;
+    textLines << QString("Planner run: %1").arg(timestamp);
+    textLines << "";
+    textLines << formatRow(headers);
+    for (const QStringList &r : tableRows) textLines << formatRow(r);
+
+    QString textPath = getWebroot() + "/" + getModuleName() + "/planning-report-" + timestamp + ".txt";
+    QFile textFile(textPath);
+    if (textFile.open(QIODevice::WriteOnly))
+    {
+        textFile.write(textLines.join("\n").toUtf8());
+        textFile.close();
+        logInfo("Wrote planning report to %1", {textPath});
+    }
+    else
+    {
+        logWarning("Could not write planning report to %1", {textPath});
+    }
+
+    // ---- One JSON file per module, appended to on every run ----
+    QString historyPath = getWebroot() + "/" + getModuleName() + "/planning-history.json";
+    QJsonArray history;
+    QFile historyFile(historyPath);
+    if (historyFile.open(QIODevice::ReadOnly))
+    {
+        QJsonParseError err;
+        QJsonDocument doc = QJsonDocument::fromJson(historyFile.readAll(), &err);
+        historyFile.close();
+        if (err.error == QJsonParseError::NoError && doc.isArray())
+            history = doc.array();
+    }
+
+    history.append(runEntry);
+
+    if (historyFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+        historyFile.write(QJsonDocument(history).toJson());
+        historyFile.close();
+        logInfo("Appended planning run to %1", {historyPath});
+    }
+    else
+    {
+        logWarning("Could not write planning history to %1", {historyPath});
+    }
 }
 
 void Planner::abortPlanner()
@@ -220,6 +353,18 @@ void Planner::abortPlanner()
 
     logInfo("Operation aborted");
 
+    // The line in progress never goes through sequenceComplete()/
+    // sequenceCancelled()/skipLine() on a manual stop - mark it Error so
+    // it doesn't stay stuck on Busy.
+    if (mCurrentLine >= 0 && mCurrentLine < getProperty("liveplanning")->getGrid().count())
+    {
+        getProperty("liveplanning")->fetchLine(mCurrentLine);
+        getEltLight("liveplanning", "status")->setValue(OST::Error, false);
+        getProperty("liveplanning")->updateLine(mCurrentLine);
+    }
+
+    writeLivePlanningStats();
+
     // Re-enable properties
     //getProperty("parms")->enable();
     getProperty("devices")->enable();
@@ -235,6 +380,7 @@ void Planner::abortPlanner()
 void Planner::onOperationComplete()
 {
     logInfo("Operation completed successfully");
+    writeLivePlanningStats();
 
     mIsRunning = false;
 
@@ -261,10 +407,11 @@ void Planner::sequenceComplete()
     mWaitingNavigator = false;
 
 
-    getProperty("planning")->fetchLine(mCurrentLine);
-    getEltPrg("planning", "progress")->setDynLabel("Finished", false);
-    getEltPrg("planning", "progress")->setPrgValue(100, false);
-    getProperty("planning")->updateLine(mCurrentLine);
+    getProperty("liveplanning")->fetchLine(mCurrentLine);
+    getEltPrg("liveplanning", "progress")->setDynLabel("Finished", false);
+    getEltPrg("liveplanning", "progress")->setPrgValue(100, false);
+    getEltLight("liveplanning", "status")->setValue(OST::Ok, false);
+    getProperty("liveplanning")->updateLine(mCurrentLine);
 
     advanceToNextLine();
 }
@@ -274,12 +421,16 @@ void Planner::sequenceCancelled()
     mWaitingSequence = false;
     mWaitingNavigator = false;
 
-    logWarning("Sequence for target %1 was cancelled - moving on", {getString("planning", "object")});
+    logWarning("Sequence for target %1 was cancelled - moving on", {getString("liveplanning", "object")});
 
-    getProperty("planning")->fetchLine(mCurrentLine);
-    getEltPrg("planning", "progress")->setDynLabel("Cancelled", false);
-    getEltPrg("planning", "progress")->setPrgValue(0, false);
-    getProperty("planning")->updateLine(mCurrentLine);
+    getProperty("liveplanning")->fetchLine(mCurrentLine);
+    getEltPrg("liveplanning", "progress")->setDynLabel("Cancelled", false);
+    getEltPrg("liveplanning", "progress")->setPrgValue(0, false);
+    // Cancelled is terminal (excluded from advanceToNextLine()'s retry
+    // scan, same as "Finished"/"Failed*") and it didn't complete - Error,
+    // not Ok.
+    getEltLight("liveplanning", "status")->setValue(OST::Error, false);
+    getProperty("liveplanning")->updateLine(mCurrentLine);
 
     advanceToNextLine();
 }
@@ -287,12 +438,12 @@ void Planner::navigatorComplete()
 {
     mWaitingNavigator = false;
 
-    logInfo("Navigator went to target %1, starting sequence with profile %2", {getString("planning", "object"), getString("planning", "profile")});
+    logInfo("Navigator went to target %1, starting sequence with profile %2", {getString("liveplanning", "object"), getString("liveplanning", "profile")});
 
-    getProperty("planning")->fetchLine(mCurrentLine);
-    getEltPrg("planning", "progress")->setDynLabel("Shooting", false);
-    getEltPrg("planning", "progress")->setPrgValue(0, false);
-    getProperty("planning")->updateLine(mCurrentLine);
+    getProperty("liveplanning")->fetchLine(mCurrentLine);
+    getEltPrg("liveplanning", "progress")->setDynLabel("Shooting", false);
+    getEltPrg("liveplanning", "progress")->setPrgValue(0, false);
+    getProperty("liveplanning")->updateLine(mCurrentLine);
 
     // Ask sequence to start
     QVariantMap eltData;
@@ -309,17 +460,18 @@ void Planner::navigatorComplete()
 void Planner::startLine()
 {
     // update global status
-    int pg =  100 * mCurrentLine / getProperty("planning")->getGrid().size();
+    int pg =  100 * mCurrentLine / getProperty("liveplanning")->getGrid().size();
     getEltPrg("progress", "global")->setPrgValue(pg, true);
-    getEltPrg("progress", "global")->setDynLabel("Step 0/" + QString::number(getProperty("planning")->getGrid().size()), true);
+    getEltPrg("progress", "global")->setDynLabel("Step 0/" + QString::number(getProperty("liveplanning")->getGrid().size()), true);
 
     // update line status
-    getProperty("planning")->fetchLine(mCurrentLine);
-    getEltPrg("planning", "progress")->setDynLabel("Checking visibility", false);
-    getEltPrg("planning", "progress")->setPrgValue(0, false);
-    getProperty("planning")->updateLine(mCurrentLine);
+    getProperty("liveplanning")->fetchLine(mCurrentLine);
+    getEltPrg("liveplanning", "progress")->setDynLabel("Checking visibility", false);
+    getEltPrg("liveplanning", "progress")->setPrgValue(0, false);
+    getEltLight("liveplanning", "status")->setValue(OST::Busy, false);
+    getProperty("liveplanning")->updateLine(mCurrentLine);
 
-    logInfo("Checking visibility for target %1", {getString("planning", "object")});
+    logInfo("Checking visibility for target %1", {getString("liveplanning", "object")});
 
     mWaitingSequence  = false;
     mWaitingNavigator = false;
@@ -328,17 +480,17 @@ void Planner::startLine()
     // Ask the sequencer how long the requested profile would theoretically take,
     // so the visibility check covers the whole sequence, not just this instant.
     otherModuleQuery(getString("slaves", "sequencemodule"), "profileduration",
-    {{"profile", getString("planning", "profile")}});
+    {{"profile", getString("liveplanning", "profile")}});
 }
 
 void Planner::proceedToSlew()
 {
-    getProperty("planning")->fetchLine(mCurrentLine);
-    getEltPrg("planning", "progress")->setDynLabel("Slewing", false);
-    getEltPrg("planning", "progress")->setPrgValue(0, false);
-    getProperty("planning")->updateLine(mCurrentLine);
+    getProperty("liveplanning")->fetchLine(mCurrentLine);
+    getEltPrg("liveplanning", "progress")->setDynLabel("Slewing", false);
+    getEltPrg("liveplanning", "progress")->setPrgValue(0, false);
+    getProperty("liveplanning")->updateLine(mCurrentLine);
 
-    logInfo("Navigator is slewing to target %1", {getString("planning", "object")});
+    logInfo("Navigator is slewing to target %1", {getString("liveplanning", "object")});
 
     mWaitingSequence = false;
     mWaitingNavigator = true;
@@ -346,15 +498,15 @@ void Planner::proceedToSlew()
     otherModuleRequestPropertyDump(getString("slaves", "navigatormodule"), "actions");
 
     // Set navigator's target
-    otherModuleSetValue( getString("slaves", "navigatormodule"), "target", "targetra", getFloat("planning", "ra"));
-    otherModuleSetValue( getString("slaves", "navigatormodule"), "target", "targetde", getFloat("planning", "dec"));
-    otherModuleSetValue( getString("slaves", "navigatormodule"), "target", "targetname", getString("planning", "object"));
+    otherModuleSetValue( getString("slaves", "navigatormodule"), "target", "targetra", getFloat("liveplanning", "ra"));
+    otherModuleSetValue( getString("slaves", "navigatormodule"), "target", "targetde", getFloat("liveplanning", "dec"));
+    otherModuleSetValue( getString("slaves", "navigatormodule"), "target", "targetname", getString("liveplanning", "object"));
 
     // Set sequencer's object data
-    otherModuleRequestProfileLoad(getString("slaves", "sequencemodule"), getString("planning", "profile"));
-    otherModuleSetValue( getString("slaves", "sequencemodule"), "object", "label", getString("planning", "object"));
-    otherModuleSetValue( getString("slaves", "sequencemodule"), "object", "ra", getFloat("planning", "ra"));
-    otherModuleSetValue( getString("slaves", "sequencemodule"), "object", "de", getFloat("planning", "dec"));
+    otherModuleRequestProfileLoad(getString("slaves", "sequencemodule"), getString("liveplanning", "profile"));
+    otherModuleSetValue( getString("slaves", "sequencemodule"), "object", "label", getString("liveplanning", "object"));
+    otherModuleSetValue( getString("slaves", "sequencemodule"), "object", "ra", getFloat("liveplanning", "ra"));
+    otherModuleSetValue( getString("slaves", "sequencemodule"), "object", "de", getFloat("liveplanning", "dec"));
 
     // Ask navigator to slew to target
     otherModuleSetValue( getString("slaves", "navigatormodule"), "actions", "gototarget", true);
@@ -367,19 +519,23 @@ void Planner::skipLine(const QString &reason)
 
     if (attempts >= maxRetries)
     {
-        logWarning("Giving up on target %1 after %2 attempts: %3", {getString("planning", "object"), QString::number(attempts), reason});
-        getProperty("planning")->fetchLine(mCurrentLine);
-        getEltPrg("planning", "progress")->setDynLabel("Failed: " + reason, false);
-        getEltPrg("planning", "progress")->setPrgValue(0, false);
-        getProperty("planning")->updateLine(mCurrentLine);
+        logWarning("Giving up on target %1 after %2 attempts: %3", {getString("liveplanning", "object"), QString::number(attempts), reason});
+        getProperty("liveplanning")->fetchLine(mCurrentLine);
+        getEltPrg("liveplanning", "progress")->setDynLabel("Failed: " + reason, false);
+        getEltPrg("liveplanning", "progress")->setPrgValue(0, false);
+        getEltLight("liveplanning", "status")->setValue(OST::Error, false);
+        getProperty("liveplanning")->updateLine(mCurrentLine);
     }
     else
     {
-        logWarning("Skipping target %1 (attempt %2/%3): %4", {getString("planning", "object"), QString::number(attempts), QString::number(maxRetries), reason});
-        getProperty("planning")->fetchLine(mCurrentLine);
-        getEltPrg("planning", "progress")->setDynLabel("Skipped: " + reason, false);
-        getEltPrg("planning", "progress")->setPrgValue(0, false);
-        getProperty("planning")->updateLine(mCurrentLine);
+        logWarning("Skipping target %1 (attempt %2/%3): %4", {getString("liveplanning", "object"), QString::number(attempts), QString::number(maxRetries), reason});
+        getProperty("liveplanning")->fetchLine(mCurrentLine);
+        getEltPrg("liveplanning", "progress")->setDynLabel("Skipped: " + reason, false);
+        getEltPrg("liveplanning", "progress")->setPrgValue(0, false);
+        // Still eligible for a retry (advanceToNextLine()'s scan doesn't
+        // exclude "Skipped*") - back to Idle/queued, not Error.
+        getEltLight("liveplanning", "status")->setValue(OST::Idle, false);
+        getProperty("liveplanning")->updateLine(mCurrentLine);
     }
 
     advanceToNextLine();
@@ -387,12 +543,12 @@ void Planner::skipLine(const QString &reason)
 
 void Planner::advanceToNextLine()
 {
-    int count = getProperty("planning")->getGrid().count();
+    int count = getProperty("liveplanning")->getGrid().count();
     for (int i = 1; i <= count; i++)
     {
         int idx = (mCurrentLine + i) % count;
-        getProperty("planning")->fetchLine(idx);
-        QString label = getEltPrg("planning", "progress")->dynLabel();
+        getProperty("liveplanning")->fetchLine(idx);
+        QString label = getEltPrg("liveplanning", "progress")->dynLabel();
         if (label != "Finished" && label != "Cancelled" && !label.startsWith("Failed"))
         {
             mCurrentLine = idx;
@@ -473,7 +629,7 @@ void Planner::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
             double seconds = q["result"].toObject()["seconds"].toDouble();
 
             QString reason;
-            if (checkVisibility(getFloat("planning", "ra"), getFloat("planning", "dec"), seconds, reason))
+            if (checkVisibility(getFloat("liveplanning", "ra"), getFloat("liveplanning", "dec"), seconds, reason))
             {
                 proceedToSlew();
             }
@@ -504,8 +660,8 @@ void Planner::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QStri
     if (mod == getString("slaves", "sequencemodule") && ev == OST::EvType::ea && prp == "progress" && mWaitingSequence)
     {
         int i = data.toMap()["e"].toMap()["global"].toInt();
-        getEltPrg("planning", "progress")->setPrgValue(i, false);
-        getProperty("planning")->updateLine(mCurrentLine);
+        getEltPrg("liveplanning", "progress")->setPrgValue(i, false);
+        getProperty("liveplanning")->updateLine(mCurrentLine);
     }
 
     if (mod == getString("slaves", "sequencemodule") && ev == OST::EvType::ea && prp == "signals"  && mWaitingSequence)

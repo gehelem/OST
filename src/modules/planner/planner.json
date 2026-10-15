@@ -121,6 +121,7 @@
           "autoupdate": false,
           "directedit": false,
           "order": 10,
+          "format": ".99999",
           "hint": "Object RA"
       },
       "dec": {
@@ -129,6 +130,7 @@
           "autoupdate": false,
           "directedit": false,
           "order": 20,
+          "format": ".99999",
           "hint": "Object DEC"
       },
       "profile": {
@@ -140,15 +142,57 @@
           "directedit": false,
           "order": 30,
           "hint": "Sequencer profile"
+      }
+    }
+  },
+  "liveplanning": {
+    "label": "Live planning",
+    "permission": 0,
+    "devcat": "Planning",
+    "group": "",
+    "autoupdate": false,
+    "order": "055",
+    "hasprofile": false,
+    "showElts":false,
+    "hasGrid": true,
+    "showGrid": true,
+    "hint": "Snapshot of the planning grid taken when a run starts - not saved to the profile, just reflects progress while running",
+    "e": {
+      "status": {
+          "type":"light",
+          "label": "Status",
+          "order":"000",
+          "hint": "Idle (queued) / busy (currently running) / ok (finished) / error (cancelled, or failed after exhausting its retries)"
+      },
+      "object": {
+          "type": "string",
+          "label": "Object",
+          "order": "010"
+      },
+      "ra": {
+          "type": "float",
+          "label": "RA",
+          "format": ".99999",
+          "order": "020"
+      },
+      "dec": {
+          "type": "float",
+          "label": "DEC",
+          "format": ".99999",
+          "order": "030"
+      },
+      "profile": {
+          "type": "string",
+          "label": "Profile",
+          "order": "040"
       },
       "progress": {
           "type":"prg",
           "label": "Progress",
           "prgtype": "spinner",
           "dynlabel": "",
-          "order":7,
-          "value":"idle",
-          "gridvalues":[]
+          "order":"050",
+          "value":0
       }
     }
   }

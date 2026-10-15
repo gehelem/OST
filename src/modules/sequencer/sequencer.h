@@ -82,6 +82,11 @@ class MODULE_INIT Sequencer: public IndiModule
         void refreshFilterLov();
         void setupOutputFolder();
         void recomputeSequenceTotals();
+        void buildLiveSequence();
+        void updateLiveSequenceProgress();
+        void bumpLiveSequenceCounter(const QString &column);
+        void quarantineLastFrame();
+        void writeLiveSequenceStats();
         static QString formatDuration(double seconds);
 
         QScxmlStateMachine  *pMachine     = nullptr;
@@ -101,6 +106,10 @@ class MODULE_INIT Sequencer: public IndiModule
         QString mPreviousFilter;
         QString mCurrentFrameType;
         QString mCurrentFolder;
+        // Path of the FITS just written by newBLOB(), empty if the disk-full
+        // guard skipped saving it - quarantineLastFrame() (issue #241) moves
+        // it out of the way when the shot turns out over the HFR threshold.
+        QString mLastFitsPath;
         QString mObjectName           = "default";
         QString mDate;
 
@@ -129,7 +138,17 @@ class MODULE_INIT Sequencer: public IndiModule
 
         // ── Per-exposure monitoring ─────────────────────────────────────────
         double  mLastHFR              = 0.0;
+        double  mLastSNR              = 0.0;
         double  mMaxRMSDuringExposure = 0.0;
+        // Running average HFR/SNR/guide RMS for the current line's
+        // "livesequence" row (issue #241) - reset in SMInitLine(),
+        // accumulated in SMEvalShot() once a shot is accepted (not for one
+        // discarded over the HFR threshold). One shared sample count: all
+        // three are always updated together.
+        double  mLineHFRSum           = 0.0;
+        double  mLineSNRSum           = 0.0;
+        double  mLineRMSSum           = 0.0;
+        int     mLineMetricSamples    = 0;
 
         // ── Image processing ────────────────────────────────────────────────
         QPointer<fileio>     _image;

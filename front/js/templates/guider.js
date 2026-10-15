@@ -92,7 +92,6 @@ function alignedYLimits(rows, f) {
 function guidingChartData(prop) {
   const rows = prop.rows || [];
   const f = guidingFields(prop);
-  if (!rows.length) return { labels: [], datasets: [] };
   const labels = rows.map((r) => {
     const d = new Date(r[f.D]);
     return isNaN(d) ? "" : d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });

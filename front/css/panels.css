@@ -50,6 +50,16 @@
    module's own "signals" property, just relocated to the button's corner.
    Absent (.hidden) for modules that never declare a "state" element. */
 .mod-btn-dot { position: absolute; top: 5px; right: 5px; margin-right: 0; }
+/* Unsaved profile changes (module.profile.changed) - same blue/blinking
+   dot as the params gear button's own .icon-chip.has-changes below, so
+   the two read as the same signal (Gilles, 2026-10-15) - top-left corner
+   here, .mod-btn-dot above already owns top-right. */
+.mod-btn.has-changes::after {
+  content: ""; position: absolute; top: 5px; left: 5px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #2196f3; box-shadow: 0 0 4px rgba(33, 150, 243, 0.7);
+  animation: pulse-dot 1s ease-in-out infinite;
+}
 .mod-btn:hover { color: var(--text-secondary); border-color: var(--accent-dim); }
 .mod-btn:hover .material-icons { transform: scale(1.15); }
 .mod-btn.active {
@@ -165,11 +175,14 @@
 .icon-chip .material-icons { font-size: 19px; }
 .icon-chip:disabled { color: var(--text-dim); cursor: not-allowed; opacity: 0.5; }
 .icon-chip.active { color: var(--accent); border-color: var(--accent); box-shadow: var(--shadow-glow); }
-/* Unsaved profile changes (module.profile.changed) — params gear button. */
+/* Unsaved profile changes (module.profile.changed) — params gear button.
+   Same blue/blinking dot as the modbar's own .mod-btn.has-changes below,
+   so the two visibly read as the same signal (Gilles, 2026-10-15). */
 .icon-chip.has-changes::after {
   content: ""; position: absolute; top: 3px; right: 3px;
   width: 7px; height: 7px; border-radius: 50%;
-  background: var(--error); box-shadow: 0 0 4px rgba(var(--error-rgb), 0.7);
+  background: #2196f3; box-shadow: 0 0 4px rgba(33, 150, 243, 0.7);
+  animation: pulse-dot 1s ease-in-out infinite;
 }
 /* Login button (#top-right): its own icon colour tracks the current
  * grant-client (Gilles, 2026-10-03: "change la couleur interne du bouton

@@ -2,6 +2,10 @@
 #include <QPainter>
 #include <QTimer>
 #include <QStorageInfo>
+#include <QFile>
+#include <QFileInfo>
+#include <QJsonDocument>
+#include <QJsonArray>
 #include "version.cc"
 
 Sequencer *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
@@ -35,6 +39,7 @@ Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap a
     getEltInt("sequence", "filter")->setLovConstrained(true);
     getEltInt("sequence", "filter")->setNullable(true);
     getEltInt("focusprofiles", "filter")->setLovConstrained(true);
+    getEltInt("livesequence", "filter")->setLovConstrained(true);
     defineMeAsSequencer();
     refreshFilterLov();
 
@@ -138,6 +143,7 @@ void Sequencer::onExternalEvent(OST::ExtEvent event)
             mShotsCompleted   = 0;
             mSecondsCompleted = 0.0;
             recomputeSequenceTotals();
+            buildLiveSequence();
 
             mSequenceStartTime = QDateTime::currentDateTime();
             getEltString("progress", "realelapsed")->setValue(formatDuration(0), true);
@@ -207,9 +213,20 @@ void Sequencer::SMWaitCooling()
 void Sequencer::SMInitLine()
 {
     //qDebug() << "SMInitLine";
+    int previousLine = mCurrentLine;
     mCurrentLine++;
 
-    if (mCurrentLine >= getProperty("sequence")->getGrid().count())
+    // The line we're leaving just completed on its own (an abort/error
+    // routes through SMAborted()/SMError() instead, never back here) -
+    // mark it Ok before moving on.
+    if (previousLine >= 0 && previousLine < getProperty("livesequence")->getGrid().count())
+    {
+        getProperty("livesequence")->fetchLine(previousLine);
+        getEltLight("livesequence", "status")->setValue(OST::Ok, false);
+        getProperty("livesequence")->updateLine(previousLine);
+    }
+
+    if (mCurrentLine >= getProperty("livesequence")->getGrid().count())
     {
         // SequenceDoneAll bubbles up through Running to Active → Done.
         // We avoid done.state.Running — Qt SCXML re-enters the parallel state instead of exiting it.
@@ -219,15 +236,26 @@ void Sequencer::SMInitLine()
 
     setStateEvent(OST::Busy, "running", "startline", "Starting line");
 
-    getProperty("sequence")->fetchLine(mCurrentLine);
-    mShotCount            = getInt("sequence", "count");
-    int filterIndex       = getInt("sequence", "filter");
-    const auto &lov       = getEltInt("sequence", "filter")->getLov();
+    // Reads "livesequence" (the frozen snapshot, issue #241), never
+    // "sequence" again once a run has started - "sequence" is only read
+    // once, by buildLiveSequence(), so editing it mid-run can never
+    // disturb the line currently executing.
+    getProperty("livesequence")->fetchLine(mCurrentLine);
+    getEltLight("livesequence", "status")->setValue(OST::Busy, false);
+    getProperty("livesequence")->updateLine(mCurrentLine);
+    mShotCount            = getInt("livesequence", "count");
+    int filterIndex       = getInt("livesequence", "filter");
+    const auto &lov       = getEltInt("livesequence", "filter")->getLov();
     mCurrentFilter        = lov.contains(filterIndex) ? lov[filterIndex] : QString();
     mCurrentFilterIndex   = filterIndex;
     mCurrentFrameType     = getString("parameters", "frametype");
     mLastHFR              = 0.0;
+    mLastSNR              = 0.0;
     mMaxRMSDuringExposure = 0.0;
+    mLineHFRSum           = 0.0;
+    mLineSNRSum           = 0.0;
+    mLineRMSSum           = 0.0;
+    mLineMetricSamples    = 0;
 
     pMachine->submitEvent("LineLoaded");
 }
@@ -235,7 +263,7 @@ void Sequencer::SMInitLine()
 void Sequencer::SMFilterStep()
 {
     //qDebug() << "SMFilterStep";
-    int filterIndex = getInt("sequence", "filter");
+    int filterIndex = getInt("livesequence", "filter");
     mFilterChanged  = !mPreviousFilter.isEmpty() && (mPreviousFilter != mCurrentFilter);
 
     if (mPreviousFilter.isEmpty() && !mCurrentFilter.isEmpty())
@@ -256,7 +284,7 @@ void Sequencer::SMFilterStep()
         return;
     }
 
-    if (!getEltInt("sequence", "filter")->getLov().contains(filterIndex))
+    if (!getEltInt("livesequence", "filter")->getLov().contains(filterIndex))
     {
         // Stale slot (e.g. the wheel now reports fewer filters than when
         // this line was configured) - never guess, never send an
@@ -350,7 +378,7 @@ void Sequencer::SMExposing()
     //qDebug() << "SMExposing";
     mMaxRMSDuringExposure = 0.0;
 
-    double exp    = getFloat("sequence", "exposure");
+    double exp    = getFloat("livesequence", "exposure");
     int    gain   = getInt("parameters", "gain");
     int    offset = getInt("parameters", "offset");
     if (getString("devices", "camera") == "CCD Simulator")
@@ -372,29 +400,50 @@ void Sequencer::SMExposing()
 void Sequencer::SMEvalShot()
 {
     //qDebug() << "SMEvalShot";
+    // Checked before any bookkeeping below (issue #241): a frame over the
+    // HFR threshold is discarded and never counted towards this line's
+    // count/progress at all - not even on what would otherwise have been
+    // the line's last shot, so a bad final frame still gets a replacement
+    // instead of silently ending the line one good frame short.
+    double hfrThreshold = getFloat("focusparameters", "hfrthreshold");
+    bool isLightOrFlat  = (mCurrentFrameType == "L" || mCurrentFrameType == "F");
+    if (isLightOrFlat && hfrThreshold > 0.0 && mLastHFR > hfrThreshold)
+    {
+        logInfo("HFR %1 exceeds threshold %2 — discarding this frame and refocusing",
+        {QString::number(mLastHFR, 'f', 2), QString::number(hfrThreshold, 'f', 2)});
+        quarantineLastFrame();
+        // DoFocus: SequenceCtrl.EvalShot → WaitFocus  AND  FocusCtrl.FocusIdle → Focusing
+        pMachine->submitEvent("DoFocus");
+        return;
+    }
+
     mShotCount--;
     mShotsSinceDither++;
     mShotsCompleted++;
-    mSecondsCompleted += getFloat("sequence", "exposure");
+    mSecondsCompleted += getFloat("livesequence", "exposure");
+
+    // Running average HFR/SNR/guide RMS for the current "livesequence" row
+    // (issue #241) - only for an accepted shot (see the discard above).
+    // mMaxRMSDuringExposure is this shot's own peak, reset per shot in
+    // SMExposing() - 0 if guiding isn't enabled, same graceful "no data"
+    // reading as avghfr/avgsnr get on a frame type with no star detection.
+    if (mCurrentLine >= 0 && mCurrentLine < getProperty("livesequence")->getGrid().count())
+    {
+        mLineHFRSum += mLastHFR;
+        mLineSNRSum += mLastSNR;
+        mLineRMSSum += mMaxRMSDuringExposure;
+        mLineMetricSamples++;
+        getEltFloat("livesequence", "avghfr")->setValue(mLineHFRSum / mLineMetricSamples, false);
+        getEltFloat("livesequence", "avgsnr")->setValue(mLineSNRSum / mLineMetricSamples, false);
+        getEltFloat("livesequence", "avgrms")->setValue(mLineRMSSum / mLineMetricSamples, false);
+    }
+
+    updateLiveSequenceProgress();
 
     if (mShotCount > 0)
-    {
-        double hfrThreshold = getFloat("focusparameters", "hfrthreshold");
-        if (hfrThreshold > 0.0 && mLastHFR > hfrThreshold)
-        {
-            logInfo("HFR %1 exceeds threshold %2 — refocusing",
-            {QString::number(mLastHFR, 'f', 2), QString::number(hfrThreshold, 'f', 2)});
-            // DoFocus: SequenceCtrl.EvalShot → WaitFocus  AND  FocusCtrl.FocusIdle → Focusing
-            pMachine->submitEvent("DoFocus");
-            return;
-        }
-
         pMachine->submitEvent("NextShot");
-    }
     else
-    {
         pMachine->submitEvent("LineDone");
-    }
 }
 
 // =============================================================================
@@ -406,6 +455,7 @@ void Sequencer::SMFocusing()
     //qDebug() << "SMFocusing";
     logInfo("Requesting autofocus from %1", {getString("slaves", "focusmodule")});
     mFocusTimer.start();
+    bumpLiveSequenceCounter("focuscount");
 
     // Per-filter override (focusprofiles grid) takes priority over the
     // single fallback profile (parameters.focusprofile). findGridRow()
@@ -454,6 +504,7 @@ void Sequencer::SMDithering()
     //qDebug() << "SMDithering";
     logInfo("Dithering (shot %1 since last dither)", {mShotsSinceDither});
     mShotsSinceDither = 0;
+    bumpLiveSequenceCounter("dithercount");
     otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "dither", true);
     // DitherDone submitted by onOtherModuleEvent when guider returns to Busy/"guiding"
 }
@@ -462,6 +513,7 @@ void Sequencer::SMRecalibrating()
 {
     //qDebug() << "SMRecalibrating";
     logInfo("RMS-triggered recalibration on %1", {getString("slaves", "guidermodule")});
+    bumpLiveSequenceCounter("recalcount");
     otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "resetcalibration", true);
     otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "guide", true);
     // RecalDone submitted by onOtherModuleEvent when guider returns to Busy/"guiding"
@@ -476,6 +528,7 @@ void Sequencer::SMDone()
     //qDebug() << "SMDone";
     logInfo("Sequence completed");
     mElapsedTimer->stop();
+    writeLiveSequenceStats();
     getProperty("actions")->setState(OST::Ok, true);
     getEltBool("actions", "startsequence")->setValue(false, true);
     getEltBool("actions", "abortsequence")->setValue(false, true);
@@ -489,6 +542,15 @@ void Sequencer::SMAborted()
     logInfo("Sequence aborted");
     mSettleTimer->stop();
     mElapsedTimer->stop();
+    // The line in progress never reached SMInitLine() again to be marked
+    // Ok (see there) - it was cut short, so it's Error, not Ok.
+    if (mCurrentLine >= 0 && mCurrentLine < getProperty("livesequence")->getGrid().count())
+    {
+        getProperty("livesequence")->fetchLine(mCurrentLine);
+        getEltLight("livesequence", "status")->setValue(OST::Error, false);
+        getProperty("livesequence")->updateLine(mCurrentLine);
+    }
+    writeLiveSequenceStats();
     getProperty("actions")->setState(OST::Ok, true);
     getEltBool("actions", "startsequence")->setValue(false, true);
     getEltBool("actions", "abortsequence")->setValue(false, true);
@@ -503,6 +565,14 @@ void Sequencer::SMError()
     mLastErrorCause.clear();
     mSettleTimer->stop();
     mElapsedTimer->stop();
+    // Same reasoning as SMAborted(): this line was cut short, mark it Error.
+    if (mCurrentLine >= 0 && mCurrentLine < getProperty("livesequence")->getGrid().count())
+    {
+        getProperty("livesequence")->fetchLine(mCurrentLine);
+        getEltLight("livesequence", "status")->setValue(OST::Error, false);
+        getProperty("livesequence")->updateLine(mCurrentLine);
+    }
+    writeLiveSequenceStats();
     getProperty("actions")->setState(OST::Error, true);
     getEltBool("actions", "startsequence")->setValue(false, true);
     getEltBool("actions", "abortsequence")->setValue(false, true);
@@ -621,10 +691,15 @@ void Sequencer::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QSt
         {
             if (pMachine->isActive("WaitGuide"))
             {
-                // Guider confirmed abort after RMS alert — reset calibration and restart
+                // Guider confirmed abort after RMS alert — reset calibration and restart.
+                // This is the actual recalibration trigger (issue #241) - the
+                // "Recalibrating" SCXML state / "DoRecal" event are never
+                // reached (nothing ever submits "DoRecal"), so bump the
+                // counter here instead of in SMRecalibrating().
                 logInfo("Guider stopped — resetting calibration and restarting");
                 otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "resetcalibration", true);
                 otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "guide", true);
+                bumpLiveSequenceCounter("recalcount");
             }
             else if (mGuiderActive && !mGuiderWasSuspended)
             {
@@ -706,6 +781,7 @@ void Sequencer::newBLOB(INDI::PropertyBlob pblob)
     QStorageInfo storage(mCurrentFolder);
     qint64 freeBytes  = storage.bytesFree();
     qint64 totalBytes = storage.bytesTotal();
+    mLastFitsPath.clear();
     if (totalBytes > 0 && freeBytes * 100 / totalBytes < getMinFreePercent())
     {
         logWarning("Sequencer: disk too full (%1 MB free, threshold %2%) — FITS not saved: %3",
@@ -719,7 +795,8 @@ void Sequencer::newBLOB(INDI::PropertyBlob pblob)
         nameParts << mCurrentFrameType;
         if (!mCurrentFilter.isEmpty()) nameParts << mCurrentFilter;
         nameParts << tt;
-        _image->saveAsFITSSimple(mCurrentFolder + "/" + nameParts.join("-") + ".FITS");
+        mLastFitsPath = mCurrentFolder + "/" + nameParts.join("-") + ".FITS";
+        _image->saveAsFITSSimple(mLastFitsPath);
     }
 
     // newBLOB runs in the INDI thread — only do I/O here.
@@ -731,6 +808,19 @@ void Sequencer::newBLOB(INDI::PropertyBlob pblob)
 void Sequencer::SMFindStars()
 {
     // Runs on the main thread (state machine entry callback).
+    // Star detection/HFR is meaningless on a frame with no stars by design
+    // (Bias/Dark) - skip the solver entirely rather than feed mLastHFR/
+    // "livesequence".avghfr (issue #241) a number that means nothing, and
+    // risk it spuriously tripping the HFR-threshold refocus in
+    // SMEvalShot() (now itself guarded, but this avoids the wasted solver
+    // run too).
+    bool isLightOrFlat = (mCurrentFrameType == "L" || mCurrentFrameType == "F");
+    if (!isLightOrFlat)
+    {
+        pMachine->submitEvent("FindStarsDone");
+        return;
+    }
+
     _solver.ResetSolver(stats, _image->getImageBuffer());
     connect(&_solver, &Solver::successSEP, this, &Sequencer::OnSucessSEP);
     _solver.FindStars(_solver.stellarSolverProfiles[0]);
@@ -747,7 +837,14 @@ void Sequencer::OnSucessSEP()
     getEltImg("image", "image")->setValue(dta, true);
 
     mLastHFR = dta.HFRavg;
+    mLastSNR = dta.SNR;
     setStateEvent(OST::Busy, "running", "imagehfr", "image HFR", dta.HFRavg);
+
+    // "livesequence"'s avghfr/avgsnr/avgrms (issue #241) are accumulated in
+    // SMEvalShot() instead of here, once a shot is actually accepted - this
+    // runs before that decision (a shot over the HFR threshold is discarded
+    // there), so accumulating here would let a bad shot's own measurement
+    // skew the very average meant to track good ones.
 
     pMachine->submitEvent("FindStarsDone");
 }
@@ -825,7 +922,7 @@ void Sequencer::newExp(INDI::PropertyNumber exp)
         logWarning("CCD_EXPOSURE_VALUE widget missing, skipping exposure progress update");
         return;
     }
-    double etot = getFloat("sequence", "exposure");
+    double etot = getFloat("livesequence", "exposure");
     double ex   = expW->value;
     double elapsedInShot = etot - ex;
     getEltPrg("progress", "exposure")->setPrgValue(100.0 * elapsedInShot / etot, true);
@@ -868,6 +965,253 @@ void Sequencer::recomputeSequenceTotals()
 
     double remaining = qMax(0.0, mTotalEstimatedSeconds - mSecondsCompleted);
     getEltString("progress", "theoreticalremaining")->setValue(formatDuration(remaining), true);
+}
+
+// Snapshots the "sequence" config grid into "livesequence" (issue #241) -
+// not saved to the profile, this is what's shown/updated while a run is
+// in progress, so editing "sequence" mid-run never disturbs it. Each line
+// starts its two progress columns at 0 - see updateLiveSequenceProgress()
+// for how they advance.
+void Sequencer::buildLiveSequence()
+{
+    getProperty("livesequence")->clearGrid();
+    for (int i = 0; i < getProperty("sequence")->getGrid().count(); i++)
+    {
+        getProperty("sequence")->fetchLine(i);
+        int    filter = getInt("sequence", "filter");
+        double exp    = getFloat("sequence", "exposure");
+        int    count  = getInt("sequence", "count");
+
+        QVariantMap values;
+        values["filter"]       = filter;
+        values["exposure"]     = exp;
+        values["count"]        = count;
+        values["dithercount"]  = 0;
+        values["focuscount"]   = 0;
+        values["recalcount"]   = 0;
+        values["avghfr"]       = 0.0;
+        values["avgsnr"]       = 0.0;
+        values["avgrms"]       = 0.0;
+        getProperty("livesequence")->newLine(values);
+
+        // newLine() snapshots whatever "progressduration" currently holds
+        // (leftover from the previous line) - set it to a clean starting
+        // point, then re-sync this one row (same pattern as planner.cpp's
+        // own prg-in-grid column).
+        getEltPrg("livesequence", "progressduration")->setPrgValue(0, false);
+        getEltPrg("livesequence", "progressduration")->setDynLabel(formatDuration(0) + "/" + formatDuration(count * exp), false);
+        getEltLight("livesequence", "status")->setValue(OST::Idle, false);
+        getProperty("livesequence")->updateLine(getProperty("livesequence")->getGrid().count() - 1);
+    }
+}
+
+// Advances the current line's progress column in "livesequence" (issue
+// #241) - called once per completed shot (SMEvalShot()). Reads
+// "sequence"'s own live count/exposure, which still reflect mCurrentLine
+// (fetchLine() for the next line only happens in SMInitLine(), once this
+// line is entirely done).
+void Sequencer::updateLiveSequenceProgress()
+{
+    if (mCurrentLine < 0 || mCurrentLine >= getProperty("livesequence")->getGrid().count())
+        return;
+
+    int    lineCount = getInt("livesequence", "count");
+    double lineExp   = getFloat("livesequence", "exposure");
+    int    done      = lineCount - mShotCount;
+    double doneSeconds  = done * lineExp;
+    double totalSeconds = lineCount * lineExp;
+
+    getEltPrg("livesequence", "progressduration")->setPrgValue(totalSeconds > 0 ? 100.0 * doneSeconds / totalSeconds : 0.0, false);
+    getEltPrg("livesequence", "progressduration")->setDynLabel(formatDuration(doneSeconds) + "/" + formatDuration(totalSeconds), false);
+    getProperty("livesequence")->updateLine(mCurrentLine);
+}
+
+// Bumps one of the three per-line activity counters on the current
+// "livesequence" row (issue #241) - called from the three state entry
+// hooks below, each firing exactly once per actual occurrence of that
+// phase (SMFocusing() also covers the very first focus, before any
+// shot - it is still "this line"'s own FocusGate decision, see the
+// "always counts as a filter change" comment on the first line above).
+void Sequencer::bumpLiveSequenceCounter(const QString &column)
+{
+    if (mCurrentLine < 0 || mCurrentLine >= getProperty("livesequence")->getGrid().count())
+        return;
+
+    int count = getGridInt("livesequence", column, mCurrentLine) + 1;
+    getEltInt("livesequence", column)->setValue(count, false);
+    getProperty("livesequence")->updateLine(mCurrentLine);
+}
+
+// Moves the FITS newBLOB() just wrote (mLastFitsPath) into a "rejected"
+// subfolder next to it, instead of leaving an over-threshold frame mixed
+// in with good ones under the same name scheme (issue #241).
+void Sequencer::quarantineLastFrame()
+{
+    if (mLastFitsPath.isEmpty())
+        return;
+
+    QFileInfo fi(mLastFitsPath);
+    QString rejectedDir = fi.absolutePath() + "/rejected";
+    QDir().mkpath(rejectedDir);
+    QString dest = rejectedDir + "/" + fi.fileName();
+    if (QFile::rename(mLastFitsPath, dest))
+        logInfo("Moved rejected frame to %1", {dest});
+    else
+        logWarning("Could not move rejected frame %1 to %2", {mLastFitsPath, dest});
+    mLastFitsPath.clear();
+}
+
+// Writes two files at the module's webroot so what actually happened
+// during a run (issue #241) survives past it - "livesequence" is never
+// saved to the profile and gets rebuilt empty by the next
+// buildLiveSequence(). Called from all three terminal states
+// (Done/Aborted/Error) - even a cut-short run has real data worth keeping:
+// - sequence-report-<timestamp>.txt: one human-readable file per run
+//   (object/coordinates/profile/frame type/gain/offset/temperature
+//   header, then a plain-text table of every "livesequence" line).
+// - sequence-history.json: one file per module, read-modify-written on
+//   every run - top-level keyed by object name, each holding an array of
+//   past runs (same fields as the text report, plus the timestamp).
+void Sequencer::writeLiveSequenceStats()
+{
+    QString profile = getCurrentProfile();
+    double  ra      = getFloat("object", "ra");
+    double  de      = getFloat("object", "de");
+    int     gain    = getInt("parameters", "gain");
+    int     offset  = getInt("parameters", "offset");
+    double  camTemp = 0.0;
+    getModNumber(getString("devices", "camera"), "CCD_TEMPERATURE", "CCD_TEMPERATURE_VALUE", camTemp);
+
+    const auto &lov = getEltInt("livesequence", "filter")->getLov();
+    const QStringList headers = {
+        "Filter", "Exposure (s)", "Count", "Duration",
+        "Dithers", "Focus", "Recal", "Avg HFR", "Avg SNR", "Avg RMS"
+    };
+    QList<QStringList> tableRows;
+    QJsonArray lines;
+
+    int rows = getProperty("livesequence")->getGrid().count();
+    for (int i = 0; i < rows; i++)
+    {
+        getProperty("livesequence")->fetchLine(i);
+        int     filterIndex  = getInt("livesequence", "filter");
+        QString filterName   = lov.value(filterIndex);
+        double  exposure     = getFloat("livesequence", "exposure");
+        int     count        = getInt("livesequence", "count");
+        QString durationDone = getEltPrg("livesequence", "progressduration")->value().dynlabel;
+        int     dithers      = getInt("livesequence", "dithercount");
+        int     focus        = getInt("livesequence", "focuscount");
+        int     recal        = getInt("livesequence", "recalcount");
+        double  avgHfr       = getFloat("livesequence", "avghfr");
+        double  avgSnr       = getFloat("livesequence", "avgsnr");
+        double  avgRms       = getFloat("livesequence", "avgrms");
+
+        tableRows.append(QStringList{
+            filterName, QString::number(exposure, 'f', 2), QString::number(count),
+            durationDone, QString::number(dithers), QString::number(focus),
+            QString::number(recal), QString::number(avgHfr, 'f', 4),
+            QString::number(avgSnr, 'f', 4), QString::number(avgRms, 'f', 4)
+        });
+
+        QJsonObject line;
+        line["filter"]       = filterIndex;
+        line["filtername"]   = filterName;
+        line["exposure"]     = exposure;
+        line["count"]        = count;
+        line["durationdone"] = durationDone;
+        line["dithercount"]  = dithers;
+        line["focuscount"]   = focus;
+        line["recalcount"]   = recal;
+        line["avghfr"]       = avgHfr;
+        line["avgsnr"]       = avgSnr;
+        line["avgrms"]       = avgRms;
+        lines.append(line);
+    }
+
+    QString timestamp = QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss");
+
+    // Shared by both files below - the JSON history's one entry for this run.
+    QJsonObject runEntry;
+    runEntry["timestamp"]   = timestamp;
+    runEntry["object"]      = mObjectName;
+    runEntry["ra"]          = ra;
+    runEntry["de"]          = de;
+    runEntry["profile"]     = profile;
+    runEntry["frametype"]   = mCurrentFrameType;
+    runEntry["gain"]        = gain;
+    runEntry["offset"]      = offset;
+    runEntry["temperature"] = camTemp;
+    runEntry["lines"]       = lines;
+
+    // ---- One human-readable report per run (issue #241) ----
+    QList<int> widths(headers.size(), 0);
+    auto measure = [&](const QStringList &row)
+    {
+        for (int c = 0; c < row.size(); c++) widths[c] = qMax(widths[c], row[c].length());
+    };
+    measure(headers);
+    for (const QStringList &r : tableRows) measure(r);
+
+    auto formatRow = [&](const QStringList &row)
+    {
+        QString s;
+        for (int c = 0; c < row.size(); c++) s += row[c].leftJustified(widths[c] + 2);
+        return s;
+    };
+
+    QStringList textLines;
+    textLines << QString("Object: %1").arg(mObjectName);
+    textLines << QString("Coordinates: RA %1  DEC %2").arg(ra, 0, 'f', 5).arg(de, 0, 'f', 5);
+    textLines << QString("Profile: %1").arg(profile);
+    textLines << QString("Frame type: %1").arg(mCurrentFrameType);
+    textLines << QString("Gain: %1  Offset: %2").arg(gain).arg(offset);
+    textLines << QString("Camera temperature: %1 °C").arg(camTemp, 0, 'f', 1);
+    textLines << "";
+    textLines << formatRow(headers);
+    for (const QStringList &r : tableRows) textLines << formatRow(r);
+
+    QString textPath = getWebroot() + "/" + getModuleName() + "/sequence-report-" + timestamp + ".txt";
+    QFile textFile(textPath);
+    if (textFile.open(QIODevice::WriteOnly))
+    {
+        textFile.write(textLines.join("\n").toUtf8());
+        textFile.close();
+        logInfo("Wrote sequence report to %1", {textPath});
+    }
+    else
+    {
+        logWarning("Could not write sequence report to %1", {textPath});
+    }
+
+    // ---- One JSON file per module, keyed by object name, appended to on
+    // every run (issue #241) - read-modify-write, not per-run like the
+    // report above. ----
+    QString historyPath = getWebroot() + "/" + getModuleName() + "/sequence-history.json";
+    QJsonObject history;
+    QFile historyFile(historyPath);
+    if (historyFile.open(QIODevice::ReadOnly))
+    {
+        QJsonParseError err;
+        QJsonDocument doc = QJsonDocument::fromJson(historyFile.readAll(), &err);
+        historyFile.close();
+        if (err.error == QJsonParseError::NoError && doc.isObject())
+            history = doc.object();
+    }
+
+    QJsonArray objectRuns = history[mObjectName].toArray();
+    objectRuns.append(runEntry);
+    history[mObjectName] = objectRuns;
+
+    if (historyFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+        historyFile.write(QJsonDocument(history).toJson());
+        historyFile.close();
+        logInfo("Appended sequence run to %1", {historyPath});
+    }
+    else
+    {
+        logWarning("Could not write sequence history to %1", {historyPath});
+    }
 }
 
 QVariantMap Sequencer::onModuleQuery(const QString &queryName, const QVariantMap &params)
@@ -948,10 +1292,12 @@ void Sequencer::refreshFilterLov()
     // Always clear first: a filter device that was unassigned or went
     // invalid must not leave stale filter names in the LOV (mCurrentFilter
     // must fall back to empty, not resolve to a phantom stale entry).
-    // Shared by "sequence" (per-line filter) and "focusprofiles" (per-filter
-    // focus profile override) — same physical filter wheel, same LOV.
+    // Shared by "sequence" (per-line filter), "focusprofiles" (per-filter
+    // focus profile override) and "livesequence" (read-only run-time copy
+    // of "sequence", issue #241) — same physical filter wheel, same LOV.
     getEltInt("sequence", "filter")->lovClear();
     getEltInt("focusprofiles", "filter")->lovClear();
+    getEltInt("livesequence", "filter")->lovClear();
 
     INDI::BaseDevice dp = getDevice(getString("devices", "filter").toStdString().c_str());
     if (!dp.isValid())
@@ -967,6 +1313,7 @@ void Sequencer::refreshFilterLov()
         // i-th (0-based) text element.
         getEltInt("sequence", "filter")->lovAdd((int)(i + 1), txt[i].getText());
         getEltInt("focusprofiles", "filter")->lovAdd((int)(i + 1), txt[i].getText());
+        getEltInt("livesequence", "filter")->lovAdd((int)(i + 1), txt[i].getText());
     }
 }
 

@@ -95,6 +95,13 @@ export function renderModbar(client, activeKey, onSelect) {
       icon(moduleIcon(mod)),
       el("span", { class: "mod-btn-label", text: label }),
     ]);
+    // Unsaved profile changes (Gilles, 2026-10-15) - same indicator and
+    // same underlying flag (module.profile.changed) as the params gear
+    // button's own "has-changes" dot (app.js's updateParamsToggle()), just
+    // shown per module here instead of only for the currently active one.
+    disposers.push(client.subscribe(client.topics.module(name), (m) => {
+      btn.classList.toggle("has-changes", !!(m && m.profile && m.profile.changed));
+    }));
     bar.appendChild(btn);
   }
   return { node: bar, dispose: () => disposers.forEach((d) => d()) };

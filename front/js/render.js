@@ -171,13 +171,24 @@ function renderLastLogLine(client, moduleName) {
 
 // ---- element value formatting / editing --------------------------------
 
-function formatScalar(type, value) {
+// `format` is the element's own display mask ("99.99", ".9999", ...) - a
+// count of "9"s after the "." gives the number of decimals to round to.
+// Only int/float use it; every other type ignores it.
+function formatScalar(type, value, format) {
   if (value === undefined || value === null) return "—";
   switch (type) {
     case "date": return value.year !== undefined ? `${value.year}-${String(value.month).padStart(2, "0")}-${String(value.day).padStart(2, "0")}` : "—";
     case "time": return value.hh !== undefined ? `${String(value.hh).padStart(2, "0")}:${String(value.mm).padStart(2, "0")}:${String(value.ss).padStart(2, "0")}` : "—";
     case "datetime": return value.year !== undefined ? `${value.year}-${String(value.month).padStart(2, "0")}-${String(value.day).padStart(2, "0")} ${String(value.hh).padStart(2, "0")}:${String(value.mm).padStart(2, "0")}:${String(value.ss).padStart(2, "0")}` : "—";
     case "bool": return value ? "true" : "false";
+    case "int":
+    case "float": {
+      if (typeof format === "string" && format.includes(".")) {
+        const decimals = format.split(".")[1].length;
+        return Number(value).toFixed(decimals);
+      }
+      return String(value);
+    }
     default: return String(value);
   }
 }
@@ -192,7 +203,7 @@ function formatScalar(type, value) {
 function formatScalarWithLov(client, moduleName, def, value) {
   const lov = client.resolveLov(moduleName, def);
   if (lov && value !== undefined && value !== null && lov[value] !== undefined) return lov[value];
-  return formatScalar(def.type, value);
+  return formatScalar(def.type, value, def.format);
 }
 
 // Shallow value-equality covering both scalars and the compound
@@ -427,7 +438,7 @@ function renderDisplayOnly(elName, el_) {
     return wrap;
   }
   if (type === "message") return el("div", { class: "muted", text: "(message elements are not implemented by the current backend)" });
-  return el("div", { class: "readonly-val", text: formatScalar(type, value) });
+  return el("div", { class: "readonly-val", text: formatScalar(type, value, el_.format) });
 }
 
 function iconSlotButtons(moduleName, propName, obj, client, elName) {
@@ -480,7 +491,7 @@ export function buildElementsForm(client, moduleName, elementDefs, order, initia
 // does nothing" report that turned out to be a panel overlap instead -
 // this ordering bug was still real and worth fixing on its own).
 function orderedElementNames(elements) {
-  return Object.keys(elements).sort((a, b) => (elements[a].order > elements[b].order ? 1 : -1));
+  return Object.keys(elements).sort((a, b) => (String(elements[a].order) > String(elements[b].order) ? 1 : -1));
 }
 
 function editableElementNames(prop) {
@@ -501,7 +512,11 @@ function renderGridSection(client, moduleName, propName, prop) {
   const wrap = el("div", { class: "grid-section" });
 
   if (prop.showGrid) {
-    const headers = prop.gridheaders || [];
+    // gridheaders comes back alphabetical by element key (PropertyMulti::
+    // getGridHeaders() returns mElts.keys(), a QMap - same ordering bug
+    // orderedElementNames() above was already written to work around for
+    // non-grid properties) - sort by each element's own "order" instead.
+    const headers = (prop.gridheaders || []).slice().sort((a, b) => (String(prop.elements[a].order) > String(prop.elements[b].order) ? 1 : -1));
     const table = el("table", { class: "grid-table" });
     const thead = el("tr");
     for (const h of headers) {
@@ -511,29 +526,39 @@ function renderGridSection(client, moduleName, propName, prop) {
     thead.appendChild(el("th", { text: "" }));
     table.appendChild(el("thead", null, [thead]));
     const tbody = el("tbody");
+    // permission:0 (ReadOnly, e.g. sequencer's "livesequence" - a run-time
+    // snapshot the backend itself writes, issue #241) also rejects every
+    // grid mutation server-side (Basemodule::onExternalEventBase) - don't
+    // show controls that would just fail.
+    const editable = prop.permission !== 0;
     (prop.rows || []).forEach((row, idx) => {
       const tr = el("tr", { class: "grid-row" });
       for (const h of headers) {
         const def = prop.elements[h] || { type: "string" };
-        tr.appendChild(el("td", { text: formatScalarWithLov(client, moduleName, def, row[h]) }));
+        if (def.type === "prg" || def.type === "light") tr.appendChild(el("td", null, [renderDisplayOnly(h, Object.assign({}, def, { value: row[h] }))]));
+        else tr.appendChild(el("td", { text: formatScalarWithLov(client, moduleName, def, row[h]) }));
       }
-      const actions = el("td", { class: "grid-actions" });
-      actions.appendChild(iconButton("edit", t("common.editRow"), () => openGridDialog(client, moduleName, propName, prop, idx, row)));
-      actions.appendChild(iconButton("arrow_upward", t("common.moveUp"), () => client.gridMoveUp(moduleName, propName, idx)));
-      actions.appendChild(iconButton("arrow_downward", t("common.moveDown"), () => client.gridMoveDown(moduleName, propName, idx)));
-      actions.appendChild(iconButton("delete", t("common.deleteRow"), () => { if (confirm(t("common.deleteRowConfirm"))) client.gridDelete(moduleName, propName, idx); }, { danger: true }));
-      tr.appendChild(actions);
-      tr.addEventListener("click", (ev) => { if (ev.target.closest(".grid-actions")) return; client.gridFetch(moduleName, propName, idx); });
+      if (editable) {
+        const actions = el("td", { class: "grid-actions" });
+        actions.appendChild(iconButton("edit", t("common.editRow"), () => openGridDialog(client, moduleName, propName, prop, idx, row)));
+        actions.appendChild(iconButton("arrow_upward", t("common.moveUp"), () => client.gridMoveUp(moduleName, propName, idx)));
+        actions.appendChild(iconButton("arrow_downward", t("common.moveDown"), () => client.gridMoveDown(moduleName, propName, idx)));
+        actions.appendChild(iconButton("delete", t("common.deleteRow"), () => { if (confirm(t("common.deleteRowConfirm"))) client.gridDelete(moduleName, propName, idx); }, { danger: true }));
+        tr.appendChild(actions);
+        tr.addEventListener("click", (ev) => { if (ev.target.closest(".grid-actions")) return; client.gridFetch(moduleName, propName, idx); });
+      }
       tbody.appendChild(tr);
     });
     table.appendChild(tbody);
     wrap.appendChild(el("div", { class: "grid-table-wrap" }, [table]));
 
-    const toolbar = el("div", { class: "grid-toolbar" });
-    toolbar.appendChild(el("button", { class: "btn btn-sm", onclick: () => openGridDialog(client, moduleName, propName, prop, null, null) }, [icon("add", { small: true }), "Add row"]));
-    toolbar.appendChild(el("button", { class: "btn btn-sm btn-danger", onclick: () => { if (confirm("Clear the whole grid?")) client.gridReset(moduleName, propName); } }, "Reset grid"));
-    if (prop.gridLimit) toolbar.appendChild(el("span", { class: "muted small mono", text: `${(prop.rows || []).length}/${prop.gridLimit} rows` }));
-    wrap.appendChild(toolbar);
+    if (editable) {
+      const toolbar = el("div", { class: "grid-toolbar" });
+      toolbar.appendChild(el("button", { class: "btn btn-sm", onclick: () => openGridDialog(client, moduleName, propName, prop, null, null) }, [icon("add", { small: true }), "Add row"]));
+      toolbar.appendChild(el("button", { class: "btn btn-sm btn-danger", onclick: () => { if (confirm("Clear the whole grid?")) client.gridReset(moduleName, propName); } }, "Reset grid"));
+      if (prop.gridLimit) toolbar.appendChild(el("span", { class: "muted small mono", text: `${(prop.rows || []).length}/${prop.gridLimit} rows` }));
+      wrap.appendChild(toolbar);
+    }
   }
 
   if (prop.hasGraph) {
@@ -552,7 +577,8 @@ export function setDialogRoot(node) { dialogRoot = node; }
 let lovDatalistSeq = 0;
 
 function openGridDialog(client, moduleName, propName, prop, index, row) {
-  const headers = prop.gridheaders || [];
+  // Same ordering fix as renderGridSection() above.
+  const headers = (prop.gridheaders || []).slice().sort((a, b) => (String(prop.elements[a].order) > String(prop.elements[b].order) ? 1 : -1));
   const form = buildElementsForm(client, moduleName, prop.elements, headers, row || {});
   const overlay = el("div", { class: "dialog-overlay" });
   const dialog = el("div", { class: "dialog" }, [
@@ -1110,19 +1136,69 @@ export function renderModuleView(client, moduleName) {
  * the exact-case infos.classname (new field, added server-side the same
  * day) - not infos.template, and not a one-shot read.
  */
+// Load/save-as both need the user to pick/type a name - rather than
+// cramming a <select> and a text field into the bar itself (Gilles,
+// 2026-10-15, on the previous 3-row version: "ça prend trop de place"),
+// each opens its own small dialog, same overlay/dialog pattern as
+// openGridDialog() above. `client.topics.lovs()` is only subscribed while
+// the Load dialog is actually open - unsubscribed on close either way
+// (picked a profile or cancelled).
+function openLoadProfileDialog(client, moduleName, mod) {
+  const classname = mod.infos.classname || "";
+  const select = el("select", { class: "field-input" });
+  const unsubscribe = client.subscribe(client.topics.lovs(), (lovs) => {
+    const lov = (classname && lovs && lovs["profiles-" + classname]) || null;
+    const options = (lov && Object.keys(lov.values || {})) || [];
+    const current = select.value;
+    select.innerHTML = "";
+    select.appendChild(el("option", { value: "", text: options.length ? t("common.chooseProfile") : t("common.noProfilesYet") }));
+    for (const name of options) select.appendChild(el("option", { value: name, text: name }));
+    if (options.includes(current)) select.value = current;
+  });
+  const overlay = el("div", { class: "dialog-overlay" });
+  const close = () => { unsubscribe(); overlay.remove(); };
+  const dialog = el("div", { class: "dialog" }, [
+    el("h3", { text: t("common.loadAProfile") }),
+    select,
+    el("div", { class: "dialog-actions" }, [
+      el("button", { class: "btn", onclick: close }, t("common.cancel")),
+      el("button", { class: "btn btn-primary", onclick: () => { if (select.value) client.loadProfile(moduleName, select.value); close(); } }, t("common.loadProfile")),
+    ]),
+  ]);
+  overlay.appendChild(dialog);
+  overlay.addEventListener("click", (ev) => { if (ev.target === overlay) close(); });
+  (dialogRoot || document.body).appendChild(overlay);
+}
+
+function openSaveAsProfileDialog(client, moduleName) {
+  const nameInput = el("input", { type: "text", class: "field-input", placeholder: t("common.profileNamePlaceholder") });
+  const overlay = el("div", { class: "dialog-overlay" });
+  const dialog = el("div", { class: "dialog" }, [
+    el("h3", { text: t("common.saveAsNewProfile") }),
+    nameInput,
+    el("div", { class: "dialog-actions" }, [
+      el("button", { class: "btn", onclick: () => overlay.remove() }, t("common.cancel")),
+      el("button", { class: "btn btn-primary", onclick: () => { if (nameInput.value) client.saveProfile(moduleName, nameInput.value); overlay.remove(); } }, t("common.save")),
+    ]),
+  ]);
+  overlay.appendChild(dialog);
+  overlay.addEventListener("click", (ev) => { if (ev.target === overlay) overlay.remove(); });
+  (dialogRoot || document.body).appendChild(overlay);
+}
+
 export function renderProfileBar(client, moduleName, mod, onTemplateToggle) {
   const bar = el("div", { class: "profile-bar" });
   bar.appendChild(el("span", { class: "muted", text: t("common.profile") }));
   const nameSpan = el("span", { class: "profile-name" + (mod.profile.changed ? " changed" : ""), text: mod.profile.name || "(none)" });
   bar.appendChild(nameSpan);
-
-  const select = el("select", { class: "field-input small" });
-  const nameInput = el("input", { type: "text", class: "field-input small", placeholder: t("common.profileNamePlaceholder") });
-  select.addEventListener("change", () => { if (select.value) nameInput.value = select.value; });
-  bar.appendChild(select);
-  bar.appendChild(nameInput);
-  bar.appendChild(el("button", { class: "btn btn-sm", onclick: () => { const n = nameInput.value || select.value; if (n) client.loadProfile(moduleName, n); } }, [icon("folder_open", { small: true }), "Load"]));
-  bar.appendChild(el("button", { class: "btn btn-sm", onclick: () => { const n = nameInput.value || select.value; if (n) client.saveProfile(moduleName, n); } }, [icon("save", { small: true }), "Save"]));
+  // "Just save what I'm on" needs no selection/typing at all (Gilles,
+  // 2026-10-15: previously had to re-pick it from a dropdown first).
+  bar.appendChild(el("button", {
+    class: "btn btn-sm", disabled: !mod.profile.name,
+    onclick: () => client.saveProfile(moduleName, mod.profile.name),
+  }, [icon("save", { small: true }), t("common.save")]));
+  bar.appendChild(el("button", { class: "btn btn-sm", onclick: () => openLoadProfileDialog(client, moduleName, mod) }, [icon("folder_open", { small: true }), t("common.loadProfile")]));
+  bar.appendChild(el("button", { class: "btn btn-sm", onclick: () => openSaveAsProfileDialog(client, moduleName) }, [icon("save", { small: true }), t("common.saveAsProfile")]));
 
   // Dev-mode "force the generic template" escape hatch - see
   // getDisableTemplates()'s own doc comment above. Gilles: "ajoute un
@@ -1139,16 +1215,9 @@ export function renderProfileBar(client, moduleName, mod, onTemplateToggle) {
     templateCb, el("span", { text: t("common.disableTemplates") }),
   ]));
 
-  const classname = mod.infos.classname || "";
-  const unsubscribe = client.subscribe(client.topics.lovs(), (lovs) => {
-    const lov = (classname && lovs && lovs["profiles-" + classname]) || null;
-    const options = (lov && Object.keys(lov.values || {})) || [];
-    const current = select.value;
-    select.innerHTML = "";
-    select.appendChild(el("option", { value: "", text: options.length ? "(choose)" : "(type name)" }));
-    for (const name of options) select.appendChild(el("option", { value: name, text: name }));
-    if (options.includes(current)) select.value = current;
-  });
-  bar._dispose = unsubscribe;
+  // No live subscription left in the bar itself any more (moved into
+  // openLoadProfileDialog()'s own transient one above) - track() still
+  // expects a `_dispose` function to call on close, so a no-op stands in.
+  bar._dispose = () => {};
   return bar;
 }

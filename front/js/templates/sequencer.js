@@ -13,6 +13,12 @@
 //   editable)".
 // - progress: global/totaltime spinners + duration readouts — Gilles:
 //   "avancement pour voir les donnees d'avancement".
+// - livesequence: same shape as "sequence" plus two per-line progress
+//   columns, permission:0 (read-only) - backend-built snapshot taken on
+//   start (Sequencer::buildLiveSequence()), not stored in the profile
+//   (issue #241). renderGridSection() hides add/edit/delete/move for a
+//   permission:0 grid, and renders a "prg"-typed column as a real
+//   progress bar (renderDisplayOnly()) instead of raw text.
 // - object (label/ra/de, hasprofile:false).
 //
 // slaves/parameters/guideparameters/focusparameters/focusprofiles (all
@@ -36,6 +42,11 @@ export const mount = buildScaffoldTemplate(
     // (same thread yet again: "pas besoin du cadre car une seule
     // propriete" - the outer panel box above already gives it one).
     { id: "progress", x: 20, y: 330, w: 300, icon: "progress_activity", iconOnly: true, framed: false },
+    // Run-time copy of "sequence" with per-line progress, read-only
+    // (permission:0) - rebuilt on each start, not persisted (issue #241).
+    // Placed/sized by guesswork, not measured against a real dump - drag
+    // position persists per (scope,id) regardless, see panels.js.
+    { id: "livesequence", x: 20, y: 92, w: 340, icon: "browse_activity", iconOnly: true, framed: false },
   ],
   { x: 720, y: 92, w: 260 },
   // No small "Image" quick-stats panel/button (Gilles, 2026-10-03: "enleve

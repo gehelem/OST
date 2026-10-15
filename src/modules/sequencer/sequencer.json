@@ -106,6 +106,115 @@
             }
         }
     },
+    "livesequence": {
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "devcat": "Sequence",
+        "group": "",
+        "permission": 0,
+        "order":15,
+        "grid":0,
+        "hasprofile":false,
+        "label": "Live sequence",
+        "hint": "Snapshot of the sequence grid taken when a run starts (issue #241) - not saved to the profile, just reflects progress while running",
+        "e": {
+            "filter": {
+                "type":"int",
+                "label": "Filter",
+                "order":"010",
+                "gridvalues":[],
+                "listOfValues":[
+                ]
+            },
+            "exposure": {
+                "type":"float",
+                "label": "Exposure",
+                "order":"020",
+                "value":10,
+                "gridvalues":[],
+                "format": "99"
+            },
+            "count": {
+                "type":"int",
+                "label": "Count",
+                "order":"030",
+                "value":5,
+                "gridvalues":[],
+                "format": "99"
+            },
+            "progressduration": {
+                "type":"prg",
+                "prgtype": "progressbar",
+                "label": "Duration",
+                "dynlabel": "",
+                "value": 0,
+                "order":"050",
+                "gridvalues":[]
+            },
+            "dithercount": {
+                "type":"int",
+                "label": "Dithers",
+                "order":"060",
+                "value":0,
+                "gridvalues":[],
+                "format": "99",
+                "hint": "How many dither phases happened while shooting this line"
+            },
+            "focuscount": {
+                "type":"int",
+                "label": "Focus runs",
+                "order":"070",
+                "value":0,
+                "gridvalues":[],
+                "format": "99",
+                "hint": "How many focus phases happened while shooting this line, including the first one if it fell on this line"
+            },
+            "recalcount": {
+                "type":"int",
+                "label": "Recalibrations",
+                "order":"080",
+                "value":0,
+                "gridvalues":[],
+                "format": "99",
+                "hint": "How many guiding recalibration phases happened while shooting this line"
+            },
+            "avghfr": {
+                "type":"float",
+                "label": "Avg HFR",
+                "order":"090",
+                "value":0,
+                "gridvalues":[],
+                "format": ".9999",
+                "hint": "Running average HFR over every shot of this line so far"
+            },
+            "avgsnr": {
+                "type":"float",
+                "label": "Avg SNR",
+                "order":"100",
+                "value":0,
+                "gridvalues":[],
+                "format": ".9999",
+                "hint": "Running average SNR over every shot of this line so far"
+            },
+            "avgrms": {
+                "type":"float",
+                "label": "Avg guide RMS",
+                "order":"110",
+                "value":0,
+                "gridvalues":[],
+                "format": ".9999",
+                "hint": "Running average of this line's own peak guide RMS per shot - 0 if guiding is disabled"
+            },
+            "status": {
+                "type":"light",
+                "label": "Status",
+                "order":"000",
+                "gridvalues":[],
+                "hint": "Idle (queued) / busy (currently running) / ok (finished) / error (aborted/errored while this line was running)"
+            }
+        }
+    },
     "object":{
             "devcat": "Parameters",
             "group": "Sequence",
