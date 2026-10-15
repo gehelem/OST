@@ -121,6 +121,7 @@
           "autoupdate": false,
           "directedit": false,
           "order": 10,
+          "format": ".99999",
           "hint": "Object RA"
       },
       "dec": {
@@ -129,6 +130,7 @@
           "autoupdate": false,
           "directedit": false,
           "order": 20,
+          "format": ".99999",
           "hint": "Object DEC"
       },
       "profile": {
@@ -171,11 +173,13 @@
       "ra": {
           "type": "float",
           "label": "RA",
+          "format": ".99999",
           "order": "020"
       },
       "dec": {
           "type": "float",
           "label": "DEC",
+          "format": ".99999",
           "order": "030"
       },
       "profile": {
