@@ -408,21 +408,12 @@ void Sequencer::SMFocusing()
     mFocusTimer.start();
 
     // Per-filter override (focusprofiles grid) takes priority over the
-    // single fallback profile (parameters.focusprofile). Not using the
-    // generic getGridString(prop, col, keyCol, keyValue) key lookup here:
-    // its findGridRow() reads the key column through getString(prop, col,
-    // line), which hard static_cast<ValueString*>'s the grid cell - fine
-    // for a string key column, undefined behavior now that "filter" is an
-    // int column (libs/datastore.cpp). Matching by hand instead.
-    QString focusProfile;
-    for (int i = 0, rows = getGridSize("focusprofiles"); i < rows; i++)
-    {
-        if (getGridInt("focusprofiles", "filter", i) == mCurrentFilterIndex)
-        {
-            focusProfile = getGridString("focusprofiles", "profile", i);
-            break;
-        }
-    }
+    // single fallback profile (parameters.focusprofile). findGridRow()
+    // (libs/basemodule.cpp) now reads the key column through whichever
+    // getter matches its real type, so this generic lookup is safe again
+    // for "filter" being an int column (was a hand-written loop here
+    // before that fix, issue #240).
+    QString focusProfile = getGridString("focusprofiles", "profile", "filter", QString::number(mCurrentFilterIndex));
     if (focusProfile.isEmpty())
         focusProfile = getString("focusparameters", "focusprofile");
 

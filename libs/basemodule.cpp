@@ -721,10 +721,23 @@ void Basemodule::setGlobalDatastore(Basemodule* gds)
 
 int Basemodule::findGridRow(const QString &propName, const QString &keyCol, const QString &keyValue)
 {
+    // Read the key column through the getter matching its real declared
+    // type, not blindly as a string: getString(prop, elt, line) hard
+    // static_cast<ValueString*>'s the grid cell, undefined behavior for
+    // any other type (found while making sequencer's "filter" an int key
+    // column, issue #240 - this generic helper is shared by every module,
+    // so any future int/float-keyed grid would have hit the same crash).
+    OST::PropertyMulti* p = getProperty(propName);
+    OST::ElementBase* keyElt = p ? p->getElt(keyCol) : nullptr;
+    const QString keyType = keyElt ? keyElt->getType() : "string";
     int size = getGridSize(propName);
     for (int i = 0; i < size; i++)
     {
-        if (getString(propName, keyCol, (long)i) == keyValue) return i;
+        QString cell;
+        if (keyType == "int") cell = QString::number(getInt(propName, keyCol, (long)i));
+        else if (keyType == "float") cell = QString::number(getFloat(propName, keyCol, (long)i));
+        else cell = getString(propName, keyCol, (long)i);
+        if (cell == keyValue) return i;
     }
     return -1;
 }

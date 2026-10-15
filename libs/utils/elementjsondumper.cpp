@@ -67,7 +67,11 @@ void ElementJsonDumper::visit(ElementInt *pElement, QVariantMap &data, bool &emi
     json["format"] = pElement->format();
     json["slider"] = pElement->slider();
     mResult = json;
-    if (mEvent == EvType::ev) return;
+    // No early return on EvType::ev here (unlike ee/ea above): ev now also
+    // carries the lov-related fields below, so PropertyMulti::OnLovChanged()
+    // (issue #240 - a local lovAdd()/lovClear()/lovUpdate() used to never
+    // reach any client at all, not even one already connected) has a real
+    // payload to send instead of just a bare notification.
 
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
     if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
@@ -115,7 +119,8 @@ void ElementJsonDumper::visit(ElementFloat *pElement, QVariantMap &data, bool &e
     json["format"] = pElement->format();
     json["slider"] = pElement->slider();
     mResult = json;
-    if (mEvent == EvType::ev) return;
+    // See the matching comment in ElementInt's own visit() just above -
+    // no early return on ev, same reason.
 
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
     if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
@@ -149,8 +154,12 @@ void ElementJsonDumper::visit(ElementString *pElement, QVariantMap &data, bool &
     QJsonObject json = dumpElementCommons(pElement);
     json["value"] = pElement->value();
     mResult = json;
-    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
+    if (mEvent == EvType::ee || mEvent == EvType::ea) return;
 
+    // ev falls through from here (unlike ee/ea above) - see the matching
+    // comment in ElementInt's own visit(): it now also carries the
+    // lov-related fields below, needed for PropertyMulti::OnLovChanged()
+    // (issue #240) to have a real payload.
     json["type"] = "string";
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
     if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
