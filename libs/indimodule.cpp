@@ -1260,6 +1260,18 @@ bool IndiModule::defineMeAsImager()
         pm->addElt(i);
     }
 
+    if (!getStore()["parms"]->getElts()->contains("jpegquality"))
+    {
+        OST::ElementInt* i  = new  OST::ElementInt("jpegquality", "Jpeg quality", "exp050", "");
+        i->setValue(100, false);
+        i->setDirectEdit(true);
+        i->setAutoUpdate(true);
+        i->setMinMax(10, 100, false);
+        i->setStep(10, false);
+        i->setSlider(OST::SliderAndValue, false);
+        pm->addElt(i);
+    }
+
     mIsImager = true;
     return true;
 

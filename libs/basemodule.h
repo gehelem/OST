@@ -2,6 +2,7 @@
 #define BASEMODULE_h_
 
 #include <dbmanager.h>
+#include <QImage>
 #include <QSet>
 /*!
  * This Class shouldn't be used as is
@@ -191,6 +192,15 @@ class Basemodule : public DBManager
     protected:
         Basemodule* mGlobalDatastore = nullptr;
         void setStateEvent(OST::State state, QString statedescription, QString event, QString eventdescription, double valNum = 0.0, int valInt = 0, QString valStr = "");
+
+        // Writes img to finalPath via a temporary file plus an atomic
+        // rename(), so a reader going through nginx's sendfile()
+        // (preview/live images under /ostmedia/) never sees a
+        // partially-written JPEG. Shared by every module that serves a
+        // live preview image (issue #239 - used to be a byte-for-byte
+        // copy of the same static function in each module's own .cpp
+        // file).
+        static void atomicSaveJpeg(const QImage &img, const QString &finalPath, int quality = 100);
 }
 ;
 #endif

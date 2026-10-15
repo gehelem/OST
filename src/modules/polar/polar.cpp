@@ -3,13 +3,6 @@
 #include <QPainter>
 #include "version.cc"
 
-static void atomicSaveJpeg(const QImage &img, const QString &finalPath, int quality = 100)
-{
-    const QString tmp = finalPath + ".tmp";
-    if (img.save(tmp, "JPG", quality))
-        ::rename(tmp.toLocal8Bit().constData(), finalPath.toLocal8Bit().constData());
-}
-
 #define PI 3.14159265
 
 Polar *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)

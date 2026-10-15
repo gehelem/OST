@@ -24,14 +24,6 @@
 /// Sidereal rate, arcsec per second (360 deg / sidereal day).
 static constexpr double SIDEREAL_ARCSEC_PER_S = 15.041067;
 
-/// Atomically replace a JPEG preview (write to .tmp then rename).
-static void atomicSaveJpeg(const QImage &img, const QString &finalPath)
-{
-    const QString tmp = finalPath + ".tmp";
-    if (img.save(tmp, "JPG", 100))
-        ::rename(tmp.toLocal8Bit().constData(), finalPath.toLocal8Bit().constData());
-}
-
 BlindPec *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
     return new BlindPec(name, label, profile, availableModuleLibs);

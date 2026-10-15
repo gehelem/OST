@@ -1,13 +1,6 @@
 #include "dummy.h"
 #include "version.cc"
 
-static void atomicSaveJpeg(const QImage &img, const QString &finalPath)
-{
-    const QString tmp = finalPath + ".tmp";
-    if (img.save(tmp, "JPG", 100))
-        ::rename(tmp.toLocal8Bit().constData(), finalPath.toLocal8Bit().constData());
-}
-
 Dummy *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
 {
     Dummy *basemodule = new Dummy(name, label, profile, availableModuleLibs);

@@ -1,4 +1,5 @@
 #include <QtCore>
+#include <cstdio>
 #include <basedevice.h>
 #include "basemodule.h"
 #include "version.cc"
@@ -871,4 +872,11 @@ bool Basemodule::giveMeAParms()
     }
 
     return true;
+}
+
+void Basemodule::atomicSaveJpeg(const QImage &img, const QString &finalPath, int quality)
+{
+    const QString tmp = finalPath + ".tmp";
+    if (img.save(tmp, "JPG", quality))
+        ::rename(tmp.toLocal8Bit().constData(), finalPath.toLocal8Bit().constData());
 }
