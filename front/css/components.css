@@ -232,8 +232,9 @@ input[type="range"]::-moz-range-thumb {
 .profile-name.changed::after { content: " •"; color: var(--warn); }
 /* Dev-mode "disable templates" checkbox (render.js's renderProfileBar()) -
  * Gilles, 2026-10-03: "un petit toggle discret a droite du bouton save" -
- * a bit of extra left margin sets it apart from the Load/Save button
- * group it otherwise just flows after, muted/small text keeps it low-key. */
+ * a bit of extra left margin sets it apart from the Save/Load/Save-as
+ * button group it otherwise just flows after, muted/small text keeps it
+ * low-key. */
 .profile-bar-dev-toggle { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; }
 
 .tab-bar { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: var(--space-4); flex-wrap: wrap; }

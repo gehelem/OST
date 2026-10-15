@@ -1136,19 +1136,69 @@ export function renderModuleView(client, moduleName) {
  * the exact-case infos.classname (new field, added server-side the same
  * day) - not infos.template, and not a one-shot read.
  */
+// Load/save-as both need the user to pick/type a name - rather than
+// cramming a <select> and a text field into the bar itself (Gilles,
+// 2026-10-15, on the previous 3-row version: "ça prend trop de place"),
+// each opens its own small dialog, same overlay/dialog pattern as
+// openGridDialog() above. `client.topics.lovs()` is only subscribed while
+// the Load dialog is actually open - unsubscribed on close either way
+// (picked a profile or cancelled).
+function openLoadProfileDialog(client, moduleName, mod) {
+  const classname = mod.infos.classname || "";
+  const select = el("select", { class: "field-input" });
+  const unsubscribe = client.subscribe(client.topics.lovs(), (lovs) => {
+    const lov = (classname && lovs && lovs["profiles-" + classname]) || null;
+    const options = (lov && Object.keys(lov.values || {})) || [];
+    const current = select.value;
+    select.innerHTML = "";
+    select.appendChild(el("option", { value: "", text: options.length ? t("common.chooseProfile") : t("common.noProfilesYet") }));
+    for (const name of options) select.appendChild(el("option", { value: name, text: name }));
+    if (options.includes(current)) select.value = current;
+  });
+  const overlay = el("div", { class: "dialog-overlay" });
+  const close = () => { unsubscribe(); overlay.remove(); };
+  const dialog = el("div", { class: "dialog" }, [
+    el("h3", { text: t("common.loadAProfile") }),
+    select,
+    el("div", { class: "dialog-actions" }, [
+      el("button", { class: "btn", onclick: close }, t("common.cancel")),
+      el("button", { class: "btn btn-primary", onclick: () => { if (select.value) client.loadProfile(moduleName, select.value); close(); } }, t("common.loadProfile")),
+    ]),
+  ]);
+  overlay.appendChild(dialog);
+  overlay.addEventListener("click", (ev) => { if (ev.target === overlay) close(); });
+  (dialogRoot || document.body).appendChild(overlay);
+}
+
+function openSaveAsProfileDialog(client, moduleName) {
+  const nameInput = el("input", { type: "text", class: "field-input", placeholder: t("common.profileNamePlaceholder") });
+  const overlay = el("div", { class: "dialog-overlay" });
+  const dialog = el("div", { class: "dialog" }, [
+    el("h3", { text: t("common.saveAsNewProfile") }),
+    nameInput,
+    el("div", { class: "dialog-actions" }, [
+      el("button", { class: "btn", onclick: () => overlay.remove() }, t("common.cancel")),
+      el("button", { class: "btn btn-primary", onclick: () => { if (nameInput.value) client.saveProfile(moduleName, nameInput.value); overlay.remove(); } }, t("common.save")),
+    ]),
+  ]);
+  overlay.appendChild(dialog);
+  overlay.addEventListener("click", (ev) => { if (ev.target === overlay) overlay.remove(); });
+  (dialogRoot || document.body).appendChild(overlay);
+}
+
 export function renderProfileBar(client, moduleName, mod, onTemplateToggle) {
   const bar = el("div", { class: "profile-bar" });
   bar.appendChild(el("span", { class: "muted", text: t("common.profile") }));
   const nameSpan = el("span", { class: "profile-name" + (mod.profile.changed ? " changed" : ""), text: mod.profile.name || "(none)" });
   bar.appendChild(nameSpan);
-
-  const select = el("select", { class: "field-input small" });
-  const nameInput = el("input", { type: "text", class: "field-input small", placeholder: t("common.profileNamePlaceholder") });
-  select.addEventListener("change", () => { if (select.value) nameInput.value = select.value; });
-  bar.appendChild(select);
-  bar.appendChild(nameInput);
-  bar.appendChild(el("button", { class: "btn btn-sm", onclick: () => { const n = nameInput.value || select.value; if (n) client.loadProfile(moduleName, n); } }, [icon("folder_open", { small: true }), "Load"]));
-  bar.appendChild(el("button", { class: "btn btn-sm", onclick: () => { const n = nameInput.value || select.value; if (n) client.saveProfile(moduleName, n); } }, [icon("save", { small: true }), "Save"]));
+  // "Just save what I'm on" needs no selection/typing at all (Gilles,
+  // 2026-10-15: previously had to re-pick it from a dropdown first).
+  bar.appendChild(el("button", {
+    class: "btn btn-sm", disabled: !mod.profile.name,
+    onclick: () => client.saveProfile(moduleName, mod.profile.name),
+  }, [icon("save", { small: true }), t("common.save")]));
+  bar.appendChild(el("button", { class: "btn btn-sm", onclick: () => openLoadProfileDialog(client, moduleName, mod) }, [icon("folder_open", { small: true }), t("common.loadProfile")]));
+  bar.appendChild(el("button", { class: "btn btn-sm", onclick: () => openSaveAsProfileDialog(client, moduleName) }, [icon("save", { small: true }), t("common.saveAsProfile")]));
 
   // Dev-mode "force the generic template" escape hatch - see
   // getDisableTemplates()'s own doc comment above. Gilles: "ajoute un
@@ -1165,16 +1215,9 @@ export function renderProfileBar(client, moduleName, mod, onTemplateToggle) {
     templateCb, el("span", { text: t("common.disableTemplates") }),
   ]));
 
-  const classname = mod.infos.classname || "";
-  const unsubscribe = client.subscribe(client.topics.lovs(), (lovs) => {
-    const lov = (classname && lovs && lovs["profiles-" + classname]) || null;
-    const options = (lov && Object.keys(lov.values || {})) || [];
-    const current = select.value;
-    select.innerHTML = "";
-    select.appendChild(el("option", { value: "", text: options.length ? "(choose)" : "(type name)" }));
-    for (const name of options) select.appendChild(el("option", { value: name, text: name }));
-    if (options.includes(current)) select.value = current;
-  });
-  bar._dispose = unsubscribe;
+  // No live subscription left in the bar itself any more (moved into
+  // openLoadProfileDialog()'s own transient one above) - track() still
+  // expects a `_dispose` function to call on close, so a no-op stands in.
+  bar._dispose = () => {};
   return bar;
 }

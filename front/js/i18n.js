@@ -63,6 +63,12 @@ const STRINGS = {
   "common.noVideo": { en: "No video", fr: "Aucune vidéo", de: "Kein Video", it: "Nessun video", es: "Sin vídeo" },
   "common.profile": { en: "Profile", fr: "Profil", de: "Profil", it: "Profilo", es: "Perfil" },
   "common.profileNamePlaceholder": { en: "profile name", fr: "nom du profil", de: "Profilname", it: "nome profilo", es: "nombre del perfil" },
+  "common.loadProfile": { en: "Load", fr: "Charger", de: "Laden", it: "Carica", es: "Cargar" },
+  "common.loadAProfile": { en: "Load a profile", fr: "Charger un profil", de: "Ein Profil laden", it: "Carica un profilo", es: "Cargar un perfil" },
+  "common.saveAsProfile": { en: "Save as…", fr: "Enregistrer sous…", de: "Speichern als…", it: "Salva come…", es: "Guardar como…" },
+  "common.saveAsNewProfile": { en: "Save as a new profile", fr: "Enregistrer sous un nouveau nom", de: "Als neues Profil speichern", it: "Salva come nuovo profilo", es: "Guardar como nuevo perfil" },
+  "common.chooseProfile": { en: "(choose)", fr: "(choisir)", de: "(auswählen)", it: "(scegli)", es: "(elegir)" },
+  "common.noProfilesYet": { en: "(none yet)", fr: "(aucun pour l'instant)", de: "(noch keine)", it: "(nessuno ancora)", es: "(ninguno aún)" },
 
   // ---- INDI-style property/element status words (dom.js) -----------------
   "status.standby": { en: "Standby", fr: "En attente", de: "Bereit", it: "Standby", es: "En espera" },
