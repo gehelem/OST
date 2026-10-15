@@ -160,6 +160,42 @@
                 "value": 0,
                 "order":5,
                 "gridvalues":[]
+            },
+            "dithercount": {
+                "type":"int",
+                "label": "Dithers",
+                "order":6,
+                "value":0,
+                "gridvalues":[],
+                "format": "99",
+                "hint": "How many dither phases happened while shooting this line"
+            },
+            "focuscount": {
+                "type":"int",
+                "label": "Focus runs",
+                "order":7,
+                "value":0,
+                "gridvalues":[],
+                "format": "99",
+                "hint": "How many focus phases happened while shooting this line, including the first one if it fell on this line"
+            },
+            "recalcount": {
+                "type":"int",
+                "label": "Recalibrations",
+                "order":8,
+                "value":0,
+                "gridvalues":[],
+                "format": "99",
+                "hint": "How many guiding recalibration phases happened while shooting this line"
+            },
+            "avghfr": {
+                "type":"float",
+                "label": "Avg HFR",
+                "order":9,
+                "value":0,
+                "gridvalues":[],
+                "format": "99.99",
+                "hint": "Running average HFR over every shot of this line so far"
             }
         }
     },

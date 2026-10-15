@@ -234,6 +234,8 @@ void Sequencer::SMInitLine()
     mCurrentFrameType     = getString("parameters", "frametype");
     mLastHFR              = 0.0;
     mMaxRMSDuringExposure = 0.0;
+    mLineHFRSum           = 0.0;
+    mLineHFRSamples       = 0;
 
     pMachine->submitEvent("LineLoaded");
 }
@@ -413,6 +415,7 @@ void Sequencer::SMFocusing()
     //qDebug() << "SMFocusing";
     logInfo("Requesting autofocus from %1", {getString("slaves", "focusmodule")});
     mFocusTimer.start();
+    bumpLiveSequenceCounter("focuscount");
 
     // Per-filter override (focusprofiles grid) takes priority over the
     // single fallback profile (parameters.focusprofile). findGridRow()
@@ -461,6 +464,7 @@ void Sequencer::SMDithering()
     //qDebug() << "SMDithering";
     logInfo("Dithering (shot %1 since last dither)", {mShotsSinceDither});
     mShotsSinceDither = 0;
+    bumpLiveSequenceCounter("dithercount");
     otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "dither", true);
     // DitherDone submitted by onOtherModuleEvent when guider returns to Busy/"guiding"
 }
@@ -469,6 +473,7 @@ void Sequencer::SMRecalibrating()
 {
     //qDebug() << "SMRecalibrating";
     logInfo("RMS-triggered recalibration on %1", {getString("slaves", "guidermodule")});
+    bumpLiveSequenceCounter("recalcount");
     otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "resetcalibration", true);
     otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "guide", true);
     // RecalDone submitted by onOtherModuleEvent when guider returns to Busy/"guiding"
@@ -756,6 +761,15 @@ void Sequencer::OnSucessSEP()
     mLastHFR = dta.HFRavg;
     setStateEvent(OST::Busy, "running", "imagehfr", "image HFR", dta.HFRavg);
 
+    // Running average HFR for the current "livesequence" row (issue #241).
+    if (mCurrentLine >= 0 && mCurrentLine < getProperty("livesequence")->getGrid().count())
+    {
+        mLineHFRSum += dta.HFRavg;
+        mLineHFRSamples++;
+        getEltFloat("livesequence", "avghfr")->setValue(mLineHFRSum / mLineHFRSamples, false);
+        getProperty("livesequence")->updateLine(mCurrentLine);
+    }
+
     pMachine->submitEvent("FindStarsDone");
 }
 
@@ -893,9 +907,13 @@ void Sequencer::buildLiveSequence()
         int    count  = getInt("sequence", "count");
 
         QVariantMap values;
-        values["filter"]   = filter;
-        values["exposure"] = exp;
-        values["count"]    = count;
+        values["filter"]       = filter;
+        values["exposure"]     = exp;
+        values["count"]        = count;
+        values["dithercount"]  = 0;
+        values["focuscount"]   = 0;
+        values["recalcount"]   = 0;
+        values["avghfr"]       = 0.0;
         getProperty("livesequence")->newLine(values);
 
         // newLine() snapshots whatever the "progress*" elements currently
@@ -930,6 +948,22 @@ void Sequencer::updateLiveSequenceProgress()
     getEltPrg("livesequence", "progresscount")->setDynLabel(QString::number(done) + "/" + QString::number(lineCount), false);
     getEltPrg("livesequence", "progressduration")->setPrgValue(totalSeconds > 0 ? 100.0 * doneSeconds / totalSeconds : 0.0, false);
     getEltPrg("livesequence", "progressduration")->setDynLabel(formatDuration(doneSeconds) + "/" + formatDuration(totalSeconds), false);
+    getProperty("livesequence")->updateLine(mCurrentLine);
+}
+
+// Bumps one of the three per-line activity counters on the current
+// "livesequence" row (issue #241) - called from the three state entry
+// hooks below, each firing exactly once per actual occurrence of that
+// phase (SMFocusing() also covers the very first focus, before any
+// shot - it is still "this line"'s own FocusGate decision, see the
+// "always counts as a filter change" comment on the first line above).
+void Sequencer::bumpLiveSequenceCounter(const QString &column)
+{
+    if (mCurrentLine < 0 || mCurrentLine >= getProperty("livesequence")->getGrid().count())
+        return;
+
+    int count = getGridInt("livesequence", column, mCurrentLine) + 1;
+    getEltInt("livesequence", column)->setValue(count, false);
     getProperty("livesequence")->updateLine(mCurrentLine);
 }
 

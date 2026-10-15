@@ -84,6 +84,7 @@ class MODULE_INIT Sequencer: public IndiModule
         void recomputeSequenceTotals();
         void buildLiveSequence();
         void updateLiveSequenceProgress();
+        void bumpLiveSequenceCounter(const QString &column);
         static QString formatDuration(double seconds);
 
         QScxmlStateMachine  *pMachine     = nullptr;
@@ -132,6 +133,11 @@ class MODULE_INIT Sequencer: public IndiModule
         // ── Per-exposure monitoring ─────────────────────────────────────────
         double  mLastHFR              = 0.0;
         double  mMaxRMSDuringExposure = 0.0;
+        // Running average HFR for the current line's "livesequence" row
+        // (issue #241) - reset in SMInitLine(), accumulated in
+        // OnSucessSEP().
+        double  mLineHFRSum           = 0.0;
+        int     mLineHFRSamples       = 0;
 
         // ── Image processing ────────────────────────────────────────────────
         QPointer<fileio>     _image;
