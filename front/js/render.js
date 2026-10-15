@@ -531,7 +531,7 @@ function renderGridSection(client, moduleName, propName, prop) {
       const tr = el("tr", { class: "grid-row" });
       for (const h of headers) {
         const def = prop.elements[h] || { type: "string" };
-        if (def.type === "prg") tr.appendChild(el("td", null, [renderDisplayOnly(h, Object.assign({}, def, { value: row[h] }))]));
+        if (def.type === "prg" || def.type === "light") tr.appendChild(el("td", null, [renderDisplayOnly(h, Object.assign({}, def, { value: row[h] }))]));
         else tr.appendChild(el("td", { text: formatScalarWithLov(client, moduleName, def, row[h]) }));
       }
       if (editable) {

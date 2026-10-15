@@ -214,6 +214,13 @@
                 "gridvalues":[],
                 "format": ".9999",
                 "hint": "Running average of this line's own peak guide RMS per shot - 0 if guiding is disabled"
+            },
+            "status": {
+                "type":"light",
+                "label": "Status",
+                "order":12,
+                "gridvalues":[],
+                "hint": "Idle (queued) / busy (currently running) / ok (finished) / error (aborted/errored while this line was running)"
             }
         }
     },

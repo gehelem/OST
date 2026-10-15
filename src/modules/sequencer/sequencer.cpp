@@ -213,7 +213,18 @@ void Sequencer::SMWaitCooling()
 void Sequencer::SMInitLine()
 {
     //qDebug() << "SMInitLine";
+    int previousLine = mCurrentLine;
     mCurrentLine++;
+
+    // The line we're leaving just completed on its own (an abort/error
+    // routes through SMAborted()/SMError() instead, never back here) -
+    // mark it Ok before moving on.
+    if (previousLine >= 0 && previousLine < getProperty("livesequence")->getGrid().count())
+    {
+        getProperty("livesequence")->fetchLine(previousLine);
+        getEltLight("livesequence", "status")->setValue(OST::Ok, false);
+        getProperty("livesequence")->updateLine(previousLine);
+    }
 
     if (mCurrentLine >= getProperty("livesequence")->getGrid().count())
     {
@@ -230,6 +241,8 @@ void Sequencer::SMInitLine()
     // once, by buildLiveSequence(), so editing it mid-run can never
     // disturb the line currently executing.
     getProperty("livesequence")->fetchLine(mCurrentLine);
+    getEltLight("livesequence", "status")->setValue(OST::Busy, false);
+    getProperty("livesequence")->updateLine(mCurrentLine);
     mShotCount            = getInt("livesequence", "count");
     int filterIndex       = getInt("livesequence", "filter");
     const auto &lov       = getEltInt("livesequence", "filter")->getLov();
@@ -529,6 +542,14 @@ void Sequencer::SMAborted()
     logInfo("Sequence aborted");
     mSettleTimer->stop();
     mElapsedTimer->stop();
+    // The line in progress never reached SMInitLine() again to be marked
+    // Ok (see there) - it was cut short, so it's Error, not Ok.
+    if (mCurrentLine >= 0 && mCurrentLine < getProperty("livesequence")->getGrid().count())
+    {
+        getProperty("livesequence")->fetchLine(mCurrentLine);
+        getEltLight("livesequence", "status")->setValue(OST::Error, false);
+        getProperty("livesequence")->updateLine(mCurrentLine);
+    }
     writeLiveSequenceStats();
     getProperty("actions")->setState(OST::Ok, true);
     getEltBool("actions", "startsequence")->setValue(false, true);
@@ -544,6 +565,13 @@ void Sequencer::SMError()
     mLastErrorCause.clear();
     mSettleTimer->stop();
     mElapsedTimer->stop();
+    // Same reasoning as SMAborted(): this line was cut short, mark it Error.
+    if (mCurrentLine >= 0 && mCurrentLine < getProperty("livesequence")->getGrid().count())
+    {
+        getProperty("livesequence")->fetchLine(mCurrentLine);
+        getEltLight("livesequence", "status")->setValue(OST::Error, false);
+        getProperty("livesequence")->updateLine(mCurrentLine);
+    }
     writeLiveSequenceStats();
     getProperty("actions")->setState(OST::Error, true);
     getEltBool("actions", "startsequence")->setValue(false, true);
@@ -974,6 +1002,7 @@ void Sequencer::buildLiveSequence()
         getEltPrg("livesequence", "progresscount")->setDynLabel("0/" + QString::number(count), false);
         getEltPrg("livesequence", "progressduration")->setPrgValue(0, false);
         getEltPrg("livesequence", "progressduration")->setDynLabel(formatDuration(0) + "/" + formatDuration(count * exp), false);
+        getEltLight("livesequence", "status")->setValue(OST::Idle, false);
         getProperty("livesequence")->updateLine(getProperty("livesequence")->getGrid().count() - 1);
     }
 }

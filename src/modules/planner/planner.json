@@ -184,6 +184,13 @@
           "order":40,
           "value":0,
           "gridvalues":[]
+      },
+      "status": {
+          "type":"light",
+          "label": "Status",
+          "order":50,
+          "gridvalues":[],
+          "hint": "Idle (queued) / busy (currently running) / ok (finished) / error (cancelled, or failed after exhausting its retries)"
       }
     }
   }

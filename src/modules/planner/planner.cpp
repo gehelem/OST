@@ -214,6 +214,7 @@ void Planner::buildLivePlanning()
 
         getEltPrg("liveplanning", "progress")->setPrgValue(0, false);
         getEltPrg("liveplanning", "progress")->setDynLabel("Queued", false);
+        getEltLight("liveplanning", "status")->setValue(OST::Idle, false);
         getProperty("liveplanning")->updateLine(getProperty("liveplanning")->getGrid().count() - 1);
     }
 }
@@ -351,6 +352,17 @@ void Planner::abortPlanner()
     mWaitingDuration = false;
 
     logInfo("Operation aborted");
+
+    // The line in progress never goes through sequenceComplete()/
+    // sequenceCancelled()/skipLine() on a manual stop - mark it Error so
+    // it doesn't stay stuck on Busy.
+    if (mCurrentLine >= 0 && mCurrentLine < getProperty("liveplanning")->getGrid().count())
+    {
+        getProperty("liveplanning")->fetchLine(mCurrentLine);
+        getEltLight("liveplanning", "status")->setValue(OST::Error, false);
+        getProperty("liveplanning")->updateLine(mCurrentLine);
+    }
+
     writeLivePlanningStats();
 
     // Re-enable properties
@@ -398,6 +410,7 @@ void Planner::sequenceComplete()
     getProperty("liveplanning")->fetchLine(mCurrentLine);
     getEltPrg("liveplanning", "progress")->setDynLabel("Finished", false);
     getEltPrg("liveplanning", "progress")->setPrgValue(100, false);
+    getEltLight("liveplanning", "status")->setValue(OST::Ok, false);
     getProperty("liveplanning")->updateLine(mCurrentLine);
 
     advanceToNextLine();
@@ -413,6 +426,10 @@ void Planner::sequenceCancelled()
     getProperty("liveplanning")->fetchLine(mCurrentLine);
     getEltPrg("liveplanning", "progress")->setDynLabel("Cancelled", false);
     getEltPrg("liveplanning", "progress")->setPrgValue(0, false);
+    // Cancelled is terminal (excluded from advanceToNextLine()'s retry
+    // scan, same as "Finished"/"Failed*") and it didn't complete - Error,
+    // not Ok.
+    getEltLight("liveplanning", "status")->setValue(OST::Error, false);
     getProperty("liveplanning")->updateLine(mCurrentLine);
 
     advanceToNextLine();
@@ -451,6 +468,7 @@ void Planner::startLine()
     getProperty("liveplanning")->fetchLine(mCurrentLine);
     getEltPrg("liveplanning", "progress")->setDynLabel("Checking visibility", false);
     getEltPrg("liveplanning", "progress")->setPrgValue(0, false);
+    getEltLight("liveplanning", "status")->setValue(OST::Busy, false);
     getProperty("liveplanning")->updateLine(mCurrentLine);
 
     logInfo("Checking visibility for target %1", {getString("liveplanning", "object")});
@@ -505,6 +523,7 @@ void Planner::skipLine(const QString &reason)
         getProperty("liveplanning")->fetchLine(mCurrentLine);
         getEltPrg("liveplanning", "progress")->setDynLabel("Failed: " + reason, false);
         getEltPrg("liveplanning", "progress")->setPrgValue(0, false);
+        getEltLight("liveplanning", "status")->setValue(OST::Error, false);
         getProperty("liveplanning")->updateLine(mCurrentLine);
     }
     else
@@ -513,6 +532,9 @@ void Planner::skipLine(const QString &reason)
         getProperty("liveplanning")->fetchLine(mCurrentLine);
         getEltPrg("liveplanning", "progress")->setDynLabel("Skipped: " + reason, false);
         getEltPrg("liveplanning", "progress")->setPrgValue(0, false);
+        // Still eligible for a retry (advanceToNextLine()'s scan doesn't
+        // exclude "Skipped*") - back to Idle/queued, not Error.
+        getEltLight("liveplanning", "status")->setValue(OST::Idle, false);
         getProperty("liveplanning")->updateLine(mCurrentLine);
     }
 
