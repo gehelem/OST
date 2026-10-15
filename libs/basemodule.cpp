@@ -567,6 +567,17 @@ bool Basemodule::loadProfile(const QString &pProfileName)
                         for(const QVariant &vv : line)
                         {
                             QString eltkey = data["gridheaders"].toList().at(icol).toString();
+                            // A saved profile/seed db can predate a schema change that
+                            // dropped this column (e.g. issue #241's "planning.progress"
+                            // moved to "liveplanning") - skip it rather than dereferencing
+                            // a null ElementBase*, unlike the "e" (non-grid) loop above,
+                            // this one had no such guard at all.
+                            if (!getProperty(key)->getElts()->contains(eltkey))
+                            {
+                                logWarning("Basemodule::loadProfile - skipping stale grid column %1.%2, no longer defined", {key, eltkey});
+                                icol++;
+                                continue;
+                            }
                             if (getEltBase(key, eltkey)->getType() == "int")
                             {
                                 getEltInt(key, eltkey)->setValue(vv.toInt(), true);

@@ -162,7 +162,6 @@
           "type":"light",
           "label": "Status",
           "order":"000",
-          "gridvalues":[],
           "hint": "Idle (queued) / busy (currently running) / ok (finished) / error (cancelled, or failed after exhausting its retries)"
       },
       "object": {
@@ -193,8 +192,7 @@
           "prgtype": "spinner",
           "dynlabel": "",
           "order":"050",
-          "value":0,
-          "gridvalues":[]
+          "value":0
       }
     }
   }
