@@ -35,6 +35,7 @@ Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap a
     getEltInt("sequence", "filter")->setLovConstrained(true);
     getEltInt("sequence", "filter")->setNullable(true);
     getEltInt("focusprofiles", "filter")->setLovConstrained(true);
+    getEltInt("livesequence", "filter")->setLovConstrained(true);
     defineMeAsSequencer();
     refreshFilterLov();
 
@@ -138,6 +139,7 @@ void Sequencer::onExternalEvent(OST::ExtEvent event)
             mShotsCompleted   = 0;
             mSecondsCompleted = 0.0;
             recomputeSequenceTotals();
+            buildLiveSequence();
 
             mSequenceStartTime = QDateTime::currentDateTime();
             getEltString("progress", "realelapsed")->setValue(formatDuration(0), true);
@@ -209,7 +211,7 @@ void Sequencer::SMInitLine()
     //qDebug() << "SMInitLine";
     mCurrentLine++;
 
-    if (mCurrentLine >= getProperty("sequence")->getGrid().count())
+    if (mCurrentLine >= getProperty("livesequence")->getGrid().count())
     {
         // SequenceDoneAll bubbles up through Running to Active → Done.
         // We avoid done.state.Running — Qt SCXML re-enters the parallel state instead of exiting it.
@@ -219,10 +221,14 @@ void Sequencer::SMInitLine()
 
     setStateEvent(OST::Busy, "running", "startline", "Starting line");
 
-    getProperty("sequence")->fetchLine(mCurrentLine);
-    mShotCount            = getInt("sequence", "count");
-    int filterIndex       = getInt("sequence", "filter");
-    const auto &lov       = getEltInt("sequence", "filter")->getLov();
+    // Reads "livesequence" (the frozen snapshot, issue #241), never
+    // "sequence" again once a run has started - "sequence" is only read
+    // once, by buildLiveSequence(), so editing it mid-run can never
+    // disturb the line currently executing.
+    getProperty("livesequence")->fetchLine(mCurrentLine);
+    mShotCount            = getInt("livesequence", "count");
+    int filterIndex       = getInt("livesequence", "filter");
+    const auto &lov       = getEltInt("livesequence", "filter")->getLov();
     mCurrentFilter        = lov.contains(filterIndex) ? lov[filterIndex] : QString();
     mCurrentFilterIndex   = filterIndex;
     mCurrentFrameType     = getString("parameters", "frametype");
@@ -235,7 +241,7 @@ void Sequencer::SMInitLine()
 void Sequencer::SMFilterStep()
 {
     //qDebug() << "SMFilterStep";
-    int filterIndex = getInt("sequence", "filter");
+    int filterIndex = getInt("livesequence", "filter");
     mFilterChanged  = !mPreviousFilter.isEmpty() && (mPreviousFilter != mCurrentFilter);
 
     if (mPreviousFilter.isEmpty() && !mCurrentFilter.isEmpty())
@@ -256,7 +262,7 @@ void Sequencer::SMFilterStep()
         return;
     }
 
-    if (!getEltInt("sequence", "filter")->getLov().contains(filterIndex))
+    if (!getEltInt("livesequence", "filter")->getLov().contains(filterIndex))
     {
         // Stale slot (e.g. the wheel now reports fewer filters than when
         // this line was configured) - never guess, never send an
@@ -350,7 +356,7 @@ void Sequencer::SMExposing()
     //qDebug() << "SMExposing";
     mMaxRMSDuringExposure = 0.0;
 
-    double exp    = getFloat("sequence", "exposure");
+    double exp    = getFloat("livesequence", "exposure");
     int    gain   = getInt("parameters", "gain");
     int    offset = getInt("parameters", "offset");
     if (getString("devices", "camera") == "CCD Simulator")
@@ -375,7 +381,8 @@ void Sequencer::SMEvalShot()
     mShotCount--;
     mShotsSinceDither++;
     mShotsCompleted++;
-    mSecondsCompleted += getFloat("sequence", "exposure");
+    mSecondsCompleted += getFloat("livesequence", "exposure");
+    updateLiveSequenceProgress();
 
     if (mShotCount > 0)
     {
@@ -825,7 +832,7 @@ void Sequencer::newExp(INDI::PropertyNumber exp)
         logWarning("CCD_EXPOSURE_VALUE widget missing, skipping exposure progress update");
         return;
     }
-    double etot = getFloat("sequence", "exposure");
+    double etot = getFloat("livesequence", "exposure");
     double ex   = expW->value;
     double elapsedInShot = etot - ex;
     getEltPrg("progress", "exposure")->setPrgValue(100.0 * elapsedInShot / etot, true);
@@ -868,6 +875,62 @@ void Sequencer::recomputeSequenceTotals()
 
     double remaining = qMax(0.0, mTotalEstimatedSeconds - mSecondsCompleted);
     getEltString("progress", "theoreticalremaining")->setValue(formatDuration(remaining), true);
+}
+
+// Snapshots the "sequence" config grid into "livesequence" (issue #241) -
+// not saved to the profile, this is what's shown/updated while a run is
+// in progress, so editing "sequence" mid-run never disturbs it. Each line
+// starts its two progress columns at 0 - see updateLiveSequenceProgress()
+// for how they advance.
+void Sequencer::buildLiveSequence()
+{
+    getProperty("livesequence")->clearGrid();
+    for (int i = 0; i < getProperty("sequence")->getGrid().count(); i++)
+    {
+        getProperty("sequence")->fetchLine(i);
+        int    filter = getInt("sequence", "filter");
+        double exp    = getFloat("sequence", "exposure");
+        int    count  = getInt("sequence", "count");
+
+        QVariantMap values;
+        values["filter"]   = filter;
+        values["exposure"] = exp;
+        values["count"]    = count;
+        getProperty("livesequence")->newLine(values);
+
+        // newLine() snapshots whatever the "progress*" elements currently
+        // hold (leftover from the previous line) - set them to a clean
+        // starting point, then re-sync this one row (same pattern as
+        // planner.cpp's own prg-in-grid column).
+        getEltPrg("livesequence", "progresscount")->setPrgValue(0, false);
+        getEltPrg("livesequence", "progresscount")->setDynLabel("0/" + QString::number(count), false);
+        getEltPrg("livesequence", "progressduration")->setPrgValue(0, false);
+        getEltPrg("livesequence", "progressduration")->setDynLabel(formatDuration(0) + "/" + formatDuration(count * exp), false);
+        getProperty("livesequence")->updateLine(getProperty("livesequence")->getGrid().count() - 1);
+    }
+}
+
+// Advances the current line's two progress columns in "livesequence"
+// (issue #241) - called once per completed shot (SMEvalShot()). Reads
+// "sequence"'s own live count/exposure, which still reflect mCurrentLine
+// (fetchLine() for the next line only happens in SMInitLine(), once this
+// line is entirely done).
+void Sequencer::updateLiveSequenceProgress()
+{
+    if (mCurrentLine < 0 || mCurrentLine >= getProperty("livesequence")->getGrid().count())
+        return;
+
+    int    lineCount = getInt("livesequence", "count");
+    double lineExp   = getFloat("livesequence", "exposure");
+    int    done      = lineCount - mShotCount;
+    double doneSeconds  = done * lineExp;
+    double totalSeconds = lineCount * lineExp;
+
+    getEltPrg("livesequence", "progresscount")->setPrgValue(lineCount > 0 ? 100.0 * done / lineCount : 0.0, false);
+    getEltPrg("livesequence", "progresscount")->setDynLabel(QString::number(done) + "/" + QString::number(lineCount), false);
+    getEltPrg("livesequence", "progressduration")->setPrgValue(totalSeconds > 0 ? 100.0 * doneSeconds / totalSeconds : 0.0, false);
+    getEltPrg("livesequence", "progressduration")->setDynLabel(formatDuration(doneSeconds) + "/" + formatDuration(totalSeconds), false);
+    getProperty("livesequence")->updateLine(mCurrentLine);
 }
 
 QVariantMap Sequencer::onModuleQuery(const QString &queryName, const QVariantMap &params)
@@ -948,10 +1011,12 @@ void Sequencer::refreshFilterLov()
     // Always clear first: a filter device that was unassigned or went
     // invalid must not leave stale filter names in the LOV (mCurrentFilter
     // must fall back to empty, not resolve to a phantom stale entry).
-    // Shared by "sequence" (per-line filter) and "focusprofiles" (per-filter
-    // focus profile override) — same physical filter wheel, same LOV.
+    // Shared by "sequence" (per-line filter), "focusprofiles" (per-filter
+    // focus profile override) and "livesequence" (read-only run-time copy
+    // of "sequence", issue #241) — same physical filter wheel, same LOV.
     getEltInt("sequence", "filter")->lovClear();
     getEltInt("focusprofiles", "filter")->lovClear();
+    getEltInt("livesequence", "filter")->lovClear();
 
     INDI::BaseDevice dp = getDevice(getString("devices", "filter").toStdString().c_str());
     if (!dp.isValid())
@@ -967,6 +1032,7 @@ void Sequencer::refreshFilterLov()
         // i-th (0-based) text element.
         getEltInt("sequence", "filter")->lovAdd((int)(i + 1), txt[i].getText());
         getEltInt("focusprofiles", "filter")->lovAdd((int)(i + 1), txt[i].getText());
+        getEltInt("livesequence", "filter")->lovAdd((int)(i + 1), txt[i].getText());
     }
 }
 

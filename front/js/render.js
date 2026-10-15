@@ -511,29 +511,39 @@ function renderGridSection(client, moduleName, propName, prop) {
     thead.appendChild(el("th", { text: "" }));
     table.appendChild(el("thead", null, [thead]));
     const tbody = el("tbody");
+    // permission:0 (ReadOnly, e.g. sequencer's "livesequence" - a run-time
+    // snapshot the backend itself writes, issue #241) also rejects every
+    // grid mutation server-side (Basemodule::onExternalEventBase) - don't
+    // show controls that would just fail.
+    const editable = prop.permission !== 0;
     (prop.rows || []).forEach((row, idx) => {
       const tr = el("tr", { class: "grid-row" });
       for (const h of headers) {
         const def = prop.elements[h] || { type: "string" };
-        tr.appendChild(el("td", { text: formatScalarWithLov(client, moduleName, def, row[h]) }));
+        if (def.type === "prg") tr.appendChild(el("td", null, [renderDisplayOnly(h, Object.assign({}, def, { value: row[h] }))]));
+        else tr.appendChild(el("td", { text: formatScalarWithLov(client, moduleName, def, row[h]) }));
       }
-      const actions = el("td", { class: "grid-actions" });
-      actions.appendChild(iconButton("edit", t("common.editRow"), () => openGridDialog(client, moduleName, propName, prop, idx, row)));
-      actions.appendChild(iconButton("arrow_upward", t("common.moveUp"), () => client.gridMoveUp(moduleName, propName, idx)));
-      actions.appendChild(iconButton("arrow_downward", t("common.moveDown"), () => client.gridMoveDown(moduleName, propName, idx)));
-      actions.appendChild(iconButton("delete", t("common.deleteRow"), () => { if (confirm(t("common.deleteRowConfirm"))) client.gridDelete(moduleName, propName, idx); }, { danger: true }));
-      tr.appendChild(actions);
-      tr.addEventListener("click", (ev) => { if (ev.target.closest(".grid-actions")) return; client.gridFetch(moduleName, propName, idx); });
+      if (editable) {
+        const actions = el("td", { class: "grid-actions" });
+        actions.appendChild(iconButton("edit", t("common.editRow"), () => openGridDialog(client, moduleName, propName, prop, idx, row)));
+        actions.appendChild(iconButton("arrow_upward", t("common.moveUp"), () => client.gridMoveUp(moduleName, propName, idx)));
+        actions.appendChild(iconButton("arrow_downward", t("common.moveDown"), () => client.gridMoveDown(moduleName, propName, idx)));
+        actions.appendChild(iconButton("delete", t("common.deleteRow"), () => { if (confirm(t("common.deleteRowConfirm"))) client.gridDelete(moduleName, propName, idx); }, { danger: true }));
+        tr.appendChild(actions);
+        tr.addEventListener("click", (ev) => { if (ev.target.closest(".grid-actions")) return; client.gridFetch(moduleName, propName, idx); });
+      }
       tbody.appendChild(tr);
     });
     table.appendChild(tbody);
     wrap.appendChild(el("div", { class: "grid-table-wrap" }, [table]));
 
-    const toolbar = el("div", { class: "grid-toolbar" });
-    toolbar.appendChild(el("button", { class: "btn btn-sm", onclick: () => openGridDialog(client, moduleName, propName, prop, null, null) }, [icon("add", { small: true }), "Add row"]));
-    toolbar.appendChild(el("button", { class: "btn btn-sm btn-danger", onclick: () => { if (confirm("Clear the whole grid?")) client.gridReset(moduleName, propName); } }, "Reset grid"));
-    if (prop.gridLimit) toolbar.appendChild(el("span", { class: "muted small mono", text: `${(prop.rows || []).length}/${prop.gridLimit} rows` }));
-    wrap.appendChild(toolbar);
+    if (editable) {
+      const toolbar = el("div", { class: "grid-toolbar" });
+      toolbar.appendChild(el("button", { class: "btn btn-sm", onclick: () => openGridDialog(client, moduleName, propName, prop, null, null) }, [icon("add", { small: true }), "Add row"]));
+      toolbar.appendChild(el("button", { class: "btn btn-sm btn-danger", onclick: () => { if (confirm("Clear the whole grid?")) client.gridReset(moduleName, propName); } }, "Reset grid"));
+      if (prop.gridLimit) toolbar.appendChild(el("span", { class: "muted small mono", text: `${(prop.rows || []).length}/${prop.gridLimit} rows` }));
+      wrap.appendChild(toolbar);
+    }
   }
 
   if (prop.hasGraph) {

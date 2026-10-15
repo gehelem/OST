@@ -106,6 +106,63 @@
             }
         }
     },
+    "livesequence": {
+        "hasGrid":true,
+        "showGrid":true,
+        "showElts":false,
+        "devcat": "Sequence",
+        "group": "",
+        "permission": 0,
+        "order":15,
+        "grid":0,
+        "hasprofile":false,
+        "label": "Live sequence",
+        "hint": "Snapshot of the sequence grid taken when a run starts (issue #241) - not saved to the profile, just reflects progress while running",
+        "e": {
+            "filter": {
+                "type":"int",
+                "label": "Filter",
+                "order":1,
+                "gridvalues":[],
+                "listOfValues":[
+                ]
+            },
+            "exposure": {
+                "type":"float",
+                "label": "Exposure",
+                "order":2,
+                "value":10,
+                "gridvalues":[],
+                "format": "99"
+            },
+            "count": {
+                "type":"int",
+                "label": "Count",
+                "order":3,
+                "value":5,
+                "gridvalues":[],
+                "format": "99"
+            },
+            "progresscount": {
+                "type":"prg",
+                "prgtype": "progressbar",
+                "label": "Shots",
+                "dynlabel": "",
+                "value": 0,
+                "order":4,
+                "gridvalues":[]
+            },
+            "progressduration": {
+                "type":"prg",
+                "prgtype": "progressbar",
+                "label": "Duration",
+                "dynlabel": "",
+                "value": 0,
+                "order":5,
+                "gridvalues":[]
+            }
+        }
+    },
     "object":{
             "devcat": "Parameters",
             "group": "Sequence",

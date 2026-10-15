@@ -82,6 +82,8 @@ class MODULE_INIT Sequencer: public IndiModule
         void refreshFilterLov();
         void setupOutputFolder();
         void recomputeSequenceTotals();
+        void buildLiveSequence();
+        void updateLiveSequenceProgress();
         static QString formatDuration(double seconds);
 
         QScxmlStateMachine  *pMachine     = nullptr;
