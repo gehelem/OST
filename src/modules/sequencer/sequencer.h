@@ -86,6 +86,7 @@ class MODULE_INIT Sequencer: public IndiModule
         void updateLiveSequenceProgress();
         void bumpLiveSequenceCounter(const QString &column);
         void quarantineLastFrame();
+        void writeLiveSequenceStats();
         static QString formatDuration(double seconds);
 
         QScxmlStateMachine  *pMachine     = nullptr;

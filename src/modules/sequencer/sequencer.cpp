@@ -4,6 +4,8 @@
 #include <QStorageInfo>
 #include <QFile>
 #include <QFileInfo>
+#include <QJsonDocument>
+#include <QJsonArray>
 #include "version.cc"
 
 Sequencer *initialize(QString name, QString label, QString profile, QVariantMap availableModuleLibs)
@@ -513,6 +515,7 @@ void Sequencer::SMDone()
     //qDebug() << "SMDone";
     logInfo("Sequence completed");
     mElapsedTimer->stop();
+    writeLiveSequenceStats();
     getProperty("actions")->setState(OST::Ok, true);
     getEltBool("actions", "startsequence")->setValue(false, true);
     getEltBool("actions", "abortsequence")->setValue(false, true);
@@ -526,6 +529,7 @@ void Sequencer::SMAborted()
     logInfo("Sequence aborted");
     mSettleTimer->stop();
     mElapsedTimer->stop();
+    writeLiveSequenceStats();
     getProperty("actions")->setState(OST::Ok, true);
     getEltBool("actions", "startsequence")->setValue(false, true);
     getEltBool("actions", "abortsequence")->setValue(false, true);
@@ -540,6 +544,7 @@ void Sequencer::SMError()
     mLastErrorCause.clear();
     mSettleTimer->stop();
     mElapsedTimer->stop();
+    writeLiveSequenceStats();
     getProperty("actions")->setState(OST::Error, true);
     getEltBool("actions", "startsequence")->setValue(false, true);
     getEltBool("actions", "abortsequence")->setValue(false, true);
@@ -1029,6 +1034,161 @@ void Sequencer::quarantineLastFrame()
     else
         logWarning("Could not move rejected frame %1 to %2", {mLastFitsPath, dest});
     mLastFitsPath.clear();
+}
+
+// Writes two files at the module's webroot so what actually happened
+// during a run (issue #241) survives past it - "livesequence" is never
+// saved to the profile and gets rebuilt empty by the next
+// buildLiveSequence(). Called from all three terminal states
+// (Done/Aborted/Error) - even a cut-short run has real data worth keeping:
+// - sequence-report-<timestamp>.txt: one human-readable file per run
+//   (object/coordinates/profile/frame type/gain/offset/temperature
+//   header, then a plain-text table of every "livesequence" line).
+// - sequence-history.json: one file per module, read-modify-written on
+//   every run - top-level keyed by object name, each holding an array of
+//   past runs (same fields as the text report, plus the timestamp).
+void Sequencer::writeLiveSequenceStats()
+{
+    QString profile = getCurrentProfile();
+    double  ra      = getFloat("object", "ra");
+    double  de      = getFloat("object", "de");
+    int     gain    = getInt("parameters", "gain");
+    int     offset  = getInt("parameters", "offset");
+    double  camTemp = 0.0;
+    getModNumber(getString("devices", "camera"), "CCD_TEMPERATURE", "CCD_TEMPERATURE_VALUE", camTemp);
+
+    const auto &lov = getEltInt("livesequence", "filter")->getLov();
+    const QStringList headers = {
+        "Filter", "Exposure (s)", "Count", "Shots", "Duration",
+        "Dithers", "Focus", "Recal", "Avg HFR", "Avg SNR", "Avg RMS"
+    };
+    QList<QStringList> tableRows;
+    QJsonArray lines;
+
+    int rows = getProperty("livesequence")->getGrid().count();
+    for (int i = 0; i < rows; i++)
+    {
+        getProperty("livesequence")->fetchLine(i);
+        int     filterIndex  = getInt("livesequence", "filter");
+        QString filterName   = lov.value(filterIndex);
+        double  exposure     = getFloat("livesequence", "exposure");
+        int     count        = getInt("livesequence", "count");
+        QString shotsDone    = getEltPrg("livesequence", "progresscount")->value().dynlabel;
+        QString durationDone = getEltPrg("livesequence", "progressduration")->value().dynlabel;
+        int     dithers      = getInt("livesequence", "dithercount");
+        int     focus        = getInt("livesequence", "focuscount");
+        int     recal        = getInt("livesequence", "recalcount");
+        double  avgHfr       = getFloat("livesequence", "avghfr");
+        double  avgSnr       = getFloat("livesequence", "avgsnr");
+        double  avgRms       = getFloat("livesequence", "avgrms");
+
+        tableRows.append(QStringList{
+            filterName, QString::number(exposure, 'f', 2), QString::number(count),
+            shotsDone, durationDone, QString::number(dithers), QString::number(focus),
+            QString::number(recal), QString::number(avgHfr, 'f', 2),
+            QString::number(avgSnr, 'f', 2), QString::number(avgRms, 'f', 2)
+        });
+
+        QJsonObject line;
+        line["filter"]       = filterIndex;
+        line["filtername"]   = filterName;
+        line["exposure"]     = exposure;
+        line["count"]        = count;
+        line["shotsdone"]    = shotsDone;
+        line["durationdone"] = durationDone;
+        line["dithercount"]  = dithers;
+        line["focuscount"]   = focus;
+        line["recalcount"]   = recal;
+        line["avghfr"]       = avgHfr;
+        line["avgsnr"]       = avgSnr;
+        line["avgrms"]       = avgRms;
+        lines.append(line);
+    }
+
+    QString timestamp = QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss");
+
+    // Shared by both files below - the JSON history's one entry for this run.
+    QJsonObject runEntry;
+    runEntry["timestamp"]   = timestamp;
+    runEntry["object"]      = mObjectName;
+    runEntry["ra"]          = ra;
+    runEntry["de"]          = de;
+    runEntry["profile"]     = profile;
+    runEntry["frametype"]   = mCurrentFrameType;
+    runEntry["gain"]        = gain;
+    runEntry["offset"]      = offset;
+    runEntry["temperature"] = camTemp;
+    runEntry["lines"]       = lines;
+
+    // ---- One human-readable report per run (issue #241) ----
+    QList<int> widths(headers.size(), 0);
+    auto measure = [&](const QStringList &row)
+    {
+        for (int c = 0; c < row.size(); c++) widths[c] = qMax(widths[c], row[c].length());
+    };
+    measure(headers);
+    for (const QStringList &r : tableRows) measure(r);
+
+    auto formatRow = [&](const QStringList &row)
+    {
+        QString s;
+        for (int c = 0; c < row.size(); c++) s += row[c].leftJustified(widths[c] + 2);
+        return s;
+    };
+
+    QStringList textLines;
+    textLines << QString("Object: %1").arg(mObjectName);
+    textLines << QString("Coordinates: RA %1  DEC %2").arg(ra, 0, 'f', 5).arg(de, 0, 'f', 5);
+    textLines << QString("Profile: %1").arg(profile);
+    textLines << QString("Frame type: %1").arg(mCurrentFrameType);
+    textLines << QString("Gain: %1  Offset: %2").arg(gain).arg(offset);
+    textLines << QString("Camera temperature: %1 °C").arg(camTemp, 0, 'f', 1);
+    textLines << "";
+    textLines << formatRow(headers);
+    for (const QStringList &r : tableRows) textLines << formatRow(r);
+
+    QString textPath = getWebroot() + "/" + getModuleName() + "/sequence-report-" + timestamp + ".txt";
+    QFile textFile(textPath);
+    if (textFile.open(QIODevice::WriteOnly))
+    {
+        textFile.write(textLines.join("\n").toUtf8());
+        textFile.close();
+        logInfo("Wrote sequence report to %1", {textPath});
+    }
+    else
+    {
+        logWarning("Could not write sequence report to %1", {textPath});
+    }
+
+    // ---- One JSON file per module, keyed by object name, appended to on
+    // every run (issue #241) - read-modify-write, not per-run like the
+    // report above. ----
+    QString historyPath = getWebroot() + "/" + getModuleName() + "/sequence-history.json";
+    QJsonObject history;
+    QFile historyFile(historyPath);
+    if (historyFile.open(QIODevice::ReadOnly))
+    {
+        QJsonParseError err;
+        QJsonDocument doc = QJsonDocument::fromJson(historyFile.readAll(), &err);
+        historyFile.close();
+        if (err.error == QJsonParseError::NoError && doc.isObject())
+            history = doc.object();
+    }
+
+    QJsonArray objectRuns = history[mObjectName].toArray();
+    objectRuns.append(runEntry);
+    history[mObjectName] = objectRuns;
+
+    if (historyFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+        historyFile.write(QJsonDocument(history).toJson());
+        historyFile.close();
+        logInfo("Appended sequence run to %1", {historyPath});
+    }
+    else
+    {
+        logWarning("Could not write sequence history to %1", {historyPath});
+    }
 }
 
 QVariantMap Sequencer::onModuleQuery(const QString &queryName, const QVariantMap &params)
