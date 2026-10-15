@@ -29,6 +29,12 @@ Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap a
     getEltString("devices", "filter")->setNullable(true);
     getEltString("focusparameters", "focusprofile")->setLovConstrained(true);
     getEltString("focusparameters", "focusprofile")->setNullable(true);
+    // FILTER_SLOT is a numeric INDI property - "filter" is declared "int"
+    // in sequencer.json (issue #240), its LOV key is the real slot number,
+    // no string round-trip needed when sending to the driver.
+    getEltInt("sequence", "filter")->setLovConstrained(true);
+    getEltInt("sequence", "filter")->setNullable(true);
+    getEltInt("focusprofiles", "filter")->setLovConstrained(true);
     defineMeAsSequencer();
     refreshFilterLov();
 
@@ -215,8 +221,8 @@ void Sequencer::SMInitLine()
 
     getProperty("sequence")->fetchLine(mCurrentLine);
     mShotCount            = getInt("sequence", "count");
-    QString filterIndex       = getString("sequence", "filter");
-    const auto &lov       = getEltString("sequence", "filter")->getLov();
+    int filterIndex       = getInt("sequence", "filter");
+    const auto &lov       = getEltInt("sequence", "filter")->getLov();
     mCurrentFilter        = lov.contains(filterIndex) ? lov[filterIndex] : QString();
     mCurrentFilterIndex   = filterIndex;
     mCurrentFrameType     = getString("parameters", "frametype");
@@ -229,7 +235,7 @@ void Sequencer::SMInitLine()
 void Sequencer::SMFilterStep()
 {
     //qDebug() << "SMFilterStep";
-    QString filterIndex = getString("sequence", "filter");
+    int filterIndex = getInt("sequence", "filter");
     mFilterChanged  = !mPreviousFilter.isEmpty() && (mPreviousFilter != mCurrentFilter);
 
     if (mPreviousFilter.isEmpty() && !mCurrentFilter.isEmpty())
@@ -242,14 +248,27 @@ void Sequencer::SMFilterStep()
     setupOutputFolder();
 
     QString filterDevice = getString("devices", "filter");
-    if (!getDevice(filterDevice.toStdString().c_str()).isValid())
+    // FILTER_SLOT is 1-based: no device, or no filter selected for this
+    // line (e.g. Bias/Dark frames), means nothing to command here.
+    if (!getDevice(filterDevice.toStdString().c_str()).isValid() || filterIndex <= 0)
     {
         pMachine->submitEvent("FilterReady");
         return;
     }
 
+    if (!getEltInt("sequence", "filter")->getLov().contains(filterIndex))
+    {
+        // Stale slot (e.g. the wheel now reports fewer filters than when
+        // this line was configured) - never guess, never send an
+        // out-of-range slot to the driver (issue #240). Stay here and let
+        // this state's own FilterTimeout watchdog (sequencer.scxml) route
+        // to Error instead.
+        logWarning("Filter slot %1 is not valid on this wheel - not sending FILTER_SLOT", {QString::number(filterIndex)});
+        return;
+    }
+
     // INDI FILTER_SLOT OK → updateProperty() submits FilterReady
-    sendModNewNumber(filterDevice, "FILTER_SLOT", "FILTER_SLOT_VALUE", filterIndex.toInt());
+    sendModNewNumber(filterDevice, "FILTER_SLOT", "FILTER_SLOT_VALUE", filterIndex);
 }
 
 void Sequencer::SMFocusGate()
@@ -389,8 +408,21 @@ void Sequencer::SMFocusing()
     mFocusTimer.start();
 
     // Per-filter override (focusprofiles grid) takes priority over the
-    // single fallback profile (parameters.focusprofile).
-    QString focusProfile = getGridString("focusprofiles", "profile", "filter", mCurrentFilterIndex);
+    // single fallback profile (parameters.focusprofile). Not using the
+    // generic getGridString(prop, col, keyCol, keyValue) key lookup here:
+    // its findGridRow() reads the key column through getString(prop, col,
+    // line), which hard static_cast<ValueString*>'s the grid cell - fine
+    // for a string key column, undefined behavior now that "filter" is an
+    // int column (libs/datastore.cpp). Matching by hand instead.
+    QString focusProfile;
+    for (int i = 0, rows = getGridSize("focusprofiles"); i < rows; i++)
+    {
+        if (getGridInt("focusprofiles", "filter", i) == mCurrentFilterIndex)
+        {
+            focusProfile = getGridString("focusprofiles", "profile", i);
+            break;
+        }
+    }
     if (focusProfile.isEmpty())
         focusProfile = getString("focusparameters", "focusprofile");
 
@@ -927,8 +959,8 @@ void Sequencer::refreshFilterLov()
     // must fall back to empty, not resolve to a phantom stale entry).
     // Shared by "sequence" (per-line filter) and "focusprofiles" (per-filter
     // focus profile override) — same physical filter wheel, same LOV.
-    getEltString("sequence", "filter")->lovClear();
-    getEltString("focusprofiles", "filter")->lovClear();
+    getEltInt("sequence", "filter")->lovClear();
+    getEltInt("focusprofiles", "filter")->lovClear();
 
     INDI::BaseDevice dp = getDevice(getString("devices", "filter").toStdString().c_str());
     if (!dp.isValid())
@@ -940,8 +972,10 @@ void Sequencer::refreshFilterLov()
 
     for (unsigned int i = 0; i < txt.count(); i++)
     {
-        getEltString("sequence", "filter")->lovAdd(QString::number(i + 1), txt[i].getText());
-        getEltString("focusprofiles", "filter")->lovAdd(QString::number(i + 1), txt[i].getText());
+        // INDI FILTER_SLOT is 1-based: slot i+1 is named by FILTER_NAME's
+        // i-th (0-based) text element.
+        getEltInt("sequence", "filter")->lovAdd((int)(i + 1), txt[i].getText());
+        getEltInt("focusprofiles", "filter")->lovAdd((int)(i + 1), txt[i].getText());
     }
 }
 

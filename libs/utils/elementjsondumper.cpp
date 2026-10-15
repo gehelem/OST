@@ -71,12 +71,18 @@ void ElementJsonDumper::visit(ElementInt *pElement, QVariantMap &data, bool &emi
 
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
     if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
+    // lovConstrained/nullable are element-level flags, independent of
+    // whether the LOV is global or local - used to be nested inside the
+    // globallov-only branch below, so a local listOfValues (lovAdd(),
+    // e.g. sequencer's per-filter FILTER_SLOT) never carried either to
+    // the frontend at all, no matter what setLovConstrained()/
+    // setNullable() was called with server-side (issue #240).
+    json["lovConstrained"] = pElement->getLovConstrained();
+    json["nullable"] = pElement->getNullable();
     if (pElement->getGlobalLov() != "")
     {
         json["globallov"] = pElement->getGlobalLov();
         json["lovScope"] = (pElement->getLovScope() == LovScope::Controller) ? "controller" : "module";
-        json["lovConstrained"] = pElement->getLovConstrained();
-        json["nullable"] = pElement->getNullable();
     }
     else
     {
@@ -113,12 +119,14 @@ void ElementJsonDumper::visit(ElementFloat *pElement, QVariantMap &data, bool &e
 
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
     if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
+    // See the matching comment in ElementInt's own visit() just above -
+    // same bug, same fix (issue #240).
+    json["lovConstrained"] = pElement->getLovConstrained();
+    json["nullable"] = pElement->getNullable();
     if (pElement->getGlobalLov() != "")
     {
         json["globallov"] = pElement->getGlobalLov();
         json["lovScope"] = (pElement->getLovScope() == LovScope::Controller) ? "controller" : "module";
-        json["lovConstrained"] = pElement->getLovConstrained();
-        json["nullable"] = pElement->getNullable();
     }
     else
     {
@@ -146,12 +154,14 @@ void ElementJsonDumper::visit(ElementString *pElement, QVariantMap &data, bool &
     json["type"] = "string";
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
     if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
+    // See the matching comment in ElementInt's own visit() above - same
+    // bug, same fix (issue #240).
+    json["lovConstrained"] = pElement->getLovConstrained();
+    json["nullable"] = pElement->getNullable();
     if (pElement->getGlobalLov() != "")
     {
         json["globallov"] = pElement->getGlobalLov();
         json["lovScope"] = (pElement->getLovScope() == LovScope::Controller) ? "controller" : "module";
-        json["lovConstrained"] = pElement->getLovConstrained();
-        json["nullable"] = pElement->getNullable();
     }
     else
     {
