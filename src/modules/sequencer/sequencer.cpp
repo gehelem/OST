@@ -994,12 +994,10 @@ void Sequencer::buildLiveSequence()
         values["avgrms"]       = 0.0;
         getProperty("livesequence")->newLine(values);
 
-        // newLine() snapshots whatever the "progress*" elements currently
-        // hold (leftover from the previous line) - set them to a clean
-        // starting point, then re-sync this one row (same pattern as
-        // planner.cpp's own prg-in-grid column).
-        getEltPrg("livesequence", "progresscount")->setPrgValue(0, false);
-        getEltPrg("livesequence", "progresscount")->setDynLabel("0/" + QString::number(count), false);
+        // newLine() snapshots whatever "progressduration" currently holds
+        // (leftover from the previous line) - set it to a clean starting
+        // point, then re-sync this one row (same pattern as planner.cpp's
+        // own prg-in-grid column).
         getEltPrg("livesequence", "progressduration")->setPrgValue(0, false);
         getEltPrg("livesequence", "progressduration")->setDynLabel(formatDuration(0) + "/" + formatDuration(count * exp), false);
         getEltLight("livesequence", "status")->setValue(OST::Idle, false);
@@ -1007,8 +1005,8 @@ void Sequencer::buildLiveSequence()
     }
 }
 
-// Advances the current line's two progress columns in "livesequence"
-// (issue #241) - called once per completed shot (SMEvalShot()). Reads
+// Advances the current line's progress column in "livesequence" (issue
+// #241) - called once per completed shot (SMEvalShot()). Reads
 // "sequence"'s own live count/exposure, which still reflect mCurrentLine
 // (fetchLine() for the next line only happens in SMInitLine(), once this
 // line is entirely done).
@@ -1023,8 +1021,6 @@ void Sequencer::updateLiveSequenceProgress()
     double doneSeconds  = done * lineExp;
     double totalSeconds = lineCount * lineExp;
 
-    getEltPrg("livesequence", "progresscount")->setPrgValue(lineCount > 0 ? 100.0 * done / lineCount : 0.0, false);
-    getEltPrg("livesequence", "progresscount")->setDynLabel(QString::number(done) + "/" + QString::number(lineCount), false);
     getEltPrg("livesequence", "progressduration")->setPrgValue(totalSeconds > 0 ? 100.0 * doneSeconds / totalSeconds : 0.0, false);
     getEltPrg("livesequence", "progressduration")->setDynLabel(formatDuration(doneSeconds) + "/" + formatDuration(totalSeconds), false);
     getProperty("livesequence")->updateLine(mCurrentLine);
@@ -1088,7 +1084,7 @@ void Sequencer::writeLiveSequenceStats()
 
     const auto &lov = getEltInt("livesequence", "filter")->getLov();
     const QStringList headers = {
-        "Filter", "Exposure (s)", "Count", "Shots", "Duration",
+        "Filter", "Exposure (s)", "Count", "Duration",
         "Dithers", "Focus", "Recal", "Avg HFR", "Avg SNR", "Avg RMS"
     };
     QList<QStringList> tableRows;
@@ -1102,7 +1098,6 @@ void Sequencer::writeLiveSequenceStats()
         QString filterName   = lov.value(filterIndex);
         double  exposure     = getFloat("livesequence", "exposure");
         int     count        = getInt("livesequence", "count");
-        QString shotsDone    = getEltPrg("livesequence", "progresscount")->value().dynlabel;
         QString durationDone = getEltPrg("livesequence", "progressduration")->value().dynlabel;
         int     dithers      = getInt("livesequence", "dithercount");
         int     focus        = getInt("livesequence", "focuscount");
@@ -1113,7 +1108,7 @@ void Sequencer::writeLiveSequenceStats()
 
         tableRows.append(QStringList{
             filterName, QString::number(exposure, 'f', 2), QString::number(count),
-            shotsDone, durationDone, QString::number(dithers), QString::number(focus),
+            durationDone, QString::number(dithers), QString::number(focus),
             QString::number(recal), QString::number(avgHfr, 'f', 4),
             QString::number(avgSnr, 'f', 4), QString::number(avgRms, 'f', 4)
         });
@@ -1123,7 +1118,6 @@ void Sequencer::writeLiveSequenceStats()
         line["filtername"]   = filterName;
         line["exposure"]     = exposure;
         line["count"]        = count;
-        line["shotsdone"]    = shotsDone;
         line["durationdone"] = durationDone;
         line["dithercount"]  = dithers;
         line["focuscount"]   = focus;

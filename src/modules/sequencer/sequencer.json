@@ -143,15 +143,6 @@
                 "gridvalues":[],
                 "format": "99"
             },
-            "progresscount": {
-                "type":"prg",
-                "prgtype": "progressbar",
-                "label": "Shots",
-                "dynlabel": "",
-                "value": 0,
-                "order":"040",
-                "gridvalues":[]
-            },
             "progressduration": {
                 "type":"prg",
                 "prgtype": "progressbar",
