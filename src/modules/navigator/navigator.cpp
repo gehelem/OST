@@ -242,7 +242,8 @@ void Navigator::newBLOB(INDI::PropertyBlob pblob)
         QImage rawImage = pImage->getRawQImage();
         QImage im = rawImage.convertToFormat(QImage::Format_RGB32);
         im.setColorTable(rawImage.colorTable());
-        atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg");
+        int quality = getInt("parms", "jpegquality");
+        atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg", quality);
         OST::ImgData dta = pImage->ImgStats();
         dta.mUrlJpeg = getModuleName() + ".jpeg";
         dta.isSolved = false;

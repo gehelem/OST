@@ -146,7 +146,8 @@ void Polar::newBLOB(INDI::PropertyBlob  bp)
         QImage im = rawImage.convertToFormat(QImage::Format_RGB32);
         im.setColorTable(rawImage.colorTable());
         _lastRawImage = im;  // keep a copy for error overlay
-        atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg");
+        int quality = getInt("parms", "jpegquality");
+        atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg", quality);
         OST::ImgData dta = image->ImgStats();
         dta.mUrlJpeg = getModuleName() + ".jpeg";
         getEltImg("image", "image")->setValue(dta, true);

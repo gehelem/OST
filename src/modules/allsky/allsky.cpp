@@ -491,9 +491,8 @@ void Allsky::newBLOB(INDI::PropertyBlob pblob)
 
         p.end();
 
-
-
-        atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + QString(pblob.getDeviceName()) + ".jpeg");
+        int quality = getInt("parms", "jpegquality");
+        atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + QString(pblob.getDeviceName()) + ".jpeg", quality);
         OST::ImgData dta = _image->ImgStats();
         dta.mUrlJpeg = getModuleName() + QString(pblob.getDeviceName()) + ".jpeg";
         dta.mAlternates.clear();

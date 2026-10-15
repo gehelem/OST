@@ -1255,7 +1255,8 @@ void BlindPec::publishFrame()
         painter.drawLine(QPointF(cx, cy),
                          QPointF(cx + _measX / 2.0, cy + _measY / 2.0));
     }
-    atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg");
+    int quality = getInt("parms", "jpegquality");
+    atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg", quality);
 
     OST::ImgData dta = _image->ImgStats();
     dta.mUrlJpeg = getModuleName() + ".jpeg";

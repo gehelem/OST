@@ -673,7 +673,8 @@ void Sequencer::newBLOB(INDI::PropertyBlob pblob)
     QImage rawImage = _image->getRawQImage();
     QImage im = rawImage.convertToFormat(QImage::Format_RGB32);
     im.setColorTable(rawImage.colorTable());
-    atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg");
+    int quality = getInt("parms", "jpegquality");
+    atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg", quality);
 
     OST::ImgData dta  = _image->ImgStats();
     dta.mUrlJpeg      = getModuleName() + ".jpeg";

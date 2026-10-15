@@ -1588,7 +1588,8 @@ void Guider::OnSucessSEP()
             painter.drawEllipse(QPointF(star.x / 2.0, star.y / 2.0), r, r);
         }
     }
-    atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg");
+    int quality = getInt("parms", "jpegquality");
+    atomicSaveJpeg(im, getWebroot() + "/" + getModuleName() + ".jpeg", quality);
     dta.mUrlJpeg = getModuleName() + ".jpeg";
 
     getEltImg("image", "image")->setValue(dta, true);
