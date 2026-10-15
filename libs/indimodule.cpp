@@ -1545,7 +1545,7 @@ bool IndiModule::giveMeATarget()
     if (!getStore().contains("target"))
     {
         OST::PropertyMulti* pm = new OST::PropertyMulti("target", "Target", OST::ReadWrite, "Target", "", "0500",
-                true,
+                false,
                 false);
         createProperty(pm);
     }
