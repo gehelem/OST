@@ -67,16 +67,26 @@ void ElementJsonDumper::visit(ElementInt *pElement, QVariantMap &data, bool &emi
     json["format"] = pElement->format();
     json["slider"] = pElement->slider();
     mResult = json;
-    if (mEvent == EvType::ev) return;
+    // No early return on EvType::ev here (unlike ee/ea above): ev now also
+    // carries the lov-related fields below, so PropertyMulti::OnLovChanged()
+    // (issue #240 - a local lovAdd()/lovClear()/lovUpdate() used to never
+    // reach any client at all, not even one already connected) has a real
+    // payload to send instead of just a bare notification.
 
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
     if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
+    // lovConstrained/nullable are element-level flags, independent of
+    // whether the LOV is global or local - used to be nested inside the
+    // globallov-only branch below, so a local listOfValues (lovAdd(),
+    // e.g. sequencer's per-filter FILTER_SLOT) never carried either to
+    // the frontend at all, no matter what setLovConstrained()/
+    // setNullable() was called with server-side (issue #240).
+    json["lovConstrained"] = pElement->getLovConstrained();
+    json["nullable"] = pElement->getNullable();
     if (pElement->getGlobalLov() != "")
     {
         json["globallov"] = pElement->getGlobalLov();
         json["lovScope"] = (pElement->getLovScope() == LovScope::Controller) ? "controller" : "module";
-        json["lovConstrained"] = pElement->getLovConstrained();
-        json["nullable"] = pElement->getNullable();
     }
     else
     {
@@ -109,16 +119,19 @@ void ElementJsonDumper::visit(ElementFloat *pElement, QVariantMap &data, bool &e
     json["format"] = pElement->format();
     json["slider"] = pElement->slider();
     mResult = json;
-    if (mEvent == EvType::ev) return;
+    // See the matching comment in ElementInt's own visit() just above -
+    // no early return on ev, same reason.
 
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
     if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
+    // See the matching comment in ElementInt's own visit() just above -
+    // same bug, same fix (issue #240).
+    json["lovConstrained"] = pElement->getLovConstrained();
+    json["nullable"] = pElement->getNullable();
     if (pElement->getGlobalLov() != "")
     {
         json["globallov"] = pElement->getGlobalLov();
         json["lovScope"] = (pElement->getLovScope() == LovScope::Controller) ? "controller" : "module";
-        json["lovConstrained"] = pElement->getLovConstrained();
-        json["nullable"] = pElement->getNullable();
     }
     else
     {
@@ -141,17 +154,23 @@ void ElementJsonDumper::visit(ElementString *pElement, QVariantMap &data, bool &
     QJsonObject json = dumpElementCommons(pElement);
     json["value"] = pElement->value();
     mResult = json;
-    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
+    if (mEvent == EvType::ee || mEvent == EvType::ea) return;
 
+    // ev falls through from here (unlike ee/ea above) - see the matching
+    // comment in ElementInt's own visit(): it now also carries the
+    // lov-related fields below, needed for PropertyMulti::OnLovChanged()
+    // (issue #240) to have a real payload.
     json["type"] = "string";
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
     if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
+    // See the matching comment in ElementInt's own visit() above - same
+    // bug, same fix (issue #240).
+    json["lovConstrained"] = pElement->getLovConstrained();
+    json["nullable"] = pElement->getNullable();
     if (pElement->getGlobalLov() != "")
     {
         json["globallov"] = pElement->getGlobalLov();
         json["lovScope"] = (pElement->getLovScope() == LovScope::Controller) ? "controller" : "module";
-        json["lovConstrained"] = pElement->getLovConstrained();
-        json["nullable"] = pElement->getNullable();
     }
     else
     {

@@ -81,7 +81,7 @@
         "label": "Sequence",
         "e": {
             "filter": {
-                "type":"string",
+                "type":"int",
                 "label": "Filter",
                 "order":1,
                 "gridvalues":[],
@@ -347,7 +347,7 @@
         "label": "Focus profile per filter",
         "e": {
             "filter": {
-                "type": "string",
+                "type": "int",
                 "label": "Filter",
                 "order": 1,
                 "gridvalues": [],

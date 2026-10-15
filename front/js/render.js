@@ -182,6 +182,19 @@ function formatScalar(type, value) {
   }
 }
 
+// Same as formatScalar(), but resolves a LOV-backed value (int, float or
+// string alike - lov keys/values round-trip through JSON as strings
+// either way, so a plain property lookup works regardless of the
+// element's real type) to its label instead of showing the raw key.
+// Falls back to formatScalar() when there's no LOV, or the value isn't
+// one of its keys (e.g. a stale slot - still shown raw rather than
+// hidden, same spirit as buildEditControl's own handling of that case).
+function formatScalarWithLov(client, moduleName, def, value) {
+  const lov = client.resolveLov(moduleName, def);
+  if (lov && value !== undefined && value !== null && lov[value] !== undefined) return lov[value];
+  return formatScalar(def.type, value);
+}
+
 // Shallow value-equality covering both scalars and the compound
 // date/time/datetime shape ({year,month,...}) - used only to decide
 // whether a directedit field's own "check" icon should turn green (see
@@ -502,7 +515,7 @@ function renderGridSection(client, moduleName, propName, prop) {
       const tr = el("tr", { class: "grid-row" });
       for (const h of headers) {
         const def = prop.elements[h] || { type: "string" };
-        tr.appendChild(el("td", { text: formatScalar(def.type, row[h]) }));
+        tr.appendChild(el("td", { text: formatScalarWithLov(client, moduleName, def, row[h]) }));
       }
       const actions = el("td", { class: "grid-actions" });
       actions.appendChild(iconButton("edit", t("common.editRow"), () => openGridDialog(client, moduleName, propName, prop, idx, row)));
@@ -756,7 +769,7 @@ function renderPropertyBody(client, moduleName, propName, prop) {
         valueCell.appendChild(checkBtn);
       }
     } else {
-      valueCell.appendChild(el("span", { class: "readonly-val", text: formatScalar(e.type, e.value) }));
+      valueCell.appendChild(el("span", { class: "readonly-val", text: formatScalarWithLov(client, moduleName, e, e.value) }));
     }
     if (e.posticon) valueCell.appendChild(iconSlotButtons(moduleName, propName, e, client, name));
     tr.appendChild(valueCell);

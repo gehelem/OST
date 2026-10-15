@@ -614,9 +614,15 @@ void PropertyMulti::OnEltEvent(OST::EvType e, QVariant data, OST::ElementBase* e
     if (e == OST::EvType::ee) emit PropertyBase::prpEvent(OST::EvType::ea, data, elt, this); /* force all switches send */
     else emit PropertyBase::prpEvent(e, data, elt, this);
 }
-void PropertyMulti::OnLovChanged(ElementBase*)
+void PropertyMulti::OnLovChanged(ElementBase* elt)
 {
-    //emit propertyEvent(this, {"ap", "", this->key(), "", 0, QVariantMap()});
+    // Was a dead stub (issue #240): a local lovAdd()/lovClear()/lovUpdate()
+    // never reached any already-connected client at all, only a later full
+    // module dump (reconnect/reload) would pick up the new LOV. Reuses the
+    // existing "ev" event/path (same as a min/max/format change,
+    // OnEltEvent() just above) - elementjsondumper.cpp now carries the
+    // lov-related fields on "ev" too, so this has a real payload to send.
+    emit PropertyBase::prpEvent(OST::EvType::ev, QVariant(), elt, this);
 }
 void PropertyMulti::OnMessage(LogLevel l, QString m, QVariantList args)
 {
