@@ -138,11 +138,13 @@ class MODULE_INIT Sequencer: public IndiModule
         // ── Per-exposure monitoring ─────────────────────────────────────────
         double  mLastHFR              = 0.0;
         double  mMaxRMSDuringExposure = 0.0;
-        // Running average HFR for the current line's "livesequence" row
+        // Running average HFR/SNR for the current line's "livesequence" row
         // (issue #241) - reset in SMInitLine(), accumulated in
-        // OnSucessSEP().
+        // OnSucessSEP(). One shared sample count: both come from the same
+        // per-shot ImgData, always updated together.
         double  mLineHFRSum           = 0.0;
-        int     mLineHFRSamples       = 0;
+        double  mLineSNRSum           = 0.0;
+        int     mLineMetricSamples    = 0;
 
         // ── Image processing ────────────────────────────────────────────────
         QPointer<fileio>     _image;

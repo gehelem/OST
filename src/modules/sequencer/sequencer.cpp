@@ -237,7 +237,8 @@ void Sequencer::SMInitLine()
     mLastHFR              = 0.0;
     mMaxRMSDuringExposure = 0.0;
     mLineHFRSum           = 0.0;
-    mLineHFRSamples       = 0;
+    mLineSNRSum           = 0.0;
+    mLineMetricSamples    = 0;
 
     pMachine->submitEvent("LineLoaded");
 }
@@ -781,12 +782,14 @@ void Sequencer::OnSucessSEP()
     mLastHFR = dta.HFRavg;
     setStateEvent(OST::Busy, "running", "imagehfr", "image HFR", dta.HFRavg);
 
-    // Running average HFR for the current "livesequence" row (issue #241).
+    // Running average HFR/SNR for the current "livesequence" row (issue #241).
     if (mCurrentLine >= 0 && mCurrentLine < getProperty("livesequence")->getGrid().count())
     {
         mLineHFRSum += dta.HFRavg;
-        mLineHFRSamples++;
-        getEltFloat("livesequence", "avghfr")->setValue(mLineHFRSum / mLineHFRSamples, false);
+        mLineSNRSum += dta.SNR;
+        mLineMetricSamples++;
+        getEltFloat("livesequence", "avghfr")->setValue(mLineHFRSum / mLineMetricSamples, false);
+        getEltFloat("livesequence", "avgsnr")->setValue(mLineSNRSum / mLineMetricSamples, false);
         getProperty("livesequence")->updateLine(mCurrentLine);
     }
 
@@ -934,6 +937,7 @@ void Sequencer::buildLiveSequence()
         values["focuscount"]   = 0;
         values["recalcount"]   = 0;
         values["avghfr"]       = 0.0;
+        values["avgsnr"]       = 0.0;
         getProperty("livesequence")->newLine(values);
 
         // newLine() snapshots whatever the "progress*" elements currently

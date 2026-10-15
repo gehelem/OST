@@ -196,6 +196,15 @@
                 "gridvalues":[],
                 "format": "99.99",
                 "hint": "Running average HFR over every shot of this line so far"
+            },
+            "avgsnr": {
+                "type":"float",
+                "label": "Avg SNR",
+                "order":10,
+                "value":0,
+                "gridvalues":[],
+                "format": "9999.99",
+                "hint": "Running average SNR over every shot of this line so far"
             }
         }
     },
