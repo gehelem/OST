@@ -389,7 +389,8 @@ void Sequencer::SMEvalShot()
     if (mShotCount > 0)
     {
         double hfrThreshold = getFloat("focusparameters", "hfrthreshold");
-        if (hfrThreshold > 0.0 && mLastHFR > hfrThreshold)
+        bool isLightOrFlat  = (mCurrentFrameType == "L" || mCurrentFrameType == "F");
+        if (isLightOrFlat && hfrThreshold > 0.0 && mLastHFR > hfrThreshold)
         {
             logInfo("HFR %1 exceeds threshold %2 — refocusing",
             {QString::number(mLastHFR, 'f', 2), QString::number(hfrThreshold, 'f', 2)});
@@ -743,6 +744,19 @@ void Sequencer::newBLOB(INDI::PropertyBlob pblob)
 void Sequencer::SMFindStars()
 {
     // Runs on the main thread (state machine entry callback).
+    // Star detection/HFR is meaningless on a frame with no stars by design
+    // (Bias/Dark) - skip the solver entirely rather than feed mLastHFR/
+    // "livesequence".avghfr (issue #241) a number that means nothing, and
+    // risk it spuriously tripping the HFR-threshold refocus in
+    // SMEvalShot() (now itself guarded, but this avoids the wasted solver
+    // run too).
+    bool isLightOrFlat = (mCurrentFrameType == "L" || mCurrentFrameType == "F");
+    if (!isLightOrFlat)
+    {
+        pMachine->submitEvent("FindStarsDone");
+        return;
+    }
+
     _solver.ResetSolver(stats, _image->getImageBuffer());
     connect(&_solver, &Solver::successSEP, this, &Sequencer::OnSucessSEP);
     _solver.FindStars(_solver.stellarSolverProfiles[0]);
