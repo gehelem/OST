@@ -140,14 +140,49 @@
           "directedit": false,
           "order": 30,
           "hint": "Sequencer profile"
+      }
+    }
+  },
+  "liveplanning": {
+    "label": "Live planning",
+    "permission": 0,
+    "devcat": "Planning",
+    "group": "",
+    "autoupdate": false,
+    "order": "055",
+    "hasprofile": false,
+    "showElts":false,
+    "hasGrid": true,
+    "showGrid": true,
+    "hint": "Snapshot of the planning grid taken when a run starts - not saved to the profile, just reflects progress while running",
+    "e": {
+      "object": {
+          "type": "string",
+          "label": "Object",
+          "order": 0
+      },
+      "ra": {
+          "type": "float",
+          "label": "RA",
+          "order": 10
+      },
+      "dec": {
+          "type": "float",
+          "label": "DEC",
+          "order": 20
+      },
+      "profile": {
+          "type": "string",
+          "label": "Profile",
+          "order": 30
       },
       "progress": {
           "type":"prg",
           "label": "Progress",
           "prgtype": "spinner",
           "dynlabel": "",
-          "order":7,
-          "value":"idle",
+          "order":40,
+          "value":0,
           "gridvalues":[]
       }
     }

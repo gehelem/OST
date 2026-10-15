@@ -42,6 +42,19 @@ class Planner : public IndiModule
         void startPlanner();
 
         /**
+         * @brief Snapshot "planning" into the read-only, run-time
+         * "liveplanning" grid (same role as Sequencer's "livesequence")
+         */
+        void buildLivePlanning();
+
+        /**
+         * @brief Write the per-run text report and append to the per-module
+         * JSON history, from "liveplanning" - same behavior as Sequencer's
+         * writeLiveSequenceStats()
+         */
+        void writeLivePlanningStats();
+
+        /**
          * @brief Stop/abort the current operation
          */
         void abortPlanner();
