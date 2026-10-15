@@ -205,6 +205,15 @@
                 "gridvalues":[],
                 "format": "9999.99",
                 "hint": "Running average SNR over every shot of this line so far"
+            },
+            "avgrms": {
+                "type":"float",
+                "label": "Avg guide RMS",
+                "order":11,
+                "value":0,
+                "gridvalues":[],
+                "format": "99.99",
+                "hint": "Running average of this line's own peak guide RMS per shot - 0 if guiding is disabled"
             }
         }
     },

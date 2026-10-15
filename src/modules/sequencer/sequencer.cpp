@@ -235,9 +235,11 @@ void Sequencer::SMInitLine()
     mCurrentFilterIndex   = filterIndex;
     mCurrentFrameType     = getString("parameters", "frametype");
     mLastHFR              = 0.0;
+    mLastSNR              = 0.0;
     mMaxRMSDuringExposure = 0.0;
     mLineHFRSum           = 0.0;
     mLineSNRSum           = 0.0;
+    mLineRMSSum           = 0.0;
     mLineMetricSamples    = 0;
 
     pMachine->submitEvent("LineLoaded");
@@ -404,6 +406,23 @@ void Sequencer::SMEvalShot()
     mShotsSinceDither++;
     mShotsCompleted++;
     mSecondsCompleted += getFloat("livesequence", "exposure");
+
+    // Running average HFR/SNR/guide RMS for the current "livesequence" row
+    // (issue #241) - only for an accepted shot (see the discard above).
+    // mMaxRMSDuringExposure is this shot's own peak, reset per shot in
+    // SMExposing() - 0 if guiding isn't enabled, same graceful "no data"
+    // reading as avghfr/avgsnr get on a frame type with no star detection.
+    if (mCurrentLine >= 0 && mCurrentLine < getProperty("livesequence")->getGrid().count())
+    {
+        mLineHFRSum += mLastHFR;
+        mLineSNRSum += mLastSNR;
+        mLineRMSSum += mMaxRMSDuringExposure;
+        mLineMetricSamples++;
+        getEltFloat("livesequence", "avghfr")->setValue(mLineHFRSum / mLineMetricSamples, false);
+        getEltFloat("livesequence", "avgsnr")->setValue(mLineSNRSum / mLineMetricSamples, false);
+        getEltFloat("livesequence", "avgrms")->setValue(mLineRMSSum / mLineMetricSamples, false);
+    }
+
     updateLiveSequenceProgress();
 
     if (mShotCount > 0)
@@ -639,10 +658,15 @@ void Sequencer::onOtherModuleEvent(OST::EvType ev, QString mod, QString prp, QSt
         {
             if (pMachine->isActive("WaitGuide"))
             {
-                // Guider confirmed abort after RMS alert — reset calibration and restart
+                // Guider confirmed abort after RMS alert — reset calibration and restart.
+                // This is the actual recalibration trigger (issue #241) - the
+                // "Recalibrating" SCXML state / "DoRecal" event are never
+                // reached (nothing ever submits "DoRecal"), so bump the
+                // counter here instead of in SMRecalibrating().
                 logInfo("Guider stopped — resetting calibration and restarting");
                 otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "resetcalibration", true);
                 otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "guide", true);
+                bumpLiveSequenceCounter("recalcount");
             }
             else if (mGuiderActive && !mGuiderWasSuspended)
             {
@@ -780,18 +804,14 @@ void Sequencer::OnSucessSEP()
     getEltImg("image", "image")->setValue(dta, true);
 
     mLastHFR = dta.HFRavg;
+    mLastSNR = dta.SNR;
     setStateEvent(OST::Busy, "running", "imagehfr", "image HFR", dta.HFRavg);
 
-    // Running average HFR/SNR for the current "livesequence" row (issue #241).
-    if (mCurrentLine >= 0 && mCurrentLine < getProperty("livesequence")->getGrid().count())
-    {
-        mLineHFRSum += dta.HFRavg;
-        mLineSNRSum += dta.SNR;
-        mLineMetricSamples++;
-        getEltFloat("livesequence", "avghfr")->setValue(mLineHFRSum / mLineMetricSamples, false);
-        getEltFloat("livesequence", "avgsnr")->setValue(mLineSNRSum / mLineMetricSamples, false);
-        getProperty("livesequence")->updateLine(mCurrentLine);
-    }
+    // "livesequence"'s avghfr/avgsnr/avgrms (issue #241) are accumulated in
+    // SMEvalShot() instead of here, once a shot is actually accepted - this
+    // runs before that decision (a shot over the HFR threshold is discarded
+    // there), so accumulating here would let a bad shot's own measurement
+    // skew the very average meant to track good ones.
 
     pMachine->submitEvent("FindStarsDone");
 }
@@ -938,6 +958,7 @@ void Sequencer::buildLiveSequence()
         values["recalcount"]   = 0;
         values["avghfr"]       = 0.0;
         values["avgsnr"]       = 0.0;
+        values["avgrms"]       = 0.0;
         getProperty("livesequence")->newLine(values);
 
         // newLine() snapshots whatever the "progress*" elements currently
