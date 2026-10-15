@@ -171,13 +171,24 @@ function renderLastLogLine(client, moduleName) {
 
 // ---- element value formatting / editing --------------------------------
 
-function formatScalar(type, value) {
+// `format` is the element's own display mask ("99.99", ".9999", ...) - a
+// count of "9"s after the "." gives the number of decimals to round to.
+// Only int/float use it; every other type ignores it.
+function formatScalar(type, value, format) {
   if (value === undefined || value === null) return "—";
   switch (type) {
     case "date": return value.year !== undefined ? `${value.year}-${String(value.month).padStart(2, "0")}-${String(value.day).padStart(2, "0")}` : "—";
     case "time": return value.hh !== undefined ? `${String(value.hh).padStart(2, "0")}:${String(value.mm).padStart(2, "0")}:${String(value.ss).padStart(2, "0")}` : "—";
     case "datetime": return value.year !== undefined ? `${value.year}-${String(value.month).padStart(2, "0")}-${String(value.day).padStart(2, "0")} ${String(value.hh).padStart(2, "0")}:${String(value.mm).padStart(2, "0")}:${String(value.ss).padStart(2, "0")}` : "—";
     case "bool": return value ? "true" : "false";
+    case "int":
+    case "float": {
+      if (typeof format === "string" && format.includes(".")) {
+        const decimals = format.split(".")[1].length;
+        return Number(value).toFixed(decimals);
+      }
+      return String(value);
+    }
     default: return String(value);
   }
 }
@@ -192,7 +203,7 @@ function formatScalar(type, value) {
 function formatScalarWithLov(client, moduleName, def, value) {
   const lov = client.resolveLov(moduleName, def);
   if (lov && value !== undefined && value !== null && lov[value] !== undefined) return lov[value];
-  return formatScalar(def.type, value);
+  return formatScalar(def.type, value, def.format);
 }
 
 // Shallow value-equality covering both scalars and the compound
@@ -427,7 +438,7 @@ function renderDisplayOnly(elName, el_) {
     return wrap;
   }
   if (type === "message") return el("div", { class: "muted", text: "(message elements are not implemented by the current backend)" });
-  return el("div", { class: "readonly-val", text: formatScalar(type, value) });
+  return el("div", { class: "readonly-val", text: formatScalar(type, value, el_.format) });
 }
 
 function iconSlotButtons(moduleName, propName, obj, client, elName) {
