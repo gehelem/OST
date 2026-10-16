@@ -401,9 +401,10 @@ export class SkyEngine {
     this.showPlanets = true;
     // Gilles, 2026-10-16, after trying several display-settings
     // combinations live: "on coche tout par defaut, sauf hips, day mode,
-    // milky way, azimutal" - every show*/dayMode/showHips field in this
-    // block now defaults per that list; showAzimuthalGrid right below
-    // stays off (one of the four named exceptions).
+    // milky way, azimutal" - milky way was turned back on later the same
+    // day ("coche par defaut milky way"), and showSensorImage further
+    // below added as an exception instead. showAzimuthalGrid right below
+    // stays off, along with dayMode/showHips further down.
     this.showTrueHorizon = true;
     this.showEquatorialGrid = true;
     this.showAzimuthalGrid = false;
@@ -414,10 +415,10 @@ export class SkyEngine {
     // with no way to show just it on its own.
     this.showMeridian = true;
     // Gilles, 2026-10-01: "ajoute son affichage en optionnel dans les
-    // settings du module" - one of the four named exceptions above
-    // (2026-10-16: "sauf hips, day mode, milky way, azimutal"), stays off
-    // unlike every other overlay in this block.
-    this.showMilkyWay = false;
+    // settings du module" - one of the four named exceptions, 2026-10-16:
+    // "sauf hips, day mode, milky way, azimutal", then explicitly turned
+    // back on the same day ("coche par defaut milky way").
+    this.showMilkyWay = true;
     // Gilles, 2026-10-01: "ajoute le trait de l'ecliptique en option".
     this.showEcliptic = true;
     // Gilles, 2026-10-03: "ajoute le noms des objets connus (etoiles,
@@ -462,13 +463,15 @@ export class SkyEngine {
     // and its one unverified assumption (the sign).
     this.sensorOrientationDeg = 0;
     // Gilles, 2026-10-01: "dans le cadre du capteur de la camera essaie de
-    // m'afficher l'image prise ... toujours en optionnel" - defaulted off
-    // at first (a heavier, speculative extra unlike showMountPosition/
-    // showSensorFov above) but turned on, 2026-10-16, with every other
-    // overlay here except the four named exceptions above. Backing state
-    // (_sensorImageUrl/_sensorImageEl) lives behind setSensorImage() below,
-    // not plain fields - loading a JPEG is asynchronous.
-    this.showSensorImage = true;
+    // m'afficher l'image prise ... toujours en optionnel" - a heavier,
+    // speculative extra unlike showMountPosition/showSensorFov above.
+    // Briefly turned on 2026-10-16 along with every other overlay in this
+    // block, then explicitly turned back off the same day ("decoche par
+    // defaut 'captured image in frame'") - stays off, unlike its siblings.
+    // Backing state (_sensorImageUrl/_sensorImageEl) lives behind
+    // setSensorImage() below, not plain fields - loading a JPEG is
+    // asynchronous.
+    this.showSensorImage = false;
     this._sensorImageUrl = null;
     this._sensorImageEl = null;
     // HiPS sky-survey background (js/hips-background.js, Gilles,
@@ -490,7 +493,12 @@ export class SkyEngine {
     // tap-to-select, the ground mask's own ray-casting) - inconsistent
     // between them would mean "what's under the cursor" and "what's drawn
     // there" disagree.
-    this.projection = opts.projection === "stereographic" ? "stereographic" : "orthographic";
+    // Default "stereographic" - Gilles, 2026-10-16, after settling on the
+    // other display-settings defaults: "coche aussi stereographic par
+    // defaut" (opts.projection stays the override hook for a caller that
+    // wants orthographic explicitly - templates/navigator.js doesn't pass
+    // one, so this default is what actually takes effect there).
+    this.projection = opts.projection === "orthographic" ? "orthographic" : "stereographic";
     // Whether the *app's own* light/dark theme is currently light — set
     // and kept in sync by the caller (templates/navigator.js watches
     // <html data-theme>). Independent of dayMode (that's the astronomical

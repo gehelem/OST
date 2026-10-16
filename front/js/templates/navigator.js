@@ -802,17 +802,18 @@ function buildSkyDome(client, moduleName, onSelect, getTime) {
   const savedSettings = loadDisplaySettings();
   Object.assign(engine, savedSettings);
   hipsBg.setEnabled(engine.showHips);
-  // "leger par defaut, mais parametrable" (Gilles, 2026-09-29) - defaults
-  // to "light" same as before, but now actually reads back whichever
-  // depth was last chosen (buildSettingsPanel()'s own selector, added
-  // 2026-10-03: "le grand saut ... on passe la taille au dessus sur les
-  // catalogues") instead of hardcoding "light" regardless. Set
+  // "leger par defaut, mais parametrable" (Gilles, 2026-09-29) - actually
+  // reads back whichever depth was last chosen (buildSettingsPanel()'s own
+  // selector, added 2026-10-03: "le grand saut ... on passe la taille au
+  // dessus sur les catalogues") instead of hardcoding one regardless. Set
   // synchronously here (loadCatalog() itself only sets it once the fetch
   // actually resolves) so buildSettingsPanel() - built right after this
   // function returns, well before that fetch is likely to have finished -
-  // shows the right depth selected immediately instead of always
-  // flashing "light" first.
-  const initialDepth = savedSettings.catalogDepth || "light";
+  // shows the right depth selected immediately instead of always flashing
+  // the fallback first. That fallback was "light" until Gilles, 2026-10-16,
+  // after settling on the other display-settings defaults: "coche aussi
+  // ... l'affichage deep pour le nombre d'etoiles".
+  const initialDepth = savedSettings.catalogDepth || "deep";
   engine.catalogDepth = initialDepth;
   engine.loadCatalog(initialDepth).then(() => engine.render()).catch((e) => console.error("[navigator] catalog load", e));
 
