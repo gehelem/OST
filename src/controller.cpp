@@ -346,6 +346,22 @@ void Controller::loadConf(const QString &pConf)
     OST::LovString* l = static_cast<OST::LovString*>(getControllerLovs()["availableconfs"]);
     l->lovClear();
 
+    // Publish the list of every known configuration up front, regardless
+    // of whether pConf itself resolves below - this used to run only past
+    // both early returns, so a missing/renamed startup --configuration
+    // (ost.cpp's own CLI default is "default") left availableconfs
+    // entirely empty even though other configurations existed in the
+    // database (Gilles, 2026-10-16, after db.sql's seed configuration was
+    // renamed from "default" to "d1" - the real rig config, visible via a
+    // direct DB query, never showed up in a fresh dump).
+    QVariantMap confs;
+    dbmanager->getDbConfigurations(confs);
+    for(QVariantMap::const_iterator iter = confs.begin(); iter != confs.end(); ++iter)
+    {
+        l->lovAdd(iter.key(), iter.key());
+    }
+    updateControllerData("availableconfs", QVariant(confs));
+
     if (!dbmanager->getDbConfiguration(pConf, result))
     {
         logError("Load configuration %1 failed", {pConf});
@@ -383,14 +399,6 @@ void Controller::loadConf(const QString &pConf)
     }
 
     updateControllerData("currentconf", QVariant(pConf));
-    QVariantMap confs;
-    dbmanager->getDbConfigurations(confs);
-    for(QVariantMap::const_iterator iter = confs.begin(); iter != confs.end(); ++iter)
-    {
-        l->lovAdd(iter.key(), iter.key());
-    }
-    updateControllerData("availableconfs", QVariant(confs));
-
 }
 void Controller::saveConf(const QString &pConf)
 {
