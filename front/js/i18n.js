@@ -81,6 +81,7 @@ const STRINGS = {
 
   // ---- app chrome: connect bar, top-right icon buttons (app.js/index.html) -
   "chrome.parameters": { en: "Parameters", fr: "Paramètres", de: "Parameter", it: "Parametri", es: "Parámetros" },
+  "chrome.moreMenu": { en: "More", fr: "Plus", de: "Mehr", it: "Altro", es: "Más" },
   "chrome.uiSize": { en: "UI size", fr: "Taille de l'interface", de: "Oberflächengröße", it: "Dimensione interfaccia", es: "Tamaño de la interfaz" },
   "chrome.toggleTheme": { en: "Toggle theme", fr: "Changer de thème", de: "Design umschalten", it: "Cambia tema", es: "Cambiar tema" },
   "chrome.login": { en: "Login", fr: "Connexion", de: "Anmelden", it: "Accedi", es: "Iniciar sesión" },
@@ -181,6 +182,10 @@ const STRINGS = {
   "views.start": { en: "Start", fr: "Démarrer", de: "Starten", it: "Avvia", es: "Iniciar" },
   "views.indiDriverSearchPlaceholder": { en: "Search a driver… (3+ characters)", fr: "Rechercher un driver… (3 caractères min.)", de: "Treiber suchen… (mind. 3 Zeichen)", it: "Cerca un driver… (3+ caratteri)", es: "Buscar un controlador… (3+ caracteres)" },
   "views.startIndiDriver": { en: "Start a driver", fr: "Démarrer un driver", de: "Treiber starten", it: "Avvia un driver", es: "Iniciar un controlador" },
+  "views.loadIndiConfiguration": { en: "Load", fr: "Charger", de: "Laden", it: "Carica", es: "Cargar" },
+  "views.loadIndiConfigurationTitle": { en: "Load a saved INDI driver configuration", fr: "Charger une configuration de drivers INDI sauvegardée", de: "Gespeicherte INDI-Treiberkonfiguration laden", it: "Carica una configurazione di driver INDI salvata", es: "Cargar una configuración de drivers INDI guardada" },
+  "views.chooseIndiConfiguration": { en: "(choose)", fr: "(choisir)", de: "(auswählen)", it: "(scegli)", es: "(elegir)" },
+  "views.noIndiConfigurationsYet": { en: "(none yet)", fr: "(aucune pour l'instant)", de: "(noch keine)", it: "(nessuna ancora)", es: "(ninguna aún)" },
   "views.rootFolder": { en: "(root)", fr: "(racine)", de: "(Wurzel)", it: "(radice)", es: "(raíz)" },
   "views.selectedPrefix": { en: "Selected: ", fr: "Sélectionné : ", de: "Ausgewählt: ", it: "Selezionato: ", es: "Seleccionado: " },
   "views.none": { en: "(none)", fr: "(aucun)", de: "(keine)", it: "(nessuno)", es: "(ninguno)" },

@@ -311,6 +311,31 @@ bool DBManager::getIndiConfiguration(const QString &pConfigName, QStringList &dr
     mDb.close();
     return true;
 }
+bool DBManager::getIndiConfigurations(QVariantMap &result)
+{
+    if (!mDb.open())
+    {
+        logError("getIndiConfigurations dbOpen - ERROR: %1 - %2", {mDb.databaseName(), mDb.lastError().text()});
+        return false;
+    }
+    QString sql = "SELECT CONFIGNAME,DRIVERS FROM INDICONFIGURATIONS";
+    if (!mQuery.exec(sql))
+    {
+        logError("getIndiConfigurations - ERROR SQL = %1", {sql});
+        logError("getIndiConfigurations - ERROR : %1", {mQuery.lastError().text()});
+        mDb.close();
+        return false;
+    }
+    while (mQuery.next())
+    {
+        QString configName = mQuery.value(0).toString();
+        QVariantList drivers = result[configName].toList();
+        drivers.append(mQuery.value(1).toString());
+        result[configName] = drivers;
+    }
+    mDb.close();
+    return true;
+}
 bool DBManager::saveIndiConfiguration(const QString &pConfigName, const QStringList &drivers)
 {
     if (!mDb.open())

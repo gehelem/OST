@@ -51,6 +51,7 @@ Alle Client-Befehlsschlüssel stehen in **GROSSBUCHSTABEN** (z. B. `DU`, `SV`, `
 | [`YS`](#indi) | INDI-Treiber stoppen |
 | [`YC`](#indi) | Gerät eines INDI-Treibers verbinden |
 | [`YD`](#indi) | Gerät eines INDI-Treibers trennen |
+| [`YK`](#indi) | Gespeicherte INDI-Treiberkonfiguration laden |
 
 ---
 
@@ -619,8 +620,9 @@ Diese Befehle sind nur verfügbar, wenn der Server über eine eingebettete INDI-
 | `YS` | INDI-Treiber stoppen (`{"YS": {"driver": "<binary>"}}`) |
 | `YC` | Gerät eines INDI-Treibers verbinden (`{"YC": {"driver": "<binary>"}}`) |
 | `YD` | Gerät eines INDI-Treibers trennen (`{"YD": {"driver": "<binary>"}}`) |
+| `YK` | Gespeicherte INDI-Treiberkonfiguration laden (`{"YK": {"name": "<Konfigurationsname>"}}`) |
 
-`YA` und `YZ` haben keinen Payload (`{"YA": {}}`). Bei `YL`, `YR`, `YS`, `YC` und `YD` ist `driver` das Feld `binary` eines Eintrags aus `controllerdata.indidrivers`.
+`YA` und `YZ` haben keinen Payload (`{"YA": {}}`). Bei `YL`, `YR`, `YS`, `YC` und `YD` ist `driver` das Feld `binary` eines Eintrags aus `controllerdata.indidrivers`. Bei `YK` ist `name` ein Schlüssel von `controllerdata.indiconfigurations` (siehe [Controller]({{% relref "controller.de.md" %}})) — es startet alle unter diesem Namen gespeicherten Treiber, unabhängig von `CL`/`CS`, die die aktiven Treiber stattdessen in eine Modulkonfiguration bündeln.
 
 {{% notice style="tip" title="Einen Treiber laden verbindet nicht sein Gerät" %}}
 `YL` startet nur den Prozess des Treibers - das Gerät muss noch verbunden werden, bevor es nutzbar ist, mit `YC` (der INDI-Eigenschaft `CONNECTION.CONNECT`). Das ist bewusst ein separater Schritt: INDI selbst modelliert "Prozess läuft" und "Gerät verbunden" unabhängig voneinander. Wie `YA`/`YZ` haben `YC`/`YD` keine eigene Bestätigung (siehe Warnung oben): derzeit gibt es kein `controllerdata`-Feld, das meldet, ob das Gerät eines Treibers tatsächlich verbunden ist, nur ob dessen Prozess aktiv ist (`indiactivedrivers`).

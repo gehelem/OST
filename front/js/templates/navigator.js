@@ -802,17 +802,18 @@ function buildSkyDome(client, moduleName, onSelect, getTime) {
   const savedSettings = loadDisplaySettings();
   Object.assign(engine, savedSettings);
   hipsBg.setEnabled(engine.showHips);
-  // "leger par defaut, mais parametrable" (Gilles, 2026-09-29) - defaults
-  // to "light" same as before, but now actually reads back whichever
-  // depth was last chosen (buildSettingsPanel()'s own selector, added
-  // 2026-10-03: "le grand saut ... on passe la taille au dessus sur les
-  // catalogues") instead of hardcoding "light" regardless. Set
+  // "leger par defaut, mais parametrable" (Gilles, 2026-09-29) - actually
+  // reads back whichever depth was last chosen (buildSettingsPanel()'s own
+  // selector, added 2026-10-03: "le grand saut ... on passe la taille au
+  // dessus sur les catalogues") instead of hardcoding one regardless. Set
   // synchronously here (loadCatalog() itself only sets it once the fetch
   // actually resolves) so buildSettingsPanel() - built right after this
   // function returns, well before that fetch is likely to have finished -
-  // shows the right depth selected immediately instead of always
-  // flashing "light" first.
-  const initialDepth = savedSettings.catalogDepth || "light";
+  // shows the right depth selected immediately instead of always flashing
+  // the fallback first. That fallback was "light" until Gilles, 2026-10-16,
+  // after settling on the other display-settings defaults: "coche aussi
+  // ... l'affichage deep pour le nombre d'etoiles".
+  const initialDepth = savedSettings.catalogDepth || "deep";
   engine.catalogDepth = initialDepth;
   engine.loadCatalog(initialDepth).then(() => engine.render()).catch((e) => console.error("[navigator] catalog load", e));
 
@@ -997,27 +998,26 @@ export function mount(client, moduleName) {
 
     // "Search" (Gilles, 2026-10-06: "nouveau bouton 'search' ... associe a
     // une nouvelle fenetre") - see buildSearchPanel()'s own header comment
-    // for the full design. collapsed:true (same reasoning as "Settings"
-    // below) - this template already opens 4 other panels by default
-    // (Selection/Timenav/Location/Mountposition); on a narrow/short phone
-    // viewport they all get clamped toward the same corner and can
-    // genuinely overlap each other, same root cause as the catalog-select
-    // saga but one layer up (a WHOLE panel buried under another one this
-    // time, not a control buried in a scroll). Gilles, 2026-10-06: search
-    // panel was open by default, "impossible de saisir ... rien du tout
-    // au toucher" - the tap was landing on a different, overlapping
-    // panel's own content instead (confirmed live, elementFromPoint() at
-    // the input's own on-screen position hit a sibling panel's read-only
-    // value span). Starting collapsed means it only ever appears on an
-    // explicit tap on its own quicknav button, which togglePanel() also
-    // raises to the front (z-order) - reachable regardless of whatever
-    // else happens to visually sit in the same spot.
+    // for the full design. collapsed:true - Gilles, 2026-10-16: "je
+    // voudrais que l'affichage par defaut des fenetres soit seulement
+    // actions + selection + display settings" - every other panel in this
+    // template (Search/Timenav/Location/Mountposition below) now starts
+    // collapsed for that same reason, reachable via its own quicknav
+    // button, which togglePanel() also raises to the front (z-order).
+    // Originally collapsed for a narrower reason too (Gilles, 2026-10-06:
+    // search panel was open by default, "impossible de saisir ... rien du
+    // tout au toucher" - the tap was landing on a different, overlapping
+    // panel's own content instead, confirmed live via elementFromPoint()).
+    // `opts.collapsed` is only ever the first-ever-render default anyway
+    // (panels.js's own Panels.make() doc comment) - a browser that already
+    // has a saved per-panel state for this module keeps that instead, so
+    // this change has no effect there until that state is cleared.
     const searchPanel = Panels.make({ id: "search", title: t("navigator.search"), x: 340, y: 580, w: 340, collapsed: true });
     searchPanel.appendChild(track(buildSearchPanel(client, moduleName, sky.engine, selection.onSelect)));
     quickNavEntries.push({ id: "search", label: t("navigator.search"), icon: "search", iconOnly: true });
 
     if (sky.engine) {
-      const settingsPanel = Panels.make({ id: "settings", title: t("navigator.displaySettings"), x: 660, y: 92, w: 260, collapsed: true });
+      const settingsPanel = Panels.make({ id: "settings", title: t("navigator.displaySettings"), x: 660, y: 92, w: 260 });
       settingsPanel.appendChild(track(buildSettingsPanel(sky.engine, sky.hips)));
       // Icon-only (Gilles, 2026-10-03: "boutons 'settings' et 'time' :
       // juste les icones aussi (qui y sont deja), plus de libelle" - same
@@ -1025,7 +1025,7 @@ export function mount(client, moduleName) {
       // before).
       quickNavEntries.push({ id: "settings", label: t("navigator.settingsQuicknav"), icon: "tune", iconOnly: true });
 
-      const timeNavPanel = Panels.make({ id: "timenav", title: t("navigator.timeNav"), x: 340, y: 463, w: 300 });
+      const timeNavPanel = Panels.make({ id: "timenav", title: t("navigator.timeNav"), x: 340, y: 463, w: 300, collapsed: true });
       timeNavPanel.appendChild(track(buildTimeNavPanel(sky.engine, () => simulatedTime, setSimTime)));
       quickNavEntries.push({ id: "timenav", label: t("navigator.timeNavQuicknav"), icon: "schedule", iconOnly: true });
 
@@ -1050,7 +1050,7 @@ export function mount(client, moduleName) {
     }
 
     if (has("location")) {
-      const b = Panels.make({ id: "location", title: mod.properties.location.label || "Site", x: 20, y: 371, w: 300 });
+      const b = Panels.make({ id: "location", title: mod.properties.location.label || "Site", x: 20, y: 371, w: 300, collapsed: true });
       // framed:false (Gilles, 2026-10-03: "comme il n'y a qu'une propriete
       // dedans, ca ne sert a rien de garder le cadre, on a mis une option
       // expres pour ca") - the outer Panels.make box above already gives
@@ -1067,7 +1067,7 @@ export function mount(client, moduleName) {
       quickNavEntries.push({ id: "location", label: mod.properties.location.label || "Site", icon: "location_on", iconOnly: true });
     }
     if (has("mountposition")) {
-      const b = Panels.make({ id: "mountposition", title: mod.properties.mountposition.label || "Mount", x: 20, y: 774, w: 260 });
+      const b = Panels.make({ id: "mountposition", title: mod.properties.mountposition.label || "Mount", x: 20, y: 774, w: 260, collapsed: true });
       // framed:false - same reasoning as "location" just above (Gilles,
       // 2026-10-03: "idem sur 'mount position'").
       b.appendChild(track(renderProperty(client, moduleName, "mountposition", { framed: false })));

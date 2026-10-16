@@ -143,5 +143,6 @@ export function createClient() {
     indiStopDriver: (...a) => connection.indiStopDriver(...a),
     indiConnectDriver: (...a) => connection.indiConnectDriver(...a),
     indiDisconnectDriver: (...a) => connection.indiDisconnectDriver(...a),
+    indiLoadConfiguration: (...a) => connection.indiLoadConfiguration(...a),
   };
 }

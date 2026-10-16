@@ -59,6 +59,27 @@
       </div>
     </nav>
     <div id="top-right">
+      <!-- Gilles, 2026-10-16: "sur smartphone en mode portrait les deux
+           menus du haut arrivent a se superposer ... j'aimerais que dans
+           ces cas de collision le menu general soit transforme en un seul
+           bouton '...'" - #modbar (left) can legitimately span nearly the
+           full viewport width on a narrow screen with several modules
+           (panels.css's own max-width:calc(100vw-24px)+overflow-x:auto on
+           it, not a shrink-to-fit box), putting its right edge right under
+           this right-anchored group. app.js's own updateTopRightCollapse()
+           measures both boxes live (resize/orientationchange/modbar
+           rebuild) and toggles this button + #top-right-items between
+           "normal inline row" and "single button, click to unfold" - see
+           panels.css's own #top-right-more/#top-right.collapsed rules for
+           the two states. No `.hidden` class here on purpose (base.css's
+           own `!important` on it would permanently override panels.css's
+           conditional display rule below regardless of state - caught
+           live, "je ne vois pas le bouton '...'") - panels.css's own
+           #top-right-more rule already defaults it to display:none,
+           #top-right.collapsed overrides that, same mechanism as every
+           other state toggle here. -->
+      <button id="top-right-more" class="glass icon-chip" title="More"><span class="material-icons">more_horiz</span></button>
+      <div id="top-right-items">
       <!-- Gilles, 2026-10-03: "en haut a droite, juste avant le bouton
            d'ajustement de taille, ajoute encore un bouton pour la gestion
            de logs" - opens the always-on floating log panel (views.js's
@@ -194,6 +215,7 @@
           <button id="credits-btn" class="btn btn-sm"><span class="material-icons">copyright</span><span id="credits-btn-label">Credits</span></button>
         </div>
       </div>
+      </div><!-- /top-right-items -->
     </div>
   </div>
   <div id="dialog-root"></div>

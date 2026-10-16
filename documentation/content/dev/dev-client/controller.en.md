@@ -18,9 +18,10 @@ The controller is the server component that loads the modules and drives the emb
 | `git` | Server version: `Gitdate`, `Githash`, `Gitmessage`, `Gittag` |
 | `libraries` | Available module libraries, one metadata object per library — keys are **prefixed with `libost`** (`libostfocus`, `libostdummy`...); strip it before passing to [`ML`]({{% relref "client-messages.en.md" %}}#ml) |
 | `profiles` | Available profiles: object `transformed library name → list of profile names` — see the keying convention below |
-| `indiserver` | `"Y"` if the embedded INDI server is enabled, `"N"` otherwise |
+| `indiserver` | `"N"` if the embedded INDI server is disabled (`--indiserver`); otherwise `"U"` once it is confirmed running, `"D"` once it isn't (startup fails, crashes, or is stopped) |
 | `indidrivers` | Catalogue of installed INDI drivers: list of `{binary, family, label, mdpd}` |
 | `indiactivedrivers` | INDI drivers currently running |
+| `indiconfigurations` | Saved INDI driver configurations: object `configuration name → list of driver labels` |
 | `systemwatcher` | Server load, see below |
 | `files`, `folders` | Copy of `d.files.files` and `d.files.folders`, see [File system](#fichiers) |
 
@@ -93,12 +94,14 @@ There is no command to remove a saved configuration — `CL` and `CS` are the on
 
 ### INDI server and drivers
 
-If `controllerdata.indiserver` is `"Y"`, the server drives an embedded INDI instance. The [`YA`/`YZ`/`YL`/`YR`/`YS`]({{% relref "client-messages.en.md" %}}#indi) commands start it, stop it and manage the drivers; `controllerdata.indidrivers` gives the available catalogue and `controllerdata.indiactivedrivers` what is running. `binary` is the value to pass as `driver` in `YL`, `YR` and `YS`.
+Unless `controllerdata.indiserver` is `"N"`, the server drives an embedded INDI instance. The [`YA`/`YZ`/`YL`/`YR`/`YS`]({{% relref "client-messages.en.md" %}}#indi) commands start it, stop it and manage the drivers; `controllerdata.indidrivers` gives the available catalogue and `controllerdata.indiactivedrivers` what is running. `binary` is the value to pass as `driver` in `YL`, `YR` and `YS`.
 
 `controllerdata.indidrivers` and `controllerdata.indiactivedrivers` are both lists of objects `{binary, family, label}` (`indidrivers` additionally has `mdpd`, see the table above).
 
-{{% notice style="warning" title="YA/YZ/YL/YR/YS have no dedicated acknowledgment" %}}
-None of these commands trigger a confirmation message of their own. Success or failure has to be inferred indirectly: `YL`/`YR`/`YS` are followed by a `uc` update of `indiactivedrivers` reflecting the requested change (but this only confirms the server *attempted* it, not that the underlying INDI driver actually came up), while `YA`/`YZ` produce no `uc` at all — only `l` (log) messages, which are meant for a human, not for a client to parse programmatically. `controllerdata.indiserver` itself reflects the `--indiserver` launch option, not whether the embedded server is actually running right now.
+A whole saved set of drivers can be started in one go with [`YK`]({{% relref "client-messages.en.md" %}}#indi), by name, from `controllerdata.indiconfigurations` — saved by `CS` alongside a module configuration (see the warning above), but loadable on its own, independently of `CL`.
+
+{{% notice style="warning" title="YA/YZ/YL/YR/YS/YK have no dedicated acknowledgment" %}}
+None of these commands trigger a confirmation message of their own. Success or failure has to be inferred indirectly: `YL`/`YR`/`YS`/`YK` are followed by a `uc` update of `indiactivedrivers` reflecting the requested change (but this only confirms the server *attempted* it, not that the underlying INDI driver actually came up), while `YA`/`YZ` produce no `uc` at all — only `l` (log) messages, which are meant for a human, not for a client to parse programmatically. `controllerdata.indiserver` does track the embedded server's own up/down state live (see the table above), but that is a side effect of `YA`/`YZ`/a crash, not a direct acknowledgment of the command that caused it.
 {{% /notice %}}
 
 ## The `GlobalDatastore` module {#globaldatastore}

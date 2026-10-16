@@ -78,20 +78,23 @@ function insertSorted(panel, z) {
 }
 
 // #modbar/#top-right float at top:12px, and #modbar's own tallest content
-// (.mod-btn, 54px) plus its 8px top+bottom padding makes it 70px tall, so
-// its bottom edge sits at 12+70=82px in viewport (== layer) coordinates.
-// A panel dragged with its title bar above this line ends up visually
-// AND pointer-wise behind that fixed, higher-z-index chrome (clicks in
-// that screen region hit the bar, not the panel) - "impossible de les
-// deplacer" once stuck there. Enforced here, once, in the panel engine
-// itself (drag clamp + make()'s own clamp, so an already-bad saved
-// position self-heals on next render) rather than by tuning a handful of
-// per-template default y values again, which is what led to this being a
-// recurring bug across several rounds (60, then 70, both still not quite
-// enough) - Gilles, 2026-09-27: "probleme qu'on a depuis le debut".
+// (.mod-btn, 64px - grew from 56px on 2026-10-16 to fit the loaded-profile
+// name under the label, see panels.css's own .mod-btn-profile) plus its
+// 8px top+bottom padding makes it 80px tall, so its bottom edge sits at
+// 12+80=92px in viewport (== layer) coordinates. A panel dragged with its
+// title bar above this line ends up visually AND pointer-wise behind that
+// fixed, higher-z-index chrome (clicks in that screen region hit the bar,
+// not the panel) - "impossible de les deplacer" once stuck there. Enforced
+// here, once, in the panel engine itself (drag clamp + make()'s own clamp,
+// so an already-bad saved position self-heals on next render) rather than
+// by tuning a handful of per-template default y values again, which is
+// what led to this being a recurring bug across several rounds (60, then
+// 70, both still not quite enough) - Gilles, 2026-09-27: "probleme qu'on a
+// depuis le debut". Kept a steady ~10px buffer below that edge across the
+// .mod-btn height change above (92 -> 100).
 import { t } from "./i18n.js";
 
-const SAFE_TOP = 92;
+const SAFE_TOP = 100;
 
 const keyFor = (sc, id) => "ostcore-ui3:layout:" + sc + ":" + id;
 function loadState(sc, id) {
@@ -113,6 +116,31 @@ export function clear() {
 }
 
 function layerRect() { return layer.getBoundingClientRect(); }
+
+// Gilles, 2026-10-16: "les fenetres ... arrivent souvent a se coincer sous
+// [le] menu de chaque module en bas" - clampBottomIntoView() below already
+// kept a freshly-made or just-reopened panel's bottom edge above #quicknav,
+// but startDrag()'s own live move handler never knew about #quicknav at
+// all (its Y clamp only ever used `lr.height - 36`, the raw layer bottom
+// minus a small fixed margin) - dragging a panel down let its body slide
+// most of the way UNDER the bar before that clamp even engaged, since it
+// only bounds where the panel's TOP can go, never its bottom edge against
+// the bar's own position. One shared "forbidden zone" height instead of
+// duplicating the quicknav lookup in three places (make()'s initial clamp
+// doesn't need it - SAFE_TOP already keeps a fresh panel well clear of the
+// bottom bar at its own small default height). 1.05x the bar's own
+// measured height (not a hardcoded px constant like SAFE_TOP) - Gilles's
+// own margin, and #quicknav's height varies with however many icons
+// wrapped onto it.
+const BOTTOM_MARGIN_FACTOR = 1.05;
+function bottomSafeLimit() {
+  const quicknav = document.getElementById("quicknav");
+  if (quicknav && !quicknav.classList.contains("hidden")) {
+    const r = quicknav.getBoundingClientRect();
+    return r.top - r.height * (BOTTOM_MARGIN_FACTOR - 1);
+  }
+  return layerRect().bottom;
+}
 
 // Whoever cares whether a given panel is shown or hidden (views.js's
 // renderQuickNav() buttons, via app.js's single listener) hears about it
@@ -165,6 +193,7 @@ function startDrag(panel, bar, id, ev, sc) {
   const z = uiZoom();
   const lr = layerRect();
   const r = panel.getBoundingClientRect();
+  const bottomLimit = bottomSafeLimit(); // #quicknav doesn't move mid-drag, same one-shot capture as `lr`/`r`
   const start = pointXY(ev);
   const ox = start.x - r.left, oy = start.y - r.top;
   panel.classList.add("dragging");
@@ -176,7 +205,12 @@ function startDrag(panel, bar, id, ev, sc) {
     // converted to local/pre-zoom space (uiZoom()'s own doc comment),
     // right before it's written into style.left/top.
     const x = Math.max(m, Math.min(p.x - lr.left - ox, lr.width - r.width - m)) / z;
-    const y = Math.max(SAFE_TOP, Math.min(p.y - lr.top - oy, lr.height - 36)) / z;
+    // Clamps the panel's BOTTOM edge against bottomLimit (bottomLimit -
+    // r.height), not just its top against the raw layer edge like before -
+    // see bottomSafeLimit()'s own doc comment for why the old `lr.height -
+    // 36` let a dragged panel's body slide most of the way under
+    // #quicknav before this ever engaged.
+    const y = Math.max(SAFE_TOP, Math.min(p.y - lr.top - oy, bottomLimit - r.height)) / z;
     panel.style.left = x + "px";
     panel.style.top = y + "px";
     if (e.touches) e.preventDefault(); // stop the page itself from scrolling under the drag
@@ -212,6 +246,12 @@ function startResize(panel, id, ev, sc) {
   const r0 = panel.getBoundingClientRect();
   const sw = r0.width, sh = r0.height;
   const lr = layerRect();
+  // Same #quicknav-aware limit as startDrag() above, anchored to this
+  // panel's own (fixed, during a pure resize) top edge instead of its
+  // current bottom - growing a panel downward by dragging its resize
+  // handle had the exact same "slides under the bar" gap as dragging its
+  // title bar did (bottomSafeLimit()'s own doc comment).
+  const maxHeight = bottomSafeLimit() - r0.top;
   panel.classList.add("resized", "resizing");
   const move = (e) => {
     const p = pointXY(e);
@@ -220,7 +260,7 @@ function startResize(panel, id, ev, sc) {
     // scaled up to viewport space for this clamp, then the whole result
     // converted back to local space (/ z) right before the style write.
     panel.style.width = (Math.max(220 * z, Math.min(sw + (p.x - sx), lr.width - 12)) / z) + "px";
-    panel.style.height = (Math.max(120 * z, Math.min(sh + (p.y - sy), lr.height - 12)) / z) + "px";
+    panel.style.height = (Math.max(120 * z, Math.min(sh + (p.y - sy), maxHeight)) / z) + "px";
     if (e.touches) e.preventDefault();
   };
   const up = () => {
@@ -387,13 +427,13 @@ export function make(opts) {
  * once every panel this build() pass appended its own content has had a
  * chance to), and again from togglePanel() whenever a `collapsed` panel
  * is revealed (make()'s own call measured nothing useful then - a
- * collapsed panel has no real height at all).
+ * collapsed panel has no real height at all). Shares bottomSafeLimit()
+ * with startDrag()/startResize() above - the live-drag/resize gap that
+ * was letting a panel's body slide under #quicknav despite this
+ * function already existing, see that helper's own doc comment.
  */
 function clampBottomIntoView(panel) {
-  const quicknav = document.getElementById("quicknav");
-  const bottomLimit = (quicknav && !quicknav.classList.contains("hidden"))
-    ? quicknav.getBoundingClientRect().top
-    : layerRect().bottom;
+  const bottomLimit = bottomSafeLimit();
   const overflow = panel.getBoundingClientRect().bottom - bottomLimit;
   if (overflow > 0) {
     const top = parseFloat(panel.style.top) || 0;

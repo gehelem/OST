@@ -51,6 +51,7 @@ Toutes les clés de commandes client sont en **MAJUSCULES** (ex. `DU`, `SV`, `SA
 | [`YS`](#indi) | Arrêter un driver INDI |
 | [`YC`](#indi) | Connecter le périphérique d'un driver INDI |
 | [`YD`](#indi) | Déconnecter le périphérique d'un driver INDI |
+| [`YK`](#indi) | Charger une configuration de drivers INDI sauvegardée |
 
 ---
 
@@ -619,8 +620,9 @@ Ces commandes ne sont disponibles que lorsque le serveur dispose d'une instance 
 | `YS` | Arrêter un driver INDI (`{"YS": {"driver": "<binary>"}}`) |
 | `YC` | Connecter le périphérique d'un driver INDI (`{"YC": {"driver": "<binary>"}}`) |
 | `YD` | Déconnecter le périphérique d'un driver INDI (`{"YD": {"driver": "<binary>"}}`) |
+| `YK` | Charger une configuration de drivers INDI sauvegardée (`{"YK": {"name": "<nom de configuration>"}}`) |
 
-`YA` et `YZ` n'ont pas de payload (`{"YA": {}}`). Pour `YL`, `YR`, `YS`, `YC` et `YD`, `driver` est le champ `binary` d'une entrée de `controllerdata.indidrivers`.
+`YA` et `YZ` n'ont pas de payload (`{"YA": {}}`). Pour `YL`, `YR`, `YS`, `YC` et `YD`, `driver` est le champ `binary` d'une entrée de `controllerdata.indidrivers`. Pour `YK`, `name` est une clé de `controllerdata.indiconfigurations` (voir [Contrôleur]({{% relref "controller.fr.md" %}})) — elle démarre tous les drivers sauvegardés sous ce nom, indépendamment de `CL`/`CS`, qui regroupent plutôt les drivers actifs dans une configuration de modules.
 
 {{% notice style="tip" title="Charger un driver ne connecte pas son périphérique" %}}
 `YL` ne fait que démarrer le process du driver - le périphérique doit encore être connecté avant d'être utilisable, avec `YC` (la propriété INDI `CONNECTION.CONNECT`). C'est une étape séparée volontairement : INDI modélise lui-même "process actif" et "périphérique connecté" indépendamment. Comme `YA`/`YZ`, `YC`/`YD` n'ont pas d'accusé de réception dédié (voir l'avertissement ci-dessus) : il n'existe actuellement aucun champ `controllerdata` indiquant si le périphérique d'un driver est réellement connecté, seulement si son process est actif (`indiactivedrivers`).

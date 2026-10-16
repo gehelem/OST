@@ -18,9 +18,10 @@ El controlador es el componente del servidor que carga los módulos y gestiona e
 | `git` | Versión del servidor: `Gitdate`, `Githash`, `Gitmessage`, `Gittag` |
 | `libraries` | Bibliotecas de módulos disponibles, un objeto de metadatos por biblioteca — las claves están **prefijadas con `libost`** (`libostfocus`, `libostdummy`...); quitar el prefijo antes de pasarlo a [`ML`]({{% relref "client-messages.es.md" %}}#ml) |
 | `profiles` | Perfiles disponibles: objeto `nombre de biblioteca transformado → lista de nombres de perfil` — ver la convención de claves más abajo |
-| `indiserver` | `"Y"` si el servidor INDI embebido está activado, `"N"` en caso contrario |
+| `indiserver` | `"N"` si el servidor INDI embebido está desactivado (`--indiserver`); en caso contrario `"U"` una vez confirmado en ejecución, `"D"` una vez que no lo está (fallo de arranque, caída o detención) |
 | `indidrivers` | Catálogo de drivers INDI instalados: lista de `{binary, family, label, mdpd}` |
 | `indiactivedrivers` | Drivers INDI actualmente en ejecución |
+| `indiconfigurations` | Configuraciones de drivers INDI guardadas: objeto `nombre de configuración → lista de etiquetas de driver` |
 | `systemwatcher` | Carga del servidor, ver más abajo |
 | `files`, `folders` | Copia de `d.files.files` y `d.files.folders`, ver [Sistema de archivos](#fichiers) |
 
@@ -93,12 +94,14 @@ No existe ningún comando para eliminar una configuración guardada — `CL` y `
 
 ### Servidor INDI y drivers
 
-Si `controllerdata.indiserver` vale `"Y"`, el servidor gestiona una instancia INDI embebida. Los comandos [`YA`/`YZ`/`YL`/`YR`/`YS`]({{% relref "client-messages.es.md" %}}#indi) la inician, la detienen y gestionan los drivers; `controllerdata.indidrivers` da el catálogo disponible y `controllerdata.indiactivedrivers` lo que está en marcha. `binary` es el valor que se pasa como `driver` en `YL`, `YR` e `YS`.
+A menos que `controllerdata.indiserver` valga `"N"`, el servidor gestiona una instancia INDI embebida. Los comandos [`YA`/`YZ`/`YL`/`YR`/`YS`]({{% relref "client-messages.es.md" %}}#indi) la inician, la detienen y gestionan los drivers; `controllerdata.indidrivers` da el catálogo disponible y `controllerdata.indiactivedrivers` lo que está en marcha. `binary` es el valor que se pasa como `driver` en `YL`, `YR` e `YS`.
 
 `controllerdata.indidrivers` y `controllerdata.indiactivedrivers` son ambas listas de objetos `{binary, family, label}` (`indidrivers` tiene además `mdpd`, ver la tabla de arriba).
 
-{{% notice style="warning" title="YA/YZ/YL/YR/YS no tienen confirmación dedicada" %}}
-Ninguno de estos comandos genera un mensaje de confirmación propio. El éxito o fallo debe deducirse indirectamente: `YL`/`YR`/`YS` van seguidos de una actualización `uc` de `indiactivedrivers` que refleja el cambio solicitado (pero esto solo confirma que el servidor lo *intentó*, no que el driver INDI subyacente realmente arrancó), mientras que `YA`/`YZ` no producen ningún `uc` — solo mensajes `l` (log), pensados para un humano, no para ser analizados programáticamente por un cliente. `controllerdata.indiserver` en sí refleja la opción de arranque `--indiserver`, no si el servidor embebido está realmente en ejecución en este momento.
+Un conjunto completo de drivers guardado puede iniciarse de una sola vez con [`YK`]({{% relref "client-messages.es.md" %}}#indi), por nombre, desde `controllerdata.indiconfigurations` — guardado por `CS` junto con una configuración de módulos (ver la advertencia anterior), pero que puede cargarse de forma independiente, sin pasar por `CL`.
+
+{{% notice style="warning" title="YA/YZ/YL/YR/YS/YK no tienen confirmación dedicada" %}}
+Ninguno de estos comandos genera un mensaje de confirmación propio. El éxito o fallo debe deducirse indirectamente: `YL`/`YR`/`YS`/`YK` van seguidos de una actualización `uc` de `indiactivedrivers` que refleja el cambio solicitado (pero esto solo confirma que el servidor lo *intentó*, no que el driver INDI subyacente realmente arrancó), mientras que `YA`/`YZ` no producen ningún `uc` — solo mensajes `l` (log), pensados para un humano, no para ser analizados programáticamente por un cliente. `controllerdata.indiserver` sí sigue en vivo el propio estado de arriba/abajo del servidor embebido (ver la tabla anterior), pero eso es un efecto secundario de `YA`/`YZ`/una caída, no una confirmación directa del comando que lo provocó.
 {{% /notice %}}
 
 ## El módulo `GlobalDatastore` {#globaldatastore}

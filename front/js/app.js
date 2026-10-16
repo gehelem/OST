@@ -22,6 +22,9 @@ import { showToast } from "./toast.js";
 const client = createClient();
 
 const modbarEl = document.getElementById("modbar");
+const topRightEl = document.getElementById("top-right");
+const topRightMoreEl = document.getElementById("top-right-more");
+const topRightItemsEl = document.getElementById("top-right-items");
 const systemViewsEl = document.getElementById("system-views");
 const panelLayerEl = document.getElementById("panel-layer");
 const dockedViewEl = document.getElementById("docked-view");
@@ -91,6 +94,7 @@ const creditsBtnLabelEl = document.getElementById("credits-btn-label");
 // current language, so those pick it up for free.
 function applyStaticLabels() {
   paramsToggleEl.title = t("chrome.parameters");
+  topRightMoreEl.title = t("chrome.moreMenu");
   zoomToggleEl.title = t("chrome.uiSize");
   themeToggle.title = t("chrome.toggleTheme");
   loginToggleEl.title = t("chrome.login");
@@ -134,6 +138,50 @@ document.addEventListener("click", (ev) => {
   if (!connPanelEl.classList.contains("hidden") && !connWidgetEl.contains(ev.target)) setConnPanelOpen(false);
 });
 setConnPanelOpen(true); // nothing connected yet at boot: start open so the fields are reachable
+
+// ---- top-right collision collapse — Gilles, 2026-10-16: "sur smartphone
+// en mode portrait les deux menus du haut arrivent a se superposer ...
+// j'aimerais que dans ces cas de collision le menu general soit transforme
+// en un seul bouton '...' et quand j'appuis sur ce bouton ca deplie le menu
+// original". #modbar (left) can legitimately span nearly the full viewport
+// width on a narrow screen with several modules loaded (panels.css's own
+// max-width:calc(100vw-24px)+overflow-x:auto on it - a capped box, not a
+// shrink-to-fit one), reaching this right-anchored group's own left edge.
+function setTopRightOpen(open) {
+  topRightEl.classList.toggle("open", open);
+}
+// Forces the normal (uncollapsed) layout, measures both boxes, then
+// decides - rather than trying to measure #top-right-items while it's
+// potentially already `display:none` (collapsed), which would read back a
+// zero-width rect and never let a freed-up-space case (e.g. rotating back
+// to landscape, or switching to a module with fewer buttons) un-collapse
+// again. The two synchronous style writes around one layout read never
+// paint an intermediate frame (same technique panels.js's own
+// clampBottomIntoView() doc comment already relies on - nothing else runs
+// between them in this task).
+function updateTopRightCollapse() {
+  topRightEl.classList.remove("collapsed");
+  const overlap = modbarEl.getBoundingClientRect().right + 8 > topRightItemsEl.getBoundingClientRect().left;
+  topRightEl.classList.toggle("collapsed", overlap);
+  if (!overlap) setTopRightOpen(false);
+}
+topRightMoreEl.addEventListener("click", () => setTopRightOpen(!topRightEl.classList.contains("open")));
+document.addEventListener("click", (ev) => {
+  if (topRightEl.classList.contains("open") && !topRightEl.contains(ev.target)) setTopRightOpen(false);
+});
+// rAF-throttled: "resize" can fire many times per second while a window is
+// actively being dragged, and each check forces a synchronous layout
+// (getBoundingClientRect() above) - coalescing to one check per frame
+// avoids doing that needlessly often. orientationchange covers a phone
+// rotation some browsers don't also fire a plain "resize" for.
+let topRightCollapseQueued = false;
+function queueTopRightCollapseUpdate() {
+  if (topRightCollapseQueued) return;
+  topRightCollapseQueued = true;
+  requestAnimationFrame(() => { topRightCollapseQueued = false; updateTopRightCollapse(); });
+}
+window.addEventListener("resize", queueTopRightCollapseUpdate);
+window.addEventListener("orientationchange", queueTopRightCollapseUpdate);
 
 setDialogRoot(document.getElementById("dialog-root"));
 
@@ -484,6 +532,10 @@ function renderModbarNow() {
   modbarDispose = modbar.dispose;
   systemViewsEl.innerHTML = "";
   systemViewsEl.appendChild(renderSystemViews(activeView, selectView));
+  // #modbar's own width can change with the module list/active selection
+  // (see updateTopRightCollapse()'s own doc comment) - queued, not called
+  // directly, so it measures AFTER this new content has actually laid out.
+  queueTopRightCollapseUpdate();
 }
 
 // Two mutually-exclusive content modes: a module renders as a set of

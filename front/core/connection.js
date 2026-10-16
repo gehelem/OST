@@ -173,4 +173,5 @@ export class Connection {
   indiStopDriver(binary) { this.send("YS", { driver: binary }); }
   indiConnectDriver(binary) { this.send("YC", { driver: binary }); }
   indiDisconnectDriver(binary) { this.send("YD", { driver: binary }); }
+  indiLoadConfiguration(name) { this.send("YK", { name }); }
 }

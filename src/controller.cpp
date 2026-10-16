@@ -98,6 +98,9 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     OST::LovString* ls = new OST::LovString("availableconfs");
     createControllerLov("availableconfs", ls);
 
+    ls = new OST::LovString("indiconfigurations");
+    createControllerLov("indiconfigurations", ls);
+
     ls = new OST::LovString("optics");
     createControllerLov("optics", ls);
     ls = new OST::LovString("servers");
@@ -345,6 +348,27 @@ void Controller::loadConf(const QString &pConf)
     QVariantMap result;
     OST::LovString* l = static_cast<OST::LovString*>(getControllerLovs()["availableconfs"]);
     l->lovClear();
+    OST::LovString* il = static_cast<OST::LovString*>(getControllerLovs()["indiconfigurations"]);
+    il->lovClear();
+
+    // List every known configuration regardless of whether pConf itself
+    // resolves below, so a missing startup configuration doesn't leave
+    // availableconfs/indiconfigurations empty.
+    QVariantMap confs;
+    dbmanager->getDbConfigurations(confs);
+    for(QVariantMap::const_iterator iter = confs.begin(); iter != confs.end(); ++iter)
+    {
+        l->lovAdd(iter.key(), iter.key());
+    }
+    updateControllerData("availableconfs", QVariant(confs));
+
+    QVariantMap indiConfs;
+    dbmanager->getIndiConfigurations(indiConfs);
+    for(QVariantMap::const_iterator iter = indiConfs.begin(); iter != indiConfs.end(); ++iter)
+    {
+        il->lovAdd(iter.key(), iter.key());
+    }
+    updateControllerData("indiconfigurations", QVariant(indiConfs));
 
     if (!dbmanager->getDbConfiguration(pConf, result))
     {
@@ -365,37 +389,37 @@ void Controller::loadConf(const QString &pConf)
     }
     logInfo("Load configuration %1 sucessfull", {pConf});
 
-    QStringList driverLabels;
-    if (dbmanager->getIndiConfiguration(pConf, driverLabels) && !driverLabels.isEmpty())
-    {
-        for (const QString &label : driverLabels)
-        {
-            auto it = std::find_if(_indiDrivers.begin(), _indiDrivers.end(),
-                                   [&](const IndiDriverInfo & d)
-            {
-                return d.label == label;
-            });
-            if (it != _indiDrivers.end())
-                startIndiDriver(it->binary);
-            else
-                logError("INDI driver not found in XML registry: %1", {label});
-        }
-    }
+    loadIndiConfiguration(pConf);
 
     updateControllerData("currentconf", QVariant(pConf));
-    QVariantMap confs;
-    dbmanager->getDbConfigurations(confs);
-    for(QVariantMap::const_iterator iter = confs.begin(); iter != confs.end(); ++iter)
+}
+// Starts every INDI driver saved under pConf (INDICONFIGURATIONS), resolving
+// each saved driver label against the XML registry (_indiDrivers). Also
+// usable standalone (YK), independent of loading a full module
+// configuration.
+void Controller::loadIndiConfiguration(const QString &pConf)
+{
+    QStringList driverLabels;
+    if (!dbmanager->getIndiConfiguration(pConf, driverLabels)) return;
+    for (const QString &label : driverLabels)
     {
-        l->lovAdd(iter.key(), iter.key());
+        auto it = std::find_if(_indiDrivers.begin(), _indiDrivers.end(),
+                               [&](const IndiDriverInfo & d)
+        {
+            return d.label == label;
+        });
+        if (it != _indiDrivers.end())
+            startIndiDriver(it->binary);
+        else
+            logError("INDI driver not found in XML registry: %1", {label});
     }
-    updateControllerData("availableconfs", QVariant(confs));
-
 }
 void Controller::saveConf(const QString &pConf)
 {
     OST::LovString* l = static_cast<OST::LovString*>(getControllerLovs()["availableconfs"]);
     l->lovClear();
+    OST::LovString* il = static_cast<OST::LovString*>(getControllerLovs()["indiconfigurations"]);
+    il->lovClear();
     QVariantMap ms, result;
     QList<Basemodule *> mods = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
     for (Basemodule *m : mods)
@@ -430,6 +454,14 @@ void Controller::saveConf(const QString &pConf)
         l->lovAdd(iter.key(), iter.key());
     }
     updateControllerData("availableconfs", QVariant(confs));
+
+    QVariantMap indiConfs;
+    dbmanager->getIndiConfigurations(indiConfs);
+    for(QVariantMap::const_iterator iter = indiConfs.begin(); iter != indiConfs.end(); ++iter)
+    {
+        il->lovAdd(iter.key(), iter.key());
+    }
+    updateControllerData("indiconfigurations", QVariant(indiConfs));
 }
 
 bool Controller::createControllerLov(const QString &lovName, OST::LovBase* pLov)
@@ -752,6 +784,11 @@ void Controller::onExternalEvent(OST::ExtEvent event)
             disconnectIndiDriver(event.data["driver"].toString());
             return;
         }
+        case OST::ExtEvType::YK:
+        {
+            loadIndiConfiguration(event.data["name"].toString());
+            return;
+        }
         default:
         {
             if (!event.data.contains("m"))
@@ -995,6 +1032,14 @@ void Controller::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
         mLogger->error("indiserver crashed");
     else
         mLogger->warning("indiserver exited (code " + QString::number(exitCode) + ")");
+    setIndiServerState(false);
+}
+// "Y" mode also carries live state: "U" once indiserver is actually
+// running, "D" once it isn't. "N" mode is left untouched.
+void Controller::setIndiServerState(bool running)
+{
+    if (_indiserver != "Y") return;
+    updateControllerData("indiserver", QVariant(running ? QString("U") : QString("D")));
 }
 void Controller::processOutput()
 {
@@ -1055,6 +1100,7 @@ void Controller::startIndi(void)
             _indiPid = pidStr.toInt();
             mLogger->info("Reusing orphaned indiserver (PID " + pidStr + ")");
             queryActiveIndiDrivers();
+            setIndiServerState(true);
             return;
         }
         mLogger->warning("Orphaned indiserver found but FIFO unusable — restarting");
@@ -1076,10 +1122,12 @@ void Controller::startIndi(void)
     if (!_indiProcess->waitForStarted(3000))
     {
         mLogger->error("indiserver failed to start");
+        setIndiServerState(false);
         return;
     }
     _indiPid = _indiProcess->processId();
     mLogger->info("indiserver started (PID " + QString::number(_indiPid) + ")");
+    setIndiServerState(true);
 
     bool fifoReady = false;
     for (int i = 0; i < 30 && !fifoReady; ++i)
@@ -1110,6 +1158,7 @@ void Controller::stopIndi(void)
         ::kill(_indiPid, SIGKILL);
         mLogger->info("Orphaned indiserver stopped (PID " + QString::number(_indiPid) + ")");
     }
+    setIndiServerState(false);
     _indiPid = 0;
     _activeIndiDrivers.clear();
     updateControllerData("indiactivedrivers", QVariantList());

@@ -84,6 +84,7 @@ class Controller : public QObject
         bool loadModule(QString lib, QString label, QString profile);
         void loadConf(const QString &pConf);
         void saveConf(const QString &pConf);
+        void loadIndiConfiguration(const QString &pConf);
         void checkModules(void);
         void checkIndiDrivers(void);
         void processOutput();
@@ -94,6 +95,7 @@ class Controller : public QObject
         void startPublish();
         void startIndi(void);
         void stopIndi(void);
+        void setIndiServerState(bool running);
         void startIndiDriver(const QString &pDriver);
         void stopIndiDriver(const QString &pDriver);
         void reloadIndiDriver(const QString &pDriver);
