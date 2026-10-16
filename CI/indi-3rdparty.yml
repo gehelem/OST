@@ -13,7 +13,7 @@ build-job-indi-3rdparty:
   image: fedora:44
   variables:
     INDI_3RDPARTY_TAG: "v2.2.4"
-    INDI_3RDPARTY_CMAKE_FLAGS: "-DWITH_ASI=1 -DWITH_QHY=1"
+    INDI_3RDPARTY_DRIVERS: "WITH_ASICAM WITH_QHY"
     RPM_FILE_INDI_3RDPARTY: "indi-3rdparty-custom_fc44_x86_64.rpm"
   script:
     - ./CI/CI-build-indi-3rdparty.sh

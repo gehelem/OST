@@ -10,12 +10,13 @@
 #
 set -e
 
-# indi-3rdparty's top-level CMakeLists configures every driver by
-# default, not just the ones enabled via INDI_3RDPARTY_CMAKE_FLAGS (that
-# only adds its own on top) - so this needs the project's FULL dependency
-# list (see its own README's apt-get line), mapped to Fedora -devel
-# package names, or an unrelated driver's missing REQUIRED dependency
-# aborts configure before it even reaches the ones actually wanted.
+# Even though the build below is narrowed to INDI_3RDPARTY_DRIVERS,
+# CMake still configures every driver's own CMakeLists before anything
+# gets built - so this needs the project's FULL dependency list (see
+# its own README's apt-get line), mapped to Fedora -devel package
+# names, or an unrelated, unwanted driver's missing REQUIRED dependency
+# still aborts configure before it ever reaches the ones actually
+# wanted.
 # --skip-unavailable: a few of these (limesuite, rtl-sdr) may not exist
 # on every Fedora release - skip them rather than fail the whole job,
 # same as FFMPEG/libudev already being silently skipped by cmake itself
@@ -35,18 +36,38 @@ echo "libindi-devel $(rpm -q --qf '%{VERSION}' libindi-devel)"
 git clone --depth 1 --branch "${INDI_3RDPARTY_TAG}" \
     https://github.com/indilib/indi-3rdparty.git /tmp/indi-3rdparty
 
+# Every WITH_<driver> option defaults On in this project's own
+# CMakeLists - there's no "build only these" switch, so this turns all
+# of them Off except the ones listed in INDI_3RDPARTY_DRIVERS, rather
+# than hand-maintaining a disable list here that silently goes stale
+# whenever upstream adds a new driver (that driver's own dependencies
+# would then need adding above too, same as eqmod/sx/weewx-json did).
+DRIVER_FLAGS=""
+for opt in $(grep -oP '^option\(\K(WITH_[A-Za-z0-9_-]+)' /tmp/indi-3rdparty/CMakeLists.txt); do
+    if printf '%s\n' "${INDI_3RDPARTY_DRIVERS}" | grep -qw "${opt}"; then
+        DRIVER_FLAGS="${DRIVER_FLAGS} -D${opt}=1"
+    else
+        DRIVER_FLAGS="${DRIVER_FLAGS} -D${opt}=0"
+    fi
+done
+echo "Driver flags: ${DRIVER_FLAGS}"
+
 cmake -B /tmp/indi-3rdparty/build -S /tmp/indi-3rdparty \
     -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
-    ${INDI_3RDPARTY_CMAKE_FLAGS}
+    ${DRIVER_FLAGS}
 cmake --build /tmp/indi-3rdparty/build -j"$(nproc)"
 DESTDIR=/tmp/indi-3rdparty-stage cmake --install /tmp/indi-3rdparty/build
 
+# fpm's argument parser (clamp) refuses any -flag once it has seen the
+# first positional argument - "usr" (what -C's directory is relative
+# to) must come last, after every -flag/--option.
 fpm -s dir -t rpm \
     -n indi-3rdparty-custom \
     -v "${INDI_3RDPARTY_TAG#v}" \
     --depends libindi \
-    -C /tmp/indi-3rdparty-stage usr \
-    -p "./${RPM_FILE_INDI_3RDPARTY}"
+    -p "./${RPM_FILE_INDI_3RDPARTY}" \
+    -C /tmp/indi-3rdparty-stage \
+    usr
 
 echo "Built: ${RPM_FILE_INDI_3RDPARTY}"
 rpm -qpi "${RPM_FILE_INDI_3RDPARTY}"
