@@ -36,19 +36,26 @@ variables:
     - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
     - if: '$CI_PIPELINE_SOURCE == "push"'
 
-# 24.04 only builds/tests on an MR-to-main or a release tag, never on a
-# plain push to a feature branch - unlike .build-rules/.test-rules
-# above (still 26.04's own, unrestricted), so inlined separately here
-# rather than sharing that anchor.
+# 24.04 only builds/tests on an MR-to-main, a push that LANDS on main
+# (a merge, since merging produces its own push pipeline rather than
+# keeping the MR's merge_request_event one alive), or a release tag -
+# never on a plain push to a feature branch. Unlike .build-rules/
+# .test-rules above (still 26.04's own, unrestricted), so inlined
+# separately here rather than sharing that anchor. The push-to-main
+# condition is required for release-job-latest, which runs on exactly
+# that push and depends on this job's artifacts - omitting it silently
+# left the latest release missing 24.04/Fedora/Arch packages.
 .build-rules-mr-or-tag: &build-rules-mr-or-tag
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
     - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
 .test-rules-mr-or-tag: &test-rules-mr-or-tag
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
     - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
 # SUSPENDED 2026-09-17 (Gilles): more effort than it's worth for now.
 # Kept intact (rules: never) rather than deleted - see
