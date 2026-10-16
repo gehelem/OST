@@ -40,7 +40,7 @@
 .mod-btn {
   position: relative;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 2px; width: 56px; height: 56px; flex-shrink: 0;
+  gap: 2px; width: 60px; height: 64px; flex-shrink: 0;
   background: var(--accent-faint); color: var(--text-muted);
   border: 1px solid var(--border-subtle); border-radius: var(--radius);
   cursor: pointer; font: inherit;
@@ -68,7 +68,14 @@
 }
 .mod-btn .material-icons { font-size: 22px; transition: transform 0.2s; }
 .mod-btn-label {
-  font-size: 9px; letter-spacing: 0.5px; max-width: 52px;
+  font-size: 9px; letter-spacing: 0.5px; max-width: 56px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* Loaded profile name (Gilles, 2026-10-16) - a dimmer, smaller third line
+   under the label, same truncation recipe. .hidden (base.css) when the
+   module has no profile loaded, rather than reserving blank space. */
+.mod-btn-profile {
+  font-size: 8px; color: var(--text-muted); opacity: 0.75; max-width: 56px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 
@@ -351,10 +358,11 @@
    clickability since #panel-layer itself stays pointer-events:none
    (below), only an actual .panel-float opts back into being interactive. */
 #panel-layer { z-index: 5; }
-/* #modbar floats fixed over the canvas (top:12px, ~56px-tall buttons, 8px
+/* #modbar floats fixed over the canvas (top:12px, ~64px-tall buttons, 8px
    padding - see above), so anything docked at inset:0 starts right behind
    it. Floating panels already dodge this by hand (every template's own
-   Panels.make() call uses y:92 or more for its top row) - #docked-view
+   Panels.make() call uses y:92 or more for its top row, below panels.js's
+   own SAFE_TOP clamp which keeps anything lower anyway) - #docked-view
    (Controller/Files/Logs/the Home dashboard/the connect screen) needs the
    same top clearance, just reserved once here instead of per-view. Gilles,
    2026-10-06, caught on the Home dashboard: "la position par defaut des

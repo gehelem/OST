@@ -90,10 +90,18 @@ export function renderModbar(client, activeKey, onSelect) {
       dot.classList.toggle("hidden", !state);
       if (state) updateStatusDot(dot, state.value);
     }));
+    // Loaded profile name (Gilles, 2026-10-16: "sous le libelle du module le
+    // nom du profil charge") - a second small line under the module label,
+    // same module.profile.name the "has-changes" dot below already reads.
+    // Starts empty/.hidden: a module can be loaded with no profile at all
+    // (profile.name === ""), and base.css's own .hidden takes care of not
+    // reserving blank space for it in that case.
+    const profileEl = el("span", { class: "mod-btn-profile hidden" });
     const btn = el("button", { class: "mod-btn" + (activeKey === name ? " active" : ""), title: label, onclick: () => onSelect(name) }, [
       dot,
       icon(moduleIcon(mod)),
       el("span", { class: "mod-btn-label", text: label }),
+      profileEl,
     ]);
     // Unsaved profile changes (Gilles, 2026-10-15) - same indicator and
     // same underlying flag (module.profile.changed) as the params gear
@@ -101,6 +109,10 @@ export function renderModbar(client, activeKey, onSelect) {
     // shown per module here instead of only for the currently active one.
     disposers.push(client.subscribe(client.topics.module(name), (m) => {
       btn.classList.toggle("has-changes", !!(m && m.profile && m.profile.changed));
+      const profileName = (m && m.profile && m.profile.name) || "";
+      profileEl.textContent = profileName;
+      profileEl.title = profileName;
+      profileEl.classList.toggle("hidden", !profileName);
     }));
     bar.appendChild(btn);
   }

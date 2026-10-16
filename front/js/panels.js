@@ -78,20 +78,23 @@ function insertSorted(panel, z) {
 }
 
 // #modbar/#top-right float at top:12px, and #modbar's own tallest content
-// (.mod-btn, 54px) plus its 8px top+bottom padding makes it 70px tall, so
-// its bottom edge sits at 12+70=82px in viewport (== layer) coordinates.
-// A panel dragged with its title bar above this line ends up visually
-// AND pointer-wise behind that fixed, higher-z-index chrome (clicks in
-// that screen region hit the bar, not the panel) - "impossible de les
-// deplacer" once stuck there. Enforced here, once, in the panel engine
-// itself (drag clamp + make()'s own clamp, so an already-bad saved
-// position self-heals on next render) rather than by tuning a handful of
-// per-template default y values again, which is what led to this being a
-// recurring bug across several rounds (60, then 70, both still not quite
-// enough) - Gilles, 2026-09-27: "probleme qu'on a depuis le debut".
+// (.mod-btn, 64px - grew from 56px on 2026-10-16 to fit the loaded-profile
+// name under the label, see panels.css's own .mod-btn-profile) plus its
+// 8px top+bottom padding makes it 80px tall, so its bottom edge sits at
+// 12+80=92px in viewport (== layer) coordinates. A panel dragged with its
+// title bar above this line ends up visually AND pointer-wise behind that
+// fixed, higher-z-index chrome (clicks in that screen region hit the bar,
+// not the panel) - "impossible de les deplacer" once stuck there. Enforced
+// here, once, in the panel engine itself (drag clamp + make()'s own clamp,
+// so an already-bad saved position self-heals on next render) rather than
+// by tuning a handful of per-template default y values again, which is
+// what led to this being a recurring bug across several rounds (60, then
+// 70, both still not quite enough) - Gilles, 2026-09-27: "probleme qu'on a
+// depuis le debut". Kept a steady ~10px buffer below that edge across the
+// .mod-btn height change above (92 -> 100).
 import { t } from "./i18n.js";
 
-const SAFE_TOP = 92;
+const SAFE_TOP = 100;
 
 const keyFor = (sc, id) => "ostcore-ui3:layout:" + sc + ":" + id;
 function loadState(sc, id) {
