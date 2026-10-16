@@ -52,11 +52,31 @@ for opt in $(grep -oP '^option\(\K(WITH_[A-Za-z0-9_-]+)' /tmp/indi-3rdparty/CMak
 done
 echo "Driver flags: ${DRIVER_FLAGS}"
 
-cmake -B /tmp/indi-3rdparty/build -S /tmp/indi-3rdparty \
+# indi-3rdparty builds in two disjoint passes, picked by BUILD_LIBS:
+# Off (default) builds the actual INDI drivers (indi_asi_ccd etc.), but
+# each one's find_package(ASI)/find_package(QHY) only looks at paths a
+# SYSTEM install would already provide (FindASI.cmake/FindQHY.cmake
+# call plain find_path/find_library, nothing pointed at this checkout)
+# - on On, it builds just the vendor SDKs (libasi, libqhy...) instead.
+# One pass alone therefore never produces both: with BUILD_LIBS=0 on a
+# clean system, ASI_FOUND/QHY_FOUND come back false and it silently
+# falls back to building libasi/libqhy AGAIN instead of indi-asi/
+# indi-qhy - no error, just the driver quietly missing from the result
+# (caught only by Gilles noticing no indi_asi_ccd in the finished rpm).
+# Pass 1 installs for real (no DESTDIR) so pass 2's find_package calls
+# can see it, same build/binary-safe container either way.
+cmake -B /tmp/indi-3rdparty/build-libs -S /tmp/indi-3rdparty \
+    -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_LIBS=1 \
+    ${DRIVER_FLAGS}
+cmake --build /tmp/indi-3rdparty/build-libs -j"$(nproc)"
+cmake --install /tmp/indi-3rdparty/build-libs
+DESTDIR=/tmp/indi-3rdparty-stage cmake --install /tmp/indi-3rdparty/build-libs
+
+cmake -B /tmp/indi-3rdparty/build-drivers -S /tmp/indi-3rdparty \
     -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
     ${DRIVER_FLAGS}
-cmake --build /tmp/indi-3rdparty/build -j"$(nproc)"
-DESTDIR=/tmp/indi-3rdparty-stage cmake --install /tmp/indi-3rdparty/build
+cmake --build /tmp/indi-3rdparty/build-drivers -j"$(nproc)"
+DESTDIR=/tmp/indi-3rdparty-stage cmake --install /tmp/indi-3rdparty/build-drivers
 
 # fpm's argument parser (clamp) refuses any -flag once it has seen the
 # first positional argument - "usr" (what -C's directory is relative
