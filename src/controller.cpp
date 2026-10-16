@@ -98,6 +98,9 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     OST::LovString* ls = new OST::LovString("availableconfs");
     createControllerLov("availableconfs", ls);
 
+    ls = new OST::LovString("indiconfigurations");
+    createControllerLov("indiconfigurations", ls);
+
     ls = new OST::LovString("optics");
     createControllerLov("optics", ls);
     ls = new OST::LovString("servers");
@@ -345,10 +348,12 @@ void Controller::loadConf(const QString &pConf)
     QVariantMap result;
     OST::LovString* l = static_cast<OST::LovString*>(getControllerLovs()["availableconfs"]);
     l->lovClear();
+    OST::LovString* il = static_cast<OST::LovString*>(getControllerLovs()["indiconfigurations"]);
+    il->lovClear();
 
     // List every known configuration regardless of whether pConf itself
     // resolves below, so a missing startup configuration doesn't leave
-    // availableconfs empty.
+    // availableconfs/indiconfigurations empty.
     QVariantMap confs;
     dbmanager->getDbConfigurations(confs);
     for(QVariantMap::const_iterator iter = confs.begin(); iter != confs.end(); ++iter)
@@ -356,6 +361,14 @@ void Controller::loadConf(const QString &pConf)
         l->lovAdd(iter.key(), iter.key());
     }
     updateControllerData("availableconfs", QVariant(confs));
+
+    QVariantMap indiConfs;
+    dbmanager->getIndiConfigurations(indiConfs);
+    for(QVariantMap::const_iterator iter = indiConfs.begin(); iter != indiConfs.end(); ++iter)
+    {
+        il->lovAdd(iter.key(), iter.key());
+    }
+    updateControllerData("indiconfigurations", QVariant(indiConfs));
 
     if (!dbmanager->getDbConfiguration(pConf, result))
     {
@@ -399,6 +412,8 @@ void Controller::saveConf(const QString &pConf)
 {
     OST::LovString* l = static_cast<OST::LovString*>(getControllerLovs()["availableconfs"]);
     l->lovClear();
+    OST::LovString* il = static_cast<OST::LovString*>(getControllerLovs()["indiconfigurations"]);
+    il->lovClear();
     QVariantMap ms, result;
     QList<Basemodule *> mods = findChildren<Basemodule *>(QString(), Qt::FindChildrenRecursively);
     for (Basemodule *m : mods)
@@ -433,6 +448,14 @@ void Controller::saveConf(const QString &pConf)
         l->lovAdd(iter.key(), iter.key());
     }
     updateControllerData("availableconfs", QVariant(confs));
+
+    QVariantMap indiConfs;
+    dbmanager->getIndiConfigurations(indiConfs);
+    for(QVariantMap::const_iterator iter = indiConfs.begin(); iter != indiConfs.end(); ++iter)
+    {
+        il->lovAdd(iter.key(), iter.key());
+    }
+    updateControllerData("indiconfigurations", QVariant(indiConfs));
 }
 
 bool Controller::createControllerLov(const QString &lovName, OST::LovBase* pLov)
