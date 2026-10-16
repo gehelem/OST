@@ -377,7 +377,12 @@ export class SkyEngine {
     this.ctx = canvas.getContext("2d");
     this.observer = makeObserver(opts.lat || 0, opts.lon || 0, opts.elev || 0);
     this.getTime = opts.getTime || (() => new Date());
-    this.zoom = 1;
+    // Default zoom level - Gilles, 2026-10-16: "le niveau de zoom doit
+    // etre a 10% par defaut", tried 1 then 20 first, settled on 5 after
+    // trying several values live. Still the first-ever-render default
+    // only - templates/navigator.js's own loadDisplaySettings() wins from
+    // then on for a returning browser.
+    this.zoom = 5;
     this.rotation = identity(); // view pan state - see this file's own header
 
     // Display settings (templates/navigator.js's "Settings" panel, Gilles,
@@ -394,29 +399,34 @@ export class SkyEngine {
     // showConstellations/showMessier above, not an optional reference
     // overlay like the grids).
     this.showPlanets = true;
-    this.showTrueHorizon = false;
-    this.showEquatorialGrid = false;
+    // Gilles, 2026-10-16, after trying several display-settings
+    // combinations live: "on coche tout par defaut, sauf hips, day mode,
+    // milky way, azimutal" - every show*/dayMode/showHips field in this
+    // block now defaults per that list; showAzimuthalGrid right below
+    // stays off (one of the four named exceptions).
+    this.showTrueHorizon = true;
+    this.showEquatorialGrid = true;
     this.showAzimuthalGrid = false;
     // Independent of showAzimuthalGrid - Gilles, 2026-10-03: "je ne vois
     // toujours pas le meridien, d'ailleurs son affichage n'est pas
     // conditionne par un toggle dans les settings" - it used to only ever
     // draw as part of the full azimuthal grid's own az=0 special case,
     // with no way to show just it on its own.
-    this.showMeridian = false;
+    this.showMeridian = true;
     // Gilles, 2026-10-01: "ajoute son affichage en optionnel dans les
-    // settings du module" - a reference/decorative overlay like the grids
-    // above, not core telescope-control info, so it defaults off like them
-    // rather than on like showConstellations/showCardinals/showMessier.
+    // settings du module" - one of the four named exceptions above
+    // (2026-10-16: "sauf hips, day mode, milky way, azimutal"), stays off
+    // unlike every other overlay in this block.
     this.showMilkyWay = false;
-    // Gilles, 2026-10-01: "ajoute le trait de l'ecliptique en option" -
-    // same default-off reference-overlay treatment.
-    this.showEcliptic = false;
+    // Gilles, 2026-10-01: "ajoute le trait de l'ecliptique en option".
+    this.showEcliptic = true;
     // Gilles, 2026-10-03: "ajoute le noms des objets connus (etoiles,
     // messier)" - one toggle for both (star proper names + Messier
-    // designations), same default-off reference-overlay treatment as the
-    // other optional decorations above: at any real star-count depth this
-    // would otherwise clutter the view by default.
-    this.showNames = false;
+    // designations). Defaulted off at first (would otherwise clutter the
+    // view at a deep star-count depth) but turned on by Gilles, 2026-10-16,
+    // along with every other overlay here except the four named
+    // exceptions above.
+    this.showNames = true;
     // Gilles, 2026-10-03: "affiche la position du telescope (repere
     // orange) et le champ du capteur (cadre rouge)". Both default to
     // shown, unlike the reference overlays above (grids/horizon) - this
@@ -452,13 +462,13 @@ export class SkyEngine {
     // and its one unverified assumption (the sign).
     this.sensorOrientationDeg = 0;
     // Gilles, 2026-10-01: "dans le cadre du capteur de la camera essaie de
-    // m'afficher l'image prise ... toujours en optionnel" - unlike
-    // showMountPosition/showSensorFov above (core telescope-control info,
-    // default on), this is a heavier, speculative extra: default OFF, same
-    // as the reference-overlay toggles (grids/horizon/Milky Way). Backing
-    // state (_sensorImageUrl/_sensorImageEl) lives behind setSensorImage()
-    // below, not plain fields - loading a JPEG is asynchronous.
-    this.showSensorImage = false;
+    // m'afficher l'image prise ... toujours en optionnel" - defaulted off
+    // at first (a heavier, speculative extra unlike showMountPosition/
+    // showSensorFov above) but turned on, 2026-10-16, with every other
+    // overlay here except the four named exceptions above. Backing state
+    // (_sensorImageUrl/_sensorImageEl) lives behind setSensorImage() below,
+    // not plain fields - loading a JPEG is asynchronous.
+    this.showSensorImage = true;
     this._sensorImageUrl = null;
     this._sensorImageEl = null;
     // HiPS sky-survey background (js/hips-background.js, Gilles,
