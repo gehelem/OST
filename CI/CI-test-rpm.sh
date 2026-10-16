@@ -32,7 +32,7 @@ export QT_QPA_PLATFORM=offscreen
 # fails here specifically). Back to a plain run - this sandbox cannot
 # give us a backtrace; reproducing on a real VM (full gdb privileges,
 # same way the Arch side was debugged) is the next step, not CI.
-ostserver --webroot=media --indiserver=Y > server.log 2>&1 &
+ostserver --webroot=media --indiserver=Y --configuration=d1 > server.log 2>&1 &
 SERVER_PID=$!
 
 sleep 7
