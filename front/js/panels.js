@@ -188,6 +188,38 @@ function uiZoom() {
   return raw > 0 ? raw : 1;
 }
 
+// Snap threshold in viewport pixels, independent of zoom (consistent with
+// the `m`/SAFE_TOP margins in startDrag()'s own move handler, which are
+// viewport-space too before their final /z conversion). Shared by both
+// axes - left/right edges and top/bottom edges snap at the same distance.
+const SNAP_THRESHOLD = 24;
+
+// Picks, among the 4 ways one of [aStart, aEnd] could align with one of
+// [bStart, bEnd], the smallest offset under `threshold` - or null if none
+// of the 4 qualifies.
+function bestSnapDelta(aStart, aEnd, bStart, bEnd, threshold) {
+  let best = null;
+  for (const d of [bStart - aStart, bEnd - aStart, bStart - aEnd, bEnd - aEnd]) {
+    if (Math.abs(d) <= threshold && (best === null || Math.abs(d) < Math.abs(best))) best = d;
+  }
+  return best;
+}
+
+// Snaps a dragged panel's candidate position (vx, vy, viewport space) to
+// the nearest edge of any other visible panel, on each axis independently.
+function snapToOtherPanels(panel, vx, vy, w, h) {
+  let bestDx = null, bestDy = null;
+  for (const other of layer.querySelectorAll(".panel-float")) {
+    if (other === panel || other.classList.contains("collapsed")) continue;
+    const orect = other.getBoundingClientRect();
+    const dx = bestSnapDelta(vx, vx + w, orect.left, orect.right, SNAP_THRESHOLD);
+    if (dx != null && (bestDx == null || Math.abs(dx) < Math.abs(bestDx))) bestDx = dx;
+    const dy = bestSnapDelta(vy, vy + h, orect.top, orect.bottom, SNAP_THRESHOLD);
+    if (dy != null && (bestDy == null || Math.abs(dy) < Math.abs(bestDy))) bestDy = dy;
+  }
+  return { dx: bestDx || 0, dy: bestDy || 0 };
+}
+
 function startDrag(panel, bar, id, ev, sc) {
   ev.preventDefault();
   const z = uiZoom();
@@ -204,13 +236,18 @@ function startDrag(panel, bar, id, ev, sc) {
     // pixels, consistent with each other) - only the FINAL result is
     // converted to local/pre-zoom space (uiZoom()'s own doc comment),
     // right before it's written into style.left/top.
-    const x = Math.max(m, Math.min(p.x - lr.left - ox, lr.width - r.width - m)) / z;
+    let vx = Math.max(m, Math.min(p.x - lr.left - ox, lr.width - r.width - m));
     // Clamps the panel's BOTTOM edge against bottomLimit (bottomLimit -
     // r.height), not just its top against the raw layer edge like before -
     // see bottomSafeLimit()'s own doc comment for why the old `lr.height -
     // 36` let a dragged panel's body slide most of the way under
     // #quicknav before this ever engaged.
-    const y = Math.max(SAFE_TOP, Math.min(p.y - lr.top - oy, bottomLimit - r.height)) / z;
+    let vy = Math.max(SAFE_TOP, Math.min(p.y - lr.top - oy, bottomLimit - r.height));
+    const snap = snapToOtherPanels(panel, vx, vy, r.width, r.height);
+    vx += snap.dx;
+    vy += snap.dy;
+    const x = vx / z;
+    const y = vy / z;
     panel.style.left = x + "px";
     panel.style.top = y + "px";
     if (e.touches) e.preventDefault(); // stop the page itself from scrolling under the drag
