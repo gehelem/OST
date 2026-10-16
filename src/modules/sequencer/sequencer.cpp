@@ -33,6 +33,8 @@ Sequencer::Sequencer(QString name, QString label, QString profile, QVariantMap a
     getEltString("devices", "filter")->setNullable(true);
     getEltString("focusparameters", "focusprofile")->setLovConstrained(true);
     getEltString("focusparameters", "focusprofile")->setNullable(true);
+    getEltString("guideparameters", "guideprofile")->setLovConstrained(true);
+    getEltString("guideparameters", "guideprofile")->setNullable(true);
     // FILTER_SLOT is a numeric INDI property - "filter" is declared "int"
     // in sequencer.json (issue #240), its LOV key is the real slot number,
     // no string round-trip needed when sending to the driver.
@@ -495,6 +497,17 @@ void Sequencer::SMGuideStarting()
     //qDebug() << "SMGuideStarting";
     logInfo("Starting guider on %1", {getString("slaves", "guidermodule")});
     mGuideStartTimer.start();
+
+    // Same single-fallback-profile mechanism as SMFocusing()'s own
+    // focusparameters.focusprofile (issue #243) - no per-filter override
+    // grid here, Gilles asked for "juste un selecteur simple" this time.
+    QString guideProfile = getString("guideparameters", "guideprofile");
+    if (!guideProfile.isEmpty())
+    {
+        logInfo("Requesting guide profile %1 on %2", {guideProfile, getString("slaves", "guidermodule")});
+        otherModuleRequestProfileLoad(getString("slaves", "guidermodule"), guideProfile);
+    }
+
     otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "guide", true);
     // GuideDone submitted by onOtherModuleEvent when guider signals Busy/"guiding"
 }

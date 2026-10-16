@@ -391,6 +391,17 @@
                 "order": 3,
                 "format": "9.9",
                 "hint": "Trigger a guider recalibration when the peak RMS during an exposure exceeds this value in arcs; 0 disables the check"
+            },
+            "guideprofile": {
+                "type": "string",
+                "label": "Guide profile to load",
+                "listOfValues": "profiles-Guider",
+                "listOfValuesIsExternal": true,
+                "autoupdate": true,
+                "directedit": true,
+                "value": "",
+                "order": 4,
+                "hint": "Profile to load on the guider module before starting guiding; leave empty to keep whatever profile is currently loaded there"
             }
         }
     },
