@@ -541,6 +541,17 @@ void Sequencer::SMDone()
     //qDebug() << "SMDone";
     logInfo("Sequence completed");
     mElapsedTimer->stop();
+
+    // Opt-in (issue request, 2026-10-16) - unlike suspendguidingduringfocus
+    // above, there is no later resume to track here: the sequence is over,
+    // so mGuiderWasSuspended is left untouched.
+    if (mGuiderActive && getBool("guideparameters", "suspendguidingaftersequence"))
+    {
+        logInfo("Suspending guiding on %1 after sequence completion", {getString("slaves", "guidermodule")});
+        mGuiderActive = false;
+        otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "abortguider", true);
+    }
+
     writeLiveSequenceStats();
     getProperty("actions")->setState(OST::Ok, true);
     getEltBool("actions", "startsequence")->setValue(false, true);
@@ -585,6 +596,17 @@ void Sequencer::SMError()
         getEltLight("livesequence", "status")->setValue(OST::Error, false);
         getProperty("livesequence")->updateLine(mCurrentLine);
     }
+
+    // Opt-in, same reasoning as SMDone()'s own suspendguidingaftersequence -
+    // unlike a manual abortsequence (onExternalEvent, always stops the
+    // guider unconditionally), an error otherwise left it running.
+    if (mGuiderActive && getBool("guideparameters", "suspendguidingonerror"))
+    {
+        logInfo("Suspending guiding on %1 after sequence error", {getString("slaves", "guidermodule")});
+        mGuiderActive = false;
+        otherModuleSetValue(getString("slaves", "guidermodule"), "actions", "abortguider", true);
+    }
+
     writeLiveSequenceStats();
     getProperty("actions")->setState(OST::Error, true);
     getEltBool("actions", "startsequence")->setValue(false, true);

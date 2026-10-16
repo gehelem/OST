@@ -402,6 +402,24 @@
                 "value": "",
                 "order": 4,
                 "hint": "Profile to load on the guider module before starting guiding; leave empty to keep whatever profile is currently loaded there"
+            },
+            "suspendguidingaftersequence": {
+                "type": "bool",
+                "label": "Suspend guiding after sequence completion",
+                "autoupdate": true,
+                "directedit": true,
+                "value": false,
+                "order": 5,
+                "hint": "Abort guiding on the guider module once the sequence completes normally; leave off to keep guiding running"
+            },
+            "suspendguidingonerror": {
+                "type": "bool",
+                "label": "Suspend guiding on sequence error",
+                "autoupdate": true,
+                "directedit": true,
+                "value": false,
+                "order": 6,
+                "hint": "Abort guiding on the guider module if the sequence stops on an error; leave off to keep guiding running"
             }
         }
     },
