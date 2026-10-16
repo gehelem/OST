@@ -155,7 +155,7 @@ function renderIndiStep(client, container, setValid) {
   // this returns - no separate initial call needed here.
   function checkValid() {
     const indiserver = client.get(client.topics.controllerData("indiserver"));
-    if (indiserver !== "Y") {
+    if (indiserver === "N") {
       // 1B ("serveur INDI non integre") is deliberately deferred (Gilles:
       // "on affinera ce cas dans un second temps") - never block on it,
       // there is nothing yet for this step to require here.

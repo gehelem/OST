@@ -736,12 +736,10 @@ function fmtBytes(mb) {
 // know when to recompute "is there at least one active driver yet" (see its
 // own `canProceed` gate), renderController() has no use for it and omits it.
 //
-// indiserver reflects whether ostserver itself was launched with
-// --indiserver, not whether some INDI server happens to be running right
-// now (controller.en.md) — "N" means OST isn't the one managing it at all
-// (a separately-run indiserver, or none), so there is nothing to
-// start/stop/list here. "Y" gets the controls; more to come here per
-// Gilles, 2026-10-09 (issue #231, second half).
+// indiserver: "N" means OST isn't managing INDI at all (a separately-run
+// indiserver, or none) - nothing to start/stop/list here. Any other
+// value ("Y" at startup, then "U"/"D" once the process state is known)
+// means OST manages it, so the controls show.
 export function buildIndiPanel(client, scope, onChange) {
   const indiSec = el("section", { class: "panel" });
   const indiTitle = el("h3");
@@ -810,7 +808,7 @@ export function buildIndiPanel(client, scope, onChange) {
 
   function renderIndi() {
     const indiserver = client.get(client.topics.controllerData("indiserver"));
-    const enabled = indiserver === "Y";
+    const enabled = indiserver !== "N";
     indiTitle.textContent = t("views.indiServerPrefix") + (enabled ? t("views.enabled") : t("views.disabled"));
     indiExternalMsg.classList.toggle("hidden", enabled);
     indiControls.classList.toggle("hidden", !enabled);
