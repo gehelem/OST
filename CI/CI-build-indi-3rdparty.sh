@@ -26,7 +26,7 @@ dnf -y install --skip-unavailable \
     gsl-devel cfitsio-devel zlib-devel libjpeg-turbo-devel libtiff-devel \
     fftw-devel libftdi-devel gpsd-devel LibRaw-devel libdc1394-devel \
     libgphoto2-devel boost-devel rtl-sdr-devel limesuite-devel \
-    zeromq-devel systemd-devel \
+    zeromq-devel systemd-devel hidapi-devel \
     rubygems ruby-devel redhat-rpm-config
 gem install --no-document fpm
 
