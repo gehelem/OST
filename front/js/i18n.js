@@ -81,6 +81,7 @@ const STRINGS = {
 
   // ---- app chrome: connect bar, top-right icon buttons (app.js/index.html) -
   "chrome.parameters": { en: "Parameters", fr: "Paramètres", de: "Parameter", it: "Parametri", es: "Parámetros" },
+  "chrome.moreMenu": { en: "More", fr: "Plus", de: "Mehr", it: "Altro", es: "Más" },
   "chrome.uiSize": { en: "UI size", fr: "Taille de l'interface", de: "Oberflächengröße", it: "Dimensione interfaccia", es: "Tamaño de la interfaz" },
   "chrome.toggleTheme": { en: "Toggle theme", fr: "Changer de thème", de: "Design umschalten", it: "Cambia tema", es: "Cambiar tema" },
   "chrome.login": { en: "Login", fr: "Connexion", de: "Anmelden", it: "Accedi", es: "Iniciar sesión" },

@@ -130,6 +130,34 @@
  * always-visible chip, never nested inside the collapsible connection
  * panel — burying it there once meant Gilles genuinely couldn't find it. */
 #top-right { position: fixed; top: 12px; right: 12px; z-index: 20; display: flex; align-items: flex-start; gap: 8px; }
+#top-right-items { display: flex; align-items: flex-start; gap: 8px; }
+/* Gilles, 2026-10-16: "sur smartphone en mode portrait les deux menus du
+ * haut arrivent a se superposer ... j'aimerais que dans ces cas de
+ * collision le menu general soit transforme en un seul bouton '...'" -
+ * app.js's own updateTopRightCollapse() toggles this ".collapsed" class
+ * once it measures #modbar's own right edge reaching #top-right-items'
+ * natural left edge. Normal state (no class) renders the plain inline row
+ * above; collapsed hides it (not just visibility:hidden - it must stop
+ * actually occupying space, that's the whole point) behind #top-right-more
+ * instead, which only ever shows in that state. */
+#top-right-more { display: none; }
+#top-right.collapsed #top-right-more { display: inline-flex; }
+#top-right.collapsed #top-right-items { display: none; }
+/* Clicking #top-right-more while collapsed (app.js) unfolds the exact same
+ * row as a dropdown instead of inline - same floating-popover idea as
+ * .conn-panel/.zoom-panel, own glass styling spelled out here rather than
+ * toggling the shared .glass class from app.js (JS only ever flips
+ * "collapsed"/"open", nothing else). */
+#top-right.collapsed.open #top-right-items {
+  display: flex; flex-direction: column; gap: 8px;
+  position: absolute; top: calc(100% + 6px); right: 0;
+  padding: var(--space-3); border-radius: var(--radius-lg); z-index: 30;
+  background: var(--bg-panel);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-panel);
+}
 
 /* UI zoom (font size + everything else, incl. floating panels) — Gilles,
    2026-09-28: "ajuster la taille de police de tous les composants ... la
