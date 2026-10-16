@@ -28,8 +28,24 @@ variables:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
     - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
+    - if: '$CI_PIPELINE_SOURCE == "push"'
 
 .test-rules: &test-rules
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+
+# 24.04 only builds/tests on an MR-to-main or a release tag, never on a
+# plain push to a feature branch - unlike .build-rules/.test-rules
+# above (still 26.04's own, unrestricted), so inlined separately here
+# rather than sharing that anchor.
+.build-rules-mr-or-tag: &build-rules-mr-or-tag
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
+
+.test-rules-mr-or-tag: &test-rules-mr-or-tag
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
     - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
@@ -78,7 +94,7 @@ build-job-2404:
       - "ostserver-complete_*_2404_amd64.deb"
     expire_in: 4 week
   allow_failure: true
-  <<: *build-rules
+  <<: *build-rules-mr-or-tag
 
 build-job-2604:
   stage: build
@@ -134,7 +150,7 @@ test-job-2404:
       - ws.log
     expire_in: 4 week
   allow_failure: true
-  <<: *test-rules
+  <<: *test-rules-mr-or-tag
 
 test-job-2604:
   stage: test
