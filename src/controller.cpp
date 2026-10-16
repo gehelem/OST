@@ -389,24 +389,30 @@ void Controller::loadConf(const QString &pConf)
     }
     logInfo("Load configuration %1 sucessfull", {pConf});
 
-    QStringList driverLabels;
-    if (dbmanager->getIndiConfiguration(pConf, driverLabels) && !driverLabels.isEmpty())
-    {
-        for (const QString &label : driverLabels)
-        {
-            auto it = std::find_if(_indiDrivers.begin(), _indiDrivers.end(),
-                                   [&](const IndiDriverInfo & d)
-            {
-                return d.label == label;
-            });
-            if (it != _indiDrivers.end())
-                startIndiDriver(it->binary);
-            else
-                logError("INDI driver not found in XML registry: %1", {label});
-        }
-    }
+    loadIndiConfiguration(pConf);
 
     updateControllerData("currentconf", QVariant(pConf));
+}
+// Starts every INDI driver saved under pConf (INDICONFIGURATIONS), resolving
+// each saved driver label against the XML registry (_indiDrivers). Also
+// usable standalone (YK), independent of loading a full module
+// configuration.
+void Controller::loadIndiConfiguration(const QString &pConf)
+{
+    QStringList driverLabels;
+    if (!dbmanager->getIndiConfiguration(pConf, driverLabels)) return;
+    for (const QString &label : driverLabels)
+    {
+        auto it = std::find_if(_indiDrivers.begin(), _indiDrivers.end(),
+                               [&](const IndiDriverInfo & d)
+        {
+            return d.label == label;
+        });
+        if (it != _indiDrivers.end())
+            startIndiDriver(it->binary);
+        else
+            logError("INDI driver not found in XML registry: %1", {label});
+    }
 }
 void Controller::saveConf(const QString &pConf)
 {
@@ -776,6 +782,11 @@ void Controller::onExternalEvent(OST::ExtEvent event)
                 return;
             };
             disconnectIndiDriver(event.data["driver"].toString());
+            return;
+        }
+        case OST::ExtEvType::YK:
+        {
+            loadIndiConfiguration(event.data["name"].toString());
             return;
         }
         default:
