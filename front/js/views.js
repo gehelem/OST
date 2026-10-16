@@ -511,18 +511,23 @@ function buildHomeCard(client, name, onSelect, onReorder) {
 
   // Gilles, 2026-10-06: "sur la vignette planner tu peux afficher la
   // valeur courante de la target (name/RA/DEC) sans aller chercher sur la
-  // grille" - "planning" is planner's own grid property (hasGrid:true,
-  // one row per planned object: object/ra/dec/profile/progress - confirmed
-  // live against the real server, not guessed), no separate "current
-  // target" property of its own. The active row is whichever one's own
-  // "progress" dynlabel names an in-progress step (planner.cpp's real
-  // setDynLabel() calls: "Checking visibility"/"Slewing"/"Shooting" while
-  // working a line, "Queued" before it and "Finished"/"Cancelled"/
+  // grille" - a lightweight read of "liveplanning", planner's own run
+  // snapshot grid (hasGrid:true, one row per planned object: object/ra/
+  // dec/profile/progress/status - confirmed live against the real server,
+  // not guessed; see planner.cpp's writeLiveSequenceStats()-style snapshot
+  // taken from the editable "planning" grid at run start - "planning"
+  // itself never carries "progress" at all). The active row is whichever
+  // one's own "progress" dynlabel names an in-progress step (planner.cpp's
+  // real setDynLabel() calls: "Checking visibility"/"Slewing"/"Shooting"
+  // while working a line, "Queued" before it and "Finished"/"Cancelled"/
   // "Failed: ..."/"Skipped: ..." once resolved) - picks the first match,
-  // same order the grid itself processes lines in.
+  // same order the grid itself processes lines in. Gilles, 2026-10-16:
+  // was still reading the (now progress-less) "planning" grid, so this
+  // card's "active" row search could never match - fixed to read
+  // "liveplanning" instead.
   const PLANNER_ACTIVE_STATES = new Set(["Checking visibility", "Slewing", "Shooting"]);
   if (template === "planner") {
-    disposers.push(client.subscribe(client.topics.property(name, "planning"), (prop) => {
+    disposers.push(client.subscribe(client.topics.property(name, "liveplanning"), (prop) => {
       const rows = (prop && prop.rows) || [];
       const active = rows.find((r) => r.progress && PLANNER_ACTIVE_STATES.has(r.progress.dynlabel));
       body.classList.toggle("muted", !active);
