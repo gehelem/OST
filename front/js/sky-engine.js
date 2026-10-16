@@ -1673,6 +1673,18 @@ export class SkyEngine {
       const hipsFovDeg = 2 * Math.min(90, this.projection === "stereographic"
         ? (2 * Math.atan(hipsRatio) * 180) / Math.PI
         : (Math.asin(Math.min(1, hipsRatio)) * 180) / Math.PI);
+      // Gilles, 2026-10-16: "lorsque je dezoome completement l'affichage du
+      // hips reste etale sur tout l'ecran ... alors que la boule des
+      // etoiles diminue encore bien" - once domeRadius drops below w/2
+      // (hipsRatio > 1), hipsFovDeg above is pinned at its 180deg max (no
+      // real angle solves "show more than a full hemisphere" for either
+      // projection) - but Aladin's own rendered sky-disc still fills its
+      // full-width div at that max fov, so it stops shrinking with our own
+      // dome while domeRadius keeps getting smaller. hips-background.js's
+      // CSS transform below makes up the rest of the shrink past that
+      // point - 1 (no-op) while hipsRatio <= 1, matching "correct a partir
+      // du moment ou la boule le rejoint sur les bords".
+      const hipsScale = hipsRatio > 1 ? 1 / hipsRatio : 1;
       // Position angle of the North Celestial Pole as WE actually draw it
       // on screen (Gilles, 2026-10-13, after seeing the background drift
       // during a pan: "les mouvements sont inverses sur l'image de fond")
@@ -1704,7 +1716,7 @@ export class SkyEngine {
       const ncpVec = rotateVector(this.rotation, horizontalToVector(ncpHor.azimuth, ncpHor.altitude));
       const ncpScreen = vectorToScreen(ncpVec, domeRadius, this.projection);
       const rotationDeg = -(Math.atan2(ncpScreen.x, -ncpScreen.y) * 180) / Math.PI;
-      this.onViewChange({ ra, dec, fovDeg: hipsFovDeg, rotationDeg });
+      this.onViewChange({ ra, dec, fovDeg: hipsFovDeg, rotationDeg, scale: hipsScale, projection: this.projection });
     }
   }
 }

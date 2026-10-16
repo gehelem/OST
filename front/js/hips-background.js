@@ -143,6 +143,27 @@ export function createHipsBackground(container) {
     // nudged off exact zero so "no rotation" still actually applies
     // instead of silently keeping whatever rotation was set previously.
     aladin.setRotation(view.rotationDeg || 1e-6);
+    // Gilles, 2026-10-16: "lorsque je dezoome completement l'affichage du
+    // hips reste etale sur tout l'ecran" - past the point where sky-engine.js's
+    // own hipsFovDeg maxes out (180deg - no real angle solves "show more
+    // than a full hemisphere"), Aladin's own sky-disc stops shrinking with
+    // our dome even as we keep dezooming further. Makes up the remaining
+    // shrink as a plain CSS scale on the whole div (1 = no-op, the normal
+    // case) - div is inset:0/100%x100% (css/panels.css), so the default
+    // transform-origin (50% 50%) is already this div's own center, same
+    // center sky-engine.js's own math is all relative to.
+    div.style.transform = view.scale === 1 ? "" : `scale(${view.scale})`;
+    // Gilles, 2026-10-16: "l'affichage hip en mode stereographic n'est pas
+    // conforme, il glisse par rapport a la carte" - sky-engine.js's own
+    // hipsFovDeg formula above already branches on this.projection to use
+    // the right inverse (asin vs atan), but nothing ever told ALADIN ITSELF
+    // which projection to actually draw with - it was left on its own
+    // default ("SIN", grepped from lib/aladin.js's own init code), i.e.
+    // permanently orthographic regardless of our own toggle
+    // (templates/navigator.js's projCb). Two projections agree at dead
+    // center (r=0) and diverge more with radius - exactly "glisse"
+    // (matches fine near the middle, drifts further out).
+    aladin.setProjection(view.projection === "stereographic" ? "STG" : "SIN");
   }
 
   const api = {
