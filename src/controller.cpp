@@ -346,14 +346,9 @@ void Controller::loadConf(const QString &pConf)
     OST::LovString* l = static_cast<OST::LovString*>(getControllerLovs()["availableconfs"]);
     l->lovClear();
 
-    // Publish the list of every known configuration up front, regardless
-    // of whether pConf itself resolves below - this used to run only past
-    // both early returns, so a missing/renamed startup --configuration
-    // (ost.cpp's own CLI default is "default") left availableconfs
-    // entirely empty even though other configurations existed in the
-    // database (Gilles, 2026-10-16, after db.sql's seed configuration was
-    // renamed from "default" to "d1" - the real rig config, visible via a
-    // direct DB query, never showed up in a fresh dump).
+    // List every known configuration regardless of whether pConf itself
+    // resolves below, so a missing startup configuration doesn't leave
+    // availableconfs empty.
     QVariantMap confs;
     dbmanager->getDbConfigurations(confs);
     for(QVariantMap::const_iterator iter = confs.begin(); iter != confs.end(); ++iter)
@@ -1003,6 +998,14 @@ void Controller::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
         mLogger->error("indiserver crashed");
     else
         mLogger->warning("indiserver exited (code " + QString::number(exitCode) + ")");
+    setIndiServerState(false);
+}
+// "Y" mode also carries live state: "U" once indiserver is actually
+// running, "D" once it isn't. "N" mode is left untouched.
+void Controller::setIndiServerState(bool running)
+{
+    if (_indiserver != "Y") return;
+    updateControllerData("indiserver", QVariant(running ? QString("U") : QString("D")));
 }
 void Controller::processOutput()
 {
@@ -1063,6 +1066,7 @@ void Controller::startIndi(void)
             _indiPid = pidStr.toInt();
             mLogger->info("Reusing orphaned indiserver (PID " + pidStr + ")");
             queryActiveIndiDrivers();
+            setIndiServerState(true);
             return;
         }
         mLogger->warning("Orphaned indiserver found but FIFO unusable — restarting");
@@ -1084,10 +1088,12 @@ void Controller::startIndi(void)
     if (!_indiProcess->waitForStarted(3000))
     {
         mLogger->error("indiserver failed to start");
+        setIndiServerState(false);
         return;
     }
     _indiPid = _indiProcess->processId();
     mLogger->info("indiserver started (PID " + QString::number(_indiPid) + ")");
+    setIndiServerState(true);
 
     bool fifoReady = false;
     for (int i = 0; i < 30 && !fifoReady; ++i)
@@ -1118,6 +1124,7 @@ void Controller::stopIndi(void)
         ::kill(_indiPid, SIGKILL);
         mLogger->info("Orphaned indiserver stopped (PID " + QString::number(_indiPid) + ")");
     }
+    setIndiServerState(false);
     _indiPid = 0;
     _activeIndiDrivers.clear();
     updateControllerData("indiactivedrivers", QVariantList());

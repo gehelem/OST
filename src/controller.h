@@ -94,6 +94,7 @@ class Controller : public QObject
         void startPublish();
         void startIndi(void);
         void stopIndi(void);
+        void setIndiServerState(bool running);
         void startIndiDriver(const QString &pDriver);
         void stopIndiDriver(const QString &pDriver);
         void reloadIndiDriver(const QString &pDriver);
