@@ -27,7 +27,7 @@ rm -f ost.db
 
 echo "Starting server..."
 export QT_QPA_PLATFORM=offscreen
-ostserver --webroot=media --indiserver=Y > server.log 2>&1 &
+ostserver --webroot=media --indiserver=Y --configuration=d1 > server.log 2>&1 &
 SERVER_PID=$!
 
 sleep 7
