@@ -747,10 +747,8 @@ export function buildIndiPanel(client, scope, onChange) {
   const indiExternalMsg = el("div", { class: "muted small hidden", text: t("views.indiServerManagedElsewhere") });
   indiSec.appendChild(indiExternalMsg);
   const indiControls = el("div", { class: "hidden" });
-  indiControls.appendChild(el("div", { class: "form-row" }, [
-    el("button", { class: "btn btn-sm", onclick: () => client.indiStart() }, t("views.startServer")),
-    el("button", { class: "btn btn-sm", onclick: () => client.indiStop() }, t("views.stopServer")),
-  ]));
+  const indiServerToggleBtn = el("button", { class: "btn btn-sm" }, t("views.startServer"));
+  indiControls.appendChild(el("div", { class: "form-row" }, [indiServerToggleBtn]));
   // Top zone: drivers actually running right now (indiactivedrivers) -
   // reload/stop only, no "load" (they're already loaded).
   const connectAllBtn = el("button", { class: "btn btn-sm", onclick: connectAll }, t("views.connectAll"));
@@ -816,6 +814,9 @@ export function buildIndiPanel(client, scope, onChange) {
       if (onChange) onChange();
       return;
     }
+    const running = indiserver === "U";
+    indiServerToggleBtn.textContent = running ? t("views.stopServer") : t("views.startServer");
+    indiServerToggleBtn.onclick = running ? () => client.indiStop() : () => client.indiStart();
     const activeDrivers = client.get(client.topics.controllerData("indiactivedrivers")) || [];
     connectAllBtn.disabled = activeDrivers.length === 0;
     activeDriversList.innerHTML = "";
