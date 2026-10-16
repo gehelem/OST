@@ -18,9 +18,10 @@ Il controller è il componente del server che carica i moduli e pilota il server
 | `git` | Versione del server: `Gitdate`, `Githash`, `Gitmessage`, `Gittag` |
 | `libraries` | Librerie di moduli disponibili, un oggetto di metadati per libreria — le chiavi sono **con prefisso `libost`** (`libostfocus`, `libostdummy`...); rimuoverlo prima di passarlo a [`ML`]({{% relref "client-messages.it.md" %}}#ml) |
 | `profiles` | Profili disponibili: oggetto `nome libreria trasformato → elenco di nomi di profilo` — vedi la convenzione di chiave qui sotto |
-| `indiserver` | `"Y"` se il server INDI integrato è attivato, `"N"` altrimenti |
+| `indiserver` | `"N"` se il server INDI integrato è disattivato (`--indiserver`); altrimenti `"U"` una volta confermato in esecuzione, `"D"` una volta che non lo è più (avvio fallito, crash, o arresto) |
 | `indidrivers` | Catalogo dei driver INDI installati: elenco di `{binary, family, label, mdpd}` |
 | `indiactivedrivers` | Driver INDI attualmente avviati |
+| `indiconfigurations` | Configurazioni di driver INDI salvate: oggetto `nome della configurazione → elenco di etichette driver` |
 | `systemwatcher` | Carico del server, vedi più avanti |
 | `files`, `folders` | Copia di `d.files.files` e `d.files.folders`, vedi [File system](#fichiers) |
 
@@ -93,12 +94,14 @@ Non esiste alcun comando per rimuovere una configurazione salvata — `CL` e `CS
 
 ### Server INDI e driver
 
-Se `controllerdata.indiserver` vale `"Y"`, il server pilota un'istanza INDI integrata. I comandi [`YA`/`YZ`/`YL`/`YR`/`YS`]({{% relref "client-messages.it.md" %}}#indi) la avviano, la arrestano e gestiscono i driver; `controllerdata.indidrivers` fornisce il catalogo disponibile e `controllerdata.indiactivedrivers` ciò che è in esecuzione. `binary` è il valore da passare come `driver` in `YL`, `YR` e `YS`.
+A meno che `controllerdata.indiserver` non valga `"N"`, il server pilota un'istanza INDI integrata. I comandi [`YA`/`YZ`/`YL`/`YR`/`YS`]({{% relref "client-messages.it.md" %}}#indi) la avviano, la arrestano e gestiscono i driver; `controllerdata.indidrivers` fornisce il catalogo disponibile e `controllerdata.indiactivedrivers` ciò che è in esecuzione. `binary` è il valore da passare come `driver` in `YL`, `YR` e `YS`.
 
 `controllerdata.indidrivers` e `controllerdata.indiactivedrivers` sono entrambi elenchi di oggetti `{binary, family, label}` (`indidrivers` ha in più `mdpd`, vedi la tabella sopra).
 
-{{% notice style="warning" title="YA/YZ/YL/YR/YS non hanno una conferma dedicata" %}}
-Nessuno di questi comandi genera un proprio messaggio di conferma. Successo o fallimento vanno dedotti indirettamente: `YL`/`YR`/`YS` sono seguiti da un aggiornamento `uc` di `indiactivedrivers` che riflette la modifica richiesta (ma questo conferma solo che il server ci ha *provato*, non che il driver INDI sottostante sia effettivamente partito), mentre `YA`/`YZ` non producono alcun `uc` — solo messaggi `l` (log), pensati per un umano, non per essere analizzati programmaticamente da un client. `controllerdata.indiserver` stesso riflette l'opzione di avvio `--indiserver`, non se il server integrato sia effettivamente in esecuzione in questo momento.
+Un intero insieme di driver salvato può essere avviato in un colpo solo con [`YK`]({{% relref "client-messages.it.md" %}}#indi), per nome, da `controllerdata.indiconfigurations` — salvato da `CS` insieme a una configurazione di moduli (vedi l'avviso sopra), ma caricabile anche da solo, indipendentemente da `CL`.
+
+{{% notice style="warning" title="YA/YZ/YL/YR/YS/YK non hanno una conferma dedicata" %}}
+Nessuno di questi comandi genera un proprio messaggio di conferma. Successo o fallimento vanno dedotti indirettamente: `YL`/`YR`/`YS`/`YK` sono seguiti da un aggiornamento `uc` di `indiactivedrivers` che riflette la modifica richiesta (ma questo conferma solo che il server ci ha *provato*, non che il driver INDI sottostante sia effettivamente partito), mentre `YA`/`YZ` non producono alcun `uc` — solo messaggi `l` (log), pensati per un umano, non per essere analizzati programmaticamente da un client. `controllerdata.indiserver` traccia effettivamente in diretta lo stato attivo/inattivo del server integrato (vedi la tabella sopra), ma questo è un effetto collaterale di `YA`/`YZ`/di un crash, non una conferma diretta del comando che lo ha causato.
 {{% /notice %}}
 
 ## Il modulo `GlobalDatastore` {#globaldatastore}

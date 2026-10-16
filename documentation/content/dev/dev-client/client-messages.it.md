@@ -51,6 +51,7 @@ Tutte le chiavi dei comandi client sono in **MAIUSCOLO** (es. `DU`, `SV`, `SA`, 
 | [`YS`](#indi) | Arrestare un driver INDI |
 | [`YC`](#indi) | Connettere il device di un driver INDI |
 | [`YD`](#indi) | Disconnettere il device di un driver INDI |
+| [`YK`](#indi) | Caricare una configurazione di driver INDI salvata |
 
 ---
 
@@ -619,8 +620,9 @@ Questi comandi sono disponibili solo quando il server dispone di un'istanza INDI
 | `YS` | Arrestare un driver INDI (`{"YS": {"driver": "<binary>"}}`) |
 | `YC` | Connettere il device di un driver INDI (`{"YC": {"driver": "<binary>"}}`) |
 | `YD` | Disconnettere il device di un driver INDI (`{"YD": {"driver": "<binary>"}}`) |
+| `YK` | Caricare una configurazione di driver INDI salvata (`{"YK": {"name": "<nome configurazione>"}}`) |
 
-`YA` e `YZ` non hanno payload (`{"YA": {}}`). Per `YL`, `YR`, `YS`, `YC` e `YD`, `driver` è il campo `binary` di una voce di `controllerdata.indidrivers`.
+`YA` e `YZ` non hanno payload (`{"YA": {}}`). Per `YL`, `YR`, `YS`, `YC` e `YD`, `driver` è il campo `binary` di una voce di `controllerdata.indidrivers`. Per `YK`, `name` è una chiave di `controllerdata.indiconfigurations` (vedi [Controller]({{% relref "controller.it.md" %}})) — avvia tutti i driver salvati con quel nome, indipendentemente da `CL`/`CS`, che invece raggruppano i driver attivi in una configurazione di moduli.
 
 {{% notice style="tip" title="Caricare un driver non connette il suo device" %}}
 `YL` avvia solo il processo del driver - il device deve ancora essere connesso prima di essere utilizzabile, con `YC` (la proprietà INDI `CONNECTION.CONNECT`). È un passaggio separato di proposito: INDI stesso modella "processo attivo" e "device connesso" in modo indipendente. Come `YA`/`YZ`, `YC`/`YD` non hanno un riscontro dedicato (vedi l'avviso sopra): al momento non esiste alcun campo `controllerdata` che indichi se il device di un driver è effettivamente connesso, solo se il suo processo è attivo (`indiactivedrivers`).
