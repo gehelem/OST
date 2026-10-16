@@ -20,12 +20,14 @@ build-job-arch:
       - "ostserver-complete_*_arch_x86_64.pkg.tar.zst"
     expire_in: 4 week
   # YAML anchors don't carry across `include:`d files (same reason
-  # CI/doc.yml inlines these same conditions (plus a push fallback that
-  # one still keeps) instead of reusing &build-rules from
-  # .gitlab-ci.yml) - kept literally identical otherwise.
+  # CI/fedora.yml inlines these same conditions instead of reusing
+  # &build-rules-mr-or-tag from .gitlab-ci.yml) - kept literally
+  # identical to it, including the push-to-main condition release-job-
+  # latest depends on (see that anchor's own doc comment).
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
     - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
 test-job-arch:
   stage: test
@@ -44,3 +46,4 @@ test-job-arch:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
     - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
