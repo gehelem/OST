@@ -736,6 +736,34 @@ function fmtBytes(mb) {
 // know when to recompute "is there at least one active driver yet" (see its
 // own `canProceed` gate), renderController() has no use for it and omits it.
 //
+// Same overlay/select/confirm shape as render.js's own openLoadProfileDialog -
+// picks a name from controllerdata.indiconfigurations (object keyed by
+// configuration name, see YK) and sends it as-is.
+function openIndiConfigDialog(client) {
+  const select = el("select", { class: "field-input" });
+  const unsubscribe = client.subscribe(client.topics.controllerData("indiconfigurations"), (confs) => {
+    const names = Object.keys(confs || {});
+    const current = select.value;
+    select.innerHTML = "";
+    select.appendChild(el("option", { value: "", text: names.length ? t("views.chooseIndiConfiguration") : t("views.noIndiConfigurationsYet") }));
+    for (const name of names) select.appendChild(el("option", { value: name, text: name }));
+    if (names.includes(current)) select.value = current;
+  });
+  const overlay = el("div", { class: "dialog-overlay" });
+  const close = () => { unsubscribe(); overlay.remove(); };
+  const dialog = el("div", { class: "dialog" }, [
+    el("h3", { text: t("views.loadIndiConfigurationTitle") }),
+    select,
+    el("div", { class: "dialog-actions" }, [
+      el("button", { class: "btn", onclick: close }, t("common.cancel")),
+      el("button", { class: "btn btn-primary", onclick: () => { if (select.value) client.indiLoadConfiguration(select.value); close(); } }, t("views.loadIndiConfiguration")),
+    ]),
+  ]);
+  overlay.appendChild(dialog);
+  overlay.addEventListener("click", (ev) => { if (ev.target === overlay) close(); });
+  document.getElementById("dialog-root").appendChild(overlay);
+}
+
 // indiserver: "N" means OST isn't managing INDI at all (a separately-run
 // indiserver, or none) - nothing to start/stop/list here. Any other
 // value ("Y" at startup, then "U"/"D" once the process state is known)
@@ -748,7 +776,12 @@ export function buildIndiPanel(client, scope, onChange) {
   indiSec.appendChild(indiExternalMsg);
   const indiControls = el("div", { class: "hidden" });
   const indiServerToggleBtn = el("button", { class: "btn btn-sm" }, t("views.startServer"));
-  indiControls.appendChild(el("div", { class: "form-row" }, [indiServerToggleBtn]));
+  // Only meaningful while the embedded server is actually confirmed
+  // running ("U") - loading a configuration while it's down or starting
+  // would just fail silently, same reasoning as the rest of this panel's
+  // own enabled/disabled split.
+  const indiLoadConfigBtn = el("button", { class: "btn btn-sm hidden", onclick: () => openIndiConfigDialog(client) }, [icon("folder_open", { small: true }), t("views.loadIndiConfiguration")]);
+  indiControls.appendChild(el("div", { class: "form-row" }, [indiServerToggleBtn, indiLoadConfigBtn]));
   // Top zone: drivers actually running right now (indiactivedrivers) -
   // reload/stop only, no "load" (they're already loaded).
   const connectAllBtn = el("button", { class: "btn btn-sm", onclick: connectAll }, t("views.connectAll"));
@@ -817,6 +850,7 @@ export function buildIndiPanel(client, scope, onChange) {
     const running = indiserver === "U";
     indiServerToggleBtn.textContent = running ? t("views.stopServer") : t("views.startServer");
     indiServerToggleBtn.onclick = running ? () => client.indiStop() : () => client.indiStart();
+    indiLoadConfigBtn.classList.toggle("hidden", !running);
     const activeDrivers = client.get(client.topics.controllerData("indiactivedrivers")) || [];
     connectAllBtn.disabled = activeDrivers.length === 0;
     activeDriversList.innerHTML = "";
