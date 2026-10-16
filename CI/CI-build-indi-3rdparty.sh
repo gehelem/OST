@@ -10,9 +10,23 @@
 #
 set -e
 
-dnf -y install \
+# indi-3rdparty's top-level CMakeLists configures every driver by
+# default, not just the ones enabled via INDI_3RDPARTY_CMAKE_FLAGS (that
+# only adds its own on top) - so this needs the project's FULL dependency
+# list (see its own README's apt-get line), mapped to Fedora -devel
+# package names, or an unrelated driver's missing REQUIRED dependency
+# aborts configure before it even reaches the ones actually wanted.
+# --skip-unavailable: a few of these (limesuite, rtl-sdr) may not exist
+# on every Fedora release - skip them rather than fail the whole job,
+# same as FFMPEG/libudev already being silently skipped by cmake itself
+# further down (optional, not REQUIRED there).
+dnf -y install --skip-unavailable \
     gcc-c++ cmake make git rpm-build \
     libindi-devel libnova-devel libusb1-devel curl-devel jsoncpp-devel \
+    gsl-devel cfitsio-devel zlib-devel libjpeg-turbo-devel libtiff-devel \
+    fftw-devel libftdi-devel gpsd-devel LibRaw-devel libdc1394-devel \
+    libgphoto2-devel boost-devel rtl-sdr-devel limesuite-devel \
+    zeromq-devel systemd-devel \
     rubygems ruby-devel redhat-rpm-config
 gem install --no-document fpm
 
