@@ -22,7 +22,7 @@
 // never shows twice by default.
 
 import { renderProperty, updateQuickNav, moduleLifecycle, renderActionsPanel } from "../render.js";
-import { addImageBlock } from "../imagelayer.js";
+import { addImageBlock, addImageBlockFrom } from "../imagelayer.js";
 import * as Panels from "../panels.js";
 import { t } from "../i18n.js";
 
@@ -73,6 +73,16 @@ import { t } from "../i18n.js";
  * sa fenetre") — unlike guider.js's own removal, this can genuinely drop
  * reachability for whatever `panelSpecs` doesn't list, so only opt out of
  * it for a module actually checked to have nothing worth keeping there.
+ *
+ * `opts.imageFrom: (mod) => moduleName|null`, if given, shows a SLAVE
+ * module's background image + Stats button instead of this module's own
+ * (today's only caller, planner.js, has no "image" of its own at all) —
+ * reads its live slaves.sequencemodule element, re-read on every rebuild
+ * so picking a different slave instance re-subscribes to that one's image
+ * instead. `opts.imageFromLabel` is an i18n.js KEY (not resolved text, same
+ * reasoning as spec.title above) for the fixed panel/quicknav label to use
+ * - no live property label available from a module this template was
+ * never mounted on.
  *
  * Returns `mount(client, moduleName)`, ready to re-export as a template's
  * own `mount`.
@@ -130,6 +140,14 @@ export function buildScaffoldTemplate(panelSpecs, imagePos, opts) {
       }
 
       addImageBlock(client, moduleName, mod, "image", "image", Panels, track, disposers, quickNavEntries, ip, { quickPanel: !opts || opts.imageQuickPanel !== false });
+
+      if (opts && opts.imageFrom) {
+        const slaveModuleName = opts.imageFrom(mod);
+        if (slaveModuleName) {
+          const label = (opts.imageFromLabel && t(opts.imageFromLabel)) || "Image";
+          addImageBlockFrom(client, slaveModuleName, label, Panels, track, disposers, quickNavEntries, ip, { quickPanel: !opts || opts.imageQuickPanel !== false });
+        }
+      }
 
       // Anything this template doesn't know about explicitly (a future
       // property this module gains) still needs to be reachable — fold it

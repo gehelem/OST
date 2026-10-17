@@ -18,8 +18,11 @@
 // all hasprofile:true and not listed below - stay Parameters-modal-only,
 // same as Rooster's own planner.component.html, which doesn't surface
 // them either. actions (start/stop) is generic to any IndiModule via
-// defineMeAsPlanner() - no "image" here, unlike sequencer (Planner never
-// calls defineMeAsImager()).
+// defineMeAsPlanner() - no "image" of its OWN here, unlike sequencer
+// (Planner never calls defineMeAsImager()) - imageFrom below borrows its
+// slave Sequencer's background image instead. quickPanel:false on it, same
+// as sequencer.js's own image handling this mirrors - background + Stats
+// button only, no extra small quick-stats panel.
 //
 // otherPanel: false - the only property that would otherwise land in the
 // catch-all is "signals" (giveMeAState()'s generic state/event bookkeeping,
@@ -32,4 +35,15 @@ export const mount = buildScaffoldTemplate([
   { id: "planning", x: 20, y: 92, w: 420, icon: "list", iconOnly: true, framed: false },
   { id: "liveplanning", x: 460, y: 92, w: 460, icon: "browse_activity", iconOnly: true, framed: false },
   { id: "progress", x: 20, y: 330, w: 300, icon: "progress_activity", iconOnly: true, framed: false },
-], undefined, { otherPanel: false });
+], undefined, {
+  otherPanel: false,
+  imageQuickPanel: false,
+  // A key, not resolved text (see scaffold.js's own spec.title doc comment
+  // on why - this opts object is built once at import time, long before a
+  // language is even selected).
+  imageFromLabel: "imagelayer.sequenceImage",
+  imageFrom: (mod) => {
+    const e = mod.properties.slaves && mod.properties.slaves.elements;
+    return (e && e.sequencemodule && e.sequencemodule.value) || null;
+  },
+});

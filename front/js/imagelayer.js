@@ -490,3 +490,31 @@ export function addImageBlock(client, moduleName, mod, propName, elName, panelsA
   // header comment on why that check always comes first).
   quickNavEntries.push({ id: propName + "-stats", label: t("imagelayer.stats"), icon: "bar_chart", iconOnly: true });
 }
+
+/**
+ * Same as addImageBlock() above, but sourced from a DIFFERENT module than
+ * the one this template is actually mounted on - for a module that has no
+ * image of its own but shows its slave's instead, e.g. planner.js showing
+ * its slave Sequencer's background + Stats button. `imageModuleName` is
+ * the slave's live instance name (planner.js reads it off its own
+ * slaves.sequencemodule element); the caller is responsible for only
+ * calling this when that module is actually expected to have an "image"
+ * property (true for any defineMeAsSequencer()/defineMeAsImager()-based
+ * module) - there's no `mod.properties` to gate on here, since this
+ * module's own `mod` never carries the slave's properties. `label` is a
+ * fixed string for the same reason (no live property label to read from).
+ */
+export function addImageBlockFrom(client, imageModuleName, label, panelsApi, track, disposers, quickNavEntries, pos, opts) {
+  const p = { x: 660, y: 92, w: 280, ...pos };
+  disposers.push(showBackgroundImage(client, imageModuleName, "image", "image").dispose);
+
+  if (!opts || opts.quickPanel !== false) {
+    const b = panelsApi.make({ id: "image", title: label, x: p.x, y: p.y, w: p.w });
+    b.appendChild(track(buildImageQuickStats(client, imageModuleName, "image", "image")));
+    quickNavEntries.push({ id: "image", label });
+  }
+
+  const sb = panelsApi.make({ id: "image-stats", title: t("imagelayer.imageStats"), x: p.x, y: p.y + 100, w: p.w + 100, collapsed: true });
+  sb.appendChild(track(buildImageStatsHistogramPanel(client, imageModuleName, "image", "image")));
+  quickNavEntries.push({ id: "image-stats", label: t("imagelayer.stats"), icon: "bar_chart", iconOnly: true });
+}
