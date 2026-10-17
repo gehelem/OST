@@ -19,6 +19,7 @@ import * as polar from "./polar.js";
 import * as parkmanager from "./parkmanager.js";
 import * as monitor from "./monitor.js";
 import * as planner from "./planner.js";
+import * as allsky from "./allsky.js";
 
 export const templates = {
   guider,
@@ -30,4 +31,5 @@ export const templates = {
   parkmanager,
   monitor,
   planner,
+  allsky,
 };
