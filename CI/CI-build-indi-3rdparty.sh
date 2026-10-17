@@ -81,9 +81,14 @@ DESTDIR=/tmp/indi-3rdparty-stage cmake --install /tmp/indi-3rdparty/build-driver
 # fpm's argument parser (clamp) refuses any -flag once it has seen the
 # first positional argument - "usr" (what -C's directory is relative
 # to) must come last, after every -flag/--option.
+# --iteration tied to CI_PIPELINE_ID: without it, rebuilding the same
+# INDI_3RDPARTY_TAG with different driver content still produces the
+# exact same NVR, and dnf treats that as already installed and no-ops
+# instead of upgrading.
 fpm -s dir -t rpm \
     -n indi-3rdparty-custom \
     -v "${INDI_3RDPARTY_TAG#v}" \
+    --iteration "${CI_PIPELINE_ID}" \
     --depends libindi \
     -p "./${RPM_FILE_INDI_3RDPARTY}" \
     -C /tmp/indi-3rdparty-stage \
