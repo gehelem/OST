@@ -18,6 +18,7 @@ import * as inspector from "./inspector.js";
 import * as polar from "./polar.js";
 import * as parkmanager from "./parkmanager.js";
 import * as monitor from "./monitor.js";
+import * as planner from "./planner.js";
 
 export const templates = {
   guider,
@@ -28,4 +29,5 @@ export const templates = {
   polar,
   parkmanager,
   monitor,
+  planner,
 };
