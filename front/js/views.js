@@ -61,11 +61,15 @@ export function renderModbar(client, activeKey, onSelect) {
   // same look as a module button - unlike Controller, which is this
   // client's own chrome and is reached from the power button instead.
   // "__home" follows that same sentinel naming convention for app.js's
-  // activeView.
-  bar.appendChild(el("button", {
-    class: "mod-btn" + (activeKey === "__home" ? " active" : ""), title: t("views.home"),
-    onclick: () => onSelect("__home"),
-  }, [icon("home"), el("span", { class: "mod-btn-label", text: t("views.home") })]));
+  // activeView. Hidden while disconnected: its cards are per-module (plus
+  // the system-load card), so with no modules loaded it would just show
+  // that one card and look like a broken/pointless destination.
+  if (client.connection.status === "connected") {
+    bar.appendChild(el("button", {
+      class: "mod-btn" + (activeKey === "__home" ? " active" : ""), title: t("views.home"),
+      onclick: () => onSelect("__home"),
+    }, [icon("home"), el("span", { class: "mod-btn-label", text: t("views.home") })]));
+  }
   for (const name of names) {
     const mod = client.get(client.topics.module(name));
     const label = (mod && (mod.infos.modulelabel || mod.infos.label)) || name;

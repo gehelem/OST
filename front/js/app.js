@@ -513,7 +513,7 @@ client.onStatus((s) => {
   // disconnected state fine (host/SSL fields, recent servers), so only a
   // module view (which would otherwise show stale/no data) gets bounced,
   // straight to Controller rather than clearing activeView entirely.
-  if ((s === "connecting" || s === "disconnected") && isModuleView()) {
+  if ((s === "connecting" || s === "disconnected") && (isModuleView() || activeView === "__home")) {
     activeView = "__controller";
     renderModbarNow();
     renderContentNow();
