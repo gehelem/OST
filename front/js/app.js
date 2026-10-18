@@ -55,7 +55,6 @@ panelLayerEl.addEventListener("panelvisibility", (ev) => {
 // established way to reach an off-screen panel, not manual scrolling).
 const connToggleEl = document.getElementById("conn-toggle");
 const settingsBoxEl = document.getElementById("controller-settings-box");
-const settingsTitleEl = document.getElementById("controller-settings-title");
 const recentServersTitleEl = document.getElementById("recent-servers-title");
 const recentServersListEl = document.getElementById("recent-servers-list");
 const langButtonsEl = document.getElementById("lang-buttons");
@@ -110,7 +109,6 @@ function applyStaticLabels() {
   creditsBtnLabelEl.textContent = t("credits.title");
   discoverBtnLabelEl.textContent = t("chrome.discover");
   connToggleEl.title = t("status." + client.connection.status);
-  settingsTitleEl.textContent = t("views.connectionSettings");
   syncLangButtons();
   recentServersTitleEl.textContent = t("chrome.recentServers");
   renderRecentServers();
@@ -127,14 +125,10 @@ function setSsl(on) {
 }
 serverSslToggleEl.addEventListener("click", () => setSsl(!sslOn()));
 
-// ---- connection widget: used to fold out a settings dropdown of its own
-// (#conn-panel) listing Controller/Files/Logs plus connection/app settings
-// - Gilles, 2026-10-18: picking one from that list was an unnecessary
-// extra step most of the time. Jumps straight to Controller instead
-// (selectView(), below), connected or not - #controller-settings-box
-// (index.html) is what that dropdown's
-// content became, reparented into Controller's own grid by
-// renderController() rather than toggled open/closed here.
+// Jumps straight to Controller (selectView(), below), connected or not -
+// #controller-settings-box (index.html) is one of Controller's own
+// floating panels (views.js's renderController()), not toggled open/closed
+// here.
 connToggleEl.addEventListener("click", () => selectView("__controller"));
 loginToggleEl.addEventListener("click", () => renderLogin(client));
 // Gilles, 2026-10-03: "quand on clique depuis un module ca selectionne
@@ -566,6 +560,10 @@ function renderContentNow() {
   dockedViewEl.innerHTML = "";
 
   const isModule = isModuleView();
+  // Controller renders its own sections as floating panels too (same
+  // panel-layer/quicknav mechanism as a module), alongside its docked
+  // settings box - so it needs the quicknav bar on, unlike Home.
+  const isController = activeView === "__controller";
   // #panel-layer stays visible regardless of isModule now (Gilles,
   // 2026-10-06: "sur la home, on doit pouvoir ouvrir les logs (sans
   // selection du module) ==> la il ne se passe rien") - the persistent
@@ -579,10 +577,10 @@ function renderContentNow() {
   // (above) already wipes every non-persistent (per-module) panel on
   // every call to this function, docked view or not.
   dockedViewEl.classList.toggle("hidden", isModule);
-  // #quicknav's own visibility follows the module view directly, not
-  // whether it has nav entries to show — the actions zone (params) is
-  // still relevant for a module with zero level1 groups.
-  quicknavEl.classList.toggle("hidden", !isModule);
+  // #quicknav's own visibility follows the module/controller view
+  // directly, not whether it has nav entries to show — the actions zone
+  // (params) is still relevant for a module with zero level1 groups.
+  quicknavEl.classList.toggle("hidden", !isModule && !isController);
   updateParamsToggle();
 
   if (isModule) {

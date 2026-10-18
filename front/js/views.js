@@ -7,7 +7,7 @@
 // subscription open, so they just return a node.
 
 import { el, icon, iconButton, moduleIcon, statusDot, updateStatusDot } from "./dom.js";
-import { togglePanel, isPanelVisible, make as makePanel } from "./panels.js";
+import { togglePanel, isPanelVisible, make as makePanel, setScope as setPanelsScope, clear as clearPanels } from "./panels.js";
 import { t } from "./i18n.js";
 // Reused as-is on the Home dashboard's bigger focus/guider cards (Gilles,
 // 2026-10-05: "mets les graphes correspondants" then "Focus: values/curve /
@@ -21,6 +21,11 @@ import { buildCompactRms, buildGuidingChartPanel, buildDriftChartPanel } from ".
 // itself uses, not reinvented here.
 import { jpegSrc, openImageViewer, refreshImageViewer, buildImageGridPanel } from "./imagelayer.js";
 import { openSetupWizard } from "./wizard.js";
+// Controller's own sections render as floating panels now, same mechanism
+// as a module's own level1 panels - this fills the shared quicknav bar
+// with one toggle button per section, exactly like render.js's own
+// renderModuleView() does for its panels.
+import { updateQuickNav } from "./render.js";
 // Inspector's own 4 control maps (hfr/shape/collim/corners), same list its
 // own "maps" panel already uses (Gilles, 2026-10-06: "sur inspector ajoute
 // les 4 images de controle en vignettes toutes petites").
@@ -880,16 +885,23 @@ export function buildIndiPanel(client, scope, onChange) {
   return indiSec;
 }
 
+// Default position for the Nth floating panel this view creates - same
+// two-column allocator idea as render.js's own autoPos() for a module, just
+// offset further right so a freshly opened Controller doesn't start these
+// stacked on top of the docked settings box. Only matters for a never-
+// before-seen (scope, id): once the user drags/resizes one, panels.js
+// persists that instead.
+function controllerPanelPos(index) {
+  const col = index % 2, row = Math.floor(index / 2);
+  return { x: 460 + col * 440, y: 100 + row * 260, w: 420 };
+}
+
 // `settingsBoxEl`: the static #controller-settings-box node (index.html,
-// app.js's own connect/SSL/discover/language/clear-cache/credits wiring) -
-// Gilles, 2026-10-18: the power button used to fold this out as a
-// dropdown menu of its own, one extra click away from what was wanted
-// most of the time; it now jumps straight into Controller here instead,
-// connected or not. Reparented into the grid below rather than rebuilt
-// here, so every one of app.js's existing listeners on its children
-// keeps working untouched - detaches itself again on dispose (the node
-// itself survives, ready to be reparented back in next time Controller
-// is entered).
+// app.js's own connect/SSL/discover/language/clear-cache/credits wiring),
+// reparented in below rather than rebuilt here, so every one of app.js's
+// existing listeners on its children keeps working untouched - the node
+// itself survives detached whenever Controller isn't the active view,
+// ready to be reparented back in next time it is.
 export function renderController(client, settingsBoxEl) {
   const root = el("div", { class: "controller-view" });
   const scope = client.scope();
@@ -906,12 +918,33 @@ export function renderController(client, settingsBoxEl) {
     if (cd.git) headerSlot.appendChild(el("div", { class: "muted small mono", text: `${cd.git.Gittag || ""} ${cd.git.Githash || ""} — ${cd.git.Gitdate || ""}` }));
   });
 
-  const grid = el("div", { class: "panel-grid" });
-  root.appendChild(grid);
+  // Every section, including Connection & settings, renders as a floating
+  // panel on the shared #panel-layer instead of a fixed docked grid, same
+  // mechanism a module's own level1 panels use (render.js's
+  // renderModuleView(): draggable, resizable, position/size/collapsed
+  // state persisted per (scope, id) in panels.js). One quicknav entry per
+  // panel shows/hides it, exactly like a module's own quicknav - no
+  // special-cased docked box any more.
+  setPanelsScope("__controller");
+  clearPanels();
+  let i = 0;
+  const quickNavEntries = [];
+  function makeSectionPanel(id, title, pos) {
+    pos = pos || controllerPanelPos(i++);
+    const body = makePanel({ id, title, x: pos.x, y: pos.y, w: pos.w });
+    quickNavEntries.push({ id, label: title });
+    return body;
+  }
 
+  // ---- Connection & settings ----
+  // Fixed top-left position so the other sections' own default column
+  // never starts under it - unlike them, never hidden by the disconnect
+  // handler below, since it's the one thing still useful while offline.
+  const settingsTitle = t("views.connectionSettings");
+  const settingsBody = makeSectionPanel("settings", settingsTitle, { x: 20, y: 100, w: 380 });
   if (settingsBoxEl) {
     settingsBoxEl.classList.remove("hidden");
-    grid.appendChild(settingsBoxEl);
+    settingsBody.appendChild(settingsBoxEl);
   }
 
   // Issue #231: the previous version rebuilt the *entire* view (including
@@ -924,33 +957,14 @@ export function renderController(client, settingsBoxEl) {
   // changed") and redraws only its own sub-container, never the inputs
   // that live in the same panel.
 
-  // ---- Server load (systemwatcher) ----
-  // Appended to the grid last (Gilles, 2026-10-09: keep this panel at the
-  // end) — created here regardless, so the subscription below is set up
-  // alongside every other section instead of out of order.
-  const swSec = el("section", { class: "panel hidden" }, [el("h3", { text: t("views.serverLoad") })]);
-  const swBody = el("div");
-  swSec.appendChild(swBody);
-  scope.subscribe(client.topics.controllerData("systemwatcher"), (sw) => {
-    swSec.classList.toggle("hidden", !sw);
-    swBody.innerHTML = "";
-    if (!sw) return;
-    if (sw.cpu) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: t("views.cpuLabel") }), el("span", { class: "value", text: `${sw.cpu.load_1m} / ${sw.cpu.load_5m} / ${sw.cpu.load_15m}` })]));
-    if (sw.ram) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: t("views.ramLabel") }), el("span", { class: "value", text: `${fmtBytes(sw.ram.used_mb)} / ${fmtBytes(sw.ram.total_mb)}` })]));
-    for (const d of sw.disks || []) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: `${d.mountpoint} (${d.device})` }), el("span", { class: "value", text: `${d.used_gb.toFixed(1)} / ${d.total_gb.toFixed(1)} GB` })]));
-    for (const n of sw.network || []) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: n.iface }), el("span", { class: "value", text: `↓${n.rx_kbps.toFixed(1)} ↑${n.tx_kbps.toFixed(1)} kbps` })]));
-    // "temp", not "t" — the latter would shadow the i18n t() used all over this file.
-    for (const temp of sw.temperatures || []) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: temp.type }), el("span", { class: "value", text: `${temp.temp_c.toFixed(1)} °C` })]));
-  });
-
   // ---- Configurations ----
-  const confSec = el("section", { class: "panel" }, [el("h3", { text: t("views.configurations") })]);
+  const confBody = makeSectionPanel("configurations", t("views.configurations"));
+  const confPanelEl = confBody.parentElement;
   const confList = el("ul");
-  confSec.appendChild(confList);
+  confBody.appendChild(confList);
   const nameInput = el("input", { type: "text", class: "field-input", placeholder: t("views.configNamePlaceholder") });
   const wizardBtn = el("button", { class: "btn btn-sm", onclick: () => openSetupWizard(client) }, [icon("auto_fix_high", { small: true }), t("wizard.title")]);
-  confSec.appendChild(el("div", { class: "form-row" }, [nameInput, el("button", { class: "btn btn-primary btn-sm", onclick: () => { if (nameInput.value) client.saveConfiguration(nameInput.value); } }, t("views.saveCurrentAs")), wizardBtn]));
-  grid.appendChild(confSec);
+  confBody.appendChild(el("div", { class: "form-row" }, [nameInput, el("button", { class: "btn btn-primary btn-sm", onclick: () => { if (nameInput.value) client.saveConfiguration(nameInput.value); } }, t("views.saveCurrentAs")), wizardBtn]));
   function renderConfigurations() {
     const confs = client.get(client.topics.controllerData("availableconfs")) || {};
     const currentconf = client.get(client.topics.controllerData("currentconf"));
@@ -977,12 +991,11 @@ export function renderController(client, settingsBoxEl) {
   // nothing to kill, kept in sync by the same subscription that redraws
   // the list.
   const killAllBtn = el("button", { class: "btn btn-sm btn-danger", text: t("views.killAll"), onclick: killAll });
-  const modSec = el("section", { class: "panel" }, [
-    el("div", { class: "panel-header-row" }, [el("h3", { text: t("views.loadedModules") }), killAllBtn]),
-  ]);
+  const modBody = makeSectionPanel("modules", t("views.loadedModules"));
+  const modPanelEl = modBody.parentElement;
+  modBody.appendChild(el("div", { class: "form-row" }, [killAllBtn]));
   const modList = el("ul");
-  modSec.appendChild(modList);
-  grid.appendChild(modSec);
+  modBody.appendChild(modList);
   function killAll() {
     const names = (client.get(client.topics.modules()) || []).filter((n) => n !== "GlobalDatastore");
     if (names.length === 0) return;
@@ -1011,14 +1024,14 @@ export function renderController(client, settingsBoxEl) {
   // first letter uppercased and the rest lowercased (see
   // controller.en.md's "profiles keying" warning — not a plain capitalize,
   // and not the same string as libSelect's own stripped value).
-  const libSec = el("section", { class: "panel" }, [el("h3", { text: t("views.loadAModule") })]);
+  const libBody = makeSectionPanel("load-module", t("views.loadAModule"));
+  const libPanelEl = libBody.parentElement;
   const libSelect = el("select", { class: "field-input" });
   const labelInput = el("input", { type: "text", class: "field-input", placeholder: t("views.instanceLabelPlaceholder") });
   const profileSelect = el("select", { class: "field-input" });
-  libSec.appendChild(el("div", { class: "form-row" }, [libSelect, labelInput, profileSelect,
+  libBody.appendChild(el("div", { class: "form-row" }, [libSelect, labelInput, profileSelect,
     el("button", { class: "btn btn-primary btn-sm", onclick: () => { if (labelInput.value) client.loadModule(libSelect.value, labelInput.value, profileSelect.value || undefined); } }, t("views.load")),
   ]));
-  grid.appendChild(libSec);
 
   // Rebuilds profileSelect's options for whichever library is currently
   // selected. Called both when `profiles` itself updates and when the
@@ -1053,29 +1066,48 @@ export function renderController(client, settingsBoxEl) {
   scope.subscribe(client.topics.controllerData("profiles"), renderProfiles);
 
   // ---- INDI server & drivers ----
-  const indiPanelNode = buildIndiPanel(client, scope);
-  grid.appendChild(indiPanelNode);
+  const indiBody = makeSectionPanel("indi", "INDI");
+  const indiPanelEl = indiBody.parentElement;
+  indiBody.appendChild(buildIndiPanel(client, scope));
 
-  grid.appendChild(swSec);
+  // ---- Server load (systemwatcher) ----
+  const swBody = makeSectionPanel("server-load", t("views.serverLoad"));
+  const swPanelEl = swBody.parentElement;
+  let swConnected = false, swHasData = false;
+  function updateSwVisibility() { swPanelEl.classList.toggle("hidden", !(swConnected && swHasData)); }
+  scope.subscribe(client.topics.controllerData("systemwatcher"), (sw) => {
+    swHasData = !!sw;
+    updateSwVisibility();
+    swBody.innerHTML = "";
+    if (!sw) return;
+    if (sw.cpu) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: t("views.cpuLabel") }), el("span", { class: "value", text: `${sw.cpu.load_1m} / ${sw.cpu.load_5m} / ${sw.cpu.load_15m}` })]));
+    if (sw.ram) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: t("views.ramLabel") }), el("span", { class: "value", text: `${fmtBytes(sw.ram.used_mb)} / ${fmtBytes(sw.ram.total_mb)}` })]));
+    for (const d of sw.disks || []) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: `${d.mountpoint} (${d.device})` }), el("span", { class: "value", text: `${d.used_gb.toFixed(1)} / ${d.total_gb.toFixed(1)} GB` })]));
+    for (const n of sw.network || []) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: n.iface }), el("span", { class: "value", text: `↓${n.rx_kbps.toFixed(1)} ↑${n.tx_kbps.toFixed(1)} kbps` })]));
+    // "temp", not "t" — the latter would shadow the i18n t() used all over this file.
+    for (const temp of sw.temperatures || []) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: temp.type }), el("span", { class: "value", text: `${temp.temp_c.toFixed(1)} °C` })]));
+  });
 
   // ---- Files ----
   // Gilles, 2026-10-18: the old folder-tree/file-grid UI is being redone
   // from scratch - a placeholder button + dialog until then, rather than
   // the half-working previous version.
-  const filesSec = el("section", { class: "panel" }, [
-    el("h3", { text: t("views.files") }),
-    el("button", { class: "btn btn-sm", onclick: openFilesWipDialog }, t("views.files")),
-  ]);
-  grid.appendChild(filesSec);
+  const filesBody = makeSectionPanel("files", t("views.files"));
+  const filesPanelEl = filesBody.parentElement;
+  filesBody.appendChild(el("button", { class: "btn btn-sm", onclick: openFilesWipDialog }, t("views.files")));
 
-  // Every box but the settings one reads live server data with nothing
+  updateQuickNav(quickNavEntries);
+
+  // Every panel but the settings box reads live server data with nothing
   // meaningful to show while disconnected - Gilles, 2026-10-18: hidden
   // instead of sitting there empty. onStatus() fires immediately with the
   // current status too, so this also covers the very first render.
-  const otherBoxes = [confSec, modSec, libSec, indiPanelNode, swSec, filesSec];
+  const otherPanels = [confPanelEl, modPanelEl, libPanelEl, indiPanelEl, filesPanelEl];
   const unsubStatus = client.onStatus((status) => {
     const connected = status === "connected";
-    for (const box of otherBoxes) box.classList.toggle("hidden", !connected);
+    for (const panelEl of otherPanels) panelEl.classList.toggle("hidden", !connected);
+    swConnected = connected;
+    updateSwVisibility();
   });
 
   return {
@@ -1083,6 +1115,7 @@ export function renderController(client, settingsBoxEl) {
     dispose: () => {
       scope.dispose();
       unsubStatus();
+      updateQuickNav([]);
       if (settingsBoxEl) settingsBoxEl.classList.add("hidden");
     },
   };

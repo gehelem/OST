@@ -254,8 +254,8 @@
  * above), not a colour of its own. Gilles, 2026-10-18: used to fold out a
  * dropdown of its own (#conn-panel, .settings-nav) - jumps straight to the
  * Controller screen instead now, so there is nothing left to toggle open
- * here; #controller-settings-box (index.html) is a plain .panel reparented
- * into Controller's own grid instead, no dropdown-specific CSS of its own. */
+ * here; #controller-settings-box (index.html) is one of Controller's own
+ * floating panels instead, no dropdown-specific CSS of its own. */
 #conn-widget { position: relative; flex-shrink: 0; }
 .conn-toggle.status-connected { color: var(--ok); }
 .conn-toggle.status-connecting { color: var(--busy); animation: pulse-dot 1s ease-in-out infinite; }
