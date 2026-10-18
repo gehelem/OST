@@ -7,7 +7,7 @@
 // shared canvas instead of a single docked node — see renderContentNow().
 
 import { createClient, deriveUrlsFromHost, cleanHost, normalizeMediaUrl } from "../core/index.js";
-import { renderModuleView, buildParamsPanel, setMediaBaseUrl, getMediaBaseUrl, setDialogRoot, setQuickNavRoot, getDisableTemplates } from "./render.js";
+import { renderModuleView, buildParamsPanel, setMediaBaseUrl, setDialogRoot, setQuickNavRoot, getDisableTemplates } from "./render.js";
 import { renderModbar, renderHome, renderController, renderLogin, renderLogPanel } from "./views.js";
 import { openSetupWizard } from "./wizard.js";
 import { openCreditsDialog } from "./credits.js";
@@ -607,7 +607,7 @@ function renderContentNow() {
 
   let result;
   if (activeView === "__home") result = renderHome(client, selectView);
-  else result = renderController(client, getMediaBaseUrl(), settingsBoxEl);
+  else result = renderController(client, settingsBoxEl);
   dockedViewEl.appendChild(result.node);
   contentDispose = result.dispose || null;
 }

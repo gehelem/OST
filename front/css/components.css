@@ -510,21 +510,6 @@ input[type="range"]::-moz-range-thumb {
 .panel li.indi-driver-row { flex-direction: column; align-items: stretch; gap: 4px; }
 .icon-btn-row { display: flex; gap: var(--space-2); }
 
-/* ---------------------------------------------------------------- files */
-.files-layout { display: flex; gap: var(--space-4); align-items: flex-start; }
-.folder-tree { width: 260px; flex-shrink: 0; max-height: 74vh; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-2); background: var(--bg-panel); }
-.folder-btn { display: flex; align-items: center; gap: 6px; width: 100%; text-align: left; background: none; border: none; color: var(--text-secondary); padding: 5px 6px; cursor: pointer; border-radius: var(--radius-sm); font: inherit; font-size: 12px; transition: all 0.12s ease; }
-.folder-btn:hover { background: var(--bg-hover); color: var(--text); }
-.folder-btn.active { background: var(--accent-subtle); color: var(--accent-strong); }
-.folder-btn .material-icons { color: var(--text-dim); font-size: 16px; }
-.folder-btn.active .material-icons { color: var(--accent); }
-.file-list-wrap { flex: 1; min-width: 0; }
-.file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: var(--space-3); margin-top: var(--space-2); }
-.file-card { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: var(--space-2); border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-panel); text-decoration: none; color: var(--text-secondary); transition: all 0.15s ease; }
-.file-card:hover { border-color: var(--accent-dim); color: var(--text); box-shadow: var(--shadow-glow); }
-.file-thumb { width: 100%; height: 92px; object-fit: cover; border-radius: var(--radius-sm); background: var(--bg-elevated); }
-.file-card .material-icons { color: var(--text-dim); }
-.file-name { word-break: break-all; text-align: center; font-size: 11px; }
 
 /* ----------------------------------------------------------------- logs */
 .log-toolbar { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3); }

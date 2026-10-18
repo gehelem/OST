@@ -141,6 +141,7 @@ const STRINGS = {
 
   // ---- views.js: modbar system entries, login, controller/files ----------
   "views.files": { en: "Files", fr: "Fichiers", de: "Dateien", it: "File", es: "Archivos" },
+  "views.filesWip": { en: "Work in progress - File explorer", fr: "En cours de refonte - Explorateur de fichiers", de: "In Arbeit - Dateiexplorer", it: "In corso di revisione - Esploratore file", es: "En desarrollo - Explorador de archivos" },
   "views.logs": { en: "Logs", fr: "Journaux", de: "Protokolle", it: "Log", es: "Registros" },
   "views.connectionSettings": { en: "Connection & settings", fr: "Connexion et réglages", de: "Verbindung & Einstellungen", it: "Connessione e impostazioni", es: "Conexión y ajustes" },
   "views.loginRequired": { en: "Login required", fr: "Connexion requise", de: "Anmeldung erforderlich", it: "Accesso richiesto", es: "Inicio de sesión requerido" },
@@ -158,7 +159,6 @@ const STRINGS = {
   "views.configNamePlaceholder": { en: "configuration name", fr: "nom de la configuration", de: "Konfigurationsname", it: "nome configurazione", es: "nombre de la configuración" },
   "views.instanceLabelPlaceholder": { en: "instance label", fr: "libellé de l'instance", de: "Instanzbezeichnung", it: "etichetta istanza", es: "etiqueta de instancia" },
   "views.profileOptionalPlaceholder": { en: "profile (optional)", fr: "profil (optionnel)", de: "Profil (optional)", it: "profilo (opzionale)", es: "perfil (opcional)" },
-  "views.noFilesInFolder": { en: "No files in this folder.", fr: "Aucun fichier dans ce dossier.", de: "Keine Dateien in diesem Ordner.", it: "Nessun file in questa cartella.", es: "No hay archivos en esta carpeta." },
   "views.login": { en: "Login", fr: "Connexion", de: "Anmelden", it: "Accedi", es: "Iniciar sesión" },
   "views.saveCurrentAs": { en: "Save current as…", fr: "Enregistrer sous…", de: "Aktuelle speichern als…", it: "Salva attuale come…", es: "Guardar actual como…" },
   "views.load": { en: "Load", fr: "Charger", de: "Laden", it: "Carica", es: "Cargar" },
@@ -186,9 +186,6 @@ const STRINGS = {
   "views.loadIndiConfigurationTitle": { en: "Load a saved INDI driver configuration", fr: "Charger une configuration de drivers INDI sauvegardée", de: "Gespeicherte INDI-Treiberkonfiguration laden", it: "Carica una configurazione di driver INDI salvata", es: "Cargar una configuración de drivers INDI guardada" },
   "views.chooseIndiConfiguration": { en: "(choose)", fr: "(choisir)", de: "(auswählen)", it: "(scegli)", es: "(elegir)" },
   "views.noIndiConfigurationsYet": { en: "(none yet)", fr: "(aucune pour l'instant)", de: "(noch keine)", it: "(nessuna ancora)", es: "(ninguna aún)" },
-  "views.rootFolder": { en: "(root)", fr: "(racine)", de: "(Wurzel)", it: "(radice)", es: "(raíz)" },
-  "views.selectedPrefix": { en: "Selected: ", fr: "Sélectionné : ", de: "Ausgewählt: ", it: "Selezionato: ", es: "Seleccionado: " },
-  "views.none": { en: "(none)", fr: "(aucun)", de: "(keine)", it: "(nessuno)", es: "(ninguno)" },
   "views.logModuleAll": { en: "All modules", fr: "Tous les modules", de: "Alle Module", it: "Tutti i moduli", es: "Todos los módulos" },
   "views.logLevelAll": { en: "All levels", fr: "Tous les niveaux", de: "Alle Stufen", it: "Tutti i livelli", es: "Todos los niveles" },
   "views.logLevelInfo": { en: "Info and above", fr: "Info et plus", de: "Info und höher", it: "Info e superiori", es: "Info y superior" },

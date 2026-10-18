@@ -885,7 +885,7 @@ export function buildIndiPanel(client, scope, onChange) {
 // keeps working untouched - detaches itself again on dispose (the node
 // itself survives, ready to be reparented back in next time Controller
 // is entered).
-export function renderController(client, mediaBaseUrl, settingsBoxEl) {
+export function renderController(client, settingsBoxEl) {
   const root = el("div", { class: "controller-view" });
   const scope = client.scope();
 
@@ -1053,44 +1053,14 @@ export function renderController(client, mediaBaseUrl, settingsBoxEl) {
   grid.appendChild(swSec);
 
   // ---- Files ----
-  // Gilles, 2026-10-18: added right after Server load - same content the
-  // standalone Files view used to show, now a box among Controller's own
-  // instead of a separate destination.
-  const filesSec = el("section", { class: "panel" }, [el("h3", { text: t("views.files") })]);
-  const filesBody = el("div");
-  filesSec.appendChild(filesBody);
+  // Gilles, 2026-10-18: the old folder-tree/file-grid UI is being redone
+  // from scratch - a placeholder button + dialog until then, rather than
+  // the half-working previous version.
+  const filesSec = el("section", { class: "panel" }, [
+    el("h3", { text: t("views.files") }),
+    el("button", { class: "btn btn-sm", onclick: openFilesWipDialog }, t("views.files")),
+  ]);
   grid.appendChild(filesSec);
-  scope.subscribe(client.topics.files(), (files) => {
-    files = files || { folders: [], files: [], selectedfolder: "" };
-    filesBody.innerHTML = "";
-    const layout = el("div", { class: "files-layout" });
-    const tree = buildFolderTree(files.folders || []);
-    const treeWrap = el("div", { class: "folder-tree" });
-    // The selected folder in the dump is an absolute server-side path, not
-    // the relative path used for navigation/FS — we cannot reliably
-    // highlight the active node from it alone (see ostcore/FINDINGS.md), so
-    // no node is marked "active" here.
-    treeWrap.appendChild(renderFolderNode(tree, client, 0));
-    layout.appendChild(treeWrap);
-
-    const listWrap = el("div", { class: "file-list-wrap" });
-    listWrap.appendChild(el("div", { class: "muted small mono", text: t("views.selectedPrefix") + (files.selectedfolder || t("views.none")) }));
-    const fgrid = el("div", { class: "file-grid" });
-    for (const f of files.files || []) {
-      const url = mediaBaseUrl + (f.startsWith("/") ? f.slice(1) : f);
-      const lower = f.toLowerCase();
-      const isImg = /\.(jpe?g|png|gif|webp)$/.test(lower);
-      const card = el("a", { href: url, target: "_blank", class: "file-card" });
-      if (isImg) card.appendChild(el("img", { src: url, class: "file-thumb" }));
-      else card.appendChild(icon("description", { small: false }));
-      card.appendChild(el("div", { class: "file-name", text: f.split("/").pop() }));
-      fgrid.appendChild(card);
-    }
-    if (!(files.files || []).length) fgrid.appendChild(el("div", { class: "muted small", text: t("views.noFilesInFolder") }));
-    listWrap.appendChild(fgrid);
-    layout.appendChild(listWrap);
-    filesBody.appendChild(layout);
-  });
 
   // Every box but the settings one reads live server data with nothing
   // meaningful to show while disconnected - Gilles, 2026-10-18: hidden
@@ -1112,30 +1082,17 @@ export function renderController(client, mediaBaseUrl, settingsBoxEl) {
   };
 }
 
-function buildFolderTree(folders) {
-  const root = { name: "", path: "", children: new Map() };
-  for (const path of folders) {
-    if (path === "") continue;
-    const parts = path.split("/").filter(Boolean);
-    let node = root;
-    let acc = "";
-    for (const part of parts) {
-      acc += "/" + part;
-      if (!node.children.has(part)) node.children.set(part, { name: part, path: acc, children: new Map() });
-      node = node.children.get(part);
-    }
-  }
-  return root;
-}
-
-function renderFolderNode(node, client, depth) {
-  const wrap = el("div", { class: "folder-node", style: `padding-left:${depth * 14}px` });
-  const btn = el("button", { class: "folder-btn" }, [icon("folder", { small: true }), el("span", { text: node.name || t("views.rootFolder") })]);
-  btn.addEventListener("click", () => client.selectFolder(node.path));
-  wrap.appendChild(btn);
-  const children = Array.from(node.children.values()).sort((a, b) => a.name.localeCompare(b.name));
-  for (const child of children) wrap.appendChild(renderFolderNode(child, client, depth + 1));
-  return wrap;
+function openFilesWipDialog() {
+  const overlay = el("div", { class: "dialog-overlay" });
+  const close = () => overlay.remove();
+  const dialog = el("div", { class: "dialog" }, [
+    el("h3", { text: t("views.files") }),
+    el("p", { text: t("views.filesWip") }),
+    el("div", { class: "dialog-actions" }, [el("button", { class: "btn", onclick: close }, t("common.cancel"))]),
+  ]);
+  overlay.appendChild(dialog);
+  overlay.addEventListener("click", (ev) => { if (ev.target === overlay) close(); });
+  document.getElementById("dialog-root").appendChild(overlay);
 }
 
 // ---- always-on floating log panel ----------------------------------------
