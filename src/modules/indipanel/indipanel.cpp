@@ -150,10 +150,17 @@ void IndiPanel::onNewProperty(INDI::Property pProperty)
                 if (_image->loadBlob(b, 64, i))
                 {
                     QImage rawImage = _image->getRawQImage();
-                    atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg");
+                    // Keyed by element name (CCD1/CCD2/...), not label - the
+                    // label is free-form display text with no uniqueness
+                    // guarantee, two chips on the same device can share one
+                    // (a dual-sensor camera not modeled as a classic
+                    // primary+guide head, where only the base class happens
+                    // to hardcode distinct labels). The name is what the
+                    // protocol itself guarantees unique per device.
+                    atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".jpeg");
                     dta = _image->ImgStats();
-                    dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg";
-                    dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".FITS";
+                    dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".jpeg";
+                    dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".FITS";
                 }
                 ei->setValue(dta, true);
                 p->addElt(ei);
@@ -253,10 +260,12 @@ void IndiPanel::onUpdateProperty (INDI::Property property)
                 if (_image->loadBlob(b, 64, i))
                 {
                     QImage rawImage = _image->getRawQImage();
-                    atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg");
+                    // Same path as onNewProperty()'s own BLOB case - keyed
+                    // by element name, not label, see its comment.
+                    atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".jpeg");
                     dta = _image->ImgStats();
-                    dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg";
-                    dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".FITS";
+                    dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".jpeg";
+                    dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".FITS";
                 }
                 ei->setValue(dta, true);
             }
