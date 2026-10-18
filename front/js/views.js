@@ -906,18 +906,6 @@ export function renderController(client, settingsBoxEl) {
   const root = el("div", { class: "controller-view" });
   const scope = client.scope();
 
-  // Header: git info only - Gilles, 2026-10-09: drop the "Controller"
-  // title and the banner line, both useless here. No live input lives in
-  // this slot, so a redraw on every uc is harmless - unlike the sections
-  // below, there's no need to reach for a per-key topic for git.
-  const headerSlot = el("div");
-  root.appendChild(headerSlot);
-  scope.subscribe(client.topics.controllerData(), (cd) => {
-    cd = cd || {};
-    headerSlot.innerHTML = "";
-    if (cd.git) headerSlot.appendChild(el("div", { class: "muted small mono", text: `${cd.git.Gittag || ""} ${cd.git.Githash || ""} — ${cd.git.Gitdate || ""}` }));
-  });
-
   // Every section, including Connection & settings, renders as a floating
   // panel on the shared #panel-layer instead of a fixed docked grid, same
   // mechanism a module's own level1 panels use (render.js's
