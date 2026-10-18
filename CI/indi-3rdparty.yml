@@ -1,0 +1,26 @@
+# Manually-triggered Fedora RPM build for indi-3rdparty drivers.
+#
+# Not part of OST's own build/test/release flow - OST neither ships nor
+# depends on these, this job only exists to produce a package on demand
+# for whichever Fedora release the community COPR (jochym/indi) doesn't
+# have a chroot for yet. `fedora:44` is pinned rather than `:latest` so
+# the result's ABI matches a Fedora 44 host exactly; bump it by hand
+# when targeting a different release. `when: manual` keeps this at zero
+# cost on every pipeline unless someone actually clicks it.
+
+build-job-indi-3rdparty:
+  stage: build
+  image: fedora:44
+  variables:
+    INDI_3RDPARTY_TAG: "v2.2.4"
+    INDI_3RDPARTY_DRIVERS: "WITH_ASICAM WITH_QHY"
+    RPM_FILE_INDI_3RDPARTY: "indi-3rdparty-custom_fc44_x86_64.rpm"
+  script:
+    - ./CI/CI-build-indi-3rdparty.sh
+  artifacts:
+    paths:
+      - "indi-3rdparty-custom_*_x86_64.rpm"
+    expire_in: 4 week
+  allow_failure: true
+  rules:
+    - when: manual

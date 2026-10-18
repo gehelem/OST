@@ -166,6 +166,9 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     {
         this->startIndi();
     }
+    // "N": OST doesn't manage an embedded indiserver, so there is no startup
+    // or ongoing hook of its own to query the bus from here - onSystemWatch()
+    // checks it on every tick instead, same as the rest of its metrics.
 
     loadConf(_conf);
 
@@ -219,11 +222,6 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
         mNetTimer.start();
         logInfo("System watch started, interval: %1s", {mSystemWatchInterval});
     }
-}
-
-
-Controller::~Controller()
-{
 }
 
 
@@ -1798,6 +1796,30 @@ void Controller::onSystemWatch()
                 }
             }
             data["disks"] = disks;
+        }
+    }
+
+    // --- INDI server ---
+    // "Y": the process is OST's own, already tracked live via QProcess's
+    // finished signal (setIndiServerState()) and updated on every
+    // start/stop/reload right where it happens - nothing to poll for here.
+    // "N": OST has no event of its own for a server it doesn't own, so this
+    // is the only place checking it at all.
+    if (_indiserver == "N")
+    {
+        QProcess pgrep;
+        pgrep.start("pgrep", {"-x", "indiserver"});
+        pgrep.waitForFinished(1000);
+        const bool running = (pgrep.exitCode() == 0);
+        data["indiserverrunning"] = running;
+        if (running)
+        {
+            queryActiveIndiDrivers();
+        }
+        else if (!_activeIndiDrivers.isEmpty())
+        {
+            _activeIndiDrivers.clear();
+            updateControllerData("indiactivedrivers", QVariantList());
         }
     }
 

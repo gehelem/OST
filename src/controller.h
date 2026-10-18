@@ -24,7 +24,6 @@ struct IndiDriverInfo
     bool    mdpd = false;
 };
 
-
 /*!
  * This class is the heart of OST
  * It dispatches events/orders/datas  from one layer to each other
@@ -41,7 +40,6 @@ class Controller : public QObject
                    OST::Logger *logger, OST::TranslateManager *translate, const QString &banner, const QString &setAdminPassword,
                    const QString &gitSha, const QString &gitDate, const QString &gitMessage, const QString &gitTag,
                    const int systemWatchInterval, const int minFreePercent);
-        ~Controller() override;
     signals:
         void controllerEvent(OST::ExtEvent  event);
         void otherModuleEvent(OST::EvType, QString, QString, QString, QVariant, int);

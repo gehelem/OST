@@ -765,32 +765,45 @@ function openIndiConfigDialog(client) {
 }
 
 // indiserver: "N" means OST isn't managing INDI at all (a separately-run
-// indiserver, or none) - nothing to start/stop/list here. Any other
-// value ("Y" at startup, then "U"/"D" once the process state is known)
-// means OST manages it, so the controls show.
+// indiserver, or none). Starting/stopping/loading a driver process goes
+// through a FIFO only OST's own embedded instance owns, so that part stays
+// hidden in that case - but the active-drivers list below comes from a
+// plain bus query (indi_getprop) that works against ANY reachable INDI
+// server, so it still shows even then, and stays live afterwards too (see
+// Controller::onSystemWatch(), which re-checks the bus on every tick
+// regardless of this mode). Connect/disconnect (indi_setprop) act on the
+// live device itself and are bus-level too, so they stay available either
+// way; reload/stop act on the driver's process through the FIFO, so
+// they're only shown once OST actually manages it.
 export function buildIndiPanel(client, scope, onChange) {
   const indiSec = el("section", { class: "panel" });
   const indiTitle = el("h3");
   indiSec.appendChild(indiTitle);
   const indiExternalMsg = el("div", { class: "muted small hidden", text: t("views.indiServerManagedElsewhere") });
   indiSec.appendChild(indiExternalMsg);
-  const indiControls = el("div", { class: "hidden" });
+
+  // FIFO-only controls: starting/stopping the embedded process itself,
+  // loading a saved driver configuration, loading a new driver from the
+  // catalogue. Hidden whenever OST doesn't manage the server.
+  const manageControls = el("div", { class: "hidden" });
   const indiServerToggleBtn = el("button", { class: "btn btn-sm" }, t("views.startServer"));
   // Only meaningful while the embedded server is actually confirmed
   // running ("U") - loading a configuration while it's down or starting
   // would just fail silently, same reasoning as the rest of this panel's
   // own enabled/disabled split.
   const indiLoadConfigBtn = el("button", { class: "btn btn-sm hidden", onclick: () => openIndiConfigDialog(client) }, [icon("folder_open", { small: true }), t("views.loadIndiConfiguration")]);
-  indiControls.appendChild(el("div", { class: "form-row" }, [indiServerToggleBtn, indiLoadConfigBtn]));
-  // Top zone: drivers actually running right now (indiactivedrivers) -
-  // reload/stop only, no "load" (they're already loaded).
+  manageControls.appendChild(el("div", { class: "form-row" }, [indiServerToggleBtn, indiLoadConfigBtn]));
+  indiSec.appendChild(manageControls);
+
+  // Active drivers (indiactivedrivers) - shown either way, see this
+  // function's own doc comment above.
   const connectAllBtn = el("button", { class: "btn btn-sm", onclick: connectAll }, t("views.connectAll"));
-  indiControls.appendChild(el("div", { class: "panel-header-row" }, [
+  indiSec.appendChild(el("div", { class: "panel-header-row" }, [
     el("div", { class: "muted small", text: t("views.activeIndiDrivers") }),
     connectAllBtn,
   ]));
   const activeDriversList = el("ul");
-  indiControls.appendChild(activeDriversList);
+  indiSec.appendChild(activeDriversList);
 
   // Gilles, 2026-10-13 (both here and the setup wizard's own step 1, which
   // reuses this same panel - see this function's own doc comment): one
@@ -802,18 +815,18 @@ export function buildIndiPanel(client, scope, onChange) {
     for (const d of activeDrivers) client.indiConnectDriver(d.binary);
   }
 
-  // Bottom zone: free-text search (driverSearchInput is created once,
-  // outside any subscription, same caution as labelInput above - never
-  // touched again after creation) over the full driver catalogue
-  // (indidrivers), each result with its own "start" button. Filtering
-  // only kicks in from 3 characters - the catalogue is in the hundreds on
-  // a full INDI install, not worth listing unfiltered.
-  indiControls.appendChild(el("div", { class: "muted small", text: t("views.startIndiDriver") }));
+  // Free-text search (driverSearchInput is created once, outside any
+  // subscription, same caution as labelInput above - never touched again
+  // after creation) over the full driver catalogue (indidrivers), each
+  // result with its own "start" button. Filtering only kicks in from 3
+  // characters - the catalogue is in the hundreds on a full INDI install,
+  // not worth listing unfiltered. Starting a new driver needs the FIFO,
+  // so this whole zone lives in manageControls too.
+  manageControls.appendChild(el("div", { class: "muted small", text: t("views.startIndiDriver") }));
   const driverSearchInput = el("input", { type: "text", class: "field-input", placeholder: t("views.indiDriverSearchPlaceholder") });
-  indiControls.appendChild(driverSearchInput);
+  manageControls.appendChild(driverSearchInput);
   const availableDriversList = el("ul");
-  indiControls.appendChild(availableDriversList);
-  indiSec.appendChild(indiControls);
+  manageControls.appendChild(availableDriversList);
 
   // Case- and accent-insensitive: NFD-normalize then strip the combining
   // diacritical marks Unicode splits accents into, so "é" and "e" compare
@@ -842,15 +855,13 @@ export function buildIndiPanel(client, scope, onChange) {
     const enabled = indiserver !== "N";
     indiTitle.textContent = t("views.indiServerPrefix") + (enabled ? t("views.enabled") : t("views.disabled"));
     indiExternalMsg.classList.toggle("hidden", enabled);
-    indiControls.classList.toggle("hidden", !enabled);
-    if (!enabled) {
-      if (onChange) onChange();
-      return;
+    manageControls.classList.toggle("hidden", !enabled);
+    if (enabled) {
+      const running = indiserver === "U";
+      indiServerToggleBtn.textContent = running ? t("views.stopServer") : t("views.startServer");
+      indiServerToggleBtn.onclick = running ? () => client.indiStop() : () => client.indiStart();
+      indiLoadConfigBtn.classList.toggle("hidden", !running);
     }
-    const running = indiserver === "U";
-    indiServerToggleBtn.textContent = running ? t("views.stopServer") : t("views.startServer");
-    indiServerToggleBtn.onclick = running ? () => client.indiStop() : () => client.indiStart();
-    indiLoadConfigBtn.classList.toggle("hidden", !running);
     const activeDrivers = client.get(client.topics.controllerData("indiactivedrivers")) || [];
     connectAllBtn.disabled = activeDrivers.length === 0;
     activeDriversList.innerHTML = "";
@@ -863,11 +874,15 @@ export function buildIndiPanel(client, scope, onChange) {
       const actions = el("div", { class: "icon-btn-row" });
       // Connect/disconnect act on the device itself (YC/YD), separate from
       // the driver process (reload/stop) - starting a driver doesn't
-      // connect its device on its own, see issue #231.
+      // connect its device on its own, see issue #231. Reload/stop act on
+      // the process through the FIFO, so they only make sense once OST
+      // actually manages the server.
       actions.appendChild(iconButton("link", t("views.connect"), () => client.indiConnectDriver(d.binary)));
       actions.appendChild(iconButton("link_off", t("views.disconnect"), () => client.indiDisconnectDriver(d.binary)));
-      actions.appendChild(iconButton("refresh", t("views.reload"), () => client.indiReloadDriver(d.binary)));
-      actions.appendChild(iconButton("stop", t("views.stop"), () => client.indiStopDriver(d.binary), { danger: true }));
+      if (enabled) {
+        actions.appendChild(iconButton("refresh", t("views.reload"), () => client.indiReloadDriver(d.binary)));
+        actions.appendChild(iconButton("stop", t("views.stop"), () => client.indiStopDriver(d.binary), { danger: true }));
+      }
       li.appendChild(actions);
       activeDriversList.appendChild(li);
     }

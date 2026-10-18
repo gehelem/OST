@@ -25,7 +25,7 @@ Allsky::Allsky(QString name, QString label, QString profile, QVariantMap availab
     setMetadata("thisGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
     setMetadata("description", "Allsky camera module");
     setMetadata("thisversion", QString::fromStdString(Version::GIT_TAG));
-    setMetadata("template", "default");
+    setMetadata("template", "allsky");
 
 
     giveMeADevice("camera", "Camera", INDI::BaseDevice::CCD_INTERFACE);

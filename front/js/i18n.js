@@ -138,6 +138,7 @@ const STRINGS = {
   "imagelayer.channelB": { en: "B", fr: "B", de: "B", it: "B", es: "A" },
   "imagelayer.channelValue": { en: "Value", fr: "Valeur", de: "Wert", it: "Valore", es: "Valor" },
   "imagelayer.noAlternates": { en: "No image yet", fr: "Aucune image pour l'instant", de: "Noch kein Bild", it: "Nessuna immagine disponibile", es: "Aún no hay imagen" },
+  "imagelayer.sequenceImage": { en: "Sequence image", fr: "Image de la séquence", de: "Sequenzbild", it: "Immagine della sequenza", es: "Imagen de la secuencia" },
 
   // ---- views.js: modbar system entries, login, controller/files ----------
   "views.controller": { en: "Controller", fr: "Contrôleur", de: "Steuerung", it: "Controllore", es: "Controlador" },
