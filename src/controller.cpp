@@ -166,6 +166,15 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     {
         this->startIndi();
     }
+    else
+    {
+        // OST isn't managing an embedded indiserver, but one may already be
+        // running on its own (started independently of us) - indi_getprop
+        // works against any INDI server reachable on the bus, not just one
+        // we spawned ourselves, so the same bus query startIndi() already
+        // uses for orphan recovery still finds its active devices here.
+        queryActiveIndiDrivers();
+    }
 
     loadConf(_conf);
 
