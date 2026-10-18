@@ -45,6 +45,24 @@ IndiPanel::~IndiPanel()
 {
 
 }
+
+// Reproduces KStars' own INDI panel devcat ordering: Main Control,
+// Connection, Options, then everything else in arrival order, General
+// Info always last. render.js sorts level2 groups (and properties within
+// one) by this string alone (buildLayout()) - without it every property
+// shared the same hardcoded "00" order, an unstable tie with no real
+// ranking at all. The trailing _orderSeq keeps that arrival-order
+// guarantee for groups sharing the same rank (every "else" group, and
+// properties within any single group).
+QString IndiPanel::groupOrder(const QString &group)
+{
+    QString rank = "5";
+    if (group == "Main Control") rank = "1";
+    else if (group == "Connection") rank = "2";
+    else if (group == "Options") rank = "3";
+    else if (group == "General Info") rank = "9";
+    return rank + QString("%1").arg(_orderSeq++, 5, 10, QChar('0'));
+}
 void IndiPanel::onNewDevice(INDI::BaseDevice dp)
 {
     auto props = dp.getProperties();
@@ -86,11 +104,10 @@ void IndiPanel::onNewProperty(INDI::Property pProperty)
     if (pProperty.getType() != INDI_BLOB) group = pProperty.getGroupName();
     else group = pProperty.getLabel();
 
-
     OST::PropertyMulti* p = new OST::PropertyMulti(devpro, pProperty.getLabel(),
             OST::IntToPermission(pProperty.getPermission()),
             pProperty.getDeviceName(),
-            group, "00", false, false);
+            group, groupOrder(group), false, false);
     p->setFreeValue(dev); // we keep original device name to avoid unwanted level1 device translations
     p->setState(OST::IntToState(pProperty.getState()), false);
 
