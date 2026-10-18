@@ -885,15 +885,16 @@ export function buildIndiPanel(client, scope, onChange) {
   return indiSec;
 }
 
-// Default position for the Nth floating panel this view creates - same
-// two-column allocator idea as render.js's own autoPos() for a module, just
-// offset further right so a freshly opened Controller doesn't start these
-// stacked on top of the docked settings box. Only matters for a never-
-// before-seen (scope, id): once the user drags/resizes one, panels.js
-// persists that instead.
+// Default position for the Nth floating panel this view creates - a
+// three-column mosaic covering all 7 sections in the same order as the
+// quicknav bar (Connection & settings first), rather than render.js's own
+// two-column autoPos() for a module. Only matters for a never-before-seen
+// (scope, id): once the user drags/resizes one, panels.js persists that
+// instead.
 function controllerPanelPos(index) {
-  const col = index % 2, row = Math.floor(index / 2);
-  return { x: 460 + col * 440, y: 100 + row * 260, w: 420 };
+  const cols = 3, w = 380, gap = 20;
+  const col = index % cols, row = Math.floor(index / cols);
+  return { x: 20 + col * (w + gap), y: 100 + row * 260, w };
 }
 
 // `settingsBoxEl`: the static #controller-settings-box node (index.html,
@@ -917,19 +918,19 @@ export function renderController(client, settingsBoxEl) {
   clearPanels();
   let i = 0;
   const quickNavEntries = [];
-  function makeSectionPanel(id, title, pos) {
-    pos = pos || controllerPanelPos(i++);
+  function makeSectionPanel(id, title) {
+    const pos = controllerPanelPos(i++);
     const body = makePanel({ id, title, x: pos.x, y: pos.y, w: pos.w });
     quickNavEntries.push({ id, label: title });
     return body;
   }
 
   // ---- Connection & settings ----
-  // Fixed top-left position so the other sections' own default column
-  // never starts under it - unlike them, never hidden by the disconnect
-  // handler below, since it's the one thing still useful while offline.
+  // First in the mosaic (top-left) - unlike every other section below,
+  // never hidden by the disconnect handler, since it's the one thing
+  // still useful while offline.
   const settingsTitle = t("views.connectionSettings");
-  const settingsBody = makeSectionPanel("settings", settingsTitle, { x: 20, y: 100, w: 380 });
+  const settingsBody = makeSectionPanel("settings", settingsTitle);
   if (settingsBoxEl) {
     settingsBoxEl.classList.remove("hidden");
     settingsBody.appendChild(settingsBoxEl);
