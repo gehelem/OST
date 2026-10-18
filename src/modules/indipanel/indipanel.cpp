@@ -16,6 +16,28 @@ IndiPanel::IndiPanel(QString name, QString label, QString profile, QVariantMap a
     setMetadata("description", "Indi control panel");
     setMetadata("thisversion", QString::fromStdString(Version::GIT_TAG));
 
+    // Own jpegquality setting, same shape as IndiModule::defineMeAsImager()'s
+    // (indimodule.cpp) but hardcoded here rather than inherited from it -
+    // this module isn't an imager (defineMeAsImager() would also pull in
+    // exposure/gain/offset/bitdepth, meaningless for a generic device
+    // panel), yet it saves JPEGs from any BLOB property it comes across
+    // (onNewProperty()/onUpdateProperty()) and small/slow setups still need
+    // a way to trade quality for less work there. Lower default than the
+    // imager one (75 vs 100): those modules show one camera's own live
+    // feed, this one can be saving several devices' BLOBs at once.
+    giveMeAParms();
+    if (!getStore()["parms"]->getElts()->contains("jpegquality"))
+    {
+        OST::ElementInt* i = new OST::ElementInt("jpegquality", "Jpeg quality", "exp050", "");
+        i->setValue(75, false);
+        i->setDirectEdit(true);
+        i->setAutoUpdate(true);
+        i->setMinMax(10, 100, false);
+        i->setStep(10, false);
+        i->setSlider(OST::SliderAndValue, false);
+        getProperty("parms")->addElt(i);
+    }
+
     connectIndi();
 }
 
@@ -157,7 +179,7 @@ void IndiPanel::onNewProperty(INDI::Property pProperty)
                     // primary+guide head, where only the base class happens
                     // to hardcode distinct labels). The name is what the
                     // protocol itself guarantees unique per device.
-                    atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".jpeg");
+                    atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".jpeg", getInt("parms", "jpegquality"));
                     dta = _image->ImgStats();
                     dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".jpeg";
                     dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".FITS";
@@ -262,7 +284,7 @@ void IndiPanel::onUpdateProperty (INDI::Property property)
                     QImage rawImage = _image->getRawQImage();
                     // Same path as onNewProperty()'s own BLOB case - keyed
                     // by element name, not label, see its comment.
-                    atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".jpeg");
+                    atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".jpeg", getInt("parms", "jpegquality"));
                     dta = _image->ImgStats();
                     dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".jpeg";
                     dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".FITS";
