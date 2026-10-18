@@ -90,7 +90,6 @@ const STRINGS = {
   "chrome.disconnect": { en: "Disconnect", fr: "Déconnecter", de: "Trennen", it: "Disconnetti", es: "Desconectar" },
   "chrome.resize": { en: "Resize", fr: "Redimensionner", de: "Größe ändern", it: "Ridimensiona", es: "Redimensionar" },
   "chrome.parametersPrefix": { en: "Parameters — ", fr: "Paramètres — ", de: "Parameter — ", it: "Parametri — ", es: "Parámetros — " },
-  "chrome.notConnectedLede": { en: "Not connected. Set the WebSocket URL above and press Connect.", fr: "Non connecté. Renseignez l'URL WebSocket ci-dessus et cliquez sur Connecter.", de: "Nicht verbunden. Geben Sie oben die WebSocket-URL ein und klicken Sie auf Verbinden.", it: "Non connesso. Imposta l'URL WebSocket sopra e premi Connetti.", es: "No conectado. Indique la URL WebSocket arriba y pulse Conectar." },
   "chrome.recentServers": { en: "Recent servers", fr: "Serveurs récents", de: "Letzte Server", it: "Server recenti", es: "Servidores recientes" },
   "chrome.noHistoryYet": { en: "No history yet.", fr: "Aucun historique pour l'instant.", de: "Noch kein Verlauf.", it: "Ancora nessuna cronologia.", es: "Aún no hay historial." },
   "chrome.removeServer": { en: "Remove", fr: "Supprimer", de: "Entfernen", it: "Rimuovi", es: "Eliminar" },
@@ -141,9 +140,9 @@ const STRINGS = {
   "imagelayer.sequenceImage": { en: "Sequence image", fr: "Image de la séquence", de: "Sequenzbild", it: "Immagine della sequenza", es: "Imagen de la secuencia" },
 
   // ---- views.js: modbar system entries, login, controller/files ----------
-  "views.controller": { en: "Controller", fr: "Contrôleur", de: "Steuerung", it: "Controllore", es: "Controlador" },
   "views.files": { en: "Files", fr: "Fichiers", de: "Dateien", it: "File", es: "Archivos" },
   "views.logs": { en: "Logs", fr: "Journaux", de: "Protokolle", it: "Log", es: "Registros" },
+  "views.connectionSettings": { en: "Connection & settings", fr: "Connexion et réglages", de: "Verbindung & Einstellungen", it: "Connessione e impostazioni", es: "Conexión y ajustes" },
   "views.loginRequired": { en: "Login required", fr: "Connexion requise", de: "Anmeldung erforderlich", it: "Accesso richiesto", es: "Inicio de sesión requerido" },
   "views.loginRequiresAuth": { en: "This server requires authentication (grant-client = -1).", fr: "Ce serveur nécessite une authentification (grant-client = -1).", de: "Dieser Server erfordert eine Authentifizierung (grant-client = -1).", it: "Questo server richiede l'autenticazione (grant-client = -1).", es: "Este servidor requiere autenticación (grant-client = -1)." },
   "views.user": { en: "User", fr: "Utilisateur", de: "Benutzer", it: "Utente", es: "Usuario" },
@@ -190,7 +189,6 @@ const STRINGS = {
   "views.rootFolder": { en: "(root)", fr: "(racine)", de: "(Wurzel)", it: "(radice)", es: "(raíz)" },
   "views.selectedPrefix": { en: "Selected: ", fr: "Sélectionné : ", de: "Ausgewählt: ", it: "Selezionato: ", es: "Seleccionado: " },
   "views.none": { en: "(none)", fr: "(aucun)", de: "(keine)", it: "(nessuno)", es: "(ninguno)" },
-  "views.entriesCappedSuffix": { en: "entries (capped at 1000)", fr: "entrées (limité à 1000)", de: "Einträge (auf 1000 begrenzt)", it: "voci (limitato a 1000)", es: "entradas (limitado a 1000)" },
   "views.logModuleAll": { en: "All modules", fr: "Tous les modules", de: "Alle Module", it: "Tutti i moduli", es: "Todos los módulos" },
   "views.logLevelAll": { en: "All levels", fr: "Tous les niveaux", de: "Alle Stufen", it: "Tutti i livelli", es: "Todos los niveles" },
   "views.logLevelInfo": { en: "Info and above", fr: "Info et plus", de: "Info und höher", it: "Info e superiori", es: "Info y superior" },

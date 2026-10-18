@@ -28,16 +28,17 @@ import { MAP_ITEMS as INSPECTOR_MAP_ITEMS } from "./templates/inspector.js";
 // monitor avec le graphe 'session graph' sans les labels de serie").
 import { buildMonitorGraphPanel } from "./templates/monitor.js";
 
-// Shared by renderLogs() (the full-page Logs system view) and
-// renderLogPanel() (the always-on floating one, below) - index == the
-// wire's own `l` field (server-messages.en.md's "l" message: 0 Debug, 1
-// Info, 2 Warning, 3 Error, 4 Critical).
+// index == the wire's own `l` field (server-messages.en.md's "l" message:
+// 0 Debug, 1 Info, 2 Warning, 3 Error, 4 Critical) - used by
+// renderLogPanel() below, the always-on floating log panel.
 const LOG_LEVELS = ["debug", "info", "warning", "error", "critical"];
 
 // Horizontal module bar (ostnoctua's .on-modbar/.on-mod, see panels.css) —
-// only the actually-loaded OST modules. Controller/Files/Logs live in the
-// settings dropdown instead (see renderSystemViews) — Gilles, 2026-09-25:
-// "deplace les boutons controller/files/logs dans les settings".
+// only the actually-loaded OST modules. Controller is reached from the
+// power button instead (app.js's own conn-toggle handler) — Gilles,
+// 2026-09-25: "deplace les boutons controller/files/logs dans les
+// settings", then 2026-10-18: folded Files/connection settings into
+// Controller itself rather than keeping them as separate destinations.
 //
 // Returns {node, dispose}: node is a DocumentFragment, not a wrapping <div>
 // — #modbar itself is the flex row (panels.css), and .mod-btn is
@@ -56,10 +57,10 @@ export function renderModbar(client, activeKey, onSelect) {
   // liste des modules [...] inspire toi de osterix qui a une telle page".
   // Not a real backend module (no entry in `names`, no "signals" to
   // subscribe to), but it belongs IN the modbar itself, first position,
-  // same look as a module button - unlike Controller/Files/Logs which are
-  // this client's own chrome and live in the settings dropdown instead
-  // (see renderSystemViews above). "__home" follows that same sentinel
-  // naming convention for app.js's activeView.
+  // same look as a module button - unlike Controller, which is this
+  // client's own chrome and is reached from the power button instead.
+  // "__home" follows that same sentinel naming convention for app.js's
+  // activeView.
   bar.appendChild(el("button", {
     class: "mod-btn" + (activeKey === "__home" ? " active" : ""), title: t("views.home"),
     onclick: () => onSelect("__home"),
@@ -164,28 +165,6 @@ export function renderQuickNav(entries) {
     bar.appendChild(btn);
   }
   return bar;
-}
-
-// The three system/utility screens, rendered as a small vertical list inside
-// the settings dropdown (#conn-panel) instead of the module bar — they
-// aren't OST modules, they're this client's own chrome, so grouping them
-// with the other app-level settings reads better than mixing them into the
-// live module list.
-const SYSTEM_VIEWS = [
-  { key: "__controller", get label() { return t("views.controller"); }, icon: "tune" },
-  { key: "__files", get label() { return t("views.files"); }, icon: "folder" },
-  { key: "__logs", get label() { return t("views.logs"); }, icon: "list" },
-];
-export function renderSystemViews(activeKey, onSelect) {
-  const nav = el("div", { class: "settings-nav" });
-  for (const item of SYSTEM_VIEWS) {
-    const btn = el("button", { class: "settings-nav-item" + (activeKey === item.key ? " active" : ""), onclick: () => onSelect(item.key) }, [
-      icon(item.icon, { small: true }),
-      el("span", { text: item.label }),
-    ]);
-    nav.appendChild(btn);
-  }
-  return nav;
 }
 
 // ---- home dashboard -------------------------------------------------------
@@ -896,7 +875,17 @@ export function buildIndiPanel(client, scope, onChange) {
   return indiSec;
 }
 
-export function renderController(client) {
+// `settingsBoxEl`: the static #controller-settings-box node (index.html,
+// app.js's own connect/SSL/discover/language/clear-cache/credits wiring) -
+// Gilles, 2026-10-18: the power button used to fold this out as a
+// dropdown menu of its own, one extra click away from what was wanted
+// most of the time; it now jumps straight into Controller here instead,
+// connected or not. Reparented into the grid below rather than rebuilt
+// here, so every one of app.js's existing listeners on its children
+// keeps working untouched - detaches itself again on dispose (the node
+// itself survives, ready to be reparented back in next time Controller
+// is entered).
+export function renderController(client, mediaBaseUrl, settingsBoxEl) {
   const root = el("div", { class: "controller-view" });
   const scope = client.scope();
 
@@ -914,6 +903,11 @@ export function renderController(client) {
 
   const grid = el("div", { class: "panel-grid" });
   root.appendChild(grid);
+
+  if (settingsBoxEl) {
+    settingsBoxEl.classList.remove("hidden");
+    grid.appendChild(settingsBoxEl);
+  }
 
   // Issue #231: the previous version rebuilt the *entire* view (including
   // the "Load a module" and "Save configuration as" <input>s) from a
@@ -1053,47 +1047,22 @@ export function renderController(client) {
   scope.subscribe(client.topics.controllerData("profiles"), renderProfiles);
 
   // ---- INDI server & drivers ----
-  grid.appendChild(buildIndiPanel(client, scope));
+  const indiPanelNode = buildIndiPanel(client, scope);
+  grid.appendChild(indiPanelNode);
 
   grid.appendChild(swSec);
 
-  return { node: root, dispose: scope.dispose };
-}
-
-function buildFolderTree(folders) {
-  const root = { name: "", path: "", children: new Map() };
-  for (const path of folders) {
-    if (path === "") continue;
-    const parts = path.split("/").filter(Boolean);
-    let node = root;
-    let acc = "";
-    for (const part of parts) {
-      acc += "/" + part;
-      if (!node.children.has(part)) node.children.set(part, { name: part, path: acc, children: new Map() });
-      node = node.children.get(part);
-    }
-  }
-  return root;
-}
-
-function renderFolderNode(node, client, depth) {
-  const wrap = el("div", { class: "folder-node", style: `padding-left:${depth * 14}px` });
-  const btn = el("button", { class: "folder-btn" }, [icon("folder", { small: true }), el("span", { text: node.name || t("views.rootFolder") })]);
-  btn.addEventListener("click", () => client.selectFolder(node.path));
-  wrap.appendChild(btn);
-  const children = Array.from(node.children.values()).sort((a, b) => a.name.localeCompare(b.name));
-  for (const child of children) wrap.appendChild(renderFolderNode(child, client, depth + 1));
-  return wrap;
-}
-
-export function renderFiles(client, mediaBaseUrl) {
-  const root = el("div", { class: "files-view" });
-  const scope = client.scope();
-
+  // ---- Files ----
+  // Gilles, 2026-10-18: added right after Server load - same content the
+  // standalone Files view used to show, now a box among Controller's own
+  // instead of a separate destination.
+  const filesSec = el("section", { class: "panel" }, [el("h3", { text: t("views.files") })]);
+  const filesBody = el("div");
+  filesSec.appendChild(filesBody);
+  grid.appendChild(filesSec);
   scope.subscribe(client.topics.files(), (files) => {
     files = files || { folders: [], files: [], selectedfolder: "" };
-    root.innerHTML = "";
-    root.appendChild(el("h2", null, [icon("folder"), el("span", { text: " " + t("views.files") })]));
+    filesBody.innerHTML = "";
     const layout = el("div", { class: "files-layout" });
     const tree = buildFolderTree(files.folders || []);
     const treeWrap = el("div", { class: "folder-tree" });
@@ -1120,33 +1089,53 @@ export function renderFiles(client, mediaBaseUrl) {
     if (!(files.files || []).length) fgrid.appendChild(el("div", { class: "muted small", text: t("views.noFilesInFolder") }));
     listWrap.appendChild(fgrid);
     layout.appendChild(listWrap);
-    root.appendChild(layout);
+    filesBody.appendChild(layout);
   });
 
-  return { node: root, dispose: scope.dispose };
+  // Every box but the settings one reads live server data with nothing
+  // meaningful to show while disconnected - Gilles, 2026-10-18: hidden
+  // instead of sitting there empty. onStatus() fires immediately with the
+  // current status too, so this also covers the very first render.
+  const otherBoxes = [confSec, modSec, libSec, indiPanelNode, swSec, filesSec];
+  const unsubStatus = client.onStatus((status) => {
+    const connected = status === "connected";
+    for (const box of otherBoxes) box.classList.toggle("hidden", !connected);
+  });
+
+  return {
+    node: root,
+    dispose: () => {
+      scope.dispose();
+      unsubStatus();
+      if (settingsBoxEl) settingsBoxEl.classList.add("hidden");
+    },
+  };
 }
 
-export function renderLogs(client) {
-  const root = el("div", { class: "logs-view" });
-  const scope = client.scope();
-
-  scope.subscribe(client.topics.logs(), (logs) => {
-    root.innerHTML = "";
-    root.appendChild(el("h2", null, [icon("list"), el("span", { text: " " + t("views.logs") })]));
-    root.appendChild(el("div", { class: "log-toolbar muted small", text: `${(logs || []).length} ${t("views.entriesCappedSuffix")}` }));
-    const table = el("table", { class: "log-table" });
-    for (const entry of (logs || []).slice().reverse()) {
-      const lvl = LOG_LEVELS[entry.l] || "info";
-      table.appendChild(el("tr", { class: "log-row log-" + lvl }, [
-        el("td", { class: "small muted mono", text: entry.d }),
-        el("td", { class: "small mono", text: entry.c }),
-        el("td", { text: entry.t }),
-      ]));
+function buildFolderTree(folders) {
+  const root = { name: "", path: "", children: new Map() };
+  for (const path of folders) {
+    if (path === "") continue;
+    const parts = path.split("/").filter(Boolean);
+    let node = root;
+    let acc = "";
+    for (const part of parts) {
+      acc += "/" + part;
+      if (!node.children.has(part)) node.children.set(part, { name: part, path: acc, children: new Map() });
+      node = node.children.get(part);
     }
-    root.appendChild(table);
-  });
+  }
+  return root;
+}
 
-  return { node: root, dispose: scope.dispose };
+function renderFolderNode(node, client, depth) {
+  const wrap = el("div", { class: "folder-node", style: `padding-left:${depth * 14}px` });
+  const btn = el("button", { class: "folder-btn" }, [icon("folder", { small: true }), el("span", { text: node.name || t("views.rootFolder") })]);
+  btn.addEventListener("click", () => client.selectFolder(node.path));
+  wrap.appendChild(btn);
+  const children = Array.from(node.children.values()).sort((a, b) => a.name.localeCompare(b.name));
+  for (const child of children) wrap.appendChild(renderFolderNode(child, client, depth + 1));
+  return wrap;
 }
 
 // ---- always-on floating log panel ----------------------------------------
@@ -1227,11 +1216,10 @@ export function renderLogPanel(client, initialModule) {
     // Gilles, 2026-10-06: "la fenetre de logs (partout sur tous les
     // modules) doit afficher le dernier message en premier, sinon on est
     // oblige de scroller pour voir les trucs recents" - newest first
-    // (reversed from the wire's own append order, same as renderLogs()'s
-    // full-page Logs view already does), and the "stay pinned so new
-    // entries remain visible without having to re-scroll" check flips
-    // from atBottom to atTop to match: new rows now land at the TOP, not
-    // the bottom.
+    // (reversed from the wire's own append order), and the "stay pinned
+    // so new entries remain visible without having to re-scroll" check
+    // flips from atBottom to atTop to match: new rows now land at the
+    // TOP, not the bottom.
     const atTop = list.scrollTop < 24;
     list.innerHTML = "";
     for (const entry of (logs || []).filter(passes).slice().reverse()) {

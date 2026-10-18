@@ -527,12 +527,6 @@ input[type="range"]::-moz-range-thumb {
 .file-name { word-break: break-all; text-align: center; font-size: 11px; }
 
 /* ----------------------------------------------------------------- logs */
-.log-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.log-table td { padding: 4px 10px; border-bottom: 1px solid var(--border-subtle); vertical-align: top; }
-.log-table tr:hover td { background: var(--bg-hover); }
-.log-warning td:last-child { color: var(--warn); }
-.log-error td:last-child { color: var(--orange); }
-.log-critical td:last-child { color: var(--error); }
 .log-toolbar { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3); }
 
 /* ---------------------------------------------------- floating log panel
@@ -553,10 +547,6 @@ input[type="range"]::-moz-range-thumb {
 .log-panel-row.log-critical .log-panel-msg { color: var(--error); }
 
 /* -------------------------------------------------------------- connect */
-.connect-screen { max-width: 560px; margin: 8vh auto; text-align: center; }
-.connect-screen .lede { color: var(--text-muted); margin-bottom: var(--space-4); }
-.connect-screen .panel { text-align: left; }
-.connect-screen .material-icons.icon-lg { color: var(--accent); }
 
 /* -------------------------------------------------------------- system */
 .metric-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 12px; border-bottom: 1px solid var(--border-subtle); }

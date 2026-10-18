@@ -124,96 +124,121 @@
              .conn-toggle now only carries the status-based colour (app.js's
              own onStatus()). The status text that used to be visible here
              lives in `title` instead (a tooltip), kept in sync the same
-             places the old text node was. -->
+             places the old text node was.
+             Gilles, 2026-10-18: used to fold out a dropdown (#conn-panel,
+             now gone) listing Controller/Files/Logs as an extra menu to
+             pick from, one extra step to reach what was wanted most of
+             the time. Jumps straight to the Controller screen instead
+             (app.js's own selectView()), connected or not -
+             #controller-settings-box below is what used to be that
+             dropdown's own content, now one of Controller's own boxes
+             instead of a menu of its own. -->
         <button id="conn-toggle" class="glass icon-chip conn-toggle" type="button">
           <span class="material-icons">power_settings_new</span>
         </button>
-        <div id="conn-panel" class="glass conn-panel">
-          <div class="brand"><img src="assets/favicon-192.png" class="brand-icon" alt="OST"><span>OST — UI3</span></div>
-          <nav id="system-views"></nav>
-          <!-- Setup wizard (issue #238) - a modal, not a view switch, so it
-               lives as its own button rather than a renderSystemViews()
-               entry (those replace the main content area; app.js wires
-               this one to wizard.js's openSetupWizard() instead). -->
-          <button id="setup-wizard-btn" class="settings-nav-item" type="button">
-            <span class="material-icons">auto_fix_high</span>
-            <span id="setup-wizard-btn-label"></span>
+      </div>
+      <!-- Was #conn-panel, a dropdown folded out from the button above -
+           now a plain Controller box (views.js's renderController()
+           reparents this whole node into its own panel-grid, first
+           position), same .panel styling as every other box there, no
+           dropdown-specific CSS left to carry. Detached from the document
+           (this spot in the markup) whenever Controller isn't the active
+           view. -->
+      <div id="controller-settings-box" class="panel hidden">
+        <h3 id="controller-settings-title"></h3>
+        <!-- Setup wizard (issue #238) - a modal, not a view switch, kept as
+             its own button (app.js wires it to wizard.js's
+             openSetupWizard()) rather than folded into the form rows below. -->
+        <button id="setup-wizard-btn" class="settings-nav-item" type="button">
+          <span class="material-icons">auto_fix_high</span>
+          <span id="setup-wizard-btn-label"></span>
+        </button>
+        <div class="settings-sep"></div>
+        <!-- Gilles, 2026-10-18: used to live only on the separate
+             "not connected" welcome screen (now gone - that screen only
+             ever showed before the very first connect, and disconnecting
+             while already on Controller bounced back to it, losing the
+             current context, instead of staying put). Filled/refreshed by
+             app.js's renderRecentServers() - a plain list, not rebuilt by
+             renderController() like the boxes below it, since this one's
+             own buttons (app.js's loadHistory()/removeHistory()) have
+             nothing to do with any live server data. -->
+        <div class="muted small" id="recent-servers-title"></div>
+        <ul id="recent-servers-list"></ul>
+        <div class="settings-sep"></div>
+        <!-- Gilles, 2026-10-06: "les deux zones qui servent a fixer
+             l'url dans les settings sont lourdes et redondantes ...
+             une seule zone de saisie, juste l'url sans http/https ou
+             ws/wss pas de port pas de /ostmedia ou /ws. Tout ca doit
+             etre determine juste avec le toggle et l'URL" - one bare
+             host + an SSL toggle (a button, not a checkbox - "il faut
+             mettre des boutons plutot que des puces ou des cases a
+             cocher", render.js's own boolean-element convention,
+             reused here) replace the old #ws-url/#media-url pair;
+             core/index.js's deriveUrlsFromHost(host, ssl) builds both
+             real URLs from the two (js/app.js). -->
+        <div class="form-row">
+          <input id="server-host" class="field-input" style="width:100%" placeholder="host">
+          <button id="server-ssl-toggle" class="btn btn-sm toggle-btn" type="button" title="SSL">
+            <span class="material-icons">lock_open</span><span id="server-ssl-label">SSL</span>
           </button>
-          <div class="settings-sep"></div>
-          <!-- Gilles, 2026-10-06: "les deux zones qui servent a fixer
-               l'url dans les settings sont lourdes et redondantes ...
-               une seule zone de saisie, juste l'url sans http/https ou
-               ws/wss pas de port pas de /ostmedia ou /ws. Tout ca doit
-               etre determine juste avec le toggle et l'URL" - one bare
-               host + an SSL toggle (a button, not a checkbox - "il faut
-               mettre des boutons plutot que des puces ou des cases a
-               cocher", render.js's own boolean-element convention,
-               reused here) replace the old #ws-url/#media-url pair;
-               core/index.js's deriveUrlsFromHost(host, ssl) builds both
-               real URLs from the two (js/app.js). -->
-          <div class="form-row">
-            <input id="server-host" class="field-input" style="width:100%" placeholder="host">
-            <button id="server-ssl-toggle" class="btn btn-sm toggle-btn" type="button" title="SSL">
-              <span class="material-icons">lock_open</span><span id="server-ssl-label">SSL</span>
-            </button>
-          </div>
-          <!-- Gilles, 2026-10-03: "ajoute la fonction discover dans le cas
-               ou on utilise l'app android ... comme sur rooster" - hidden
-               by default (js/app.js only shows it once js/zeroconf.js's
-               own isAvailable() confirms this is the real native app, not
-               a browser - mDNS has no browser API to speak of). -->
-          <div class="form-row hidden" id="discover-row">
-            <button id="discover-btn" class="btn btn-sm" type="button"><span class="material-icons" style="font-size:15px;vertical-align:middle">wifi_find</span> <span id="discover-btn-label">Discover</span></button>
-          </div>
-          <div id="discover-results" class="discover-results"></div>
-          <div class="form-row">
-            <select id="lang-select" class="field-input">
-              <option value="en">EN</option>
-              <option value="fr">FR</option>
-              <option value="de">DE</option>
-              <option value="es">ES</option>
-              <option value="it">IT</option>
-            </select>
-          </div>
-          <div class="form-row">
-            <button id="connect-btn" class="btn btn-primary"><span class="material-icons">power</span><span id="connect-btn-label">Connect</span></button>
-            <button id="disconnect-btn" class="btn"><span id="disconnect-btn-label">Disconnect</span></button>
-          </div>
-          <div id="grant-pill" class="grant-pill"></div>
-          <!-- Gilles, 2026-10-06: "ajoute un fichier 'gitdata' pour que
-               l'application android et le site web puissent afficher la
-               version (tag date commit message de commit) au niveau des
-               settings, apres les infos de connexion" - filled from
-               gitdata.json (CI/write-gitdata.js), right after the
-               connection info above. Empty/hidden until that fetch
-               resolves (js/app.js) - not every www/ build has the file
-               (a plain `npm run prepare-www` does, see that script, but
-               nothing stops someone serving an older build without it).
-               The commit message gets its own visible line, not just a
-               title tooltip - Gilles, right after a first version shipped
-               with it as a tooltip only: "je ne vois pas le 'commit
-               message' dans ton screenshot" - a tooltip needs hover,
-               which the Android app (touch, no pointer) can't do at all. -->
-          <div id="version-info" class="hidden">
-            <div id="version-info-tag" class="muted small mono"></div>
-            <div id="version-info-message" class="muted small"></div>
-          </div>
-          <div class="settings-sep"></div>
-          <!-- Gilles, 2026-10-02, after a stale localStorage value left his
-               regular Chrome profile's planetarium blank (stars gone, panels
-               still there) while a fresh profile/private window rendered
-               fine - a hard reload (Ctrl+Shift+R) bypasses the HTTP cache
-               but never touches localStorage, so it didn't help: "ajoute un
-               bouton 'clear cache + localstorage' avec confirmation - au
-               moins on sera a l'abris les prochains coups". Self-service
-               recovery from exactly this class of problem, no dev tools
-               needed. -->
-          <button id="clear-cache-btn" class="btn btn-sm btn-danger"><span class="material-icons">delete_sweep</span><span id="clear-cache-btn-label">Clear cache + localStorage</span></button>
-          <!-- Gilles, 2026-10-14: "ajoute une fenetre modale 'Credits'...
-               sur le composant de settings generaux, en bas sous 'clear
-               cache + local storage'" - see js/credits.js. -->
-          <button id="credits-btn" class="btn btn-sm"><span class="material-icons">copyright</span><span id="credits-btn-label">Credits</span></button>
         </div>
+        <!-- Gilles, 2026-10-03: "ajoute la fonction discover dans le cas
+             ou on utilise l'app android ... comme sur rooster" - hidden
+             by default (js/app.js only shows it once js/zeroconf.js's
+             own isAvailable() confirms this is the real native app, not
+             a browser - mDNS has no browser API to speak of). -->
+        <div class="form-row hidden" id="discover-row">
+          <button id="discover-btn" class="btn btn-sm" type="button"><span class="material-icons" style="font-size:15px;vertical-align:middle">wifi_find</span> <span id="discover-btn-label">Discover</span></button>
+        </div>
+        <div id="discover-results" class="discover-results"></div>
+        <div class="form-row">
+          <select id="lang-select" class="field-input">
+            <option value="en">EN</option>
+            <option value="fr">FR</option>
+            <option value="de">DE</option>
+            <option value="es">ES</option>
+            <option value="it">IT</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <button id="connect-btn" class="btn btn-primary"><span class="material-icons">power</span><span id="connect-btn-label">Connect</span></button>
+          <button id="disconnect-btn" class="btn"><span id="disconnect-btn-label">Disconnect</span></button>
+        </div>
+        <div id="grant-pill" class="grant-pill"></div>
+        <!-- Gilles, 2026-10-06: "ajoute un fichier 'gitdata' pour que
+             l'application android et le site web puissent afficher la
+             version (tag date commit message de commit) au niveau des
+             settings, apres les infos de connexion" - filled from
+             gitdata.json (CI/write-gitdata.js), right after the
+             connection info above. Empty/hidden until that fetch
+             resolves (js/app.js) - not every www/ build has the file
+             (a plain `npm run prepare-www` does, see that script, but
+             nothing stops someone serving an older build without it).
+             The commit message gets its own visible line, not just a
+             title tooltip - Gilles, right after a first version shipped
+             with it as a tooltip only: "je ne vois pas le 'commit
+             message' dans ton screenshot" - a tooltip needs hover,
+             which the Android app (touch, no pointer) can't do at all. -->
+        <div id="version-info" class="hidden">
+          <div id="version-info-tag" class="muted small mono"></div>
+          <div id="version-info-message" class="muted small"></div>
+        </div>
+        <div class="settings-sep"></div>
+        <!-- Gilles, 2026-10-02, after a stale localStorage value left his
+             regular Chrome profile's planetarium blank (stars gone, panels
+             still there) while a fresh profile/private window rendered
+             fine - a hard reload (Ctrl+Shift+R) bypasses the HTTP cache
+             but never touches localStorage, so it didn't help: "ajoute un
+             bouton 'clear cache + localstorage' avec confirmation - au
+             moins on sera a l'abris les prochains coups". Self-service
+             recovery from exactly this class of problem, no dev tools
+             needed. -->
+        <button id="clear-cache-btn" class="btn btn-sm btn-danger"><span class="material-icons">delete_sweep</span><span id="clear-cache-btn-label">Clear cache + localStorage</span></button>
+        <!-- Gilles, 2026-10-14: "ajoute une fenetre modale 'Credits'...
+             sur le composant de settings generaux, en bas sous 'clear
+             cache + local storage'" - see js/credits.js. -->
+        <button id="credits-btn" class="btn btn-sm"><span class="material-icons">copyright</span><span id="credits-btn-label">Credits</span></button>
       </div>
       </div><!-- /top-right-items -->
     </div>
