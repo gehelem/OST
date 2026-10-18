@@ -98,6 +98,7 @@ const STRINGS = {
   "credits.title": { en: "Credits", fr: "Crédits", de: "Danksagungen", it: "Crediti", es: "Créditos" },
   "credits.intro": { en: "This app builds on several free/open-source projects:", fr: "Cette application s'appuie sur plusieurs projets libres/open-source :", de: "Diese App baut auf mehreren freien/Open-Source-Projekten auf:", it: "Questa app si basa su diversi progetti liberi/open-source:", es: "Esta aplicación se basa en varios proyectos libres/de código abierto:" },
   "credits.backendLabel": { en: "Backend:", fr: "Backend :", de: "Backend:", it: "Backend:", es: "Backend:" },
+  "credits.frontLabel": { en: "Front:", fr: "Front :", de: "Front:", it: "Front:", es: "Front:" },
   "credits.aladin.name": { en: "Aladin Lite (CDS, Strasbourg)", fr: "Aladin Lite (CDS, Strasbourg)", de: "Aladin Lite (CDS, Straßburg)", it: "Aladin Lite (CDS, Strasburgo)", es: "Aladin Lite (CDS, Estrasburgo)" },
   "credits.aladin.desc": { en: "HiPS sky-survey background in the planetarium view", fr: "Fond de ciel HiPS dans la vue planétarium", de: "HiPS-Himmelshintergrund in der Planetariumsansicht", it: "Sfondo cielo HiPS nella vista planetario", es: "Fondo de cielo HiPS en la vista del planetario" },
   "credits.d3celestial.name": { en: "D3 Celestial", fr: "D3 Celestial", de: "D3 Celestial", it: "D3 Celestial", es: "D3 Celestial" },

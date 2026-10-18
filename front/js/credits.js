@@ -96,7 +96,7 @@ const SOURCES = [
   },
 ];
 
-export function openCreditsDialog() {
+export function openCreditsDialog(client) {
   const overlay = el("div", { class: "dialog-overlay" });
   const closeBtn = el("button", { class: "btn-icon", title: t("common.close"), onclick: () => overlay.remove() }, [icon("close")]);
 
@@ -119,6 +119,26 @@ export function openCreditsDialog() {
   // dialog, not just to a future reader of the source.
   const backendLink = el("a", { href: "https://documentation.ostserver.fr/licences/index.html", target: "_blank", rel: "noopener", text: "documentation.ostserver.fr/licences" });
 
+  // Build info, below the licences - front always (CI/write-gitdata.js's
+  // own gitdata.json, fetched fresh here rather than reusing a cached copy
+  // elsewhere), backend only while connected (controllerdata.git, same
+  // tag/hash/date/message shape - see src/controller.cpp).
+  const versions = el("div", { class: "credits-versions" });
+  fetch("gitdata.json").then((r) => (r.ok ? r.json() : null)).then((d) => {
+    if (!d) return;
+    versions.appendChild(el("div", { class: "muted small", text: t("credits.frontLabel") }));
+    versions.appendChild(el("div", { class: "small mono", text: `${d.tag} · ${(d.date || "").slice(0, 10)} · ${d.commit}` }));
+    versions.appendChild(el("div", { class: "small", text: d.message || "" }));
+  }).catch(() => { /* no gitdata.json in this build */ });
+  if (client && client.connection.status === "connected") {
+    const git = client.get(client.topics.controllerData("git"));
+    if (git) {
+      versions.appendChild(el("div", { class: "muted small", text: t("credits.backendLabel") }));
+      versions.appendChild(el("div", { class: "small mono", text: `${git.Gittag || ""} · ${git.Gitdate || ""} · ${(git.Githash || "").slice(0, 8)}` }));
+      versions.appendChild(el("div", { class: "small", text: git.Gitmessage || "" }));
+    }
+  }
+
   const dialog = el("div", { class: "dialog credits-dialog" }, [
     // .panel-header-row (components.css) - the generic, non-dialog-scoped
     // "title + action button(s), space-between" shape (.params-dialog's
@@ -127,6 +147,8 @@ export function openCreditsDialog() {
     el("p", { class: "muted small", text: t("credits.intro") }),
     list,
     el("p", { class: "small" }, [el("span", { class: "muted", text: t("credits.backendLabel") + " " }), backendLink]),
+    el("div", { class: "settings-sep" }),
+    versions,
   ]);
   overlay.appendChild(dialog);
   overlay.addEventListener("click", (ev) => { if (ev.target === overlay) overlay.remove(); });

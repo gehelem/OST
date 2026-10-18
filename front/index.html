@@ -197,24 +197,6 @@
           <button id="disconnect-btn" class="btn"><span id="disconnect-btn-label">Disconnect</span></button>
         </div>
         <div id="grant-pill" class="grant-pill"></div>
-        <!-- Gilles, 2026-10-06: "ajoute un fichier 'gitdata' pour que
-             l'application android et le site web puissent afficher la
-             version (tag date commit message de commit) au niveau des
-             settings, apres les infos de connexion" - filled from
-             gitdata.json (CI/write-gitdata.js), right after the
-             connection info above. Empty/hidden until that fetch
-             resolves (js/app.js) - not every www/ build has the file
-             (a plain `npm run prepare-www` does, see that script, but
-             nothing stops someone serving an older build without it).
-             The commit message gets its own visible line, not just a
-             title tooltip - Gilles, right after a first version shipped
-             with it as a tooltip only: "je ne vois pas le 'commit
-             message' dans ton screenshot" - a tooltip needs hover,
-             which the Android app (touch, no pointer) can't do at all. -->
-        <div id="version-info" class="hidden">
-          <div id="version-info-tag" class="muted small mono"></div>
-          <div id="version-info-message" class="muted small"></div>
-        </div>
         <div class="settings-sep"></div>
         <!-- Gilles, 2026-10-02, after a stale localStorage value left his
              regular Chrome profile's planetarium blank (stars gone, panels

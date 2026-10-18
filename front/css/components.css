@@ -442,12 +442,11 @@ input[type="range"]::-moz-range-thumb {
 .dialog.wizard-dialog.fullscreen { width: 95vw; max-width: 95vw; height: 90vh; max-height: 90vh; display: flex; flex-direction: column; overflow-y: hidden; }
 .wizard-dialog.fullscreen .wizard-body { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
 
-/* Credits dialog (js/credits.js) - grew from 2 to 11 entries (2026-10-14)
-   once Gilles confirmed d3-celestial also covers constellations.lines/
-   messier.json (not just mw.json) and asked for Capacitor/zeroconf too -
-   wider than the original 2-entry version, .dialog's own max-height:85vh/
-   overflow-y:auto (components.css) already handles the longer list. */
-.dialog.credits-dialog { width: 480px; }
+/* Credits dialog (js/credits.js) - wider than a plain confirm dialog for
+   its source list, with its own explicit max-height/overflow-y (on top of
+   .dialog's own) now that the front/backend build info below the licence
+   list can push it past the viewport too. */
+.dialog.credits-dialog { width: 480px; max-height: 85vh; overflow-y: auto; }
 .credits-list { list-style: none; padding: 0; margin: var(--space-3) 0; }
 .credits-list li { padding: 6px 0; border-bottom: 1px solid var(--border-subtle); }
 .credits-list li:last-child { border-bottom: none; }
