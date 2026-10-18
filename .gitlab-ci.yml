@@ -6,7 +6,6 @@ include:
   - local: CI/doc.yml
   - local: CI/android.yml
   - local: CI/web-zip.yml
-  - local: CI/indi-3rdparty.yml
 
 stages:
   - images
