@@ -63,27 +63,17 @@ QString IndiPanel::groupOrder(const QString &group)
     else if (group == "General Info") rank = "9";
     return rank + QString("%1").arg(_orderSeq++, 5, 10, QChar('0'));
 }
+// A device has none of its properties yet at this point (they stream in
+// right after, one newProperty() call each) - onNewProperty() alone
+// already builds every property correctly (elements, group order, BLOB
+// handling), so there is nothing left to do here.
 void IndiPanel::onNewDevice(INDI::BaseDevice dp)
 {
-    auto props = dp.getProperties();
-
-    for (auto pProperty : props)
-    {
-        QString dev = pProperty.getDeviceName();
-        QString pro = pProperty.getName();
-        QString devpro = dev + pro;
-        QString mess;
-        OST::PropertyMulti *pm = new OST::PropertyMulti(devpro, pProperty.getLabel(),
-                OST::IntToPermission(pProperty.getPermission()),
-                pProperty.getDeviceName(),
-                pProperty.getGroupName(), "00", false, false);
-        createProperty(pm);
-    }
+    Q_UNUSED(dp);
 }
 void IndiPanel::onRemoveDevice(INDI::BaseDevice dp)
 {
     for(const QString &key : getStore().keys())    {
-        getProperty(key)->level1();
         if (strcmp(dp.getDeviceName(), getProperty(key)->level1().toStdString().c_str()) == 0)
         {
             deleteOstProperty(key);
@@ -188,6 +178,7 @@ void IndiPanel::onNewProperty(INDI::Property pProperty)
                 OST::ImgData dta;
                 if (_image->loadBlob(b, 64, i))
                 {
+                    stats = _image->getStats();
                     QImage rawImage = _image->getRawQImage();
                     // Keyed by element name (CCD1/CCD2/...), not label - the
                     // label is free-form display text with no uniqueness
@@ -298,6 +289,7 @@ void IndiPanel::onUpdateProperty (INDI::Property property)
 
                 if (_image->loadBlob(b, 64, i))
                 {
+                    stats = _image->getStats();
                     QImage rawImage = _image->getRawQImage();
                     // Same path as onNewProperty()'s own BLOB case - keyed
                     // by element name, not label, see its comment.
