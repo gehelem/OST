@@ -334,10 +334,23 @@ export class Datastore {
     for (const [modName, modBody] of Object.entries(payload)) {
       const mod = this._ensureModule(modName);
       const props = modBody.p || modBody.properties || {};
+      let sawNewProperty = false;
       for (const [propName, raw] of Object.entries(props)) {
+        if (!(propName in mod.properties)) sawNewProperty = true;
         mod.properties[propName] = this._normalizeProperty(raw);
         this._emit(topics.property(modName, propName));
       }
+      // A property appearing for the first time (e.g. an INDI device's own
+      // properties, re-created from scratch after it dropped off the bus
+      // and came back) needs the module-level topic too - nothing is ever
+      // subscribed to topics.property() for a property that didn't exist
+      // yet, so the generic fallback template's level1/level2 layout
+      // (built from the module snapshot, see render.js's moduleLifecycle())
+      // would otherwise only pick it up on an unrelated full module
+      // rebuild. Same reasoning as the aa/dm/dp handlers, which already
+      // emit this. A plain replace of an already-known property (e.g. a
+      // grid reorder) stays scoped to its own topic, same as before.
+      if (sawNewProperty) this._emit(topics.module(modName));
     }
   }
 
