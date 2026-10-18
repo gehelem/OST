@@ -14,9 +14,6 @@
 #include "translatemanager.h"
 #include "globaldatastore.h"
 #include <lovbase.h>
-#include <baseclient.h>
-#include <basedevice.h>
-#include <functional>
 
 struct IndiDriverInfo
 {
@@ -26,34 +23,6 @@ struct IndiDriverInfo
     QString skeleton;
     bool    mdpd = false;
 };
-
-// Lightweight INDI client used only to learn, via INDI's own push
-// notifications, that a device appeared or disappeared on the bus - no
-// property watching, Controller re-resolves the whole active-driver list
-// from scratch (queryActiveIndiDrivers()) on every change instead of
-// tracking devices here itself. Used when OST doesn't manage the server
-// itself (controllerdata.indiserver == "N") and therefore has no FIFO of
-// its own to learn about external changes from - a live connection reacts
-// to real bus events, it is not a polling loop.
-class IndiBusWatcher : public INDI::BaseClient
-{
-    public:
-        explicit IndiBusWatcher(std::function<void()> onChange) : _onChange(std::move(onChange)) {}
-    protected:
-        void newDevice(INDI::BaseDevice dp) override
-        {
-            Q_UNUSED(dp);
-            _onChange();
-        }
-        void removeDevice(INDI::BaseDevice dp) override
-        {
-            Q_UNUSED(dp);
-            _onChange();
-        }
-    private:
-        std::function<void()> _onChange;
-};
-
 
 /*!
  * This class is the heart of OST
@@ -71,7 +40,6 @@ class Controller : public QObject
                    OST::Logger *logger, OST::TranslateManager *translate, const QString &banner, const QString &setAdminPassword,
                    const QString &gitSha, const QString &gitDate, const QString &gitMessage, const QString &gitTag,
                    const int systemWatchInterval, const int minFreePercent);
-        ~Controller() override;
     signals:
         void controllerEvent(OST::ExtEvent  event);
         void otherModuleEvent(OST::EvType, QString, QString, QString, QVariant, int);
@@ -94,7 +62,6 @@ class Controller : public QObject
         QProcess    *_process     = nullptr;
         QProcess    *_indiProcess = nullptr;
         pid_t        _indiPid     = 0;
-        IndiBusWatcher *_indiBusWatcher = nullptr;
         QZeroConf zeroConf;
         QFileSystemWatcher mFileWatcher;
         QStringList mFilesList;

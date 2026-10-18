@@ -770,11 +770,11 @@ function openIndiConfigDialog(client) {
 // hidden in that case - but the active-drivers list below comes from a
 // plain bus query (indi_getprop) that works against ANY reachable INDI
 // server, so it still shows even then, and stays live afterwards too (see
-// Controller's own constructor, queryActiveIndiDrivers() +
-// IndiBusWatcher in the "N" branch). Connect/disconnect (indi_setprop)
-// act on the live device itself and are bus-level too, so they stay
-// available either way; reload/stop act on the driver's process through
-// the FIFO, so they're only shown once OST actually manages it.
+// Controller::onSystemWatch(), which re-checks the bus on every tick
+// regardless of this mode). Connect/disconnect (indi_setprop) act on the
+// live device itself and are bus-level too, so they stay available either
+// way; reload/stop act on the driver's process through the FIFO, so
+// they're only shown once OST actually manages it.
 export function buildIndiPanel(client, scope, onChange) {
   const indiSec = el("section", { class: "panel" });
   const indiTitle = el("h3");

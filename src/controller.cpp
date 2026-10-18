@@ -166,29 +166,9 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
     {
         this->startIndi();
     }
-    else
-    {
-        // OST isn't managing an embedded indiserver, but one may already be
-        // running on its own (started independently of us) - indi_getprop
-        // works against any INDI server reachable on the bus, not just one
-        // we spawned ourselves, so the same bus query startIndi() already
-        // uses for orphan recovery still finds its active drivers here too.
-        queryActiveIndiDrivers();
-
-        // Stay in sync afterwards: OST has no FIFO of its own to learn about
-        // further changes from in this mode, so a lightweight INDI client
-        // watches the bus directly instead and re-queries on every
-        // newDevice()/removeDevice() push (see IndiBusWatcher's own doc
-        // comment). Connects to the same default indiserver address
-        // indi_getprop/indi_setprop already target above and in
-        // resolveIndiDeviceNames()/connectIndiDriver()/disconnectIndiDriver().
-        // If no indiserver is reachable yet, this attempt simply fails -
-        // nothing retries it later, same one-shot spirit as the query
-        // above.
-        _indiBusWatcher = new IndiBusWatcher([this]() { queryActiveIndiDrivers(); });
-        _indiBusWatcher->setServer("localhost", 7624);
-        _indiBusWatcher->connectServer();
-    }
+    // "N": OST doesn't manage an embedded indiserver, so there is no startup
+    // or ongoing hook of its own to query the bus from here - onSystemWatch()
+    // checks it on every tick instead, same as the rest of its metrics.
 
     loadConf(_conf);
 
@@ -241,16 +221,6 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
         mSystemWatchTimer.start(mSystemWatchInterval * 1000);
         mNetTimer.start();
         logInfo("System watch started, interval: %1s", {mSystemWatchInterval});
-    }
-}
-
-
-Controller::~Controller()
-{
-    if (_indiBusWatcher)
-    {
-        _indiBusWatcher->disconnectServer();
-        delete _indiBusWatcher;
     }
 }
 
@@ -1826,6 +1796,30 @@ void Controller::onSystemWatch()
                 }
             }
             data["disks"] = disks;
+        }
+    }
+
+    // --- INDI server ---
+    // "Y": the process is OST's own, already tracked live via QProcess's
+    // finished signal (setIndiServerState()) and updated on every
+    // start/stop/reload right where it happens - nothing to poll for here.
+    // "N": OST has no event of its own for a server it doesn't own, so this
+    // is the only place checking it at all.
+    if (_indiserver == "N")
+    {
+        QProcess pgrep;
+        pgrep.start("pgrep", {"-x", "indiserver"});
+        pgrep.waitForFinished(1000);
+        const bool running = (pgrep.exitCode() == 0);
+        data["indiserverrunning"] = running;
+        if (running)
+        {
+            queryActiveIndiDrivers();
+        }
+        else if (!_activeIndiDrivers.isEmpty())
+        {
+            _activeIndiDrivers.clear();
+            updateControllerData("indiactivedrivers", QVariantList());
         }
     }
 
