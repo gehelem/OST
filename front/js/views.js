@@ -7,7 +7,7 @@
 // subscription open, so they just return a node.
 
 import { el, icon, iconButton, moduleIcon, statusDot, updateStatusDot } from "./dom.js";
-import { togglePanel, isPanelVisible, make as makePanel } from "./panels.js";
+import { togglePanel, isPanelVisible, make as makePanel, setScope as setPanelsScope, clear as clearPanels } from "./panels.js";
 import { t } from "./i18n.js";
 // Reused as-is on the Home dashboard's bigger focus/guider cards (Gilles,
 // 2026-10-05: "mets les graphes correspondants" then "Focus: values/curve /
@@ -20,6 +20,12 @@ import { buildCompactRms, buildGuidingChartPanel, buildDriftChartPanel } from ".
 // prise") - same urljpeg/urlthumbnail resolution showBackgroundImage()
 // itself uses, not reinvented here.
 import { jpegSrc, openImageViewer, refreshImageViewer, buildImageGridPanel } from "./imagelayer.js";
+import { openSetupWizard } from "./wizard.js";
+// Controller's own sections render as floating panels now, same mechanism
+// as a module's own level1 panels - this fills the shared quicknav bar
+// with one toggle button per section, exactly like render.js's own
+// renderModuleView() does for its panels.
+import { updateQuickNav, getQuickNavButton } from "./render.js";
 // Inspector's own 4 control maps (hfr/shape/collim/corners), same list its
 // own "maps" panel already uses (Gilles, 2026-10-06: "sur inspector ajoute
 // les 4 images de controle en vignettes toutes petites").
@@ -28,16 +34,17 @@ import { MAP_ITEMS as INSPECTOR_MAP_ITEMS } from "./templates/inspector.js";
 // monitor avec le graphe 'session graph' sans les labels de serie").
 import { buildMonitorGraphPanel } from "./templates/monitor.js";
 
-// Shared by renderLogs() (the full-page Logs system view) and
-// renderLogPanel() (the always-on floating one, below) - index == the
-// wire's own `l` field (server-messages.en.md's "l" message: 0 Debug, 1
-// Info, 2 Warning, 3 Error, 4 Critical).
+// index == the wire's own `l` field (server-messages.en.md's "l" message:
+// 0 Debug, 1 Info, 2 Warning, 3 Error, 4 Critical) - used by
+// renderLogPanel() below, the always-on floating log panel.
 const LOG_LEVELS = ["debug", "info", "warning", "error", "critical"];
 
 // Horizontal module bar (ostnoctua's .on-modbar/.on-mod, see panels.css) —
-// only the actually-loaded OST modules. Controller/Files/Logs live in the
-// settings dropdown instead (see renderSystemViews) — Gilles, 2026-09-25:
-// "deplace les boutons controller/files/logs dans les settings".
+// only the actually-loaded OST modules. Controller is reached from the
+// power button instead (app.js's own conn-toggle handler) — Gilles,
+// 2026-09-25: "deplace les boutons controller/files/logs dans les
+// settings", then 2026-10-18: folded Files/connection settings into
+// Controller itself rather than keeping them as separate destinations.
 //
 // Returns {node, dispose}: node is a DocumentFragment, not a wrapping <div>
 // — #modbar itself is the flex row (panels.css), and .mod-btn is
@@ -56,14 +63,18 @@ export function renderModbar(client, activeKey, onSelect) {
   // liste des modules [...] inspire toi de osterix qui a une telle page".
   // Not a real backend module (no entry in `names`, no "signals" to
   // subscribe to), but it belongs IN the modbar itself, first position,
-  // same look as a module button - unlike Controller/Files/Logs which are
-  // this client's own chrome and live in the settings dropdown instead
-  // (see renderSystemViews above). "__home" follows that same sentinel
-  // naming convention for app.js's activeView.
-  bar.appendChild(el("button", {
-    class: "mod-btn" + (activeKey === "__home" ? " active" : ""), title: t("views.home"),
-    onclick: () => onSelect("__home"),
-  }, [icon("home"), el("span", { class: "mod-btn-label", text: t("views.home") })]));
+  // same look as a module button - unlike Controller, which is this
+  // client's own chrome and is reached from the power button instead.
+  // "__home" follows that same sentinel naming convention for app.js's
+  // activeView. Hidden while disconnected: its cards are per-module (plus
+  // the system-load card), so with no modules loaded it would just show
+  // that one card and look like a broken/pointless destination.
+  if (client.connection.status === "connected") {
+    bar.appendChild(el("button", {
+      class: "mod-btn" + (activeKey === "__home" ? " active" : ""), title: t("views.home"),
+      onclick: () => onSelect("__home"),
+    }, [icon("home"), el("span", { class: "mod-btn-label", text: t("views.home") })]));
+  }
   for (const name of names) {
     const mod = client.get(client.topics.module(name));
     const label = (mod && (mod.infos.modulelabel || mod.infos.label)) || name;
@@ -164,28 +175,6 @@ export function renderQuickNav(entries) {
     bar.appendChild(btn);
   }
   return bar;
-}
-
-// The three system/utility screens, rendered as a small vertical list inside
-// the settings dropdown (#conn-panel) instead of the module bar — they
-// aren't OST modules, they're this client's own chrome, so grouping them
-// with the other app-level settings reads better than mixing them into the
-// live module list.
-const SYSTEM_VIEWS = [
-  { key: "__controller", get label() { return t("views.controller"); }, icon: "tune" },
-  { key: "__files", get label() { return t("views.files"); }, icon: "folder" },
-  { key: "__logs", get label() { return t("views.logs"); }, icon: "list" },
-];
-export function renderSystemViews(activeKey, onSelect) {
-  const nav = el("div", { class: "settings-nav" });
-  for (const item of SYSTEM_VIEWS) {
-    const btn = el("button", { class: "settings-nav-item" + (activeKey === item.key ? " active" : ""), onclick: () => onSelect(item.key) }, [
-      icon(item.icon, { small: true }),
-      el("span", { text: item.label }),
-    ]);
-    nav.appendChild(btn);
-  }
-  return nav;
 }
 
 // ---- home dashboard -------------------------------------------------------
@@ -719,12 +708,6 @@ export function renderLogin(client, onDone) {
   document.body.appendChild(overlay);
 }
 
-function fmtBytes(mb) {
-  if (mb === undefined) return "—";
-  if (mb > 1024) return (mb / 1024).toFixed(1) + " GB";
-  return mb.toFixed(0) + " MB";
-}
-
 // ---- INDI server & drivers panel -----------------------------------------
 // Extracted out of renderController() (issue #238) so the setup wizard's own
 // first step (wizard.js) can reuse the exact same controls instead of
@@ -783,20 +766,24 @@ export function buildIndiPanel(client, scope, onChange) {
   indiSec.appendChild(indiExternalMsg);
 
   // FIFO-only controls: starting/stopping the embedded process itself,
-  // loading a saved driver configuration, loading a new driver from the
-  // catalogue. Hidden whenever OST doesn't manage the server.
-  const manageControls = el("div", { class: "hidden" });
+  // loading a saved driver configuration. Hidden whenever OST doesn't
+  // manage the server. Split from manageControlsBottom below (the
+  // catalogue search/start section) so Active drivers can sit between the
+  // two - both halves still hide/show together, see renderIndi().
+  const manageControlsTop = el("div", { class: "hidden" });
   const indiServerToggleBtn = el("button", { class: "btn btn-sm" }, t("views.startServer"));
   // Only meaningful while the embedded server is actually confirmed
   // running ("U") - loading a configuration while it's down or starting
   // would just fail silently, same reasoning as the rest of this panel's
   // own enabled/disabled split.
   const indiLoadConfigBtn = el("button", { class: "btn btn-sm hidden", onclick: () => openIndiConfigDialog(client) }, [icon("folder_open", { small: true }), t("views.loadIndiConfiguration")]);
-  manageControls.appendChild(el("div", { class: "form-row" }, [indiServerToggleBtn, indiLoadConfigBtn]));
-  indiSec.appendChild(manageControls);
+  manageControlsTop.appendChild(el("div", { class: "form-row" }, [indiServerToggleBtn, indiLoadConfigBtn]));
+  indiSec.appendChild(manageControlsTop);
 
   // Active drivers (indiactivedrivers) - shown either way, see this
-  // function's own doc comment above.
+  // function's own doc comment above. Ahead of the "start a driver"
+  // catalogue below it (a separate, less-often-used action), with a
+  // separator between the two.
   const connectAllBtn = el("button", { class: "btn btn-sm", onclick: connectAll }, t("views.connectAll"));
   indiSec.appendChild(el("div", { class: "panel-header-row" }, [
     el("div", { class: "muted small", text: t("views.activeIndiDrivers") }),
@@ -804,6 +791,10 @@ export function buildIndiPanel(client, scope, onChange) {
   ]));
   const activeDriversList = el("ul");
   indiSec.appendChild(activeDriversList);
+
+  const manageControlsBottom = el("div", { class: "hidden" });
+  manageControlsBottom.appendChild(el("div", { class: "settings-sep" }));
+  indiSec.appendChild(manageControlsBottom);
 
   // Gilles, 2026-10-13 (both here and the setup wizard's own step 1, which
   // reuses this same panel - see this function's own doc comment): one
@@ -821,12 +812,12 @@ export function buildIndiPanel(client, scope, onChange) {
   // result with its own "start" button. Filtering only kicks in from 3
   // characters - the catalogue is in the hundreds on a full INDI install,
   // not worth listing unfiltered. Starting a new driver needs the FIFO,
-  // so this whole zone lives in manageControls too.
-  manageControls.appendChild(el("div", { class: "muted small", text: t("views.startIndiDriver") }));
+  // so this whole zone lives in manageControlsBottom too.
+  manageControlsBottom.appendChild(el("div", { class: "muted small", text: t("views.startIndiDriver") }));
   const driverSearchInput = el("input", { type: "text", class: "field-input", placeholder: t("views.indiDriverSearchPlaceholder") });
-  manageControls.appendChild(driverSearchInput);
+  manageControlsBottom.appendChild(driverSearchInput);
   const availableDriversList = el("ul");
-  manageControls.appendChild(availableDriversList);
+  manageControlsBottom.appendChild(availableDriversList);
 
   // Case- and accent-insensitive: NFD-normalize then strip the combining
   // diacritical marks Unicode splits accents into, so "é" and "e" compare
@@ -855,7 +846,8 @@ export function buildIndiPanel(client, scope, onChange) {
     const enabled = indiserver !== "N";
     indiTitle.textContent = t("views.indiServerPrefix") + (enabled ? t("views.enabled") : t("views.disabled"));
     indiExternalMsg.classList.toggle("hidden", enabled);
-    manageControls.classList.toggle("hidden", !enabled);
+    manageControlsTop.classList.toggle("hidden", !enabled);
+    manageControlsBottom.classList.toggle("hidden", !enabled);
     if (enabled) {
       const running = indiserver === "U";
       indiServerToggleBtn.textContent = running ? t("views.stopServer") : t("views.startServer");
@@ -866,11 +858,11 @@ export function buildIndiPanel(client, scope, onChange) {
     connectAllBtn.disabled = activeDrivers.length === 0;
     activeDriversList.innerHTML = "";
     for (const d of activeDrivers) {
-      // Two lines - label, then icon buttons below it - rather than
-      // cramming four buttons on the same row as the label (Gilles,
-      // 2026-10-09: that overflowed the panel on a narrow column).
-      const li = el("li", { class: "indi-driver-row" });
-      li.appendChild(el("div", { class: "small", text: `${d.label} (${d.family})` }));
+      // Buttons first, label last (.spacer - takes the rest of the row,
+      // truncating label text before button text) - denser than label
+      // above/buttons below, wraps onto its own line only if the row
+      // genuinely has no room left.
+      const li = el("li");
       const actions = el("div", { class: "icon-btn-row" });
       // Connect/disconnect act on the device itself (YC/YD), separate from
       // the driver process (reload/stop) - starting a driver doesn't
@@ -884,6 +876,7 @@ export function buildIndiPanel(client, scope, onChange) {
         actions.appendChild(iconButton("stop", t("views.stop"), () => client.indiStopDriver(d.binary), { danger: true }));
       }
       li.appendChild(actions);
+      li.appendChild(el("span", { class: "spacer small indi-driver-label", text: `${d.label} (${d.family})` }));
       activeDriversList.appendChild(li);
     }
     if (onChange) onChange();
@@ -896,24 +889,56 @@ export function buildIndiPanel(client, scope, onChange) {
   return indiSec;
 }
 
-export function renderController(client) {
+// Default position for the Nth floating panel this view creates - a
+// three-column mosaic covering all 7 sections in the same order as the
+// quicknav bar (Connection & settings first), rather than render.js's own
+// two-column autoPos() for a module. Only matters for a never-before-seen
+// (scope, id): once the user drags/resizes one, panels.js persists that
+// instead.
+function controllerPanelPos(index) {
+  const cols = 3, w = 380, gap = 20;
+  const col = index % cols, row = Math.floor(index / cols);
+  return { x: 20 + col * (w + gap), y: 100 + row * 260, w };
+}
+
+// `settingsBoxEl`: the static #controller-settings-box node (index.html,
+// app.js's own connect/SSL/discover/language/clear-cache/credits wiring),
+// reparented in below rather than rebuilt here, so every one of app.js's
+// existing listeners on its children keeps working untouched - the node
+// itself survives detached whenever Controller isn't the active view,
+// ready to be reparented back in next time it is.
+export function renderController(client, settingsBoxEl) {
   const root = el("div", { class: "controller-view" });
   const scope = client.scope();
 
-  // Header: git info only - Gilles, 2026-10-09: drop the "Controller"
-  // title and the banner line, both useless here. No live input lives in
-  // this slot, so a redraw on every uc is harmless - unlike the sections
-  // below, there's no need to reach for a per-key topic for git.
-  const headerSlot = el("div");
-  root.appendChild(headerSlot);
-  scope.subscribe(client.topics.controllerData(), (cd) => {
-    cd = cd || {};
-    headerSlot.innerHTML = "";
-    if (cd.git) headerSlot.appendChild(el("div", { class: "muted small mono", text: `${cd.git.Gittag || ""} ${cd.git.Githash || ""} — ${cd.git.Gitdate || ""}` }));
-  });
+  // Every section, including Connection & settings, renders as a floating
+  // panel on the shared #panel-layer instead of a fixed docked grid, same
+  // mechanism a module's own level1 panels use (render.js's
+  // renderModuleView(): draggable, resizable, position/size/collapsed
+  // state persisted per (scope, id) in panels.js). One quicknav entry per
+  // panel shows/hides it, exactly like a module's own quicknav - no
+  // special-cased docked box any more.
+  setPanelsScope("__controller");
+  clearPanels();
+  let i = 0;
+  const quickNavEntries = [];
+  function makeSectionPanel(id, title) {
+    const pos = controllerPanelPos(i++);
+    const body = makePanel({ id, title, x: pos.x, y: pos.y, w: pos.w });
+    quickNavEntries.push({ id, label: title });
+    return body;
+  }
 
-  const grid = el("div", { class: "panel-grid" });
-  root.appendChild(grid);
+  // ---- Connection & settings ----
+  // First in the mosaic (top-left) - unlike every other section below,
+  // never hidden by the disconnect handler, since it's the one thing
+  // still useful while offline.
+  const settingsTitle = t("views.connectionSettings");
+  const settingsBody = makeSectionPanel("settings", settingsTitle);
+  if (settingsBoxEl) {
+    settingsBoxEl.classList.remove("hidden");
+    settingsBody.appendChild(settingsBoxEl);
+  }
 
   // Issue #231: the previous version rebuilt the *entire* view (including
   // the "Load a module" and "Save configuration as" <input>s) from a
@@ -925,32 +950,14 @@ export function renderController(client) {
   // changed") and redraws only its own sub-container, never the inputs
   // that live in the same panel.
 
-  // ---- Server load (systemwatcher) ----
-  // Appended to the grid last (Gilles, 2026-10-09: keep this panel at the
-  // end) — created here regardless, so the subscription below is set up
-  // alongside every other section instead of out of order.
-  const swSec = el("section", { class: "panel hidden" }, [el("h3", { text: t("views.serverLoad") })]);
-  const swBody = el("div");
-  swSec.appendChild(swBody);
-  scope.subscribe(client.topics.controllerData("systemwatcher"), (sw) => {
-    swSec.classList.toggle("hidden", !sw);
-    swBody.innerHTML = "";
-    if (!sw) return;
-    if (sw.cpu) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: t("views.cpuLabel") }), el("span", { class: "value", text: `${sw.cpu.load_1m} / ${sw.cpu.load_5m} / ${sw.cpu.load_15m}` })]));
-    if (sw.ram) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: t("views.ramLabel") }), el("span", { class: "value", text: `${fmtBytes(sw.ram.used_mb)} / ${fmtBytes(sw.ram.total_mb)}` })]));
-    for (const d of sw.disks || []) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: `${d.mountpoint} (${d.device})` }), el("span", { class: "value", text: `${d.used_gb.toFixed(1)} / ${d.total_gb.toFixed(1)} GB` })]));
-    for (const n of sw.network || []) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: n.iface }), el("span", { class: "value", text: `↓${n.rx_kbps.toFixed(1)} ↑${n.tx_kbps.toFixed(1)} kbps` })]));
-    // "temp", not "t" — the latter would shadow the i18n t() used all over this file.
-    for (const temp of sw.temperatures || []) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: temp.type }), el("span", { class: "value", text: `${temp.temp_c.toFixed(1)} °C` })]));
-  });
-
   // ---- Configurations ----
-  const confSec = el("section", { class: "panel" }, [el("h3", { text: t("views.configurations") })]);
+  const confBody = makeSectionPanel("configurations", t("views.configurations"));
+  const confPanelEl = confBody.parentElement;
   const confList = el("ul");
-  confSec.appendChild(confList);
+  confBody.appendChild(confList);
   const nameInput = el("input", { type: "text", class: "field-input", placeholder: t("views.configNamePlaceholder") });
-  confSec.appendChild(el("div", { class: "form-row" }, [nameInput, el("button", { class: "btn btn-primary btn-sm", onclick: () => { if (nameInput.value) client.saveConfiguration(nameInput.value); } }, t("views.saveCurrentAs"))]));
-  grid.appendChild(confSec);
+  const wizardBtn = el("button", { class: "btn btn-sm", onclick: () => openSetupWizard(client) }, [icon("auto_fix_high", { small: true }), t("wizard.title")]);
+  confBody.appendChild(el("div", { class: "form-row" }, [nameInput, el("button", { class: "btn btn-primary btn-sm", onclick: () => { if (nameInput.value) client.saveConfiguration(nameInput.value); } }, t("views.saveCurrentAs")), wizardBtn]));
   function renderConfigurations() {
     const confs = client.get(client.topics.controllerData("availableconfs")) || {};
     const currentconf = client.get(client.topics.controllerData("currentconf"));
@@ -977,12 +984,11 @@ export function renderController(client) {
   // nothing to kill, kept in sync by the same subscription that redraws
   // the list.
   const killAllBtn = el("button", { class: "btn btn-sm btn-danger", text: t("views.killAll"), onclick: killAll });
-  const modSec = el("section", { class: "panel" }, [
-    el("div", { class: "panel-header-row" }, [el("h3", { text: t("views.loadedModules") }), killAllBtn]),
-  ]);
+  const modBody = makeSectionPanel("modules", t("views.loadedModules"));
+  const modPanelEl = modBody.parentElement;
+  modBody.appendChild(el("div", { class: "form-row" }, [killAllBtn]));
   const modList = el("ul");
-  modSec.appendChild(modList);
-  grid.appendChild(modSec);
+  modBody.appendChild(modList);
   function killAll() {
     const names = (client.get(client.topics.modules()) || []).filter((n) => n !== "GlobalDatastore");
     if (names.length === 0) return;
@@ -1011,14 +1017,14 @@ export function renderController(client) {
   // first letter uppercased and the rest lowercased (see
   // controller.en.md's "profiles keying" warning — not a plain capitalize,
   // and not the same string as libSelect's own stripped value).
-  const libSec = el("section", { class: "panel" }, [el("h3", { text: t("views.loadAModule") })]);
+  const libBody = makeSectionPanel("load-module", t("views.loadAModule"));
+  const libPanelEl = libBody.parentElement;
   const libSelect = el("select", { class: "field-input" });
   const labelInput = el("input", { type: "text", class: "field-input", placeholder: t("views.instanceLabelPlaceholder") });
   const profileSelect = el("select", { class: "field-input" });
-  libSec.appendChild(el("div", { class: "form-row" }, [libSelect, labelInput, profileSelect,
+  libBody.appendChild(el("div", { class: "form-row" }, [libSelect, labelInput, profileSelect,
     el("button", { class: "btn btn-primary btn-sm", onclick: () => { if (labelInput.value) client.loadModule(libSelect.value, labelInput.value, profileSelect.value || undefined); } }, t("views.load")),
   ]));
-  grid.appendChild(libSec);
 
   // Rebuilds profileSelect's options for whichever library is currently
   // selected. Called both when `profiles` itself updates and when the
@@ -1053,100 +1059,89 @@ export function renderController(client) {
   scope.subscribe(client.topics.controllerData("profiles"), renderProfiles);
 
   // ---- INDI server & drivers ----
-  grid.appendChild(buildIndiPanel(client, scope));
+  const indiBody = makeSectionPanel("indi", "INDI");
+  const indiPanelEl = indiBody.parentElement;
+  // buildIndiPanel() is shared with wizard.js's own step container, which
+  // isn't itself boxed - strip its own .panel framing here only, so it
+  // doesn't double up with the floating panel's own border/padding.
+  const indiNode = buildIndiPanel(client, scope);
+  indiNode.classList.remove("panel");
+  indiBody.appendChild(indiNode);
 
-  grid.appendChild(swSec);
-
-  return { node: root, dispose: scope.dispose };
-}
-
-function buildFolderTree(folders) {
-  const root = { name: "", path: "", children: new Map() };
-  for (const path of folders) {
-    if (path === "") continue;
-    const parts = path.split("/").filter(Boolean);
-    let node = root;
-    let acc = "";
-    for (const part of parts) {
-      acc += "/" + part;
-      if (!node.children.has(part)) node.children.set(part, { name: part, path: acc, children: new Map() });
-      node = node.children.get(part);
-    }
-  }
-  return root;
-}
-
-function renderFolderNode(node, client, depth) {
-  const wrap = el("div", { class: "folder-node", style: `padding-left:${depth * 14}px` });
-  const btn = el("button", { class: "folder-btn" }, [icon("folder", { small: true }), el("span", { text: node.name || t("views.rootFolder") })]);
-  btn.addEventListener("click", () => client.selectFolder(node.path));
-  wrap.appendChild(btn);
-  const children = Array.from(node.children.values()).sort((a, b) => a.name.localeCompare(b.name));
-  for (const child of children) wrap.appendChild(renderFolderNode(child, client, depth + 1));
-  return wrap;
-}
-
-export function renderFiles(client, mediaBaseUrl) {
-  const root = el("div", { class: "files-view" });
-  const scope = client.scope();
-
-  scope.subscribe(client.topics.files(), (files) => {
-    files = files || { folders: [], files: [], selectedfolder: "" };
-    root.innerHTML = "";
-    root.appendChild(el("h2", null, [icon("folder"), el("span", { text: " " + t("views.files") })]));
-    const layout = el("div", { class: "files-layout" });
-    const tree = buildFolderTree(files.folders || []);
-    const treeWrap = el("div", { class: "folder-tree" });
-    // The selected folder in the dump is an absolute server-side path, not
-    // the relative path used for navigation/FS — we cannot reliably
-    // highlight the active node from it alone (see ostcore/FINDINGS.md), so
-    // no node is marked "active" here.
-    treeWrap.appendChild(renderFolderNode(tree, client, 0));
-    layout.appendChild(treeWrap);
-
-    const listWrap = el("div", { class: "file-list-wrap" });
-    listWrap.appendChild(el("div", { class: "muted small mono", text: t("views.selectedPrefix") + (files.selectedfolder || t("views.none")) }));
-    const fgrid = el("div", { class: "file-grid" });
-    for (const f of files.files || []) {
-      const url = mediaBaseUrl + (f.startsWith("/") ? f.slice(1) : f);
-      const lower = f.toLowerCase();
-      const isImg = /\.(jpe?g|png|gif|webp)$/.test(lower);
-      const card = el("a", { href: url, target: "_blank", class: "file-card" });
-      if (isImg) card.appendChild(el("img", { src: url, class: "file-thumb" }));
-      else card.appendChild(icon("description", { small: false }));
-      card.appendChild(el("div", { class: "file-name", text: f.split("/").pop() }));
-      fgrid.appendChild(card);
-    }
-    if (!(files.files || []).length) fgrid.appendChild(el("div", { class: "muted small", text: t("views.noFilesInFolder") }));
-    listWrap.appendChild(fgrid);
-    layout.appendChild(listWrap);
-    root.appendChild(layout);
+  // ---- Server load (systemwatcher) ----
+  const swBody = makeSectionPanel("server-load", t("views.serverLoad"));
+  const swPanelEl = swBody.parentElement;
+  let swConnected = false, swHasData = false;
+  function updateSwVisibility() { swPanelEl.classList.toggle("hidden", !(swConnected && swHasData)); }
+  scope.subscribe(client.topics.controllerData("systemwatcher"), (sw) => {
+    swHasData = !!sw;
+    updateSwVisibility();
+    swBody.innerHTML = "";
+    if (!sw) return;
+    // Same ring-gauge treatment as the Home dashboard's own system card
+    // (ringGauge() above) for RAM/disks - every disk here, not just the
+    // compact card's first two.
+    const rings = el("div", { class: "home-ring-row" });
+    if (sw.ram) rings.appendChild(ringGauge((sw.ram.used_mb / sw.ram.total_mb) * 100, t("views.ramLabel")));
+    for (const d of sw.disks || []) rings.appendChild(ringGauge((d.used_gb / d.total_gb) * 100, d.mountpoint));
+    if (rings.children.length) swBody.appendChild(rings);
+    if (sw.cpu) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: t("views.cpuLabel") }), el("span", { class: "value", text: `${sw.cpu.load_1m} / ${sw.cpu.load_5m} / ${sw.cpu.load_15m}` })]));
+    for (const n of sw.network || []) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: n.iface }), el("span", { class: "value", text: `↓${n.rx_kbps.toFixed(1)} ↑${n.tx_kbps.toFixed(1)} kbps` })]));
+    // "temp", not "t" — the latter would shadow the i18n t() used all over this file.
+    for (const temp of sw.temperatures || []) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: temp.type }), el("span", { class: "value", text: `${temp.temp_c.toFixed(1)} °C` })]));
   });
 
-  return { node: root, dispose: scope.dispose };
-}
+  // ---- Files ----
+  // Gilles, 2026-10-18: the old folder-tree/file-grid UI is being redone
+  // from scratch - a placeholder button + dialog until then, rather than
+  // the half-working previous version.
+  const filesBody = makeSectionPanel("files", t("views.files"));
+  const filesPanelEl = filesBody.parentElement;
+  filesBody.appendChild(el("button", { class: "btn btn-sm", onclick: openFilesWipDialog }, t("views.files")));
 
-export function renderLogs(client) {
-  const root = el("div", { class: "logs-view" });
-  const scope = client.scope();
+  updateQuickNav(quickNavEntries);
 
-  scope.subscribe(client.topics.logs(), (logs) => {
-    root.innerHTML = "";
-    root.appendChild(el("h2", null, [icon("list"), el("span", { text: " " + t("views.logs") })]));
-    root.appendChild(el("div", { class: "log-toolbar muted small", text: `${(logs || []).length} ${t("views.entriesCappedSuffix")}` }));
-    const table = el("table", { class: "log-table" });
-    for (const entry of (logs || []).slice().reverse()) {
-      const lvl = LOG_LEVELS[entry.l] || "info";
-      table.appendChild(el("tr", { class: "log-row log-" + lvl }, [
-        el("td", { class: "small muted mono", text: entry.d }),
-        el("td", { class: "small mono", text: entry.c }),
-        el("td", { text: entry.t }),
-      ]));
+  // Every panel but the settings box reads live server data with nothing
+  // meaningful to show while disconnected - Gilles, 2026-10-18: hidden
+  // instead of sitting there empty. onStatus() fires immediately with the
+  // current status too, so this also covers the very first render. Their
+  // quicknav buttons are disabled right alongside, rather than left
+  // clickable toggles for a panel that's hidden regardless.
+  const otherPanels = [confPanelEl, modPanelEl, libPanelEl, indiPanelEl, filesPanelEl];
+  const toggleableIds = quickNavEntries.map((e) => e.id).filter((id) => id !== "settings");
+  const unsubStatus = client.onStatus((status) => {
+    const connected = status === "connected";
+    for (const panelEl of otherPanels) panelEl.classList.toggle("hidden", !connected);
+    for (const id of toggleableIds) {
+      const btn = getQuickNavButton(id);
+      if (btn) btn.disabled = !connected;
     }
-    root.appendChild(table);
+    swConnected = connected;
+    updateSwVisibility();
   });
 
-  return { node: root, dispose: scope.dispose };
+  return {
+    node: root,
+    dispose: () => {
+      scope.dispose();
+      unsubStatus();
+      updateQuickNav([]);
+      if (settingsBoxEl) settingsBoxEl.classList.add("hidden");
+    },
+  };
+}
+
+function openFilesWipDialog() {
+  const overlay = el("div", { class: "dialog-overlay" });
+  const close = () => overlay.remove();
+  const dialog = el("div", { class: "dialog" }, [
+    el("h3", { text: t("views.files") }),
+    el("p", { text: t("views.filesWip") }),
+    el("div", { class: "dialog-actions" }, [el("button", { class: "btn", onclick: close }, t("common.cancel"))]),
+  ]);
+  overlay.appendChild(dialog);
+  overlay.addEventListener("click", (ev) => { if (ev.target === overlay) close(); });
+  document.getElementById("dialog-root").appendChild(overlay);
 }
 
 // ---- always-on floating log panel ----------------------------------------
@@ -1227,11 +1222,10 @@ export function renderLogPanel(client, initialModule) {
     // Gilles, 2026-10-06: "la fenetre de logs (partout sur tous les
     // modules) doit afficher le dernier message en premier, sinon on est
     // oblige de scroller pour voir les trucs recents" - newest first
-    // (reversed from the wire's own append order, same as renderLogs()'s
-    // full-page Logs view already does), and the "stay pinned so new
-    // entries remain visible without having to re-scroll" check flips
-    // from atBottom to atTop to match: new rows now land at the TOP, not
-    // the bottom.
+    // (reversed from the wire's own append order), and the "stay pinned
+    // so new entries remain visible without having to re-scroll" check
+    // flips from atBottom to atTop to match: new rows now land at the
+    // TOP, not the bottom.
     const atTop = list.scrollTop < 24;
     list.innerHTML = "";
     for (const entry of (logs || []).filter(passes).slice().reverse()) {

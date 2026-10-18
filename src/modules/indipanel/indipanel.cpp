@@ -15,6 +15,29 @@ IndiPanel::IndiPanel(QString name, QString label, QString profile, QVariantMap a
     setMetadata("thisGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
     setMetadata("description", "Indi control panel");
     setMetadata("thisversion", QString::fromStdString(Version::GIT_TAG));
+    setMetadata("template", "indipanel");
+
+    // Own jpegquality setting, same shape as IndiModule::defineMeAsImager()'s
+    // (indimodule.cpp) but hardcoded here rather than inherited from it -
+    // this module isn't an imager (defineMeAsImager() would also pull in
+    // exposure/gain/offset/bitdepth, meaningless for a generic device
+    // panel), yet it saves JPEGs from any BLOB property it comes across
+    // (onNewProperty()/onUpdateProperty()) and small/slow setups still need
+    // a way to trade quality for less work there. Lower default than the
+    // imager one (75 vs 100): those modules show one camera's own live
+    // feed, this one can be saving several devices' BLOBs at once.
+    giveMeAParms();
+    if (!getStore()["parms"]->getElts()->contains("jpegquality"))
+    {
+        OST::ElementInt* i = new OST::ElementInt("jpegquality", "Jpeg quality", "exp050", "");
+        i->setValue(75, false);
+        i->setDirectEdit(true);
+        i->setAutoUpdate(true);
+        i->setMinMax(10, 100, false);
+        i->setStep(10, false);
+        i->setSlider(OST::SliderAndValue, false);
+        getProperty("parms")->addElt(i);
+    }
 
     connectIndi();
 }
@@ -23,27 +46,36 @@ IndiPanel::~IndiPanel()
 {
 
 }
+
+// Reproduces KStars' own INDI panel devcat ordering: Main Control,
+// Connection, Options, then everything else in arrival order, General
+// Info always last. render.js sorts level2 groups (and properties within
+// one) by this string alone (buildLayout()) - without it every property
+// shared the same hardcoded "00" order, an unstable tie with no real
+// ranking at all. The trailing _orderSeq keeps that arrival-order
+// guarantee for groups sharing the same rank (every "else" group, and
+// properties within any single group).
+QString IndiPanel::groupOrder(const QString &group)
+{
+    QString rank = "5";
+    if (group == "Main Control") rank = "1";
+    else if (group == "Connection") rank = "2";
+    else if (group == "Options") rank = "3";
+    else if (group == "General Info") rank = "9";
+    return rank + QString("%1").arg(_orderSeq++, 5, 10, QChar('0'));
+}
+// A device has none of its properties yet at this point (they stream in
+// right after, one newProperty() call each) - onNewProperty() alone
+// already builds every property correctly (elements, group order, BLOB
+// handling), so there is nothing left to do here.
 void IndiPanel::onNewDevice(INDI::BaseDevice dp)
 {
-    auto props = dp.getProperties();
-
-    for (auto pProperty : props)
-    {
-        QString dev = pProperty.getDeviceName();
-        QString pro = pProperty.getName();
-        QString devpro = dev + pro;
-        QString mess;
-        OST::PropertyMulti *pm = new OST::PropertyMulti(devpro, pProperty.getLabel(),
-                OST::IntToPermission(pProperty.getPermission()),
-                pProperty.getDeviceName(),
-                pProperty.getGroupName(), "00", false, false);
-        createProperty(pm);
-    }
+    Q_UNUSED(dp);
 }
 void IndiPanel::onRemoveDevice(INDI::BaseDevice dp)
 {
-    for(const QString &key : getStore().keys())    {
-        getProperty(key)->level1();
+    for(const QString &key : getStore().keys())
+    {
         if (strcmp(dp.getDeviceName(), getProperty(key)->level1().toStdString().c_str()) == 0)
         {
             deleteOstProperty(key);
@@ -64,11 +96,10 @@ void IndiPanel::onNewProperty(INDI::Property pProperty)
     if (pProperty.getType() != INDI_BLOB) group = pProperty.getGroupName();
     else group = pProperty.getLabel();
 
-
     OST::PropertyMulti* p = new OST::PropertyMulti(devpro, pProperty.getLabel(),
             OST::IntToPermission(pProperty.getPermission()),
             pProperty.getDeviceName(),
-            group, "00", false, false);
+            group, groupOrder(group), false, false);
     p->setFreeValue(dev); // we keep original device name to avoid unwanted level1 device translations
     p->setState(OST::IntToState(pProperty.getState()), false);
 
@@ -149,11 +180,20 @@ void IndiPanel::onNewProperty(INDI::Property pProperty)
                 OST::ImgData dta;
                 if (_image->loadBlob(b, 64, i))
                 {
+                    stats = _image->getStats();
                     QImage rawImage = _image->getRawQImage();
-                    atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg");
+                    // Keyed by element name (CCD1/CCD2/...), not label - the
+                    // label is free-form display text with no uniqueness
+                    // guarantee, two chips on the same device can share one
+                    // (a dual-sensor camera not modeled as a classic
+                    // primary+guide head, where only the base class happens
+                    // to hardcode distinct labels). The name is what the
+                    // protocol itself guarantees unique per device.
+                    atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".jpeg",
+                                   getInt("parms", "jpegquality"));
                     dta = _image->ImgStats();
-                    dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg";
-                    dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".FITS";
+                    dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".jpeg";
+                    dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".FITS";
                 }
                 ei->setValue(dta, true);
                 p->addElt(ei);
@@ -252,11 +292,15 @@ void IndiPanel::onUpdateProperty (INDI::Property property)
 
                 if (_image->loadBlob(b, 64, i))
                 {
+                    stats = _image->getStats();
                     QImage rawImage = _image->getRawQImage();
-                    atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg");
+                    // Same path as onNewProperty()'s own BLOB case - keyed
+                    // by element name, not label, see its comment.
+                    atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".jpeg",
+                                   getInt("parms", "jpegquality"));
                     dta = _image->ImgStats();
-                    dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".jpeg";
-                    dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].label + ".FITS";
+                    dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".jpeg";
+                    dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".FITS";
                 }
                 ei->setValue(dta, true);
             }

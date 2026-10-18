@@ -248,37 +248,19 @@
  * 2026-10-03: "diminue la taille du bouton connection = taille identique
  * au toggle jour/nuit, juste icone power_settings_new ... avec la couleur
  * qui change en fonction de l'etat de la connection (pas de libelle)".
- * Click anywhere on it to fold out the full settings (brand/URL/media
- * URL/language/connect); .conn-toggle itself only carries the
- * status-based colour now (app.js's own onStatus()) - connecting pulses
- * the same way a module button's own "busy" status dot already does
- * (.status-dot.status-busy, panels.css above), not a colour of its own. */
+ * .conn-toggle itself only carries the status-based colour now (app.js's
+ * own onStatus()) - connecting pulses the same way a module button's own
+ * "busy" status dot already does (.status-dot.status-busy, panels.css
+ * above), not a colour of its own. Gilles, 2026-10-18: used to fold out a
+ * dropdown of its own (#conn-panel, .settings-nav) - jumps straight to the
+ * Controller screen instead now, so there is nothing left to toggle open
+ * here; #controller-settings-box (index.html) is one of Controller's own
+ * floating panels instead, no dropdown-specific CSS of its own. */
 #conn-widget { position: relative; flex-shrink: 0; }
 .conn-toggle.status-connected { color: var(--ok); }
 .conn-toggle.status-connecting { color: var(--busy); animation: pulse-dot 1s ease-in-out infinite; }
 .conn-toggle.status-disconnected { color: var(--error); }
-.conn-panel {
-  position: absolute; top: calc(100% + 6px); right: 0; z-index: 30;
-  display: flex; flex-direction: column; gap: 8px;
-  width: 280px; padding: var(--space-3);
-}
-/* .hidden (base.css, !important) toggles this panel's visibility. */
 
-/* Controller/Files/Logs — this client's own chrome, not OST modules, so
-   they live here as a small settings-style list instead of in #modbar
-   (Gilles, 2026-09-25). */
-.settings-nav { display: flex; flex-direction: column; gap: 1px; margin: 0 calc(var(--space-3) * -1); }
-.settings-nav-item {
-  display: flex; align-items: center; gap: 8px;
-  padding: 7px var(--space-3);
-  background: none; border: none; border-radius: 0;
-  color: var(--text-secondary); cursor: pointer; font: inherit; font-size: 12.5px; text-align: left;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-.settings-nav-item:hover { background: var(--bg-hover); color: var(--text); }
-.settings-nav-item.active { background: var(--accent-subtle); color: var(--accent-strong); font-weight: 600; }
-.settings-nav-item .material-icons { font-size: 16px; color: var(--text-muted); flex-shrink: 0; }
-.settings-nav-item.active .material-icons { color: var(--accent); }
 .settings-sep { height: 1px; background: var(--border); margin: 2px 0; }
 
 /* ------------------------------------------------------------- canvas ---

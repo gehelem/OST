@@ -7,15 +7,14 @@
 // shared canvas instead of a single docked node — see renderContentNow().
 
 import { createClient, deriveUrlsFromHost, cleanHost, normalizeMediaUrl } from "../core/index.js";
-import { renderModuleView, buildParamsPanel, setMediaBaseUrl, getMediaBaseUrl, setDialogRoot, setQuickNavRoot, getDisableTemplates } from "./render.js";
-import { renderModbar, renderSystemViews, renderHome, renderController, renderFiles, renderLogs, renderLogin, renderLogPanel } from "./views.js";
-import { openSetupWizard } from "./wizard.js";
+import { renderModuleView, buildParamsPanel, setMediaBaseUrl, setDialogRoot, setQuickNavRoot, getDisableTemplates } from "./render.js";
+import { renderModbar, renderHome, renderController, renderLogin, renderLogPanel } from "./views.js";
 import { openCreditsDialog } from "./credits.js";
 import { el, icon, iconButton } from "./dom.js";
 import * as Panels from "./panels.js";
 import { setBgLayer } from "./imagelayer.js";
 import { templates } from "./templates/index.js";
-import { setLanguage, t } from "./i18n.js";
+import { setLanguage, getLanguage, t } from "./i18n.js";
 import * as zeroconf from "./zeroconf.js";
 import { showToast } from "./toast.js";
 
@@ -25,7 +24,6 @@ const modbarEl = document.getElementById("modbar");
 const topRightEl = document.getElementById("top-right");
 const topRightMoreEl = document.getElementById("top-right-more");
 const topRightItemsEl = document.getElementById("top-right-items");
-const systemViewsEl = document.getElementById("system-views");
 const panelLayerEl = document.getElementById("panel-layer");
 const dockedViewEl = document.getElementById("docked-view");
 const quicknavEl = document.getElementById("quicknav");
@@ -55,9 +53,11 @@ panelLayerEl.addEventListener("panelvisibility", (ev) => {
 // panels.css's own comment for why that doesn't cost #panel-layer's
 // wheel-scroll capability (togglePanel()'s scrollIntoView() is the actual
 // established way to reach an off-screen panel, not manual scrolling).
-const connWidgetEl = document.getElementById("conn-widget");
 const connToggleEl = document.getElementById("conn-toggle");
-const connPanelEl = document.getElementById("conn-panel");
+const settingsBoxEl = document.getElementById("controller-settings-box");
+const recentServersTitleEl = document.getElementById("recent-servers-title");
+const recentServersListEl = document.getElementById("recent-servers-list");
+const langButtonsEl = document.getElementById("lang-buttons");
 const grantPill = document.getElementById("grant-pill");
 const serverHostInput = document.getElementById("server-host");
 const serverSslToggleEl = document.getElementById("server-ssl-toggle");
@@ -70,25 +70,26 @@ const paramsToggleEl = document.getElementById("params-toggle");
 const dialogRootEl = document.getElementById("dialog-root");
 const connectBtnLabelEl = document.getElementById("connect-btn-label");
 const disconnectBtnLabelEl = document.getElementById("disconnect-btn-label");
-const versionInfoEl = document.getElementById("version-info");
-const versionInfoTagEl = document.getElementById("version-info-tag");
-const versionInfoMessageEl = document.getElementById("version-info-message");
 const clearCacheBtnEl = document.getElementById("clear-cache-btn");
 const clearCacheBtnLabelEl = document.getElementById("clear-cache-btn-label");
 const discoverRowEl = document.getElementById("discover-row");
 const discoverBtnEl = document.getElementById("discover-btn");
 const discoverBtnLabelEl = document.getElementById("discover-btn-label");
 const discoverResultsEl = document.getElementById("discover-results");
-const setupWizardBtnEl = document.getElementById("setup-wizard-btn");
-const setupWizardBtnLabelEl = document.getElementById("setup-wizard-btn-label");
 const creditsBtnEl = document.getElementById("credits-btn");
 const creditsBtnLabelEl = document.getElementById("credits-btn-label");
+
+// Highlights whichever flag button matches the current language.
+function syncLangButtons() {
+  const current = getLanguage();
+  for (const btn of langButtonsEl.querySelectorAll(".lang-flag-btn")) btn.classList.toggle("active", btn.dataset.lang === current);
+}
 
 // Static chrome (this file's own top-right icon chips + the connect bar) is
 // never rebuilt from a server dump the way a module's panels are, so a
 // language change needs to touch it explicitly — called once at boot and
-// again every time the language actually changes (connect, or the
-// lang-select's own change handler below). Everything else UI3-local
+// again every time the language actually changes (connect, or a flag
+// button's own click handler below). Everything else UI3-local
 // (module panels, system views, login...) is rebuilt from client-driven
 // events that already run after setLanguage() has updated i18n.js's
 // current language, so those pick it up for free.
@@ -105,7 +106,9 @@ function applyStaticLabels() {
   creditsBtnLabelEl.textContent = t("credits.title");
   discoverBtnLabelEl.textContent = t("chrome.discover");
   connToggleEl.title = t("status." + client.connection.status);
-  setupWizardBtnLabelEl.textContent = t("wizard.title");
+  syncLangButtons();
+  recentServersTitleEl.textContent = t("chrome.recentServers");
+  renderRecentServers();
 }
 
 // A button, not a checkbox (render.js's own boolean-element convention,
@@ -119,25 +122,17 @@ function setSsl(on) {
 }
 serverSslToggleEl.addEventListener("click", () => setSsl(!sslOn()));
 
-// ---- connection widget: collapsed status pill, click (or connecting/
-// disconnected) to fold out the full settings — Gilles, 2026-09-25: "settings
-// general et connexion en haut a droite (version minimale si connexion OK,
-// clic dessus ca la deplie)".
-function setConnPanelOpen(open) {
-  connPanelEl.classList.toggle("hidden", !open);
-  connWidgetEl.classList.toggle("open", open);
-}
-connToggleEl.addEventListener("click", () => setConnPanelOpen(connPanelEl.classList.contains("hidden")));
+// Jumps straight to Controller (selectView(), below), connected or not -
+// #controller-settings-box (index.html) is one of Controller's own
+// floating panels (views.js's renderController()), not toggled open/closed
+// here.
+connToggleEl.addEventListener("click", () => selectView("__controller"));
 loginToggleEl.addEventListener("click", () => renderLogin(client));
 // Gilles, 2026-10-03: "quand on clique depuis un module ca selectionne
 // les messages du module" - isModuleView()/activeView defined further
 // down (function hoisting - this only runs on an actual click, long after
 // the whole module has loaded, so the forward reference is fine).
 logToggleEl.addEventListener("click", () => renderLogPanel(client, isModuleView() ? activeView : null));
-document.addEventListener("click", (ev) => {
-  if (!connPanelEl.classList.contains("hidden") && !connWidgetEl.contains(ev.target)) setConnPanelOpen(false);
-});
-setConnPanelOpen(true); // nothing connected yet at boot: start open so the fields are reachable
 
 // ---- top-right collision collapse — Gilles, 2026-10-16: "sur smartphone
 // en mode portrait les deux menus du haut arrivent a se superposer ...
@@ -185,7 +180,7 @@ window.addEventListener("orientationchange", queueTopRightCollapseUpdate);
 
 setDialogRoot(document.getElementById("dialog-root"));
 
-let activeView = null; // module name, or "__controller"/"__files"/"__logs", or null
+let activeView = null; // module name, or "__home"/"__controller", or null
 let contentDispose = null; // disposes whatever subscriptions the current content view opened
 let loginShown = false;
 // Declared up here, not just above renderModbarNow() itself: client.onStatus()
@@ -210,11 +205,34 @@ function saveHistory(entry) {
   try { localStorage.setItem("ostcore-ui3.history", JSON.stringify(hist.slice(0, 10))); } catch (e) { /* ignore */ }
 }
 // Gilles, 2026-10-06: "ajoute un bouton sur chaque ligne de la liste des
-// url connues pour supprimer la ligne si besoin" - renderConnectScreen()'s
-// own "Recent servers" list, below.
+// url connues pour supprimer la ligne si besoin" - renderRecentServers()'s
+// own list, below.
 function removeHistory(host) {
   const hist = loadHistory().filter((h) => h.host !== host);
   try { localStorage.setItem("ostcore-ui3.history", JSON.stringify(hist)); } catch (e) { /* ignore */ }
+}
+
+// Lives inside #controller-settings-box (index.html) rather than on a
+// separate "not connected" screen - Gilles, 2026-10-18: disconnecting
+// while already on Controller used to bounce back to that other screen
+// instead of staying put, losing the current context for no reason, so
+// this needed to be reachable from Controller itself, connected or not,
+// same as the host/SSL fields right below it. Rebuilt
+// (not just toggled) on every call - the list of entries, not just their
+// labels, can change (saveHistory()/removeHistory()).
+function renderRecentServers() {
+  recentServersListEl.innerHTML = "";
+  const history = loadHistory();
+  for (const h of history) {
+    const li = el("li");
+    const content = h.ssl ? [icon("lock", { small: true }), el("span", { text: h.host })] : h.host;
+    const btn = el("button", { class: "btn spacer" }, content);
+    btn.addEventListener("click", () => { serverHostInput.value = h.host; setSsl(!!h.ssl); document.getElementById("connect-btn").click(); });
+    li.appendChild(btn);
+    li.appendChild(iconButton("close", t("chrome.removeServer"), () => { removeHistory(h.host); renderRecentServers(); }, { danger: true }));
+    recentServersListEl.appendChild(li);
+  }
+  if (!history.length) recentServersListEl.appendChild(el("li", { class: "muted small", text: t("chrome.noHistoryYet") }));
 }
 
 // The active view survives a reload (Gilles, 2026-09-27: "apres un f5 je ne
@@ -346,7 +364,7 @@ zoomSliderEl.addEventListener("input", () => {
 // already uses — reused here rather than inventing a second modal pattern.
 
 function isModuleView() {
-  return activeView && activeView !== "__home" && activeView !== "__controller" && activeView !== "__files" && activeView !== "__logs";
+  return activeView && activeView !== "__home" && activeView !== "__controller";
 }
 
 function updateParamsToggle() {
@@ -404,10 +422,7 @@ document.getElementById("connect-btn").addEventListener("click", () => {
   saveHistory({ host, ssl });
   loginShown = false;
   activeView = null;
-  const lang = document.getElementById("lang-select").value;
-  setLanguage(lang);
-  applyStaticLabels();
-  client.connect(urls.wsUrl, { language: lang });
+  client.connect(urls.wsUrl, { language: getLanguage() });
 });
 document.getElementById("disconnect-btn").addEventListener("click", () => client.disconnect());
 // "Self-service recovery" button (see index.html's own comment on why) - a
@@ -460,67 +475,46 @@ if (zeroconf.isAvailable()) {
     }
   });
 }
-document.getElementById("lang-select").addEventListener("change", (e) => {
-  setLanguage(e.target.value);
-  applyStaticLabels();
-  // Everything server-sourced (property/element labels) follows this same
-  // language once the server's own reply comes back, re-triggering each
-  // module's own client.subscribe() callback and rebuilding its panels —
-  // that rebuild is also what picks up this file's own local i18n.t()
-  // calls for free. Views NOT driven by a module subscription (system
-  // views, login, the disconnected screen) don't get that free ride, so
-  // force them explicitly here too.
-  if (client.connection.status === "connected") client.setLanguage(e.target.value);
-  renderModbarNow();
-  renderContentNow();
-});
+for (const btn of langButtonsEl.querySelectorAll(".lang-flag-btn")) {
+  btn.addEventListener("click", () => {
+    const lang = btn.dataset.lang;
+    setLanguage(lang);
+    applyStaticLabels();
+    // Everything server-sourced (property/element labels) follows this same
+    // language once the server's own reply comes back, re-triggering each
+    // module's own client.subscribe() callback and rebuilding its panels —
+    // that rebuild is also what picks up this file's own local i18n.t()
+    // calls for free. Views NOT driven by a module subscription (system
+    // views, login, Controller) don't get that free ride, so force them
+    // explicitly here too.
+    if (client.connection.status === "connected") client.setLanguage(lang);
+    renderModbarNow();
+    renderContentNow();
+  });
+}
 
 client.onStatus((s) => {
   connToggleEl.classList.remove("status-connected", "status-connecting", "status-disconnected");
   connToggleEl.classList.add("status-" + s);
   connToggleEl.title = t("status." + s);
   if (s !== "connected") grantPill.textContent = "";
-  // Minimal pill once connected; folded open again the moment there's
-  // something the user needs to look at or act on.
-  setConnPanelOpen(s !== "connected");
-  if (s === "connecting" || s === "disconnected") { activeView = null; renderModbarNow(); renderContentNow(); }
+  // Gilles, 2026-10-18: disconnecting used to always bounce to the
+  // (now-gone) separate "not connected" screen, even when already
+  // sitting on Controller - Controller itself already handles the
+  // disconnected state fine (host/SSL fields, recent servers), so only a
+  // module view (which would otherwise show stale/no data) gets bounced,
+  // straight to Controller rather than clearing activeView entirely.
+  if ((s === "connecting" || s === "disconnected") && (isModuleView() || activeView === "__home")) {
+    activeView = "__controller";
+    renderModbarNow();
+    renderContentNow();
+  }
 });
 applyStaticLabels();
 
-// Setup wizard (issue #238) - a modal, opened straight from Settings, not a
-// renderSystemViews() entry (those replace the main content area instead -
-// see index.html's own comment on this button). Closes the settings
-// dropdown first, same as picking a system view already does just below
-// (selectView()'s own "__controller"/"__files"/"__logs" handling) - no
-// reason to leave it open behind the modal.
-setupWizardBtnEl.addEventListener("click", () => {
-  setConnPanelOpen(false);
-  openSetupWizard(client);
-});
-
-// Credits (Gilles, 2026-10-14) - same "close the settings dropdown first"
-// convention as the wizard button right above.
-creditsBtnEl.addEventListener("click", () => {
-  setConnPanelOpen(false);
-  openCreditsDialog();
-});
-
-// ---- build/version info (Settings, after the connection info) ----------
-// Gilles, 2026-10-06: "ajoute un fichier 'gitdata' ... pour afficher la
-// version (tag date commit message de commit)" - static per-build data
-// (CI/write-gitdata.js), fetched once; no error UI if the file is
-// missing (an older/non-CI www/ build, or plain local dev straight off
-// index.html without ever running `npm run prepare-www`) - the row just
-// stays hidden, same as it starts in index.html.
-fetch("gitdata.json").then((r) => (r.ok ? r.json() : null)).then((d) => {
-  if (!d) return;
-  versionInfoTagEl.textContent = `${d.tag} · ${(d.date || "").slice(0, 10)} · ${d.commit}`;
-  // A visible line, not just a title tooltip - Gilles, 2026-10-06: "je ne
-  // vois pas le 'commit message' dans ton screenshot" - a tooltip needs
-  // hover, which the Android app (touch) has no equivalent of at all.
-  versionInfoMessageEl.textContent = d.message || "";
-  versionInfoEl.classList.remove("hidden");
-}).catch(() => { /* no gitdata.json in this build - leave the row hidden */ });
+// Credits - also the front/backend build info now (gitdata.json/
+// controllerdata.git), credits.js's own openCreditsDialog().
+creditsBtnEl.addEventListener("click", () => openCreditsDialog(client));
 
 // ---- rendering -------------------------------------------------------
 
@@ -530,8 +524,6 @@ function renderModbarNow() {
   const modbar = renderModbar(client, activeView, selectView);
   modbarEl.appendChild(modbar.node);
   modbarDispose = modbar.dispose;
-  systemViewsEl.innerHTML = "";
-  systemViewsEl.appendChild(renderSystemViews(activeView, selectView));
   // #modbar's own width can change with the module list/active selection
   // (see updateTopRightCollapse()'s own doc comment) - queued, not called
   // directly, so it measures AFTER this new content has actually laid out.
@@ -540,35 +532,38 @@ function renderModbarNow() {
 
 // Two mutually-exclusive content modes: a module renders as a set of
 // floating panels directly on #panel-layer (see render.js/panels.js — no
-// single node comes back for those); Controller/Files/Logs/the connect
-// screen are conventional "docked" full-width views appended to
-// #docked-view. Only one of the two containers is shown at a time.
+// single node comes back for those); Controller/the connect screen are
+// conventional "docked" full-width views appended to #docked-view. Only
+// one of the two containers is shown at a time.
 function renderContentNow() {
   if (contentDispose) { contentDispose(); contentDispose = null; }
   Panels.clear();
   dockedViewEl.innerHTML = "";
 
   const isModule = isModuleView();
+  // Controller renders its own sections as floating panels too (same
+  // panel-layer/quicknav mechanism as a module), alongside its docked
+  // settings box - so it needs the quicknav bar on, unlike Home.
+  const isController = activeView === "__controller";
   // #panel-layer stays visible regardless of isModule now (Gilles,
   // 2026-10-06: "sur la home, on doit pouvoir ouvrir les logs (sans
   // selection du module) ==> la il ne se passe rien") - the persistent
   // log panel (views.js's renderLogPanel(), panels.js's own
   // `persistent:true`) lives inside #panel-layer and survives
   // Panels.clear() by design, but hiding its whole ANCESTOR container
-  // whenever a docked view (Home/Controller/Files/Logs) was active made
-  // it invisible and unclickable there regardless. Safe to leave it
-  // always on: #panel-layer itself is pointer-events:none (panels.css),
+  // whenever a docked view (Home/Controller) was active made it invisible
+  // and unclickable there regardless. Safe to leave it always on:
+  // #panel-layer itself is pointer-events:none (panels.css),
   // so it doesn't block anything over empty space, and Panels.clear()
   // (above) already wipes every non-persistent (per-module) panel on
   // every call to this function, docked view or not.
   dockedViewEl.classList.toggle("hidden", isModule);
-  // #quicknav's own visibility follows the module view directly, not
-  // whether it has nav entries to show — the actions zone (params) is
-  // still relevant for a module with zero level1 groups.
-  quicknavEl.classList.toggle("hidden", !isModule);
+  // #quicknav's own visibility follows the module/controller view
+  // directly, not whether it has nav entries to show — the actions zone
+  // (params) is still relevant for a module with zero level1 groups.
+  quicknavEl.classList.toggle("hidden", !isModule && !isController);
   updateParamsToggle();
 
-  if (!activeView) { dockedViewEl.appendChild(renderConnectScreen()); return; }
   if (isModule) {
     // A bespoke template (templates/index.js) wins over the generic,
     // level1-grouped renderer when infos.template names one we have —
@@ -592,42 +587,14 @@ function renderContentNow() {
 
   let result;
   if (activeView === "__home") result = renderHome(client, selectView);
-  else if (activeView === "__controller") result = renderController(client);
-  else if (activeView === "__files") result = renderFiles(client, getMediaBaseUrl());
-  else result = renderLogs(client);
+  else result = renderController(client, settingsBoxEl);
   dockedViewEl.appendChild(result.node);
   contentDispose = result.dispose || null;
-}
-
-function renderConnectScreen() {
-  const div = el("div", { class: "connect-screen" });
-  div.appendChild(icon("stars", { small: false }));
-  div.querySelector(".material-icons").classList.add("icon-lg");
-  div.appendChild(el("h2", { text: "OST — UI3" }));
-  div.appendChild(el("p", { class: "lede", text: t("chrome.notConnectedLede") }));
-  const panel = el("div", { class: "panel" }, [el("h3", { text: t("chrome.recentServers") })]);
-  const ul = el("ul");
-  for (const h of loadHistory()) {
-    const li = el("li");
-    const content = h.ssl ? [icon("lock", { small: true }), el("span", { text: h.host })] : h.host;
-    const btn = el("button", { class: "btn spacer" }, content);
-    btn.addEventListener("click", () => { serverHostInput.value = h.host; setSsl(!!h.ssl); document.getElementById("connect-btn").click(); });
-    li.appendChild(btn);
-    li.appendChild(iconButton("close", t("chrome.removeServer"), () => { removeHistory(h.host); renderContentNow(); }, { danger: true }));
-    ul.appendChild(li);
-  }
-  if (!loadHistory().length) ul.appendChild(el("li", { class: "muted small", text: t("chrome.noHistoryYet") }));
-  panel.appendChild(ul);
-  div.appendChild(panel);
-  return div;
 }
 
 function selectView(key) {
   activeView = key;
   saveLastView(key);
-  // Picking Controller/Files/Logs from the settings dropdown should close
-  // it back down, same as picking any other destination would.
-  if (key === "__controller" || key === "__files" || key === "__logs") setConnPanelOpen(false);
   renderModbarNow();
   renderContentNow();
 }
@@ -728,7 +695,7 @@ client.subscribe(client.topics.session(), (session) => {
     // no saved view at all, e.g. the very first visit) falls back to
     // Controller, same as before this existed.
     const last = loadLastView();
-    const stillThere = last === "__home" || last === "__controller" || last === "__files" || last === "__logs" || client.get(client.topics.modules()).includes(last);
+    const stillThere = last === "__home" || last === "__controller" || client.get(client.topics.modules()).includes(last);
     selectView(stillThere ? last : "__home");
   }
 });

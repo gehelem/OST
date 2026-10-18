@@ -22,8 +22,8 @@
 // Language tracking: this module has no connection of its own to read
 // from - it mirrors core/connection.js's own `language` field (the single
 // source of truth already used for DU/IL/LO), kept in sync by app.js's two
-// call sites that ever change it (the initial connect() and the
-// lang-select's own change handler). See setLanguage()/getLanguage().
+// call sites that ever change it (the initial connect() and the flag
+// buttons' own click handler). See setLanguage()/getLanguage().
 
 const DEFAULT_LANG = "en";
 let currentLang = DEFAULT_LANG;
@@ -37,7 +37,7 @@ export function getLanguage() {
 }
 
 /** Every UI3-local string lives here, one entry per supported language
- * (same 5 as the lang-select: en/fr/de/it/es). Keys are short dotted ids
+ * (same 5 as the flag buttons: en/fr/de/it/es). Keys are short dotted ids
  * grouped by where they're used, not the English text itself, so a key
  * never silently goes stale if the English wording changes later. */
 const STRINGS = {
@@ -90,7 +90,6 @@ const STRINGS = {
   "chrome.disconnect": { en: "Disconnect", fr: "Déconnecter", de: "Trennen", it: "Disconnetti", es: "Desconectar" },
   "chrome.resize": { en: "Resize", fr: "Redimensionner", de: "Größe ändern", it: "Ridimensiona", es: "Redimensionar" },
   "chrome.parametersPrefix": { en: "Parameters — ", fr: "Paramètres — ", de: "Parameter — ", it: "Parametri — ", es: "Parámetros — " },
-  "chrome.notConnectedLede": { en: "Not connected. Set the WebSocket URL above and press Connect.", fr: "Non connecté. Renseignez l'URL WebSocket ci-dessus et cliquez sur Connecter.", de: "Nicht verbunden. Geben Sie oben die WebSocket-URL ein und klicken Sie auf Verbinden.", it: "Non connesso. Imposta l'URL WebSocket sopra e premi Connetti.", es: "No conectado. Indique la URL WebSocket arriba y pulse Conectar." },
   "chrome.recentServers": { en: "Recent servers", fr: "Serveurs récents", de: "Letzte Server", it: "Server recenti", es: "Servidores recientes" },
   "chrome.noHistoryYet": { en: "No history yet.", fr: "Aucun historique pour l'instant.", de: "Noch kein Verlauf.", it: "Ancora nessuna cronologia.", es: "Aún no hay historial." },
   "chrome.removeServer": { en: "Remove", fr: "Supprimer", de: "Entfernen", it: "Rimuovi", es: "Eliminar" },
@@ -99,6 +98,7 @@ const STRINGS = {
   "credits.title": { en: "Credits", fr: "Crédits", de: "Danksagungen", it: "Crediti", es: "Créditos" },
   "credits.intro": { en: "This app builds on several free/open-source projects:", fr: "Cette application s'appuie sur plusieurs projets libres/open-source :", de: "Diese App baut auf mehreren freien/Open-Source-Projekten auf:", it: "Questa app si basa su diversi progetti liberi/open-source:", es: "Esta aplicación se basa en varios proyectos libres/de código abierto:" },
   "credits.backendLabel": { en: "Backend:", fr: "Backend :", de: "Backend:", it: "Backend:", es: "Backend:" },
+  "credits.frontLabel": { en: "Front:", fr: "Front :", de: "Front:", it: "Front:", es: "Front:" },
   "credits.aladin.name": { en: "Aladin Lite (CDS, Strasbourg)", fr: "Aladin Lite (CDS, Strasbourg)", de: "Aladin Lite (CDS, Straßburg)", it: "Aladin Lite (CDS, Strasburgo)", es: "Aladin Lite (CDS, Estrasburgo)" },
   "credits.aladin.desc": { en: "HiPS sky-survey background in the planetarium view", fr: "Fond de ciel HiPS dans la vue planétarium", de: "HiPS-Himmelshintergrund in der Planetariumsansicht", it: "Sfondo cielo HiPS nella vista planetario", es: "Fondo de cielo HiPS en la vista del planetario" },
   "credits.d3celestial.name": { en: "D3 Celestial", fr: "D3 Celestial", de: "D3 Celestial", it: "D3 Celestial", es: "D3 Celestial" },
@@ -141,9 +141,10 @@ const STRINGS = {
   "imagelayer.sequenceImage": { en: "Sequence image", fr: "Image de la séquence", de: "Sequenzbild", it: "Immagine della sequenza", es: "Imagen de la secuencia" },
 
   // ---- views.js: modbar system entries, login, controller/files ----------
-  "views.controller": { en: "Controller", fr: "Contrôleur", de: "Steuerung", it: "Controllore", es: "Controlador" },
   "views.files": { en: "Files", fr: "Fichiers", de: "Dateien", it: "File", es: "Archivos" },
+  "views.filesWip": { en: "Work in progress - File explorer", fr: "En cours de refonte - Explorateur de fichiers", de: "In Arbeit - Dateiexplorer", it: "In corso di revisione - Esploratore file", es: "En desarrollo - Explorador de archivos" },
   "views.logs": { en: "Logs", fr: "Journaux", de: "Protokolle", it: "Log", es: "Registros" },
+  "views.connectionSettings": { en: "Connection & settings", fr: "Connexion et réglages", de: "Verbindung & Einstellungen", it: "Connessione e impostazioni", es: "Conexión y ajustes" },
   "views.loginRequired": { en: "Login required", fr: "Connexion requise", de: "Anmeldung erforderlich", it: "Accesso richiesto", es: "Inicio de sesión requerido" },
   "views.loginRequiresAuth": { en: "This server requires authentication (grant-client = -1).", fr: "Ce serveur nécessite une authentification (grant-client = -1).", de: "Dieser Server erfordert eine Authentifizierung (grant-client = -1).", it: "Questo server richiede l'autenticazione (grant-client = -1).", es: "Este servidor requiere autenticación (grant-client = -1)." },
   "views.user": { en: "User", fr: "Utilisateur", de: "Benutzer", it: "Utente", es: "Usuario" },
@@ -159,7 +160,6 @@ const STRINGS = {
   "views.configNamePlaceholder": { en: "configuration name", fr: "nom de la configuration", de: "Konfigurationsname", it: "nome configurazione", es: "nombre de la configuración" },
   "views.instanceLabelPlaceholder": { en: "instance label", fr: "libellé de l'instance", de: "Instanzbezeichnung", it: "etichetta istanza", es: "etiqueta de instancia" },
   "views.profileOptionalPlaceholder": { en: "profile (optional)", fr: "profil (optionnel)", de: "Profil (optional)", it: "profilo (opzionale)", es: "perfil (opcional)" },
-  "views.noFilesInFolder": { en: "No files in this folder.", fr: "Aucun fichier dans ce dossier.", de: "Keine Dateien in diesem Ordner.", it: "Nessun file in questa cartella.", es: "No hay archivos en esta carpeta." },
   "views.login": { en: "Login", fr: "Connexion", de: "Anmelden", it: "Accedi", es: "Iniciar sesión" },
   "views.saveCurrentAs": { en: "Save current as…", fr: "Enregistrer sous…", de: "Aktuelle speichern als…", it: "Salva attuale come…", es: "Guardar actual como…" },
   "views.load": { en: "Load", fr: "Charger", de: "Laden", it: "Carica", es: "Cargar" },
@@ -187,10 +187,6 @@ const STRINGS = {
   "views.loadIndiConfigurationTitle": { en: "Load a saved INDI driver configuration", fr: "Charger une configuration de drivers INDI sauvegardée", de: "Gespeicherte INDI-Treiberkonfiguration laden", it: "Carica una configurazione di driver INDI salvata", es: "Cargar una configuración de drivers INDI guardada" },
   "views.chooseIndiConfiguration": { en: "(choose)", fr: "(choisir)", de: "(auswählen)", it: "(scegli)", es: "(elegir)" },
   "views.noIndiConfigurationsYet": { en: "(none yet)", fr: "(aucune pour l'instant)", de: "(noch keine)", it: "(nessuna ancora)", es: "(ninguna aún)" },
-  "views.rootFolder": { en: "(root)", fr: "(racine)", de: "(Wurzel)", it: "(radice)", es: "(raíz)" },
-  "views.selectedPrefix": { en: "Selected: ", fr: "Sélectionné : ", de: "Ausgewählt: ", it: "Selezionato: ", es: "Seleccionado: " },
-  "views.none": { en: "(none)", fr: "(aucun)", de: "(keine)", it: "(nessuno)", es: "(ninguno)" },
-  "views.entriesCappedSuffix": { en: "entries (capped at 1000)", fr: "entrées (limité à 1000)", de: "Einträge (auf 1000 begrenzt)", it: "voci (limitato a 1000)", es: "entradas (limitado a 1000)" },
   "views.logModuleAll": { en: "All modules", fr: "Tous les modules", de: "Alle Module", it: "Tutti i moduli", es: "Todos los módulos" },
   "views.logLevelAll": { en: "All levels", fr: "Tous les niveaux", de: "Alle Stufen", it: "Tutti i livelli", es: "Todos los niveles" },
   "views.logLevelInfo": { en: "Info and above", fr: "Info et plus", de: "Info und höher", it: "Info e superiori", es: "Info y superior" },

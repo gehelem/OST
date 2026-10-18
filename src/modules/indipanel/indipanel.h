@@ -28,8 +28,13 @@ class MODULE_INIT IndiPanel : public IndiModule
     private:
         void newMessage     (INDI::BaseDevice dp, int messageID) override;
         void onExternalEvent(OST::ExtEvent event) override;
+        QString groupOrder(const QString &group);
         QPointer<fileio> _image;
         FITSImage::Statistic stats;
+        // Per-property tiebreaker appended to groupOrder()'s own rank prefix,
+        // so two properties/groups sharing a rank still sort in arrival
+        // order instead of landing on an unstable tie (see onNewProperty()).
+        int _orderSeq = 0;
 
 };
 

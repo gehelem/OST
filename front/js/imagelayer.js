@@ -266,19 +266,26 @@ function renderImageStatsTable(v) {
   // "x").
   wrap.appendChild(statSecLine(t("imagelayer.dimensions"), `${ch === 3 ? "RGB" : "Grayscale"} ${v.width || "N/A"}×${v.height || "N/A"}`));
 
-  if (v.hfravg != null || v.stars != null || v.snr != null) {
+  // hfravg/stars default to 0 whether or not star detection ever actually
+  // ran on this image (same "no not-computed sentinel" gap as render.js's
+  // own imageStatsLine(), see its comment) - gated on > 0 so a module that
+  // never runs detection (e.g. indipanel) doesn't show a meaningless
+  // "HFR avg 0.00 / Stars 0". snr is a real pixel-stats computation
+  // regardless, so it's shown independently of the other two.
+  if (v.hfravg > 0) {
     // HFR avg + its own deviation on the section's title line - "''" (two
     // straight quotes) is the arcsec shorthand focus.json's own element
     // labels already use (e.g. "Average HFR ('')"), not guessed.
-    const hfrParts = [];
-    if (v.hfravg != null) hfrParts.push(`HFR avg ${fmtNum(v.hfravg)}''`);
+    const hfrParts = [`HFR avg ${fmtNum(v.hfravg)}''`];
     if (v.hfravgdev != null) hfrParts.push({ tag: "dev", value: fmtNum(v.hfravgdev) + "''" });
     wrap.appendChild(statSecLine(t("imagelayer.focus"), hfrParts));
+  }
+  {
     // Stars/SNR merged underneath, each with its own "Label : value" pair
     // this time (Gilles: "Stars : 93 · SNR : 2.60") - same " · " join
     // style as render.js's own imageStatsLine().
     const pairs = [];
-    if (v.stars != null) pairs.push(["Stars", v.stars]);
+    if (v.stars > 0) pairs.push(["Stars", v.stars]);
     if (v.snr != null) pairs.push(["SNR", fmtNum(v.snr)]);
     if (pairs.length) wrap.appendChild(labeledPairsRow(pairs));
   }
