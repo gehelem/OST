@@ -9,13 +9,12 @@
 import { createClient, deriveUrlsFromHost, cleanHost, normalizeMediaUrl } from "../core/index.js";
 import { renderModuleView, buildParamsPanel, setMediaBaseUrl, setDialogRoot, setQuickNavRoot, getDisableTemplates } from "./render.js";
 import { renderModbar, renderHome, renderController, renderLogin, renderLogPanel } from "./views.js";
-import { openSetupWizard } from "./wizard.js";
 import { openCreditsDialog } from "./credits.js";
 import { el, icon, iconButton } from "./dom.js";
 import * as Panels from "./panels.js";
 import { setBgLayer } from "./imagelayer.js";
 import { templates } from "./templates/index.js";
-import { setLanguage, t } from "./i18n.js";
+import { setLanguage, getLanguage, t } from "./i18n.js";
 import * as zeroconf from "./zeroconf.js";
 import { showToast } from "./toast.js";
 
@@ -59,6 +58,7 @@ const settingsBoxEl = document.getElementById("controller-settings-box");
 const settingsTitleEl = document.getElementById("controller-settings-title");
 const recentServersTitleEl = document.getElementById("recent-servers-title");
 const recentServersListEl = document.getElementById("recent-servers-list");
+const langButtonsEl = document.getElementById("lang-buttons");
 const grantPill = document.getElementById("grant-pill");
 const serverHostInput = document.getElementById("server-host");
 const serverSslToggleEl = document.getElementById("server-ssl-toggle");
@@ -80,16 +80,20 @@ const discoverRowEl = document.getElementById("discover-row");
 const discoverBtnEl = document.getElementById("discover-btn");
 const discoverBtnLabelEl = document.getElementById("discover-btn-label");
 const discoverResultsEl = document.getElementById("discover-results");
-const setupWizardBtnEl = document.getElementById("setup-wizard-btn");
-const setupWizardBtnLabelEl = document.getElementById("setup-wizard-btn-label");
 const creditsBtnEl = document.getElementById("credits-btn");
 const creditsBtnLabelEl = document.getElementById("credits-btn-label");
+
+// Highlights whichever flag button matches the current language.
+function syncLangButtons() {
+  const current = getLanguage();
+  for (const btn of langButtonsEl.querySelectorAll(".lang-flag-btn")) btn.classList.toggle("active", btn.dataset.lang === current);
+}
 
 // Static chrome (this file's own top-right icon chips + the connect bar) is
 // never rebuilt from a server dump the way a module's panels are, so a
 // language change needs to touch it explicitly — called once at boot and
-// again every time the language actually changes (connect, or the
-// lang-select's own change handler below). Everything else UI3-local
+// again every time the language actually changes (connect, or a flag
+// button's own click handler below). Everything else UI3-local
 // (module panels, system views, login...) is rebuilt from client-driven
 // events that already run after setLanguage() has updated i18n.js's
 // current language, so those pick it up for free.
@@ -106,8 +110,8 @@ function applyStaticLabels() {
   creditsBtnLabelEl.textContent = t("credits.title");
   discoverBtnLabelEl.textContent = t("chrome.discover");
   connToggleEl.title = t("status." + client.connection.status);
-  setupWizardBtnLabelEl.textContent = t("wizard.title");
   settingsTitleEl.textContent = t("views.connectionSettings");
+  syncLangButtons();
   recentServersTitleEl.textContent = t("chrome.recentServers");
   renderRecentServers();
 }
@@ -427,10 +431,7 @@ document.getElementById("connect-btn").addEventListener("click", () => {
   saveHistory({ host, ssl });
   loginShown = false;
   activeView = null;
-  const lang = document.getElementById("lang-select").value;
-  setLanguage(lang);
-  applyStaticLabels();
-  client.connect(urls.wsUrl, { language: lang });
+  client.connect(urls.wsUrl, { language: getLanguage() });
 });
 document.getElementById("disconnect-btn").addEventListener("click", () => client.disconnect());
 // "Self-service recovery" button (see index.html's own comment on why) - a
@@ -483,20 +484,23 @@ if (zeroconf.isAvailable()) {
     }
   });
 }
-document.getElementById("lang-select").addEventListener("change", (e) => {
-  setLanguage(e.target.value);
-  applyStaticLabels();
-  // Everything server-sourced (property/element labels) follows this same
-  // language once the server's own reply comes back, re-triggering each
-  // module's own client.subscribe() callback and rebuilding its panels —
-  // that rebuild is also what picks up this file's own local i18n.t()
-  // calls for free. Views NOT driven by a module subscription (system
-  // views, login, the disconnected screen) don't get that free ride, so
-  // force them explicitly here too.
-  if (client.connection.status === "connected") client.setLanguage(e.target.value);
-  renderModbarNow();
-  renderContentNow();
-});
+for (const btn of langButtonsEl.querySelectorAll(".lang-flag-btn")) {
+  btn.addEventListener("click", () => {
+    const lang = btn.dataset.lang;
+    setLanguage(lang);
+    applyStaticLabels();
+    // Everything server-sourced (property/element labels) follows this same
+    // language once the server's own reply comes back, re-triggering each
+    // module's own client.subscribe() callback and rebuilding its panels —
+    // that rebuild is also what picks up this file's own local i18n.t()
+    // calls for free. Views NOT driven by a module subscription (system
+    // views, login, Controller) don't get that free ride, so force them
+    // explicitly here too.
+    if (client.connection.status === "connected") client.setLanguage(lang);
+    renderModbarNow();
+    renderContentNow();
+  });
+}
 
 client.onStatus((s) => {
   connToggleEl.classList.remove("status-connected", "status-connecting", "status-disconnected");
@@ -516,9 +520,6 @@ client.onStatus((s) => {
   }
 });
 applyStaticLabels();
-
-// Setup wizard (issue #238) - a modal, opened straight from Settings.
-setupWizardBtnEl.addEventListener("click", () => openSetupWizard(client));
 
 // Credits (Gilles, 2026-10-14).
 creditsBtnEl.addEventListener("click", () => openCreditsDialog());

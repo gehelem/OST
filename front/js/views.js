@@ -20,6 +20,7 @@ import { buildCompactRms, buildGuidingChartPanel, buildDriftChartPanel } from ".
 // prise") - same urljpeg/urlthumbnail resolution showBackgroundImage()
 // itself uses, not reinvented here.
 import { jpegSrc, openImageViewer, refreshImageViewer, buildImageGridPanel } from "./imagelayer.js";
+import { openSetupWizard } from "./wizard.js";
 // Inspector's own 4 control maps (hfr/shape/collim/corners), same list its
 // own "maps" panel already uses (Gilles, 2026-10-06: "sur inspector ajoute
 // les 4 images de controle en vignettes toutes petites").
@@ -943,7 +944,8 @@ export function renderController(client, settingsBoxEl) {
   const confList = el("ul");
   confSec.appendChild(confList);
   const nameInput = el("input", { type: "text", class: "field-input", placeholder: t("views.configNamePlaceholder") });
-  confSec.appendChild(el("div", { class: "form-row" }, [nameInput, el("button", { class: "btn btn-primary btn-sm", onclick: () => { if (nameInput.value) client.saveConfiguration(nameInput.value); } }, t("views.saveCurrentAs"))]));
+  const wizardBtn = el("button", { class: "btn btn-sm", onclick: () => openSetupWizard(client) }, [icon("auto_fix_high", { small: true }), t("wizard.title")]);
+  confSec.appendChild(el("div", { class: "form-row" }, [nameInput, el("button", { class: "btn btn-primary btn-sm", onclick: () => { if (nameInput.value) client.saveConfiguration(nameInput.value); } }, t("views.saveCurrentAs")), wizardBtn]));
   grid.appendChild(confSec);
   function renderConfigurations() {
     const confs = client.get(client.topics.controllerData("availableconfs")) || {};

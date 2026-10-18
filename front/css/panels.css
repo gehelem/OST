@@ -261,20 +261,6 @@
 .conn-toggle.status-connecting { color: var(--busy); animation: pulse-dot 1s ease-in-out infinite; }
 .conn-toggle.status-disconnected { color: var(--error); }
 
-/* The setup wizard button, kept as a settings-nav-item row even though the
-   dropdown it used to live in (.settings-nav above) is gone - still reads
-   fine as a plain left-aligned icon+label row inside a .panel box. */
-.settings-nav-item {
-  display: flex; align-items: center; gap: 8px;
-  padding: 7px var(--space-3);
-  background: none; border: none; border-radius: 0;
-  color: var(--text-secondary); cursor: pointer; font: inherit; font-size: 12.5px; text-align: left;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-.settings-nav-item:hover { background: var(--bg-hover); color: var(--text); }
-.settings-nav-item.active { background: var(--accent-subtle); color: var(--accent-strong); font-weight: 600; }
-.settings-nav-item .material-icons { font-size: 16px; color: var(--text-muted); flex-shrink: 0; }
-.settings-nav-item.active .material-icons { color: var(--accent); }
 .settings-sep { height: 1px; background: var(--border); margin: 2px 0; }
 
 /* ------------------------------------------------------------- canvas ---

@@ -146,14 +146,6 @@
            view. -->
       <div id="controller-settings-box" class="panel hidden">
         <h3 id="controller-settings-title"></h3>
-        <!-- Setup wizard (issue #238) - a modal, not a view switch, kept as
-             its own button (app.js wires it to wizard.js's
-             openSetupWizard()) rather than folded into the form rows below. -->
-        <button id="setup-wizard-btn" class="settings-nav-item" type="button">
-          <span class="material-icons">auto_fix_high</span>
-          <span id="setup-wizard-btn-label"></span>
-        </button>
-        <div class="settings-sep"></div>
         <!-- Gilles, 2026-10-18: used to live only on the separate
              "not connected" welcome screen (now gone - that screen only
              ever showed before the very first connect, and disconnecting
@@ -178,7 +170,7 @@
              core/index.js's deriveUrlsFromHost(host, ssl) builds both
              real URLs from the two (js/app.js). -->
         <div class="form-row">
-          <input id="server-host" class="field-input" style="width:100%" placeholder="host">
+          <input id="server-host" class="field-input" style="flex:1 1 auto;min-width:0" placeholder="host">
           <button id="server-ssl-toggle" class="btn btn-sm toggle-btn" type="button" title="SSL">
             <span class="material-icons">lock_open</span><span id="server-ssl-label">SSL</span>
           </button>
@@ -192,14 +184,14 @@
           <button id="discover-btn" class="btn btn-sm" type="button"><span class="material-icons" style="font-size:15px;vertical-align:middle">wifi_find</span> <span id="discover-btn-label">Discover</span></button>
         </div>
         <div id="discover-results" class="discover-results"></div>
-        <div class="form-row">
-          <select id="lang-select" class="field-input">
-            <option value="en">EN</option>
-            <option value="fr">FR</option>
-            <option value="de">DE</option>
-            <option value="es">ES</option>
-            <option value="it">IT</option>
-          </select>
+        <!-- Flag buttons instead of a <select> - one click, no dropdown
+             to open first. -->
+        <div class="form-row" id="lang-buttons">
+          <button class="lang-flag-btn" data-lang="en" type="button" title="English">🇬🇧</button>
+          <button class="lang-flag-btn" data-lang="fr" type="button" title="Français">🇫🇷</button>
+          <button class="lang-flag-btn" data-lang="de" type="button" title="Deutsch">🇩🇪</button>
+          <button class="lang-flag-btn" data-lang="it" type="button" title="Italiano">🇮🇹</button>
+          <button class="lang-flag-btn" data-lang="es" type="button" title="Español">🇪🇸</button>
         </div>
         <div class="form-row">
           <button id="connect-btn" class="btn btn-primary"><span class="material-icons">power</span><span id="connect-btn-label">Connect</span></button>

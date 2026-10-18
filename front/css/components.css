@@ -30,6 +30,17 @@
   cursor: pointer; transition: all 0.15s ease; flex-shrink: 0;
 }
 .btn-icon:hover { color: var(--accent); background: var(--bg-hover); border-color: var(--border-subtle); }
+/* Small flag buttons replacing the language <select> - one click, no
+ * dropdown. Deliberately smaller than .btn-icon (22px vs 28px). */
+.lang-flag-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: var(--radius-sm);
+  background: transparent; border: 1px solid transparent;
+  cursor: pointer; font-size: 14px; line-height: 1; padding: 0;
+  transition: all 0.15s ease; flex-shrink: 0; opacity: 0.55;
+}
+.lang-flag-btn:hover { opacity: 0.85; background: var(--bg-hover); }
+.lang-flag-btn.active { opacity: 1; border-color: var(--accent-dim); background: var(--accent-subtle); }
 /* A directedit field's "send" confirm - invisible until the field is
  * actually dirty, then turns green - Gilles, 2026-10-0X, on the previous
  * unconditional "send" arrow: "la fleche n'est pas tres parlante, je

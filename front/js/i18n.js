@@ -22,8 +22,8 @@
 // Language tracking: this module has no connection of its own to read
 // from - it mirrors core/connection.js's own `language` field (the single
 // source of truth already used for DU/IL/LO), kept in sync by app.js's two
-// call sites that ever change it (the initial connect() and the
-// lang-select's own change handler). See setLanguage()/getLanguage().
+// call sites that ever change it (the initial connect() and the flag
+// buttons' own click handler). See setLanguage()/getLanguage().
 
 const DEFAULT_LANG = "en";
 let currentLang = DEFAULT_LANG;
@@ -37,7 +37,7 @@ export function getLanguage() {
 }
 
 /** Every UI3-local string lives here, one entry per supported language
- * (same 5 as the lang-select: en/fr/de/it/es). Keys are short dotted ids
+ * (same 5 as the flag buttons: en/fr/de/it/es). Keys are short dotted ids
  * grouped by where they're used, not the English text itself, so a key
  * never silently goes stale if the English wording changes later. */
 const STRINGS = {
