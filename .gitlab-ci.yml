@@ -6,7 +6,6 @@ include:
   - local: CI/doc.yml
   - local: CI/android.yml
   - local: CI/web-zip.yml
-  - local: CI/indi-3rdparty.yml
 
 stages:
   - images
@@ -18,6 +17,7 @@ stages:
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
   PACKAGE_REGISTRY_LATEST: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/latest/latest"
+  PACKAGE_REGISTRY_NIGHTLY: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/nightly/nightly"
   PACKAGE_REGISTRY_TAG: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${CI_COMMIT_TAG}/${CI_COMMIT_TAG}"
   # Global (not job-local like RPM_FILE_LATEST/co. elsewhere in this file)
   # - needed in both build-job-android (CI/android.yml) and
@@ -185,6 +185,7 @@ release-job-tag:
     - build-job-fedora
     - build-job-arch
     - build-doc
+    - build-job-android
     - build-web-zip
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   script:
@@ -192,6 +193,12 @@ release-job-tag:
   rules:
     - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
 
+# Restricted to a push landing ON the default branch, not any push - a
+# push to a feature branch used to also match the bare "push" condition
+# below, overwriting this with an incomplete release (missing whatever
+# only builds on an MR/push-to-main, e.g. 24.04/fedora/arch) every time
+# someone pushed to a branch of their own. release-job-nightly below is
+# what a non-default-branch push produces instead now.
 release-job-latest:
   stage: release
   dependencies:
@@ -211,4 +218,26 @@ release-job-latest:
     - sh ./CI/CI-upload-release-latest.sh
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
-    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+# A rolling, minimal release for a branch still in development - the one
+# job in this file that MUST NOT run on the default branch (that's
+# release-job-latest's own job), nor on an MR or a tag (not meant to
+# ever be the final artifact). Only the jobs that actually build outside
+# of main/MR/tag today (build-job-2604, build-doc, build-job-android,
+# build-web-zip - see each one's own rules) are listed as dependencies.
+release-job-nightly:
+  stage: release
+  dependencies:
+    - build-job-2604
+    - build-doc
+    - build-job-android
+    - build-web-zip
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  variables:
+    DOC_FILE_LATEST: "documentation_latest.tar.gz"
+    WWW_ZIP_LATEST: "ostcore_latest_www.zip"
+  script:
+    - sh ./CI/CI-upload-release-nightly.sh
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH'

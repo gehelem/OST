@@ -1,21 +1,20 @@
 # Android APK build for front/ (Capacitor, fr.ostserver.ostcore) - ported
 # from the old standalone ostcore repo's own .gitlab-ci.yml (superseded by
 # front/ here since issue #229 - ostcore itself is to be archived once
-# this lands, Gilles 2026-10-09), same proven image/JDK fix.
+# this lands), same proven image/JDK fix.
 #
-# Deliberately NOT in build-rules (OST/.gitlab-ci.yml's own
-# merge_request_event + push + tag combo): Gilles, 2026-10-09, "je ne veux
-# pas que ca bloque la MR, mais je ne veux pas oublier non plus de la
-# fabriquer (et tant pis si ca plante)". push-to-main only (fires right
-# after a merge, a separate pipeline run from the MR's own one - never
-# blocks it) + allow_failure: true.
+# Same build-rules combo as every other build job (merge_request_event
+# to the default branch, a semver tag, or any push) - allow_failure:true
+# below means a build failure here never blocks an MR or any other job
+# regardless.
 #
 # Debug-signed, not a dedicated release keystore - same tradeoff ostcore's
-# own CI already made (sideload-only "latest" build, not a Play Store
-# release).
+# own CI already made (sideload-only build, not a Play Store release).
 
 build-job-android:
   stage: build
+  variables:
+    APK_FILE_TAG: "ostcore_${CI_COMMIT_TAG}.apk"
   # Node + JDK + Android SDK/build-tools all in one, the common choice for
   # Capacitor/React Native CI - no custom image maintained for this yet
   # (unlike OST/'s own $CI_REGISTRY_IMAGE/ci-build:*). It only ships JDK
@@ -35,10 +34,18 @@ build-job-android:
     - npm ci
     - npm run android:build
     - cp android/app/build/outputs/apk/debug/app-debug.apk "../${APK_FILE_LATEST}"
+    # Same latest-then-copy-for-tag idiom as CI/web-zip.yml.
+    - if [ -n "$CI_COMMIT_TAG" ]; then cp "../${APK_FILE_LATEST}" "../${APK_FILE_TAG}"; fi
   artifacts:
     paths:
-      - "${APK_FILE_LATEST}"
+      # Glob, not the two exact names - same reasoning as build-job-2604's
+      # own deb glob: APK_FILE_TAG is only ever actually written on a tag
+      # pipeline, and GitLab only warns (doesn't fail the job) on an
+      # artifacts path with no match, but a glob avoids that warning too.
+      - "ostcore_*.apk"
     expire_in: 4 week
   allow_failure: true
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
+    - if: '$CI_PIPELINE_SOURCE == "push"'
