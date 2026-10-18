@@ -15,6 +15,7 @@ IndiPanel::IndiPanel(QString name, QString label, QString profile, QVariantMap a
     setMetadata("thisGitmessage", QString::fromStdString(Version::GIT_COMMIT_SUBJECT));
     setMetadata("description", "Indi control panel");
     setMetadata("thisversion", QString::fromStdString(Version::GIT_TAG));
+    setMetadata("template", "indipanel");
 
     // Own jpegquality setting, same shape as IndiModule::defineMeAsImager()'s
     // (indimodule.cpp) but hardcoded here rather than inherited from it -
@@ -73,7 +74,8 @@ void IndiPanel::onNewDevice(INDI::BaseDevice dp)
 }
 void IndiPanel::onRemoveDevice(INDI::BaseDevice dp)
 {
-    for(const QString &key : getStore().keys())    {
+    for(const QString &key : getStore().keys())
+    {
         if (strcmp(dp.getDeviceName(), getProperty(key)->level1().toStdString().c_str()) == 0)
         {
             deleteOstProperty(key);
@@ -187,7 +189,8 @@ void IndiPanel::onNewProperty(INDI::Property pProperty)
                     // primary+guide head, where only the base class happens
                     // to hardcode distinct labels). The name is what the
                     // protocol itself guarantees unique per device.
-                    atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".jpeg", getInt("parms", "jpegquality"));
+                    atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".jpeg",
+                                   getInt("parms", "jpegquality"));
                     dta = _image->ImgStats();
                     dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".jpeg";
                     dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".FITS";
@@ -293,7 +296,8 @@ void IndiPanel::onUpdateProperty (INDI::Property property)
                     QImage rawImage = _image->getRawQImage();
                     // Same path as onNewProperty()'s own BLOB case - keyed
                     // by element name, not label, see its comment.
-                    atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".jpeg", getInt("parms", "jpegquality"));
+                    atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".jpeg",
+                                   getInt("parms", "jpegquality"));
                     dta = _image->ImgStats();
                     dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".jpeg";
                     dta.mUrlFits = getModuleName() + QString(b.getDeviceName()) + b[i].getName() + ".FITS";
