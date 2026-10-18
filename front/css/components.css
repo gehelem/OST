@@ -403,7 +403,8 @@ input[type="range"]::-moz-range-thumb {
 
 .img-elt .preview-img { max-width: 340px; max-height: 250px; border-radius: var(--radius-sm); display: block; border: 1px solid var(--border); }
 .preview-video { max-width: 340px; border-radius: var(--radius-sm); }
-.img-stats { margin-top: 6px; font-size: 11.5px; }
+.img-stats-row { margin-top: 6px; display: flex; align-items: center; gap: var(--space-2); }
+.img-stats { font-size: 11.5px; }
 
 /* ---------------------------------------------------------------- dialog */
 .dialog-overlay { position: fixed; inset: 0; background: var(--overlay); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; z-index: 50; }

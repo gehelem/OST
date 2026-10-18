@@ -20,6 +20,7 @@ import { mediaUrl as buildMediaUrl } from "../core/index.js";
 import { el, icon, statusDot, iconButton } from "./dom.js";
 import * as Panels from "./panels.js";
 import { renderQuickNav } from "./views.js";
+import { buildImageStatsHistogramPanel } from "./imagelayer.js";
 import { t } from "./i18n.js";
 
 const DISPLAY_ONLY_TYPES = new Set(["img", "video", "light", "prg", "message"]);
@@ -385,14 +386,42 @@ function buildEditControl(client, moduleName, el_, elName, buffer, opts) {
 export function imageStatsLine(v) {
   const stats = [];
   if (v.width) stats.push(`${v.width}×${v.height}`);
-  if (v.stars !== undefined) stats.push(`${v.stars} stars`);
-  if (v.hfravg !== undefined) stats.push(`HFR ${v.hfravg.toFixed?.(2) ?? v.hfravg}`);
+  // stars/hfravg default to 0 server-side whether or not star detection
+  // ever actually ran on this image (ImgData has no "not computed" sentinel,
+  // see OST::ImgData, libs/model/element/common.h) - a module that never
+  // runs it (indipanel, showing an arbitrary device's BLOB) would otherwise
+  // always show a meaningless "0 stars · HFR 0.00". snr is always a real
+  // pixel-stats computation regardless, so it has no such gate.
+  if (v.stars > 0) stats.push(`${v.stars} stars`);
+  if (v.hfravg > 0) stats.push(`HFR ${v.hfravg.toFixed?.(2) ?? v.hfravg}`);
   if (v.snr !== undefined) stats.push(`SNR ${v.snr.toFixed?.(2) ?? v.snr}`);
   if (v.issolved) stats.push(`solved (${v.solverra?.toFixed?.(3)}, ${v.solverde?.toFixed?.(3)})`);
   return stats;
 }
 
-function renderDisplayOnly(elName, el_) {
+// Opens the same full per-channel stats table + histogram chart
+// imagelayer.js's own addImageBlock() shows in a persistent floating panel
+// - this generic fallback has no per-property quicknav slot to toggle one
+// from, so a plain modal dialog instead, same dialog-overlay pattern as
+// openPropertyEditDialog() above. Reuses buildImageStatsHistogramPanel()
+// rather than duplicating its table/histogram here.
+function openImageStatsDialog(client, moduleName, propName, elName, label) {
+  const panel = buildImageStatsHistogramPanel(client, moduleName, propName, elName);
+  const overlay = el("div", { class: "dialog-overlay" });
+  const close = () => { if (panel._dispose) panel._dispose(); overlay.remove(); };
+  const dialog = el("div", { class: "dialog" }, [
+    el("h3", { text: label || t("imagelayer.imageStats") }),
+    panel,
+    el("div", { class: "dialog-actions" }, [
+      el("button", { class: "btn", onclick: close }, t("common.close")),
+    ]),
+  ]);
+  overlay.appendChild(dialog);
+  overlay.addEventListener("click", (ev) => { if (ev.target === overlay) close(); });
+  (dialogRoot || document.body).appendChild(overlay);
+}
+
+function renderDisplayOnly(elName, el_, ctx) {
   const type = el_.type;
   const value = el_.value;
   if (type === "img") {
@@ -408,8 +437,13 @@ function renderDisplayOnly(elName, el_) {
     } else {
       wrap.appendChild(el("div", { class: "muted", text: t("common.noImage") }));
     }
+    const statsRow = el("div", { class: "img-stats-row" });
     const stats = imageStatsLine(v);
-    if (stats.length) wrap.appendChild(el("div", { class: "img-stats muted mono", text: stats.join(" · ") }));
+    if (stats.length) statsRow.appendChild(el("div", { class: "img-stats muted mono", text: stats.join(" · ") }));
+    if (ctx) {
+      statsRow.appendChild(iconButton("bar_chart", t("imagelayer.stats"), () => openImageStatsDialog(ctx.client, ctx.moduleName, ctx.propName, elName, el_.label)));
+    }
+    if (statsRow.childNodes.length) wrap.appendChild(statsRow);
     return wrap;
   }
   if (type === "video") {
@@ -755,7 +789,7 @@ function renderPropertyBody(client, moduleName, propName, prop) {
     const valueCell = el("td", { class: "elt-value" });
 
     if (DISPLAY_ONLY_TYPES.has(e.type)) {
-      valueCell.appendChild(renderDisplayOnly(name, e));
+      valueCell.appendChild(renderDisplayOnly(name, e, e.type === "img" ? { client, moduleName, propName } : null));
     } else if (permOk && e.directedit) {
       // Only a directedit element gets an inline control here - anything
       // else (directedit:false) is display-only in this table, editable
