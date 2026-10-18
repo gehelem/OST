@@ -24,4 +24,4 @@ ASSETS="$ASSETS --assets-link {\"name\":\"ostserver-complete_latest_2604_amd64.d
 [ -f documentation/${DOC_FILE_LATEST} ] && ASSETS="$ASSETS --assets-link {\"name\":\"${DOC_FILE_LATEST}\",\"url\":\"${PACKAGE_REGISTRY_NIGHTLY}/${DOC_FILE_LATEST}\"}"
 [ -f ${APK_FILE_LATEST} ] && ASSETS="$ASSETS --assets-link {\"name\":\"${APK_FILE_LATEST}\",\"url\":\"${PACKAGE_REGISTRY_NIGHTLY}/${APK_FILE_LATEST}\"}"
 [ -f front/${WWW_ZIP_LATEST} ] && ASSETS="$ASSETS --assets-link {\"name\":\"${WWW_ZIP_LATEST}\",\"url\":\"${PACKAGE_REGISTRY_NIGHTLY}/${WWW_ZIP_LATEST}\"}"
-release-cli create --name "nightly" --tag-name nightly $ASSETS
+release-cli create --name "nightly" --tag-name nightly --ref "$CI_COMMIT_SHA" $ASSETS
