@@ -708,12 +708,6 @@ export function renderLogin(client, onDone) {
   document.body.appendChild(overlay);
 }
 
-function fmtBytes(mb) {
-  if (mb === undefined) return "—";
-  if (mb > 1024) return (mb / 1024).toFixed(1) + " GB";
-  return mb.toFixed(0) + " MB";
-}
-
 // ---- INDI server & drivers panel -----------------------------------------
 // Extracted out of renderController() (issue #238) so the setup wizard's own
 // first step (wizard.js) can reuse the exact same controls instead of
@@ -1069,9 +1063,14 @@ export function renderController(client, settingsBoxEl) {
     updateSwVisibility();
     swBody.innerHTML = "";
     if (!sw) return;
+    // Same ring-gauge treatment as the Home dashboard's own system card
+    // (ringGauge() above) for RAM/disks - every disk here, not just the
+    // compact card's first two.
+    const rings = el("div", { class: "home-ring-row" });
+    if (sw.ram) rings.appendChild(ringGauge((sw.ram.used_mb / sw.ram.total_mb) * 100, t("views.ramLabel")));
+    for (const d of sw.disks || []) rings.appendChild(ringGauge((d.used_gb / d.total_gb) * 100, d.mountpoint));
+    if (rings.children.length) swBody.appendChild(rings);
     if (sw.cpu) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: t("views.cpuLabel") }), el("span", { class: "value", text: `${sw.cpu.load_1m} / ${sw.cpu.load_5m} / ${sw.cpu.load_15m}` })]));
-    if (sw.ram) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: t("views.ramLabel") }), el("span", { class: "value", text: `${fmtBytes(sw.ram.used_mb)} / ${fmtBytes(sw.ram.total_mb)}` })]));
-    for (const d of sw.disks || []) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: `${d.mountpoint} (${d.device})` }), el("span", { class: "value", text: `${d.used_gb.toFixed(1)} / ${d.total_gb.toFixed(1)} GB` })]));
     for (const n of sw.network || []) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: n.iface }), el("span", { class: "value", text: `↓${n.rx_kbps.toFixed(1)} ↑${n.tx_kbps.toFixed(1)} kbps` })]));
     // "temp", not "t" — the latter would shadow the i18n t() used all over this file.
     for (const temp of sw.temperatures || []) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: temp.type }), el("span", { class: "value", text: `${temp.temp_c.toFixed(1)} °C` })]));
