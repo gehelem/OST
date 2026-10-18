@@ -25,7 +25,7 @@ import { openSetupWizard } from "./wizard.js";
 // as a module's own level1 panels - this fills the shared quicknav bar
 // with one toggle button per section, exactly like render.js's own
 // renderModuleView() does for its panels.
-import { updateQuickNav } from "./render.js";
+import { updateQuickNav, getQuickNavButton } from "./render.js";
 // Inspector's own 4 control maps (hfr/shape/collim/corners), same list its
 // own "maps" panel already uses (Gilles, 2026-10-06: "sur inspector ajoute
 // les 4 images de controle en vignettes toutes petites").
@@ -1089,11 +1089,18 @@ export function renderController(client, settingsBoxEl) {
   // Every panel but the settings box reads live server data with nothing
   // meaningful to show while disconnected - Gilles, 2026-10-18: hidden
   // instead of sitting there empty. onStatus() fires immediately with the
-  // current status too, so this also covers the very first render.
+  // current status too, so this also covers the very first render. Their
+  // quicknav buttons are disabled right alongside, rather than left
+  // clickable toggles for a panel that's hidden regardless.
   const otherPanels = [confPanelEl, modPanelEl, libPanelEl, indiPanelEl, filesPanelEl];
+  const toggleableIds = quickNavEntries.map((e) => e.id).filter((id) => id !== "settings");
   const unsubStatus = client.onStatus((status) => {
     const connected = status === "connected";
     for (const panelEl of otherPanels) panelEl.classList.toggle("hidden", !connected);
+    for (const id of toggleableIds) {
+      const btn = getQuickNavButton(id);
+      if (btn) btn.disabled = !connected;
+    }
     swConnected = connected;
     updateSwVisibility();
   });
