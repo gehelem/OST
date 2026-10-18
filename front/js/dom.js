@@ -111,6 +111,11 @@ const TEMPLATE_ICON_MAP = {
   parkmanager: "garage",
   monitor: "query_stats",
   polar: "recenter",
+  // indipanel (infos.template, src/modules/indipanel/indipanel.cpp) renders
+  // on the same generic fallback as any other unlisted template - this own
+  // entry exists only to give it a distinct shortcut icon, not a bespoke
+  // screen.
+  indipanel: "tornado",
 };
 export function moduleIcon(mod) {
   const template = ((mod && mod.infos && mod.infos.template) || "").toLowerCase();
