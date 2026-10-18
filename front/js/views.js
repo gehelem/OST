@@ -766,20 +766,24 @@ export function buildIndiPanel(client, scope, onChange) {
   indiSec.appendChild(indiExternalMsg);
 
   // FIFO-only controls: starting/stopping the embedded process itself,
-  // loading a saved driver configuration, loading a new driver from the
-  // catalogue. Hidden whenever OST doesn't manage the server.
-  const manageControls = el("div", { class: "hidden" });
+  // loading a saved driver configuration. Hidden whenever OST doesn't
+  // manage the server. Split from manageControlsBottom below (the
+  // catalogue search/start section) so Active drivers can sit between the
+  // two - both halves still hide/show together, see renderIndi().
+  const manageControlsTop = el("div", { class: "hidden" });
   const indiServerToggleBtn = el("button", { class: "btn btn-sm" }, t("views.startServer"));
   // Only meaningful while the embedded server is actually confirmed
   // running ("U") - loading a configuration while it's down or starting
   // would just fail silently, same reasoning as the rest of this panel's
   // own enabled/disabled split.
   const indiLoadConfigBtn = el("button", { class: "btn btn-sm hidden", onclick: () => openIndiConfigDialog(client) }, [icon("folder_open", { small: true }), t("views.loadIndiConfiguration")]);
-  manageControls.appendChild(el("div", { class: "form-row" }, [indiServerToggleBtn, indiLoadConfigBtn]));
-  indiSec.appendChild(manageControls);
+  manageControlsTop.appendChild(el("div", { class: "form-row" }, [indiServerToggleBtn, indiLoadConfigBtn]));
+  indiSec.appendChild(manageControlsTop);
 
   // Active drivers (indiactivedrivers) - shown either way, see this
-  // function's own doc comment above.
+  // function's own doc comment above. Ahead of the "start a driver"
+  // catalogue below it (a separate, less-often-used action), with a
+  // separator between the two.
   const connectAllBtn = el("button", { class: "btn btn-sm", onclick: connectAll }, t("views.connectAll"));
   indiSec.appendChild(el("div", { class: "panel-header-row" }, [
     el("div", { class: "muted small", text: t("views.activeIndiDrivers") }),
@@ -787,6 +791,10 @@ export function buildIndiPanel(client, scope, onChange) {
   ]));
   const activeDriversList = el("ul");
   indiSec.appendChild(activeDriversList);
+
+  const manageControlsBottom = el("div", { class: "hidden" });
+  manageControlsBottom.appendChild(el("div", { class: "settings-sep" }));
+  indiSec.appendChild(manageControlsBottom);
 
   // Gilles, 2026-10-13 (both here and the setup wizard's own step 1, which
   // reuses this same panel - see this function's own doc comment): one
@@ -804,12 +812,12 @@ export function buildIndiPanel(client, scope, onChange) {
   // result with its own "start" button. Filtering only kicks in from 3
   // characters - the catalogue is in the hundreds on a full INDI install,
   // not worth listing unfiltered. Starting a new driver needs the FIFO,
-  // so this whole zone lives in manageControls too.
-  manageControls.appendChild(el("div", { class: "muted small", text: t("views.startIndiDriver") }));
+  // so this whole zone lives in manageControlsBottom too.
+  manageControlsBottom.appendChild(el("div", { class: "muted small", text: t("views.startIndiDriver") }));
   const driverSearchInput = el("input", { type: "text", class: "field-input", placeholder: t("views.indiDriverSearchPlaceholder") });
-  manageControls.appendChild(driverSearchInput);
+  manageControlsBottom.appendChild(driverSearchInput);
   const availableDriversList = el("ul");
-  manageControls.appendChild(availableDriversList);
+  manageControlsBottom.appendChild(availableDriversList);
 
   // Case- and accent-insensitive: NFD-normalize then strip the combining
   // diacritical marks Unicode splits accents into, so "é" and "e" compare
@@ -838,7 +846,8 @@ export function buildIndiPanel(client, scope, onChange) {
     const enabled = indiserver !== "N";
     indiTitle.textContent = t("views.indiServerPrefix") + (enabled ? t("views.enabled") : t("views.disabled"));
     indiExternalMsg.classList.toggle("hidden", enabled);
-    manageControls.classList.toggle("hidden", !enabled);
+    manageControlsTop.classList.toggle("hidden", !enabled);
+    manageControlsBottom.classList.toggle("hidden", !enabled);
     if (enabled) {
       const running = indiserver === "U";
       indiServerToggleBtn.textContent = running ? t("views.stopServer") : t("views.startServer");
@@ -849,11 +858,11 @@ export function buildIndiPanel(client, scope, onChange) {
     connectAllBtn.disabled = activeDrivers.length === 0;
     activeDriversList.innerHTML = "";
     for (const d of activeDrivers) {
-      // Two lines - label, then icon buttons below it - rather than
-      // cramming four buttons on the same row as the label (Gilles,
-      // 2026-10-09: that overflowed the panel on a narrow column).
-      const li = el("li", { class: "indi-driver-row" });
-      li.appendChild(el("div", { class: "small", text: `${d.label} (${d.family})` }));
+      // Buttons first, label last (.spacer - takes the rest of the row,
+      // truncating label text before button text) - denser than label
+      // above/buttons below, wraps onto its own line only if the row
+      // genuinely has no room left.
+      const li = el("li");
       const actions = el("div", { class: "icon-btn-row" });
       // Connect/disconnect act on the device itself (YC/YD), separate from
       // the driver process (reload/stop) - starting a driver doesn't
@@ -867,6 +876,7 @@ export function buildIndiPanel(client, scope, onChange) {
         actions.appendChild(iconButton("stop", t("views.stop"), () => client.indiStopDriver(d.binary), { danger: true }));
       }
       li.appendChild(actions);
+      li.appendChild(el("span", { class: "spacer small indi-driver-label", text: `${d.label} (${d.family})` }));
       activeDriversList.appendChild(li);
     }
     if (onChange) onChange();
@@ -1051,7 +1061,12 @@ export function renderController(client, settingsBoxEl) {
   // ---- INDI server & drivers ----
   const indiBody = makeSectionPanel("indi", "INDI");
   const indiPanelEl = indiBody.parentElement;
-  indiBody.appendChild(buildIndiPanel(client, scope));
+  // buildIndiPanel() is shared with wizard.js's own step container, which
+  // isn't itself boxed - strip its own .panel framing here only, so it
+  // doesn't double up with the floating panel's own border/padding.
+  const indiNode = buildIndiPanel(client, scope);
+  indiNode.classList.remove("panel");
+  indiBody.appendChild(indiNode);
 
   // ---- Server load (systemwatcher) ----
   const swBody = makeSectionPanel("server-load", t("views.serverLoad"));
