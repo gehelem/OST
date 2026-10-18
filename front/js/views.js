@@ -767,13 +767,14 @@ function openIndiConfigDialog(client) {
 // indiserver: "N" means OST isn't managing INDI at all (a separately-run
 // indiserver, or none). Starting/stopping/loading a driver process goes
 // through a FIFO only OST's own embedded instance owns, so that part stays
-// hidden in that case - but the active-devices list below comes from a
+// hidden in that case - but the active-drivers list below comes from a
 // plain bus query (indi_getprop) that works against ANY reachable INDI
-// server, so it still shows even then (see Controller's own constructor,
-// queryActiveIndiDrivers() in the "N" branch). Connect/disconnect
-// (indi_setprop) are bus-level too, so they stay available either way;
-// reload/stop act on the process through the FIFO, so they're only shown
-// once OST actually manages it.
+// server, so it still shows even then, and stays live afterwards too (see
+// Controller's own constructor, queryActiveIndiDrivers() +
+// IndiBusWatcher in the "N" branch). Connect/disconnect (indi_setprop)
+// act on the live device itself and are bus-level too, so they stay
+// available either way; reload/stop act on the driver's process through
+// the FIFO, so they're only shown once OST actually manages it.
 export function buildIndiPanel(client, scope, onChange) {
   const indiSec = el("section", { class: "panel" });
   const indiTitle = el("h3");
@@ -794,7 +795,7 @@ export function buildIndiPanel(client, scope, onChange) {
   manageControls.appendChild(el("div", { class: "form-row" }, [indiServerToggleBtn, indiLoadConfigBtn]));
   indiSec.appendChild(manageControls);
 
-  // Active devices (indiactivedrivers) - shown either way, see this
+  // Active drivers (indiactivedrivers) - shown either way, see this
   // function's own doc comment above.
   const connectAllBtn = el("button", { class: "btn btn-sm", onclick: connectAll }, t("views.connectAll"));
   indiSec.appendChild(el("div", { class: "panel-header-row" }, [

@@ -172,8 +172,22 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
         // running on its own (started independently of us) - indi_getprop
         // works against any INDI server reachable on the bus, not just one
         // we spawned ourselves, so the same bus query startIndi() already
-        // uses for orphan recovery still finds its active devices here.
+        // uses for orphan recovery still finds its active drivers here too.
         queryActiveIndiDrivers();
+
+        // Stay in sync afterwards: OST has no FIFO of its own to learn about
+        // further changes from in this mode, so a lightweight INDI client
+        // watches the bus directly instead and re-queries on every
+        // newDevice()/removeDevice() push (see IndiBusWatcher's own doc
+        // comment). Connects to the same default indiserver address
+        // indi_getprop/indi_setprop already target above and in
+        // resolveIndiDeviceNames()/connectIndiDriver()/disconnectIndiDriver().
+        // If no indiserver is reachable yet, this attempt simply fails -
+        // nothing retries it later, same one-shot spirit as the query
+        // above.
+        _indiBusWatcher = new IndiBusWatcher([this]() { queryActiveIndiDrivers(); });
+        _indiBusWatcher->setServer("localhost", 7624);
+        _indiBusWatcher->connectServer();
     }
 
     loadConf(_conf);
@@ -233,6 +247,11 @@ Controller::Controller(const QString &webroot, const QString &dbpath,
 
 Controller::~Controller()
 {
+    if (_indiBusWatcher)
+    {
+        _indiBusWatcher->disconnectServer();
+        delete _indiBusWatcher;
+    }
 }
 
 
