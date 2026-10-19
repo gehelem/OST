@@ -907,6 +907,31 @@ function controllerPanelPos(index) {
 // existing listeners on its children keeps working untouched - the node
 // itself survives detached whenever Controller isn't the active view,
 // ready to be reparented back in next time it is.
+// Wraps a live-rebuild function (e.g. a <select>'s options, torn down and
+// recreated from a backend push) so it's deferred while `selectEl` itself
+// is focused/mid-interaction instead of running right away. A native
+// select's own dropdown is a one-shot OS gesture tied to the tap that
+// opens it - rebuilding its options out from under that exact gesture
+// cancels it silently on Android, same root cause as panels.js's
+// raisePanel, just triggered by the select's own live update instead of
+// an ancestor's. Flushes with whatever the latest call provided once the
+// select settles (change or blur).
+function guardSelectRebuild(selectEl, rebuild) {
+  let pending = null;
+  function flush() {
+    if (!pending) return;
+    const args = pending;
+    pending = null;
+    rebuild(...args);
+  }
+  selectEl.addEventListener("change", flush);
+  selectEl.addEventListener("blur", flush);
+  return (...args) => {
+    if (document.activeElement === selectEl) { pending = args; return; }
+    rebuild(...args);
+  };
+}
+
 export function renderController(client, settingsBoxEl) {
   const root = el("div", { class: "controller-view" });
   const scope = client.scope();
@@ -1032,7 +1057,7 @@ export function renderController(client, settingsBoxEl) {
   // — a library switch naturally resets the selection to "none" here,
   // same as OstErix's onLibraryChange(), since the old value almost never
   // matches an option in the new library's own profile list.
-  function renderProfiles() {
+  function renderProfilesNow() {
     const profiles = client.get(client.topics.controllerData("profiles")) || {};
     const profileKey = libSelect.value ? libSelect.value.charAt(0).toUpperCase() + libSelect.value.slice(1).toLowerCase() : "";
     const options = Array.isArray(profiles[profileKey]) ? profiles[profileKey] : [];
@@ -1042,9 +1067,10 @@ export function renderController(client, settingsBoxEl) {
     for (const p of options) profileSelect.appendChild(el("option", { value: p, text: p }));
     if (options.includes(prevValue)) profileSelect.value = prevValue;
   }
+  const renderProfiles = guardSelectRebuild(profileSelect, renderProfilesNow);
   libSelect.addEventListener("change", renderProfiles);
 
-  scope.subscribe(client.topics.controllerData("libraries"), (libs) => {
+  const rebuildLibSelect = guardSelectRebuild(libSelect, (libs) => {
     // libraries is static in practice (scanned once at server startup) but
     // keep the currently selected library across a redraw regardless.
     const prevValue = libSelect.value;
@@ -1056,6 +1082,7 @@ export function renderController(client, settingsBoxEl) {
     if ([...libSelect.options].some((o) => o.value === prevValue)) libSelect.value = prevValue;
     renderProfiles();
   });
+  scope.subscribe(client.topics.controllerData("libraries"), rebuildLibSelect);
   scope.subscribe(client.topics.controllerData("profiles"), renderProfiles);
 
   // ---- INDI server & drivers ----
