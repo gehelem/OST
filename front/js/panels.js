@@ -422,7 +422,28 @@ export function make(opts) {
   // The drag bar/resize handle above still raise instantly on their own
   // mousedown instead - neither is a button with its own click handler
   // to protect, so there's nothing to break.
-  panel.addEventListener("click", () => raisePanel(panel, id, sc));
+  // A native <select>'s own dropdown is a one-shot OS-level action tied to
+  // this exact click - raising right now would reparent the panel
+  // (raisePanel's appendChild) while that's still pending and silently
+  // cancel it on Android WebView, confirmed live: the select never opens.
+  // Unlike the focused-<input> case above, there's no after-the-fact fix
+  // (focus can be restored, a cancelled native popup can't) - so for a
+  // select the raise itself is deferred until it settles (change or
+  // blur), once reparenting is safe again.
+  panel.addEventListener("click", (ev) => {
+    const sel = ev.target.closest && ev.target.closest("select");
+    if (sel) {
+      const raiseOnce = () => {
+        sel.removeEventListener("change", raiseOnce);
+        sel.removeEventListener("blur", raiseOnce);
+        raisePanel(panel, id, sc);
+      };
+      sel.addEventListener("change", raiseOnce);
+      sel.addEventListener("blur", raiseOnce);
+      return;
+    }
+    raisePanel(panel, id, sc);
+  });
 
   insertSorted(panel, z);
   if (!opts.persistent) live.push(panel);
