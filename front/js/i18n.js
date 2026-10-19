@@ -58,7 +58,6 @@ const STRINGS = {
   "common.moveDown": { en: "Move down", fr: "Descendre", de: "Nach unten", it: "Sposta giù", es: "Bajar" },
   "common.deleteRow": { en: "Delete row", fr: "Supprimer la ligne", de: "Zeile löschen", it: "Elimina riga", es: "Eliminar fila" },
   "common.deleteRowConfirm": { en: "Delete this row?", fr: "Supprimer cette ligne ?", de: "Diese Zeile löschen?", it: "Eliminare questa riga?", es: "¿Eliminar esta fila?" },
-  "common.sendNow": { en: "Send now (SV)", fr: "Envoyer maintenant (SV)", de: "Jetzt senden (SV)", it: "Invia ora (SV)", es: "Enviar ahora (SV)" },
   "common.noImage": { en: "No image", fr: "Aucune image", de: "Kein Bild", it: "Nessuna immagine", es: "Sin imagen" },
   "common.noVideo": { en: "No video", fr: "Aucune vidéo", de: "Kein Video", it: "Nessun video", es: "Sin vídeo" },
   "common.profile": { en: "Profile", fr: "Profil", de: "Profil", it: "Profilo", es: "Perfil" },

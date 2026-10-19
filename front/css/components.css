@@ -41,15 +41,19 @@
 }
 .lang-flag-btn:hover { opacity: 0.85; background: var(--bg-hover); }
 .lang-flag-btn.active { opacity: 1; border-color: var(--accent-dim); background: var(--accent-subtle); }
-/* A directedit field's "send" confirm - invisible until the field is
- * actually dirty, then turns green - Gilles, 2026-10-0X, on the previous
- * unconditional "send" arrow: "la fleche n'est pas tres parlante, je
- * prefererais une icone 'check' qui apparaisse en vert seulement si je
- * modifie la zone". Space is reserved (opacity, not display:none) so
- * typing doesn't shift the row. */
-.send-check { opacity: 0; pointer-events: none; }
-.send-check.dirty { opacity: 1; pointer-events: auto; color: var(--ok); }
-.send-check.dirty:hover { color: var(--ok); background: rgba(var(--ok-rgb), 0.12); }
+/* A free-typed directedit field's status icon - invisible at rest, yellow
+ * while a pending edit differs from the server's value, green right after
+ * it's sent (committed on focusout, see render.js). Space is reserved
+ * (opacity, not display:none) so typing doesn't shift the row. */
+.field-edit-icon { opacity: 0; transition: opacity 0.15s ease, color 0.15s ease; }
+.field-edit-icon .material-icons { font-size: 16px; }
+.field-edit-icon.editing { opacity: 1; color: var(--warn); }
+.field-edit-icon.sent { opacity: 1; color: var(--ok); }
+/* Cancels a pending edit instead of committing it - hidden until dirty,
+ * same reserved-space idiom as above. */
+.field-cancel-btn { opacity: 0; pointer-events: none; color: var(--btn-danger); }
+.field-cancel-btn.visible { opacity: 1; pointer-events: auto; }
+.field-cancel-btn.visible:hover { color: var(--btn-danger); background: rgba(var(--error-rgb), 0.12); }
 .toggle-btn { min-width: 52px; justify-content: center; }
 .toggle-btn.active { background: var(--accent-subtle); border-color: var(--accent); color: var(--accent-strong); box-shadow: 0 0 10px var(--accent-faint); }
 

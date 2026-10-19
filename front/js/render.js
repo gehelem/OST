@@ -209,8 +209,8 @@ function formatScalarWithLov(client, moduleName, def, value) {
 
 // Shallow value-equality covering both scalars and the compound
 // date/time/datetime shape ({year,month,...}) - used only to decide
-// whether a directedit field's own "check" icon should turn green (see
-// renderPropertyBody's own directedit branch), nothing protocol-facing.
+// whether a directedit field is currently dirty (see renderPropertyBody's
+// own directedit branch), nothing protocol-facing.
 function valuesEqual(a, b) {
   if (a && b && typeof a === "object" && typeof b === "object") {
     const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
@@ -704,7 +704,7 @@ function openPropertyEditDialog(client, moduleName, propName, prop, formable) {
   (dialogRoot || document.body).appendChild(overlay);
 }
 
-function renderPropertyBody(client, moduleName, propName, prop) {
+function renderPropertyBody(client, moduleName, propName, prop, editTracker) {
   const body = el("div", { class: "prop-body" });
 
   // freevalue is documented as a generic display field (structure.en.md),
@@ -798,18 +798,11 @@ function renderPropertyBody(client, moduleName, propName, prop) {
       // A local one-field buffer is enough - there's no bulk Save left to
       // share it with.
       //
-      // WHEN the SV actually fires differs by control kind, matching
-      // OstErix/Rooster's own property.component.ts (confirmed against its
-      // source, Gilles 2026-10-0X: "a quel moment on envoie effectivement
-      // le message SV sur une mise a jour individuelle d'un element") - a
-      // select/LOV is already a complete, deliberate choice the instant it
-      // changes, so it sends immediately, same as the bool buttons above
-      // (no separate confirm step); a free-typed field (number/text/date/
-      // time) must NOT send on every keystroke, so it only buffers
-      // locally, with a "check" icon that stays invisible until the
-      // buffer actually differs from the server's own value, then turns
-      // green - replacing the previous unconditional "send" arrow, which
-      // Gilles found unclear: "la fleche n'est pas tres parlante".
+      // A select/LOV is already a complete, deliberate choice the instant
+      // it changes, so it sends immediately, same as the bool buttons
+      // above. A free-typed field (number/text/date/time) instead commits
+      // on leaving the field (focusout), not on every keystroke - see the
+      // else branch below.
       const fieldBuffer = { [name]: e.value };
       if (client.resolveLov(moduleName, e)) {
         const ctrl = buildEditControl(client, moduleName, e, name, fieldBuffer, {
@@ -817,16 +810,58 @@ function renderPropertyBody(client, moduleName, propName, prop) {
         });
         valueCell.appendChild(ctrl);
       } else {
-        const checkBtn = iconButton("check", t("common.sendNow"), () => {
-          client.setValue(moduleName, propName, name, fieldBuffer[name]);
-          checkBtn.classList.remove("dirty");
-        });
-        checkBtn.classList.add("send-check");
+        // Commits on focusout (leaving the field), not per keystroke, and
+        // while focused this property stops redrawing from backend
+        // updates (editTracker.begin()/end()) so a live push never
+        // overwrites what's being typed. A yellow icon + cancel cross only
+        // appear once the value actually differs from the server's; the
+        // cross cancels (reverts, no send) instead of committing - its
+        // pointerdown is intercepted with preventDefault so the browser
+        // never shifts focus away from the field first, which would
+        // otherwise fire focusout (and commit) before the cross's own
+        // click is handled. Escape does the same cancel. On commit the
+        // icon turns green for a moment before the row is redrawn.
+        let began = false;
+        let dirty = false;
+        const statusIcon = el("span", { class: "field-edit-icon" }, [icon("check", { small: true })]);
+        function finish(send) {
+          if (!began) return;
+          began = false;
+          statusIcon.classList.remove("editing", "sent");
+          cancelBtn.classList.remove("visible");
+          if (send) {
+            client.setValue(moduleName, propName, name, fieldBuffer[name]);
+            statusIcon.classList.add("sent");
+            setTimeout(() => editTracker.end(), 500);
+          } else {
+            editTracker.end();
+          }
+        }
+        const cancelBtn = iconButton("close", t("common.cancel"), () => finish(false));
+        cancelBtn.classList.add("field-cancel-btn");
+        cancelBtn.addEventListener("pointerdown", (ev) => ev.preventDefault());
         const ctrl = buildEditControl(client, moduleName, e, name, fieldBuffer, {
-          onChange: () => checkBtn.classList.toggle("dirty", !valuesEqual(fieldBuffer[name], e.value)),
+          onChange: () => {
+            dirty = !valuesEqual(fieldBuffer[name], e.value);
+            statusIcon.classList.toggle("editing", dirty);
+            cancelBtn.classList.toggle("visible", dirty);
+          },
+        });
+        valueCell.addEventListener("focusin", () => {
+          if (began) return;
+          began = true;
+          editTracker.begin();
+        });
+        valueCell.addEventListener("focusout", (ev) => {
+          if (valueCell.contains(ev.relatedTarget)) return;
+          finish(dirty);
+        });
+        valueCell.addEventListener("keydown", (ev) => {
+          if (ev.key === "Escape") { ev.preventDefault(); finish(false); }
         });
         valueCell.appendChild(ctrl);
-        valueCell.appendChild(checkBtn);
+        valueCell.appendChild(statusIcon);
+        valueCell.appendChild(cancelBtn);
       }
     } else {
       valueCell.appendChild(el("span", { class: "readonly-val", text: formatScalarWithLov(client, moduleName, e, e.value) }));
@@ -869,7 +904,16 @@ export function renderProperty(client, moduleName, propName, opts) {
   container.dataset.module = moduleName;
   container.dataset.prop = propName;
 
-  const unsubscribe = client.subscribe(client.topics.property(moduleName, propName), (prop) => {
+  // While a free-typed directedit field is being edited (see
+  // renderPropertyBody's own else branch), redraws are frozen so a
+  // backend push never overwrites what's being typed - editingCount
+  // tracks how many fields are currently mid-edit (focused), and the
+  // latest prop received meanwhile is drawn as soon as it drops back to
+  // zero, whether that's from a commit or a cancel.
+  let editingCount = 0;
+  let currentProp = null;
+
+  function draw(prop) {
     container.innerHTML = "";
     if (!prop) { container.classList.add("hidden"); return; }
     container.classList.remove("hidden");
@@ -898,7 +942,20 @@ export function renderProperty(client, moduleName, propName, opts) {
       }
       container.appendChild(header);
     }
-    container.appendChild(renderPropertyBody(client, moduleName, propName, prop));
+    container.appendChild(renderPropertyBody(client, moduleName, propName, prop, editTracker));
+  }
+
+  const editTracker = {
+    begin() { editingCount++; },
+    end() {
+      editingCount = Math.max(0, editingCount - 1);
+      if (editingCount === 0) draw(currentProp);
+    },
+  };
+
+  const unsubscribe = client.subscribe(client.topics.property(moduleName, propName), (prop) => {
+    currentProp = prop;
+    if (editingCount === 0) draw(prop);
   });
 
   container._dispose = unsubscribe;
