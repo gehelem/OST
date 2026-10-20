@@ -841,6 +841,7 @@ void Guider::openGuideLog()
 
     PHD2GuideLog::HeaderInfo h;
     h.equipmentProfile   = "Guider";
+    h.pixelScaleArcsecPerPx = getSampling();
     h.exposureMs          = qRound(getFloat("parms", "exposure") * 1000.0);
     h.xAngleDeg           = xAngle;
     h.xRateArcsecS        = xRate;
