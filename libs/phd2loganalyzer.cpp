@@ -43,6 +43,97 @@ struct LinFit
     double theta() const { return n >= 2. ? std::atan2(covxy, varx) : 0.; }
 };
 
+// Full RA periodic-error spectrum. undoCorrections=true reconstructs the
+// uncorrected position (undoes every applied guide pulse) so the worm's
+// true periodic error shows up even while being guided - useful to read
+// off a PEC curve. false FFTs the actual guided residual as-is, showing
+// what the guide loop left behind - useful to judge how well it's
+// compensating.
+std::vector<PHD2LogAnalyzer::Peak> computeSpectrum(const std::vector<Row> &rows, bool undoCorrections)
+{
+    const size_t n = rows.size();
+    std::vector<double> t(n), rapos(n);
+    {
+        double prevRaraw = 0, prevRaguide = 0, pos = 0;
+        for (size_t i = 0; i < n; i++)
+        {
+            const double move = rows[i].raraw - prevRaraw - prevRaguide;
+            pos += move;
+            prevRaraw = rows[i].raraw;
+            prevRaguide = undoCorrections ? rows[i].raguide : 0.0;
+            t[i] = rows[i].t;
+            rapos[i] = pos;
+        }
+    }
+
+    // Detrend: remove the linear drift, keep only the periodic + noise part.
+    LinFit fit;
+    for (size_t i = 0; i < n; i++)
+        fit.add(t[i], rapos[i]);
+    std::vector<double> rac(n);
+    for (size_t i = 0; i < n; i++)
+        rac[i] = rapos[i] - (fit.intercept() + fit.slope() * t[i]);
+
+    // Resample to a uniform time step (Akima spline) - the FFT needs evenly
+    // spaced samples but real guide frames don't arrive at a fixed rate.
+    const double dt = (t[n - 1] - t[0]) / (double)(n - 1);
+    std::vector<double> data(n * 2, 0.0);
+    {
+        gsl_interp_accel *acc = gsl_interp_accel_alloc();
+        gsl_spline *spline = gsl_spline_alloc(gsl_interp_akima, n);
+        gsl_spline_init(spline, t.data(), rac.data(), n);
+
+        const double k = M_PI * 2.0 / (double)(n - 1);
+        double x = t[0];
+        for (size_t i = 0; i < n; i++, x += dt)
+        {
+            if (x > t[n - 1]) x = t[n - 1];
+            const double hamming = 0.54 - 0.46 * std::cos((double)i * k);
+            data[i * 2] = hamming * gsl_spline_eval(spline, x, acc);
+        }
+
+        gsl_spline_free(spline);
+        gsl_interp_accel_free(acc);
+    }
+
+    gsl_fft_complex_workspace *work = gsl_fft_complex_workspace_alloc(n);
+    gsl_fft_complex_wavetable *wt = gsl_fft_complex_wavetable_alloc(n);
+    gsl_fft_complex_forward(data.data(), 1, n, wt, work);
+    gsl_fft_complex_wavetable_free(wt);
+    gsl_fft_complex_workspace_free(work);
+
+    const size_t nfft = n / 2 - 1;   // omit DC (f=0) and the Nyquist-adjacent tail
+    std::vector<PHD2LogAnalyzer::Peak> spectrum;
+    spectrum.reserve(nfft);
+    const double scale = 4.0 / (double)n;
+    for (size_t i = 0; i < nfft; i++)
+    {
+        const gsl_complex *z = (const gsl_complex *)(&data[(i + 1) * 2]);
+        const double f = (double)(i + 1) / ((double)n * dt);
+        spectrum.push_back({1.0 / f, gsl_complex_abs(*z) * scale});
+    }
+    return spectrum;
+}
+
+// A spectral line spans several adjacent bins - keep only local maxima, so
+// reporting the "top N" doesn't just repeat the same peak several times.
+std::vector<PHD2LogAnalyzer::Peak> localMaximaPeaks(const std::vector<PHD2LogAnalyzer::Peak> &spectrum, int maxPeaks)
+{
+    std::vector<PHD2LogAnalyzer::Peak> peaks;
+    for (size_t i = 1; i + 1 < spectrum.size(); i++)
+    {
+        if (spectrum[i].amplitudePx > spectrum[i - 1].amplitudePx && spectrum[i].amplitudePx > spectrum[i + 1].amplitudePx)
+            peaks.push_back(spectrum[i]);
+    }
+    std::sort(peaks.begin(), peaks.end(), [](const PHD2LogAnalyzer::Peak & a, const PHD2LogAnalyzer::Peak & b)
+    {
+        return a.amplitudePx > b.amplitudePx;
+    });
+    if ((int)peaks.size() > maxPeaks)
+        peaks.resize(maxPeaks);
+    return peaks;
+}
+
 bool parseRows(const QString &path, double &pixelScaleArcsecPerPx, double &declinationRad,
                 std::vector<Row> &rows)
 {
@@ -192,91 +283,10 @@ PHD2LogAnalyzer::Result PHD2LogAnalyzer::Analyze(const QString &logFilePath, int
         }
     }
 
-    // ---- RA periodic error spectrum (worm) ----
-    {
-        // Reconstruct the uncorrected RA position: undo every applied guide
-        // pulse so the worm's periodic error shows up even while being guided.
-        std::vector<double> t(n), rapos(n);
-        {
-            double prevRaraw = 0, prevRaguide = 0, pos = 0;
-            for (size_t i = 0; i < n; i++)
-            {
-                const double move = rows[i].raraw - prevRaraw - prevRaguide;
-                pos += move;
-                prevRaraw = rows[i].raraw;
-                prevRaguide = rows[i].raguide;
-                t[i] = rows[i].t;
-                rapos[i] = pos;
-            }
-        }
-
-        // Detrend: remove the linear drift, keep only the periodic + noise part.
-        LinFit fit;
-        for (size_t i = 0; i < n; i++)
-            fit.add(t[i], rapos[i]);
-        std::vector<double> rac(n);
-        for (size_t i = 0; i < n; i++)
-            rac[i] = rapos[i] - (fit.intercept() + fit.slope() * t[i]);
-
-        // Resample to a uniform time step (Akima spline) - the FFT needs evenly
-        // spaced samples but real guide frames don't arrive at a fixed rate.
-        const double dt = (t[n - 1] - t[0]) / (double)(n - 1);
-        std::vector<double> data(n * 2, 0.0);
-        {
-            gsl_interp_accel *acc = gsl_interp_accel_alloc();
-            gsl_spline *spline = gsl_spline_alloc(gsl_interp_akima, n);
-            gsl_spline_init(spline, t.data(), rac.data(), n);
-
-            const double k = M_PI * 2.0 / (double)(n - 1);
-            double x = t[0];
-            for (size_t i = 0; i < n; i++, x += dt)
-            {
-                if (x > t[n - 1]) x = t[n - 1];
-                const double hamming = 0.54 - 0.46 * std::cos((double)i * k);
-                data[i * 2] = hamming * gsl_spline_eval(spline, x, acc);
-            }
-
-            gsl_spline_free(spline);
-            gsl_interp_accel_free(acc);
-        }
-
-        gsl_fft_complex_workspace *work = gsl_fft_complex_workspace_alloc(n);
-        gsl_fft_complex_wavetable *wt = gsl_fft_complex_wavetable_alloc(n);
-        gsl_fft_complex_forward(data.data(), 1, n, wt, work);
-        gsl_fft_complex_wavetable_free(wt);
-        gsl_fft_complex_workspace_free(work);
-
-        const size_t nfft = n / 2 - 1;   // omit DC (f=0) and the Nyquist-adjacent tail
-        std::vector<double> period(nfft), amplitude(nfft);
-        const double scale = 4.0 / (double)n;
-        for (size_t i = 0; i < nfft; i++)
-        {
-            const gsl_complex *z = (const gsl_complex *)(&data[(i + 1) * 2]);
-            const double f = (double)(i + 1) / ((double)n * dt);
-            period[i] = 1.0 / f;
-            amplitude[i] = gsl_complex_abs(*z) * scale;
-        }
-
-        res.spectrum.reserve(nfft);
-        for (size_t i = 0; i < nfft; i++)
-            res.spectrum.push_back({period[i], amplitude[i]});
-
-        // Keep only local maxima (a spectral line spans several adjacent bins
-        // otherwise, reporting the "top N" would just repeat the same peak).
-        std::vector<PHD2LogAnalyzer::Peak> peaks;
-        for (size_t i = 1; i + 1 < nfft; i++)
-        {
-            if (amplitude[i] > amplitude[i - 1] && amplitude[i] > amplitude[i + 1])
-                peaks.push_back({period[i], amplitude[i]});
-        }
-        std::sort(peaks.begin(), peaks.end(), [](const PHD2LogAnalyzer::Peak & a, const PHD2LogAnalyzer::Peak & b)
-        {
-            return a.amplitudePx > b.amplitudePx;
-        });
-        if ((int)peaks.size() > maxPeaks)
-            peaks.resize(maxPeaks);
-        res.topPeriods = std::move(peaks);
-    }
+    // ---- RA periodic error spectrum (worm), raw and corrected ----
+    res.spectrumRaw = computeSpectrum(rows, true);
+    res.spectrumCorrected = computeSpectrum(rows, false);
+    res.topPeriods = localMaximaPeaks(res.spectrumRaw, maxPeaks);
 
     res.ok = true;
     return res;

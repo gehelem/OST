@@ -289,10 +289,32 @@ export function buildDriftChartPanel(client, moduleName, opts) {
 // not a live-streaming series like drift/guiding - each click replaces
 // the previous curve. Log-scale X: periods span roughly the worm period
 // down to a couple of seconds, a linear axis would crush the short end.
-function spectrumPoints(prop) {
+// Two series share the grid (graphType SXY), told apart by the "series"
+// column: "raw" (corrections undone - the worm's true PE) vs "corrected"
+// (the actual guided residual - what the loop left behind).
+const SPECTRUM_SERIES_COLORS = { raw: "#ff8a65", corrected: "#4fc3f7" };
+
+function spectrumSeries(prop) {
   const rows = prop.rows || [];
-  const gp = (prop && prop.graphParams) || { X: "period", Y: "amplitude" };
-  return rows.map((r) => ({ x: num(r[gp.X]), y: num(r[gp.Y]) })).filter((pt) => isFinite(pt.x) && isFinite(pt.y) && pt.x > 0);
+  const gp = (prop && prop.graphParams) || { X: "period", Y: "amplitude", S: "series" };
+  const series = new Map();
+  for (const r of rows) {
+    const x = num(r[gp.X]), y = num(r[gp.Y]);
+    if (!isFinite(x) || !isFinite(y) || x <= 0) continue;
+    const name = String(r[gp.S] ?? "");
+    if (!series.has(name)) series.set(name, []);
+    series.get(name).push({ x, y });
+  }
+  return series;
+}
+
+function spectrumDatasets(series) {
+  return [...series.entries()].map(([name, data]) => ({
+    label: name, data, parsing: false,
+    borderColor: SPECTRUM_SERIES_COLORS[name] || "#4fc3f7",
+    backgroundColor: SPECTRUM_SERIES_COLORS[name] || "#4fc3f7",
+    borderWidth: 1.5, pointRadius: 1.5, tension: 0,
+  }));
 }
 
 export function buildSpectrumChartPanel(client, moduleName) {
@@ -305,21 +327,15 @@ export function buildSpectrumChartPanel(client, moduleName) {
 
   const unsub = client.subscribe(client.topics.property(moduleName, "spectrum"), (prop) => {
     if (!prop) return;
-    const pts = spectrumPoints(prop);
+    const series = spectrumSeries(prop);
     const gp = prop.graphParams || {};
     if (!chart) {
       chart = new window.Chart(canvas.getContext("2d"), {
         type: "line",
-        data: {
-          datasets: [{
-            label: "RA PE", data: pts, parsing: false,
-            borderColor: "#4fc3f7", backgroundColor: "#4fc3f7",
-            borderWidth: 1.5, pointRadius: 1.5, tension: 0,
-          }],
-        },
+        data: { datasets: spectrumDatasets(series) },
         options: {
           responsive: true, maintainAspectRatio: false, animation: false,
-          plugins: { legend: { display: false } },
+          plugins: { legend: { display: true, position: "bottom", labels: { color: grey, boxWidth: 14, boxHeight: 10, font: { size: 10 } } } },
           scales: {
             x: {
               type: "logarithmic",
@@ -336,7 +352,7 @@ export function buildSpectrumChartPanel(client, moduleName) {
       });
       return;
     }
-    chart.data.datasets[0].data = pts;
+    chart.data.datasets = spectrumDatasets(series);
     chart.update("none");
   });
 

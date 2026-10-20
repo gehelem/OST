@@ -33,8 +33,15 @@ public:
         double driftRaPxPerMin = 0, driftDecPxPerMin = 0;
         double polarAlignErrArcmin = 0;            // 0 if declination unknown
 
-        std::vector<Peak> topPeriods;              // RA worm spectrum, strongest first
-        std::vector<Peak> spectrum;                 // full RA worm spectrum, for graphing
+        // "Raw" undoes every applied guide pulse before the FFT, so it shows
+        // the worm's true periodic error as if unguided (useful to read off
+        // a PEC curve). "Corrected" FFTs the actual guided residual as-is,
+        // so it shows what the guide loop left behind (useful to judge how
+        // well it's compensating). topPeriods is the raw spectrum's
+        // strongest components; both full spectra are kept for graphing.
+        std::vector<Peak> topPeriods;
+        std::vector<Peak> spectrumRaw;
+        std::vector<Peak> spectrumCorrected;
     };
 
     // maxPeaks: how many of the strongest RA periodic-error components to report.

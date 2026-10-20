@@ -257,11 +257,12 @@
         "hasGrid":true,
         "showElts":false,
         "showGrid":false,
-        "gridLimit":2000,
-        "graphType":"XY",
+        "gridLimit":4000,
+        "graphType":"SXY",
         "graphParams":{
             "X":"period",
-            "Y":"amplitude"
+            "Y":"amplitude",
+            "S":"series"
         },
         "e": {
             "period": {
@@ -275,6 +276,11 @@
                 "label": "Amplitude",
                 "order":"02",
                 "format": "9.999"
+            },
+            "series": {
+                "type":"string",
+                "label": "Series",
+                "order":"03"
             }
         }
     },

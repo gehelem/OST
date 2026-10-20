@@ -952,10 +952,20 @@ void Guider::runLogAnalysis()
 
     // Full spectrum for the front-end graph - replaces the previous one each
     // time "analyse" is clicked, it is a snapshot, not a running series.
+    // Raw and corrected share the grid, told apart by the "series" column
+    // (SXY graph type - see libs/phd2loganalyzer.h's own doc comment).
     getProperty("spectrum")->clearGrid();
-    getProperty("spectrum")->setGridLimit((int)r.spectrum.size());
-    for (const auto &p : r.spectrum)
+    getProperty("spectrum")->setGridLimit((int)(r.spectrumRaw.size() + r.spectrumCorrected.size()));
+    for (const auto &p : r.spectrumRaw)
     {
+        getEltString("spectrum", "series")->setValue("raw");
+        getEltFloat("spectrum", "period")->setValue(p.periodS);
+        getEltFloat("spectrum", "amplitude")->setValue(p.amplitudePx, true);
+        getProperty("spectrum")->push();
+    }
+    for (const auto &p : r.spectrumCorrected)
+    {
+        getEltString("spectrum", "series")->setValue("corrected");
         getEltFloat("spectrum", "period")->setValue(p.periodS);
         getEltFloat("spectrum", "amplitude")->setValue(p.amplitudePx, true);
         getProperty("spectrum")->push();
