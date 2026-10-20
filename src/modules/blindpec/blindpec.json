@@ -28,10 +28,18 @@
                 "value": 0,
                 "format": "99.99"
             },
+            "rmsTotal": {
+                "type":"float",
+                "label": "RMS Total",
+                "order":"04",
+                "value": 0,
+                "format": "99.99",
+                "hint": "RA-only module: same value as RMS RA, exposed under this name so Sequencer can gate on it like it does for Guider"
+            },
             "residual": {
                 "type":"float",
                 "label": "Residual (px)",
-                "order":"04",
+                "order":"05",
                 "value": 0,
                 "format": "999.99",
                 "hint": "p - V.t on the RA axis: the periodic error plus what is left of the tracking drift"
@@ -39,7 +47,7 @@
             "response": {
                 "type":"float",
                 "label": "Correlation response",
-                "order":"05",
+                "order":"06",
                 "value": 0,
                 "format": "9.999",
                 "hint": "phaseCorrelate peak sharpness; low = frame not trusted"
@@ -47,7 +55,7 @@
             "crossaxis": {
                 "type":"float",
                 "label": "Cross-axis (px)",
-                "order":"06",
+                "order":"07",
                 "value": 0,
                 "format": "999.99",
                 "hint": "displacement on the image axis orthogonal to RA; should stay near 0 (health signal: CD slip / tilt)"

@@ -1160,6 +1160,7 @@ void BlindPec::computeGuide()
     getEltInt("values", "pulseE")->setValue(_pulseE);
     getEltInt("values", "pulseW")->setValue(_pulseW);
     getEltFloat("values", "rmsRA")->setValue(rms);
+    getEltFloat("values", "rmsTotal")->setValue(rms);   // RA-only: same value, under the name Sequencer looks for
     getEltFloat("values", "residual")->setValue(err);
     getEltFloat("values", "response")->setValue(_measResp);
     getEltFloat("values", "crossaxis")->setValue(cross, true);
