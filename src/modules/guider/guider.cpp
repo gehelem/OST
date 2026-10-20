@@ -929,6 +929,7 @@ void Guider::runLogAnalysis()
     // Scalar summary for the front-end - same numbers as the logInfo above,
     // as a property so the UI can show them without scraping the log.
     getEltInt("analysis", "frames")->setValue(r.frameCount);
+    getEltInt("analysis", "duration")->setValue(qRound(r.durationS));
     getEltFloat("analysis", "pixelScale")->setValue(r.pixelScaleArcsecPerPx);
     getEltFloat("analysis", "rmsRA")->setValue(r.rmsRaPx);
     getEltFloat("analysis", "rmsDEC")->setValue(r.rmsDecPx);

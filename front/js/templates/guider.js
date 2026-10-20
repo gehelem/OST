@@ -308,13 +308,40 @@ function spectrumSeries(prop) {
   return series;
 }
 
-function spectrumDatasets(series) {
+function spectrumDatasets(series, mapping) {
   return [...series.entries()].map(([name, data]) => ({
     label: name, data, parsing: false,
     borderColor: SPECTRUM_SERIES_COLORS[name] || "#4fc3f7",
     backgroundColor: SPECTRUM_SERIES_COLORS[name] || "#4fc3f7",
     borderWidth: 1.5, pointRadius: 1.5, tension: 0,
+    yAxisID: (mapping && mapping[name]) || "y",
   }));
+}
+
+// graphParams.axis/mapping (structure.en.md's SXY doc) - one Y axis per
+// series so "corrected" (much smaller amplitude once guiding is actually
+// compensating) doesn't get crushed flat by "raw"'s scale (Gilles,
+// 2026-10-20, after seeing exactly that: "il faudrait deux axes sur le
+// graphe"). Falls back to a single shared "y" axis if a property doesn't
+// declare graphParams.axis, same as the single-series XY panels above.
+function spectrumYScales(axisDefs, grey, grid) {
+  const entries = axisDefs ? Object.entries(axisDefs) : [];
+  if (entries.length === 0) {
+    return { y: { beginAtZero: true, title: { display: true, text: "Amplitude (px)", color: grey, font: { size: 10 } }, ticks: { color: grey, font: { size: 9 } }, grid } };
+  }
+  const scales = {};
+  entries.forEach(([name, def], i) => {
+    scales[name] = {
+      type: "linear",
+      position: def.pos || "left",
+      beginAtZero: true,
+      min: def.min, max: def.max,
+      title: { display: true, text: def.text || name, color: grey, font: { size: 10 } },
+      ticks: { color: grey, font: { size: 9 } },
+      grid: i === 0 ? grid : { drawOnChartArea: false },
+    };
+  });
+  return scales;
 }
 
 export function buildSpectrumChartPanel(client, moduleName) {
@@ -332,7 +359,7 @@ export function buildSpectrumChartPanel(client, moduleName) {
     if (!chart) {
       chart = new window.Chart(canvas.getContext("2d"), {
         type: "line",
-        data: { datasets: spectrumDatasets(series) },
+        data: { datasets: spectrumDatasets(series, gp.mapping) },
         options: {
           responsive: true, maintainAspectRatio: false, animation: false,
           plugins: { legend: { display: true, position: "bottom", labels: { color: grey, boxWidth: 14, boxHeight: 10, font: { size: 10 } } } },
@@ -342,17 +369,13 @@ export function buildSpectrumChartPanel(client, moduleName) {
               title: { display: true, text: (prop.elements[gp.X] && prop.elements[gp.X].label) || "Period (s)", color: grey, font: { size: 10 } },
               ticks: { color: grey, font: { size: 9 } }, grid,
             },
-            y: {
-              beginAtZero: true,
-              title: { display: true, text: (prop.elements[gp.Y] && prop.elements[gp.Y].label) || "Amplitude (px)", color: grey, font: { size: 10 } },
-              ticks: { color: grey, font: { size: 9 } }, grid,
-            },
+            ...spectrumYScales(gp.axis, grey, grid),
           },
         },
       });
       return;
     }
-    chart.data.datasets = spectrumDatasets(series);
+    chart.data.datasets = spectrumDatasets(series, gp.mapping);
     chart.update("none");
   });
 
@@ -419,9 +442,19 @@ function pulseAxisRow(axisLabel, leftVal, rightVal, leftName, rightName, maxVal)
 // styling as buildCompactRms below, just arranged in a CSS grid to roughly
 // halve the height.
 const ANALYSIS_DECIMALS = {
-  frames: 0, pixelScale: 2, rmsRA: 2, rmsDEC: 2, peakRA: 2, peakDEC: 2,
+  frames: 0, duration: null, pixelScale: 2, rmsRA: 2, rmsDEC: 2, peakRA: 2, peakDEC: 2,
   elongation: 2, driftRA: 3, driftDEC: 3, polarAlignErr: 1,
 };
+
+// "duration" is stored in seconds (int element, libs/phd2loganalyzer.h's
+// durationS) - displayed as hh:mm:ss here rather than a raw second count.
+function formatDuration(totalSeconds) {
+  const s = Math.max(0, Math.round(totalSeconds || 0));
+  const hh = Math.floor(s / 3600);
+  const mm = Math.floor((s % 3600) / 60);
+  const ss = s % 60;
+  return [hh, mm, ss].map((v) => String(v).padStart(2, "0")).join(":");
+}
 
 function buildAnalysisPanel(client, moduleName) {
   const wrap = el("div", { class: "rms-compact", style: "display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;" });
@@ -432,7 +465,8 @@ function buildAnalysisPanel(client, moduleName) {
     for (const key of Object.keys(ANALYSIS_DECIMALS)) {
       if (!e[key]) continue;
       const v = e[key].value;
-      const txt = typeof v === "number" ? v.toFixed(ANALYSIS_DECIMALS[key]) : String(v ?? "");
+      const txt = key === "duration" ? formatDuration(v)
+        : typeof v === "number" ? v.toFixed(ANALYSIS_DECIMALS[key]) : String(v ?? "");
       wrap.appendChild(el("div", { class: "rms-compact-item" }, [
         el("span", { class: "muted small", text: e[key].label || key }),
         el("span", { class: "mono small", text: txt }),

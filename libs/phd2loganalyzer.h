@@ -25,6 +25,7 @@ public:
         QString error;
 
         int frameCount = 0;
+        double durationS = 0;                      // elapsed time, first to last frame
         double pixelScaleArcsecPerPx = 0;
 
         double rmsRaPx = 0, rmsDecPx = 0;

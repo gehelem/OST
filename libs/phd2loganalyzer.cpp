@@ -217,6 +217,7 @@ PHD2LogAnalyzer::Result PHD2LogAnalyzer::Analyze(const QString &logFilePath, int
 
     const size_t n = rows.size();
     res.frameCount = (int)n;
+    res.durationS = rows.back().t - rows.front().t;
     res.pixelScaleArcsecPerPx = pixelScale;
 
     // ---- residual RMS / peak / elongation (CalcStats) ----

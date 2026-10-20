@@ -947,6 +947,7 @@ void BlindPec::runLogAnalysis()
     // as a property so the UI can show them without scraping the log. DEC
     // fields stay 0 (RA-only module, same as the spectrum/log columns).
     getEltInt("analysis", "frames")->setValue(r.frameCount);
+    getEltInt("analysis", "duration")->setValue((int)std::lround(r.durationS));
     getEltFloat("analysis", "pixelScale")->setValue(r.pixelScaleArcsecPerPx);
     getEltFloat("analysis", "rmsRA")->setValue(r.rmsRaPx);
     getEltFloat("analysis", "rmsDEC")->setValue(r.rmsDecPx);
