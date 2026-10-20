@@ -1062,6 +1062,17 @@ void BlindPec::computeGuide()
     for (double v : _rmsBuf) rms += square(v);
     rms = _rmsBuf.empty() ? 0 : std::sqrt(rms / _rmsBuf.size());
 
+    // A handful of samples can't give a meaningful RMS yet - whatever residual
+    // lands first (often still settling right after the forced no-correction
+    // first frame) would otherwise dominate it. Same reasoning as guider.cpp's
+    // own warm-up gate: Sequencer aborts the moment live values/rmsTotal
+    // exceeds guideparameters.rmsthreshold even once, so an early transient
+    // here could abort a perfectly fine run. Only holds the *reported* value
+    // at 0 - _rmsBuf itself still keeps every frame once past this point.
+    enum { MIN_RMS_SAMPLES = 5 };
+    if ((int)_rmsBuf.size() < MIN_RMS_SAMPLES)
+        rms = 0;
+
     _guideFrame++;
 
     // "blank": the frame right after a pulse (or the first frame) - measure and
