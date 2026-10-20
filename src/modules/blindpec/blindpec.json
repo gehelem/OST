@@ -218,13 +218,13 @@
         "e": {
             "period": {
                 "type":"float",
-                "label": "Period",
+                "label": "Period (s)",
                 "order":"01",
                 "format": "9999.9"
             },
             "amplitude": {
                 "type":"float",
-                "label": "Amplitude",
+                "label": "Amplitude (px)",
                 "order":"02",
                 "format": "9.999"
             }
@@ -257,13 +257,13 @@
         "e": {
             "period": {
                 "type":"float",
-                "label": "Period",
+                "label": "Period (s)",
                 "order":"01",
                 "format": "9999.9"
             },
             "amplitude": {
                 "type":"float",
-                "label": "Amplitude",
+                "label": "Amplitude (px)",
                 "order":"02",
                 "format": "9.999"
             },
