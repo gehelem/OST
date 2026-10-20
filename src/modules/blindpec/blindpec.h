@@ -35,6 +35,8 @@
 
 #include <indimodule.h>
 #include <fileio.h>
+#include <phd2guidelog.h>
+#include <phd2loganalyzer.h>
 #include <opencv2/opencv.hpp>
 #include "pecmeter.h"
 
@@ -190,16 +192,14 @@ class MODULE_INIT BlindPec : public IndiModule
         std::vector<double> _rmsBuf;
 
         // ==================== PHD2-format GuideLog ====================
-        // A PHD2-compatible guide log, written to getWebroot() (next to the JPEG
-        // preview) so it can be opened directly in PHD Log Viewer. One
-        // "Guiding Begins ... Guiding Ends" block per guiding run. RA axis only:
-        // every DEC column is 0 / empty.
-        QFile  _guideLog;
-        int    _glFrame = 0;                            ///< per-session frame counter (PHD2 "Frame" column)
-        double _glT0    = 0;                            ///< epoch (ms) of "Guiding Begins" (PHD2 "Time" origin)
+        // Written to getWebroot() (next to the JPEG preview) so it can be
+        // opened directly in PHD Log Viewer. One "Guiding Begins ... Guiding
+        // Ends" block per guiding run. RA axis only: every DEC column is 0 / empty.
+        PHD2GuideLog _guideLog;
         void   openGuideLog();                          ///< create the file + PHD2 header (from enterGuide)
         void   writeGuideLogRow(double raErr, double crossErr, double needPx);
         void   closeGuideLog();                         ///< "Guiding Ends" / "Log closed" + close (from SMAbort)
+        void   runLogAnalysis();                        ///< read the (possibly still-open) guide log and logInfo the stats
 
         inline double square(double v) { return v * v; }
 

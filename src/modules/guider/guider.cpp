@@ -246,6 +246,11 @@ void Guider::onExternalEvent(OST::ExtEvent event)
                 logInfo("Calibration data reset - recalibration required before guiding");
             }
         }
+        if (event.eltkey == "analyse")
+        {
+            if (getEltBool(event.prpkey, event.eltkey)->setValue(false, true))
+                runLogAnalysis();
+        }
     }
 }
 
@@ -819,10 +824,178 @@ void Guider::SMInitGuide()
         QString(getBool("revCorrections", "revDE") ? "on" : "off")
     });
 
+    openGuideLog();
+
     emit InitGuideDone();
     setStateEvent(OST::Busy, "initguidedone", "initguidedone", "init guide done");
 
 }
+
+// ======================================================================
+//  PHD2-format GuideLog (see libs/phd2guidelog.h) - unlike BlindPEC this
+//  module guides both axes, so DEC columns carry real data.
+// ======================================================================
+void Guider::openGuideLog()
+{
+    const double xAngle = _calCcdOrientation * 180.0 / PI;
+    const double decDiv = qMax(cos(_mountDEC * PI / 180.0), 0.05);
+    const double calPulseRACompensated = (decDiv > 1e-6) ? _calPulseRA / decDiv : 0.0;
+    const double xRate = (calPulseRACompensated > 1e-6) ? 1000.0 / calPulseRACompensated : 0.0;
+    const double yRate = (_calPulseDEC > 1e-6) ? 1000.0 / _calPulseDEC : 0.0;
+    const int    pulsemin = getInt("guideParams", "pulsemin");
+
+    PHD2GuideLog::HeaderInfo h;
+    h.equipmentProfile   = "Guider";
+    h.pixelScaleArcsecPerPx = getSampling();
+    h.exposureMs          = qRound(getFloat("parms", "exposure") * 1000.0);
+    h.xAngleDeg           = xAngle;
+    h.xRateArcsecS        = xRate;
+    h.yAngleDeg           = xAngle - 90.0;
+    h.yRateArcsecS        = yRate;
+    h.minMoveX            = (calPulseRACompensated > 1e-6) ? pulsemin / calPulseRACompensated : 0.0;
+    h.minMoveY            = (_calPulseDEC > 1e-6) ? pulsemin / _calPulseDEC : 0.0;
+    h.xGuideAlgorithm     = "PI";
+    h.yGuideAlgorithm     = "PI";
+    h.maxRaDurationMs     = getInt("guideParams", "pulsemax");
+    h.maxDecDurationMs    = getInt("guideParams", "pulsemax");
+    h.decGuideMode        = "On";
+    h.raGuideSpeedArcsecS = xRate;
+    h.mountRAHours        = _mountRA;
+    h.mountDECDeg         = _mountDEC;
+
+    _guideLog.open(getWebroot(), "PHD2_GuideLog", h);
+    if (_guideLog.isOpen())
+        logInfo("PHD2 GuideLog: %1", {_guideLog.fileName()});
+    else
+        logWarning("Could not open GuideLog in %1 - PHD2-format logging disabled", {getWebroot()});
+}
+
+void Guider::writeGuideLogRow(double driftRA, double driftDE, double driftRAeff, double driftDEeff,
+                               int revRA, int revDE)
+{
+    // PHD sign convention here: positive RARawDistance <=> a West pulse,
+    // positive DECRawDistance <=> a South pulse. The control loop above
+    // picks East/North when revRA*drift or revDE*drift is positive, so RA
+    // needs the sign flipped to match; DEC already comes out right.
+    PHD2GuideLog::Row r;
+    r.dx               = _dxFirst;
+    r.dy               = _dyFirst;
+    r.raRawDistance    = -revRA * driftRA;
+    r.raGuideDistance  = -revRA * driftRAeff;
+    r.decRawDistance   = revDE * driftDE;
+    r.decGuideDistance = revDE * driftDEeff;
+    r.raDurationMs     = (_pulseW > 0) ? _pulseW : (_pulseE > 0) ? _pulseE : 0;
+    r.raDirection      = (_pulseW > 0) ? "W" : (_pulseE > 0) ? "E" : "";
+    r.decDurationMs    = (_pulseS > 0) ? _pulseS : (_pulseN > 0) ? _pulseN : 0;
+    r.decDirection     = (_pulseS > 0) ? "S" : (_pulseN > 0) ? "N" : "";
+    r.snr              = _image->getStats().SNR;
+
+    _guideLog.writeRow(r);
+}
+
+void Guider::closeGuideLog()
+{
+    _guideLog.close();
+}
+
+void Guider::runLogAnalysis()
+{
+    const double maxPeriodFraction = getFloat("analysisparms", "maxwindowpercentage");
+    const PHD2LogAnalyzer::Result r = PHD2LogAnalyzer::Analyze(_guideLog.fileName(), 5, maxPeriodFraction);
+    if (!r.ok)
+    {
+        logWarning("Guide log analysis: %1", {r.error});
+        return;
+    }
+
+    logInfo("Guide log analysis (%1 frames): RMS RA=%2px (%3\") DEC=%4px (%5\") Total=%6px (%7\") | "
+            "peak RA=%8px DEC=%9px | drift RA=%10px/min DEC=%11px/min | elongation=%12 | polar align error=%13'",
+    {
+        QString::number(r.frameCount),
+        QString::number(r.rmsRaPx, 'f', 2), QString::number(r.rmsRaPx * r.pixelScaleArcsecPerPx, 'f', 2),
+        QString::number(r.rmsDecPx, 'f', 2), QString::number(r.rmsDecPx * r.pixelScaleArcsecPerPx, 'f', 2),
+        QString::number(r.rmsTotalPx, 'f', 2), QString::number(r.rmsTotalPx * r.pixelScaleArcsecPerPx, 'f', 2),
+        QString::number(r.peakRaPx, 'f', 2), QString::number(r.peakDecPx, 'f', 2),
+        QString::number(r.driftRaPxPerMin, 'f', 3), QString::number(r.driftDecPxPerMin, 'f', 3),
+        QString::number(r.elongation, 'f', 2),
+        r.polarAlignErrArcmin > 0 ? QString::number(r.polarAlignErrArcmin, 'f', 1) : "N/A"
+    });
+
+    for (const auto &p : r.topPeriods)
+        logInfo("Guide log analysis: RA periodic error - period=%1s amplitude=%2px (%3\")",
+    {
+        QString::number(p.periodS, 'f', 1), QString::number(p.amplitudePx, 'f', 3),
+        QString::number(p.amplitudePx * r.pixelScaleArcsecPerPx, 'f', 2)
+    });
+
+    // Scalar summary for the front-end - same numbers as the logInfo above,
+    // as a property so the UI can show them without scraping the log.
+    // setValue()'s single-arg overload defaults emitEvent to TRUE (see
+    // elementtemplate.h) - every call below needs the explicit "false" or
+    // each one fires its own "ea", not just the last/signaling one as
+    // intended.
+    getEltInt("analysis", "frames")->setValue(r.frameCount, false);
+    getEltInt("analysis", "duration")->setValue(qRound(r.durationS), false);
+    getEltFloat("analysis", "pixelScale")->setValue(r.pixelScaleArcsecPerPx, false);
+    getEltFloat("analysis", "rmsRA")->setValue(r.rmsRaPx, false);
+    getEltFloat("analysis", "rmsDEC")->setValue(r.rmsDecPx, false);
+    getEltFloat("analysis", "rmsTotal")->setValue(r.rmsTotalPx, false);
+    getEltFloat("analysis", "peakRA")->setValue(r.peakRaPx, false);
+    getEltFloat("analysis", "peakDEC")->setValue(r.peakDecPx, false);
+    getEltFloat("analysis", "elongation")->setValue(r.elongation, false);
+    getEltFloat("analysis", "driftRA")->setValue(r.driftRaPxPerMin, false);
+    getEltFloat("analysis", "driftDEC")->setValue(r.driftDecPxPerMin, false);
+    getEltFloat("analysis", "polarAlignErr")->setValue(r.polarAlignErrArcmin, true);
+
+    // Top periods, same data as the logInfo loop above but as a small grid
+    // so the UI can show it as a table. Amplitude in arcsec here (unlike
+    // the px-based Peak struct) - raw pixels aren't meaningful across
+    // different setups/pixel scales.
+    //
+    // Pushed silently, one row at a time, then a single emitAll() - pushing
+    // non-silently here would fire one "ea" per setValue(..., true) PLUS one
+    // "gc" per push(), i.e. ~2 websocket messages per point (hundreds of
+    // points on a long session): a message flood that stutters the UI for
+    // no benefit, since nothing needs to render mid-build anyway (Gilles,
+    // 2026-10-20: "tu envoies le graphe avec des ea, autant que de lignes -
+    // c'est la mort de l'ui"). Every setValue() below needs the explicit
+    // "false" - the single-arg overload defaults emitEvent to true.
+    getProperty("peaks")->clearGrid();
+    getProperty("peaks")->setGridLimit((int)r.topPeriods.size());
+    for (const auto &p : r.topPeriods)
+    {
+        getEltFloat("peaks", "period")->setValue(p.periodS, false);
+        getEltFloat("peaks", "amplitude")->setValue(p.amplitudePx * r.pixelScaleArcsecPerPx, false);
+        getProperty("peaks")->push(true);
+    }
+    getProperty("peaks")->emitAll();
+
+    // Full spectrum for the front-end graph - replaces the previous one each
+    // time "analyse" is clicked, it is a snapshot, not a running series.
+    // Raw and corrected share the grid, told apart by the "series" column
+    // (SXY graph type - see libs/phd2loganalyzer.h's own doc comment).
+    // Amplitude in arcsec, same reasoning as peaks above. Silent push +
+    // single emitAll() at the end, same reasoning as peaks above too - this
+    // one can run into the hundreds of rows, so it matters even more here.
+    getProperty("spectrum")->clearGrid();
+    getProperty("spectrum")->setGridLimit((int)(r.spectrumRaw.size() + r.spectrumCorrected.size()));
+    for (const auto &p : r.spectrumRaw)
+    {
+        getEltString("spectrum", "series")->setValue("raw", false);
+        getEltFloat("spectrum", "period")->setValue(p.periodS, false);
+        getEltFloat("spectrum", "amplitude")->setValue(p.amplitudePx * r.pixelScaleArcsecPerPx, false);
+        getProperty("spectrum")->push(true);
+    }
+    for (const auto &p : r.spectrumCorrected)
+    {
+        getEltString("spectrum", "series")->setValue("corrected", false);
+        getEltFloat("spectrum", "period")->setValue(p.periodS, false);
+        getEltFloat("spectrum", "amplitude")->setValue(p.amplitudePx * r.pixelScaleArcsecPerPx, false);
+        getProperty("spectrum")->push(true);
+    }
+    getProperty("spectrum")->emitAll();
+}
+
 void Guider::SMRequestFrameReset()
 {
     //logInfo("SMRequestFrameReset");
@@ -1435,6 +1608,19 @@ void Guider::SMComputeGuide()
         rmsTotal = sqrt(square(rmsRA) + square(rmsDEC));
     }
 
+    // A rolling RMS built from only a couple of samples is dominated by
+    // whatever residual happened to land first - typically still elevated
+    // right after the forced no-correction first frame (SMComputeGuide's
+    // own _firstGuideFrame block). Not yet a meaningful "is guiding
+    // stable" signal, so hold it at 0 until the window has filled up a
+    // bit - same spirit as excluding that first frame from correction.
+    // Matters beyond cosmetics: Sequencer aborts the moment live rmsTotal
+    // exceeds guideparameters.rmsthreshold even once (sequencer.cpp), so
+    // an early transient here previously could abort a perfectly fine run.
+    enum { MIN_RMS_SAMPLES = 5 };
+    if (_dRAvector.size() < MIN_RMS_SAMPLES)
+        rmsRA = rmsDEC = rmsTotal = 0;
+
     getProperty("drift")->setGridLimit(rmsOver);
     getProperty("guiding")->setGridLimit(rmsOver);
 
@@ -1464,6 +1650,8 @@ void Guider::SMComputeGuide()
                   rmsTotal);
     setStateEvent(OST::Busy, "guiding", "guideSNR", "guide SNR",
                   qRound(_image->getStats().SNR));
+
+    writeGuideLogRow(_driftRA, _driftDE, driftRAeff, driftDEeff, revRA, revDE);
 
     emit ComputeGuideDone();
 }
@@ -1610,6 +1798,7 @@ void Guider::OnSucessSEP()
 void Guider::SMAbort()
 {
     logInfo("Aborting guiding");
+    closeGuideLog();
     disarmWatchdog();
     _expectingFrame = false;
     getEltBool("actions", "calibrate")->setValue(false, false);

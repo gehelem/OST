@@ -41,7 +41,7 @@
 // `image`, defined generically by IndiModule::defineMeAsImager() (see
 // libs/indimodule.cpp) for any imaging module, guider included.
 
-import { updateQuickNav, moduleLifecycle, renderActionsPanel } from "../render.js";
+import { updateQuickNav, moduleLifecycle, renderActionsPanel, renderProperty } from "../render.js";
 import { addImageBlock } from "../imagelayer.js";
 import { el, statusDot } from "../dom.js";
 import * as Panels from "../panels.js";
@@ -283,6 +283,106 @@ export function buildDriftChartPanel(client, moduleName, opts) {
   return wrap;
 }
 
+// -------------------------------------------------------------- spectrum
+// RA periodic-error spectrum (period vs amplitude), pushed as a one-shot
+// snapshot by the "actions.analyse" button (libs/phd2loganalyzer.{h,cpp}),
+// not a live-streaming series like drift/guiding - each click replaces
+// the previous curve. Log-scale X: periods span roughly the worm period
+// down to a couple of seconds, a linear axis would crush the short end.
+// Two series share the grid (graphType SXY), told apart by the "series"
+// column: "raw" (corrections undone - the worm's true PE) vs "corrected"
+// (the actual guided residual - what the loop left behind).
+const SPECTRUM_SERIES_COLORS = { raw: "#ff8a65", corrected: "#4fc3f7" };
+
+function spectrumSeries(prop) {
+  const rows = prop.rows || [];
+  const gp = (prop && prop.graphParams) || { X: "period", Y: "amplitude", S: "series" };
+  const series = new Map();
+  for (const r of rows) {
+    const x = num(r[gp.X]), y = num(r[gp.Y]);
+    if (!isFinite(x) || !isFinite(y) || x <= 0) continue;
+    const name = String(r[gp.S] ?? "");
+    if (!series.has(name)) series.set(name, []);
+    series.get(name).push({ x, y });
+  }
+  return series;
+}
+
+function spectrumDatasets(series, mapping) {
+  return [...series.entries()].map(([name, data]) => ({
+    label: name, data, parsing: false,
+    borderColor: SPECTRUM_SERIES_COLORS[name] || "#4fc3f7",
+    backgroundColor: SPECTRUM_SERIES_COLORS[name] || "#4fc3f7",
+    borderWidth: 1.5, pointRadius: 1.5, tension: 0,
+    yAxisID: (mapping && mapping[name]) || "y",
+  }));
+}
+
+// graphParams.axis/mapping (structure.en.md's SXY doc) - one Y axis per
+// series so "corrected" (much smaller amplitude once guiding is actually
+// compensating) doesn't get crushed flat by "raw"'s scale (Gilles,
+// 2026-10-20, after seeing exactly that: "il faudrait deux axes sur le
+// graphe"). Falls back to a single shared "y" axis if a property doesn't
+// declare graphParams.axis, same as the single-series XY panels above.
+function spectrumYScales(axisDefs, grey, grid) {
+  const entries = axisDefs ? Object.entries(axisDefs) : [];
+  if (entries.length === 0) {
+    return { y: { beginAtZero: true, title: { display: true, text: "Amplitude (px)", color: grey, font: { size: 10 } }, ticks: { color: grey, font: { size: 9 } }, grid } };
+  }
+  const scales = {};
+  entries.forEach(([name, def], i) => {
+    scales[name] = {
+      type: "linear",
+      position: def.pos || "left",
+      beginAtZero: true,
+      min: def.min, max: def.max,
+      title: { display: true, text: def.text || name, color: grey, font: { size: 10 } },
+      ticks: { color: grey, font: { size: 9 } },
+      grid: i === 0 ? grid : { drawOnChartArea: false },
+    };
+  });
+  return scales;
+}
+
+export function buildSpectrumChartPanel(client, moduleName) {
+  const wrap = el("div", { class: "gd-chart" });
+  const canvas = el("canvas");
+  wrap.appendChild(canvas);
+  let chart = null;
+  const grey = "rgba(255,255,255,0.55)";
+  const grid = { color: "rgba(255,255,255,0.08)" };
+
+  const unsub = client.subscribe(client.topics.property(moduleName, "spectrum"), (prop) => {
+    if (!prop) return;
+    const series = spectrumSeries(prop);
+    const gp = prop.graphParams || {};
+    if (!chart) {
+      chart = new window.Chart(canvas.getContext("2d"), {
+        type: "line",
+        data: { datasets: spectrumDatasets(series, gp.mapping) },
+        options: {
+          responsive: true, maintainAspectRatio: false, animation: false,
+          plugins: { legend: { display: true, position: "bottom", labels: { color: grey, boxWidth: 14, boxHeight: 10, font: { size: 10 } } } },
+          scales: {
+            x: {
+              type: "logarithmic",
+              title: { display: true, text: (prop.elements[gp.X] && prop.elements[gp.X].label) || "Period (s)", color: grey, font: { size: 10 } },
+              ticks: { color: grey, font: { size: 9 } }, grid,
+            },
+            ...spectrumYScales(gp.axis, grey, grid),
+          },
+        },
+      });
+      return;
+    }
+    chart.data.datasets = spectrumDatasets(series, gp.mapping);
+    chart.update("none");
+  });
+
+  wrap._dispose = () => { unsub(); if (chart) { chart.destroy(); chart = null; } };
+  return wrap;
+}
+
 // --------------------------------------------------------------- values
 // Bespoke "values" panel (Gilles, 2026-10-03, on the plain generic table
 // it used to be: "rends-la plus graphique") - matches OstErix/Rooster's
@@ -335,6 +435,99 @@ function pulseAxisRow(axisLabel, leftVal, rightVal, leftName, rightName, maxVal)
 // it instead of matching boxes of their own, both to read as secondary
 // figures and to keep this column narrow (views.js gives it a fixed width,
 // not an equal flex share, see components.css).
+// Compact 2-column grid for the "analysis" scalar snapshot - the generic
+// renderProperty() table (one row per element) turned out ~390px tall for
+// these 10 fields, which the panel auto-placement couldn't fit without
+// overlapping the Guiding graph panel above it. Same label/value pair
+// styling as buildCompactRms below, just arranged in a CSS grid to roughly
+// halve the height.
+const ANALYSIS_DECIMALS = {
+  frames: 0, duration: null, pixelScale: 2, rmsRA: 2, rmsDEC: 2, rmsTotal: 2, peakRA: 2, peakDEC: 2,
+  elongation: 2, driftRA: 3, driftDEC: 3, polarAlignErr: 1,
+};
+
+// Fields stored in pixels that should also show their arcsec equivalent
+// (Gilles, 2026-10-20: "montre aussi les chiffres en deux versions,
+// arcsecondes(pixels)") - driftRA/driftDEC are px/min, so their arcsec
+// side is "/min too; everything else here is a plain px distance.
+const ANALYSIS_PX_FIELDS = new Set(["rmsRA", "rmsDEC", "rmsTotal", "peakRA", "peakDEC", "driftRA", "driftDEC"]);
+const ANALYSIS_PER_MIN_FIELDS = new Set(["driftRA", "driftDEC"]);
+// Plain unit suffix, no px/arcsec dual display - polarAlignErrArcmin is
+// already in arcminutes (Barrett's formula), not a pixel distance.
+const ANALYSIS_UNITS = { polarAlignErr: "'" };
+
+// "duration" is stored in seconds (int element, libs/phd2loganalyzer.h's
+// durationS) - displayed as hh:mm:ss here rather than a raw second count.
+function formatDuration(totalSeconds) {
+  const s = Math.max(0, Math.round(totalSeconds || 0));
+  const hh = Math.floor(s / 3600);
+  const mm = Math.floor((s % 3600) / 60);
+  const ss = s % 60;
+  return [hh, mm, ss].map((v) => String(v).padStart(2, "0")).join(":");
+}
+
+function buildAnalysisPanel(client, moduleName) {
+  const wrap = el("div", { class: "rms-compact", style: "display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;" });
+  const unsub = client.subscribe(client.topics.property(moduleName, "analysis"), (prop) => {
+    wrap.innerHTML = "";
+    if (!prop) return;
+    const e = prop.elements;
+    const pxScale = (e.pixelScale && typeof e.pixelScale.value === "number") ? e.pixelScale.value : 0;
+    for (const key of Object.keys(ANALYSIS_DECIMALS)) {
+      if (!e[key]) continue;
+      const v = e[key].value;
+      const dec = ANALYSIS_DECIMALS[key];
+      let txt;
+      if (key === "duration") txt = formatDuration(v);
+      else if (typeof v !== "number") txt = String(v ?? "");
+      else if (ANALYSIS_PX_FIELDS.has(key) && pxScale > 0) {
+        const perMin = ANALYSIS_PER_MIN_FIELDS.has(key);
+        txt = `${(v * pxScale).toFixed(dec)}"${perMin ? "/min" : ""} (${v.toFixed(dec)}px${perMin ? "/min" : ""})`;
+      }
+      else txt = v.toFixed(dec) + (ANALYSIS_UNITS[key] || "");
+      wrap.appendChild(el("div", { class: "rms-compact-item" }, [
+        el("span", { class: "muted small", text: e[key].label || key }),
+        el("span", { class: "mono small", text: txt }),
+      ]));
+    }
+  });
+  wrap._dispose = unsub;
+  return wrap;
+}
+
+// Single scrollable stack for everything "actions.analyse" produces -
+// replaces the 3 separate panels (analysis/peaks/spectrum) this template
+// started with (Gilles, 2026-10-20: "regroupe les infos sur une seule
+// fenetre analyse"). Panels.make()'s own body already scrolls when its
+// content overflows (components.css), so no height juggling needed here
+// the way the standalone "Session analysis" panel needed earlier.
+// Wider layout (Gilles, 2026-10-20: "plus large, en haut les deux groupes
+// de donnees numeriques, en bas le graphe") - the two numeric groups side
+// by side on top (each about half width), the spectrum chart full-width
+// below where there is actually room to read it.
+function buildAnalyseWindow(client, moduleName) {
+  const wrap = el("div", { class: "guider-analyse" });
+  const disposers = [];
+  function track(node) { disposers.push(node._dispose); return node; }
+  function titled(titleText, node) {
+    return el("div", null, [
+      el("div", { class: "prop-label", style: "margin:0 0 6px;" }, titleText),
+      node,
+    ]);
+  }
+
+  const top = el("div", { style: "display:flex; gap:20px; align-items:flex-start;" }, [
+    el("div", { style: "flex:1; min-width:0;" }, [titled("Session analysis", track(buildAnalysisPanel(client, moduleName)))]),
+    el("div", { style: "flex:1; min-width:0;" }, [titled("Top periods", track(renderProperty(client, moduleName, "peaks", { framed: false })))]),
+  ]);
+  wrap.appendChild(top);
+  wrap.appendChild(el("div", { class: "prop-label", style: "margin:16px 0 6px;" }, "RA PE spectrum"));
+  wrap.appendChild(track(buildSpectrumChartPanel(client, moduleName)));
+
+  wrap._dispose = () => { while (disposers.length) { const d = disposers.pop(); if (d) d(); } };
+  return wrap;
+}
+
 export function buildCompactRms(client, moduleName) {
   const wrap = el("div", { class: "rms-compact" });
   const unsub = client.subscribe(client.topics.property(moduleName, "values"), (prop) => {
@@ -458,9 +651,20 @@ export function mount(client, moduleName) {
       quickNavEntries.push({ id: "guiding", label: mod.properties.guiding.label || "Guiding", icon: "browse_activity", iconOnly: true });
     }
     if (has("drift")) {
-      const b = Panels.make({ id: "drift", title: mod.properties.drift.label || "Drift", x: 990, y: 92, w: 340 });
+      const b = Panels.make({ id: "drift", title: mod.properties.drift.label || "Drift", x: 20, y: 680, w: 300 });
       b.appendChild(track(buildDriftChartPanel(client, moduleName)));
       quickNavEntries.push({ id: "drift", label: mod.properties.drift.label || "Drift", icon: "scatter_plot", iconOnly: true });
+    }
+    // "analyse" window: one panel for everything "actions.analyse" produces
+    // (Gilles, 2026-10-20: "regroupe les infos sur une seule fenetre
+    // analyse" - was 3 separate panels, now one scrollable stack: scalar
+    // summary, top-periods table, full spectrum chart).
+    if (has("analysis") || has("peaks") || has("spectrum")) {
+      const title = (mod.properties.actions && mod.properties.actions.elements.analyse
+        && mod.properties.actions.elements.analyse.label) || "Analyse";
+      const b = Panels.make({ id: "analyse", title, x: 350, y: 650, w: 620 });
+      b.appendChild(track(buildAnalyseWindow(client, moduleName, mod)));
+      quickNavEntries.push({ id: "analyse", label: title, icon: "query_stats", iconOnly: true });
     }
     // The profile-centric "Parameters" box (buildParamsPanel, render.js) is
     // not built here — it opens on demand from the gear button (app.js),

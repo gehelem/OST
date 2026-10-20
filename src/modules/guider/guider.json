@@ -155,6 +155,154 @@
             }
         }
     },
+    "analysis": {
+        "devcat": "Control",
+        "group": "",
+        "order":"Control355",
+        "permission": 0,
+        "label": "Session analysis",
+        "e": {
+            "frames": {
+                "type":"int",
+                "label": "Frames",
+                "order":"01"
+            },
+            "duration": {
+                "type":"int",
+                "label": "Duration",
+                "order":"02"
+            },
+            "pixelScale": {
+                "type":"float",
+                "label": "Pixel scale",
+                "order":"03",
+                "format": "9.99"
+            },
+            "rmsRA": {
+                "type":"float",
+                "label": "RMS RA",
+                "order":"04",
+                "format": "9.99"
+            },
+            "rmsDEC": {
+                "type":"float",
+                "label": "RMS DEC",
+                "order":"05",
+                "format": "9.99"
+            },
+            "rmsTotal": {
+                "type":"float",
+                "label": "RMS Total",
+                "order":"06",
+                "format": "9.99"
+            },
+            "peakRA": {
+                "type":"float",
+                "label": "Peak RA",
+                "order":"07",
+                "format": "9.99"
+            },
+            "peakDEC": {
+                "type":"float",
+                "label": "Peak DEC",
+                "order":"08",
+                "format": "9.99"
+            },
+            "elongation": {
+                "type":"float",
+                "label": "Elongation",
+                "order":"09",
+                "format": "9.99"
+            },
+            "driftRA": {
+                "type":"float",
+                "label": "Drift RA",
+                "order":"10",
+                "format": "9.999"
+            },
+            "driftDEC": {
+                "type":"float",
+                "label": "Drift DEC",
+                "order":"11",
+                "format": "9.999"
+            },
+            "polarAlignErr": {
+                "type":"float",
+                "label": "Polar align error",
+                "order":"12",
+                "format": "9.9"
+            }
+        }
+    },
+    "peaks": {
+        "devcat": "Control",
+        "group": "",
+        "order":"Control365",
+        "permission": 0,
+        "label": "Top periods",
+        "hasGrid":true,
+        "showElts":false,
+        "showGrid":true,
+        "gridLimit":10,
+        "e": {
+            "period": {
+                "type":"float",
+                "label": "Period (s)",
+                "order":"01",
+                "format": "9999.9"
+            },
+            "amplitude": {
+                "type":"float",
+                "label": "Amplitude (\")",
+                "order":"02",
+                "format": "9.999"
+            }
+        }
+    },
+    "spectrum": {
+        "devcat": "Control",
+        "group": "",
+        "order":"Control360",
+        "permission": 0,
+        "label": "RA PE spectrum",
+        "hasGrid":true,
+        "showElts":false,
+        "showGrid":false,
+        "gridLimit":4000,
+        "graphType":"SXY",
+        "graphParams":{
+            "X":"period",
+            "Y":"amplitude",
+            "S":"series",
+            "axis":{
+                "raw":{"pos":"left","text":"Raw amplitude (\")"},
+                "corrected":{"pos":"right","text":"Corrected amplitude (\")"}
+            },
+            "mapping":{
+                "raw":"raw",
+                "corrected":"corrected"
+            }
+        },
+        "e": {
+            "period": {
+                "type":"float",
+                "label": "Period (s)",
+                "order":"01",
+                "format": "9999.9"
+            },
+            "amplitude": {
+                "type":"float",
+                "label": "Amplitude (\")",
+                "order":"02",
+                "format": "9.999"
+            },
+            "series": {
+                "type":"string",
+                "label": "Series",
+                "order":"03"
+            }
+        }
+    },
     "drift": {
         "devcat": "Control",
         "group": "",
@@ -630,6 +778,28 @@
                 "value":10,
                 "format": "999",
                 "hint": "How much the estimate is nudged up or down after each reversal, based on measured over/undershoot"
+            }
+        }
+    },
+    "analysisparms": {
+        "devcat": "Analysis",
+        "group": "",
+        "order":"Parameters600",
+        "permission": 2,
+        "hasprofile":true,
+        "label": "Analysis parameters",
+        "e": {
+            "maxwindowpercentage": {
+                "type":"float",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Max period (fraction of window)",
+                "order":"01",
+                "value":0.25,
+                "format": "0.99",
+                "min":0.1,
+                "max":0.5,
+                "hint": "Periods longer than this fraction of the session's total duration are dropped from the spectrum/top periods - too few cycles fit in the window to trust the estimate"
             }
         }
     }
