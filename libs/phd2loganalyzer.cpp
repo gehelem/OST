@@ -188,7 +188,7 @@ bool parseRows(const QString &path, double &pixelScaleArcsecPerPx, double &decli
 
 } // namespace
 
-PHD2LogAnalyzer::Result PHD2LogAnalyzer::Analyze(const QString &logFilePath, int maxPeaks)
+PHD2LogAnalyzer::Result PHD2LogAnalyzer::Analyze(const QString &logFilePath, int maxPeaks, double maxPeriodFraction)
 {
     Result res;
 
@@ -288,6 +288,28 @@ PHD2LogAnalyzer::Result PHD2LogAnalyzer::Analyze(const QString &logFilePath, int
     // ---- RA periodic error spectrum (worm), raw and corrected ----
     res.spectrumRaw = computeSpectrum(rows, true);
     res.spectrumCorrected = computeSpectrum(rows, false);
+
+    // A period close to the session's own duration means only a single
+    // cycle (or less) fits in the window - no replication, so the estimate
+    // is essentially unconstrained noise, not a trustworthy periodic
+    // component. Drop anything past maxPeriodFraction of durationS before
+    // ranking/graphing (Gilles, 2026-10-20: "les pics qui sont au-dela de
+    // la moitie/le quart de la duree de mesure ne peuvent pas etre
+    // significatifs").
+    if (maxPeriodFraction > 0 && maxPeriodFraction < 1.0)
+    {
+        const double maxPeriodS = maxPeriodFraction * res.durationS;
+        auto dropLongPeriods = [maxPeriodS](std::vector<PHD2LogAnalyzer::Peak> &spec)
+        {
+            spec.erase(std::remove_if(spec.begin(), spec.end(), [maxPeriodS](const PHD2LogAnalyzer::Peak & p)
+            {
+                return p.periodS > maxPeriodS;
+            }), spec.end());
+        };
+        dropLongPeriods(res.spectrumRaw);
+        dropLongPeriods(res.spectrumCorrected);
+    }
+
     res.topPeriods = localMaximaPeaks(res.spectrumRaw, maxPeaks);
 
     res.ok = true;

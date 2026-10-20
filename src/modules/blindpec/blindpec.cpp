@@ -918,7 +918,8 @@ void BlindPec::closeGuideLog()
 
 void BlindPec::runLogAnalysis()
 {
-    const PHD2LogAnalyzer::Result r = PHD2LogAnalyzer::Analyze(_guideLog.fileName());
+    const double maxPeriodFraction = getFloat("analysisparms", "maxwindowpercentage");
+    const PHD2LogAnalyzer::Result r = PHD2LogAnalyzer::Analyze(_guideLog.fileName(), 5, maxPeriodFraction);
     if (!r.ok)
     {
         logWarning("Guide log analysis: %1", {r.error});
@@ -960,13 +961,15 @@ void BlindPec::runLogAnalysis()
     getEltFloat("analysis", "polarAlignErr")->setValue(r.polarAlignErrArcmin, true);
 
     // Top periods, same data as the logInfo loop above but as a small grid
-    // so the UI can show it as a table.
+    // so the UI can show it as a table. Amplitude in arcsec here (unlike
+    // the px-based Peak struct) - raw pixels aren't meaningful across
+    // different setups/pixel scales.
     getProperty("peaks")->clearGrid();
     getProperty("peaks")->setGridLimit((int)r.topPeriods.size());
     for (const auto &p : r.topPeriods)
     {
         getEltFloat("peaks", "period")->setValue(p.periodS);
-        getEltFloat("peaks", "amplitude")->setValue(p.amplitudePx, true);
+        getEltFloat("peaks", "amplitude")->setValue(p.amplitudePx * r.pixelScaleArcsecPerPx, true);
         getProperty("peaks")->push();
     }
 
@@ -974,20 +977,21 @@ void BlindPec::runLogAnalysis()
     // time "analyse" is clicked, it is a snapshot, not a running series.
     // Raw and corrected share the grid, told apart by the "series" column
     // (SXY graph type - see libs/phd2loganalyzer.h's own doc comment).
+    // Amplitude in arcsec, same reasoning as peaks above.
     getProperty("spectrum")->clearGrid();
     getProperty("spectrum")->setGridLimit((int)(r.spectrumRaw.size() + r.spectrumCorrected.size()));
     for (const auto &p : r.spectrumRaw)
     {
         getEltString("spectrum", "series")->setValue("raw");
         getEltFloat("spectrum", "period")->setValue(p.periodS);
-        getEltFloat("spectrum", "amplitude")->setValue(p.amplitudePx, true);
+        getEltFloat("spectrum", "amplitude")->setValue(p.amplitudePx * r.pixelScaleArcsecPerPx, true);
         getProperty("spectrum")->push();
     }
     for (const auto &p : r.spectrumCorrected)
     {
         getEltString("spectrum", "series")->setValue("corrected");
         getEltFloat("spectrum", "period")->setValue(p.periodS);
-        getEltFloat("spectrum", "amplitude")->setValue(p.amplitudePx, true);
+        getEltFloat("spectrum", "amplitude")->setValue(p.amplitudePx * r.pixelScaleArcsecPerPx, true);
         getProperty("spectrum")->push();
     }
 }

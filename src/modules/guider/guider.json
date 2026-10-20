@@ -253,7 +253,7 @@
             },
             "amplitude": {
                 "type":"float",
-                "label": "Amplitude (px)",
+                "label": "Amplitude (\")",
                 "order":"02",
                 "format": "9.999"
             }
@@ -275,8 +275,8 @@
             "Y":"amplitude",
             "S":"series",
             "axis":{
-                "raw":{"pos":"left","text":"Raw amplitude (px)"},
-                "corrected":{"pos":"right","text":"Corrected amplitude (px)"}
+                "raw":{"pos":"left","text":"Raw amplitude (\")"},
+                "corrected":{"pos":"right","text":"Corrected amplitude (\")"}
             },
             "mapping":{
                 "raw":"raw",
@@ -292,7 +292,7 @@
             },
             "amplitude": {
                 "type":"float",
-                "label": "Amplitude (px)",
+                "label": "Amplitude (\")",
                 "order":"02",
                 "format": "9.999"
             },
@@ -778,6 +778,28 @@
                 "value":10,
                 "format": "999",
                 "hint": "How much the estimate is nudged up or down after each reversal, based on measured over/undershoot"
+            }
+        }
+    },
+    "analysisparms": {
+        "devcat": "Analysis",
+        "group": "",
+        "order":"Parameters600",
+        "permission": 2,
+        "hasprofile":true,
+        "label": "Analysis parameters",
+        "e": {
+            "maxwindowpercentage": {
+                "type":"float",
+                "autoupdate":true,
+                "directedit":true,
+                "label": "Max period (fraction of window)",
+                "order":"01",
+                "value":0.25,
+                "format": "0.99",
+                "min":0.1,
+                "max":0.5,
+                "hint": "Periods longer than this fraction of the session's total duration are dropped from the spectrum/top periods - too few cycles fit in the window to trust the estimate"
             }
         }
     }

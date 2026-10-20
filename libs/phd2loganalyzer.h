@@ -45,6 +45,10 @@ public:
         std::vector<Peak> spectrumCorrected;
     };
 
-    // maxPeaks: how many of the strongest RA periodic-error components to report.
-    static Result Analyze(const QString &logFilePath, int maxPeaks = 5);
+    // maxPeaks: how many of the strongest RA periodic-error components to
+    // report. maxPeriodFraction: periods longer than this fraction of the
+    // session's own durationS are dropped before ranking/graphing - too few
+    // cycles fit in the window for the estimate to mean anything (1.0 = no
+    // filtering).
+    static Result Analyze(const QString &logFilePath, int maxPeaks = 5, double maxPeriodFraction = 1.0);
 };
