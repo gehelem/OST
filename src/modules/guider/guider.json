@@ -155,6 +155,99 @@
             }
         }
     },
+    "analysis": {
+        "devcat": "Control",
+        "group": "",
+        "order":"Control355",
+        "permission": 0,
+        "label": "Session analysis",
+        "e": {
+            "frames": {
+                "type":"int",
+                "label": "Frames",
+                "order":"01"
+            },
+            "pixelScale": {
+                "type":"float",
+                "label": "Pixel scale",
+                "order":"02",
+                "format": "9.99"
+            },
+            "rmsRA": {
+                "type":"float",
+                "label": "RMS RA",
+                "order":"03",
+                "format": "9.99"
+            },
+            "rmsDEC": {
+                "type":"float",
+                "label": "RMS DEC",
+                "order":"04",
+                "format": "9.99"
+            },
+            "peakRA": {
+                "type":"float",
+                "label": "Peak RA",
+                "order":"05",
+                "format": "9.99"
+            },
+            "peakDEC": {
+                "type":"float",
+                "label": "Peak DEC",
+                "order":"06",
+                "format": "9.99"
+            },
+            "elongation": {
+                "type":"float",
+                "label": "Elongation",
+                "order":"07",
+                "format": "9.99"
+            },
+            "driftRA": {
+                "type":"float",
+                "label": "Drift RA",
+                "order":"08",
+                "format": "9.999"
+            },
+            "driftDEC": {
+                "type":"float",
+                "label": "Drift DEC",
+                "order":"09",
+                "format": "9.999"
+            },
+            "polarAlignErr": {
+                "type":"float",
+                "label": "Polar align error",
+                "order":"10",
+                "format": "9.9"
+            }
+        }
+    },
+    "peaks": {
+        "devcat": "Control",
+        "group": "",
+        "order":"Control365",
+        "permission": 0,
+        "label": "Top periods",
+        "hasGrid":true,
+        "showElts":false,
+        "showGrid":true,
+        "gridLimit":10,
+        "e": {
+            "period": {
+                "type":"float",
+                "label": "Period",
+                "order":"01",
+                "format": "9999.9"
+            },
+            "amplitude": {
+                "type":"float",
+                "label": "Amplitude",
+                "order":"02",
+                "format": "9.999"
+            }
+        }
+    },
     "spectrum": {
         "devcat": "Control",
         "group": "",

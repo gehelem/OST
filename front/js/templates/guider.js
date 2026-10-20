@@ -41,7 +41,7 @@
 // `image`, defined generically by IndiModule::defineMeAsImager() (see
 // libs/indimodule.cpp) for any imaging module, guider included.
 
-import { updateQuickNav, moduleLifecycle, renderActionsPanel } from "../render.js";
+import { updateQuickNav, moduleLifecycle, renderActionsPanel, renderProperty } from "../render.js";
 import { addImageBlock } from "../imagelayer.js";
 import { el, statusDot } from "../dom.js";
 import * as Panels from "../panels.js";
@@ -396,6 +396,37 @@ function pulseAxisRow(axisLabel, leftVal, rightVal, leftName, rightName, maxVal)
 // it instead of matching boxes of their own, both to read as secondary
 // figures and to keep this column narrow (views.js gives it a fixed width,
 // not an equal flex share, see components.css).
+// Compact 2-column grid for the "analysis" scalar snapshot - the generic
+// renderProperty() table (one row per element) turned out ~390px tall for
+// these 10 fields, which the panel auto-placement couldn't fit without
+// overlapping the Guiding graph panel above it. Same label/value pair
+// styling as buildCompactRms below, just arranged in a CSS grid to roughly
+// halve the height.
+const ANALYSIS_DECIMALS = {
+  frames: 0, pixelScale: 2, rmsRA: 2, rmsDEC: 2, peakRA: 2, peakDEC: 2,
+  elongation: 2, driftRA: 3, driftDEC: 3, polarAlignErr: 1,
+};
+
+function buildAnalysisPanel(client, moduleName) {
+  const wrap = el("div", { class: "rms-compact", style: "display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;" });
+  const unsub = client.subscribe(client.topics.property(moduleName, "analysis"), (prop) => {
+    wrap.innerHTML = "";
+    if (!prop) return;
+    const e = prop.elements;
+    for (const key of Object.keys(ANALYSIS_DECIMALS)) {
+      if (!e[key]) continue;
+      const v = e[key].value;
+      const txt = typeof v === "number" ? v.toFixed(ANALYSIS_DECIMALS[key]) : String(v ?? "");
+      wrap.appendChild(el("div", { class: "rms-compact-item" }, [
+        el("span", { class: "muted small", text: e[key].label || key }),
+        el("span", { class: "mono small", text: txt }),
+      ]));
+    }
+  });
+  wrap._dispose = unsub;
+  return wrap;
+}
+
 export function buildCompactRms(client, moduleName) {
   const wrap = el("div", { class: "rms-compact" });
   const unsub = client.subscribe(client.topics.property(moduleName, "values"), (prop) => {
@@ -527,6 +558,20 @@ export function mount(client, moduleName) {
       const b = Panels.make({ id: "spectrum", title: mod.properties.spectrum.label || "RA PE spectrum", x: 990, y: 520, w: 340 });
       b.appendChild(track(buildSpectrumChartPanel(client, moduleName)));
       quickNavEntries.push({ id: "spectrum", label: mod.properties.spectrum.label || "RA PE spectrum", icon: "query_stats", iconOnly: true });
+    }
+    // "analysis"/"peaks" are plain scalar values / a short grid table -
+    // the generic renderer (renderProperty, framed:false since Panels.make
+    // already draws a title bar) already does exactly this, no bespoke
+    // chart needed like spectrum/drift/guiding above.
+    if (has("analysis")) {
+      const b = Panels.make({ id: "analysis", title: mod.properties.analysis.label || "Session analysis", x: 660, y: 650, w: 300 });
+      b.appendChild(track(buildAnalysisPanel(client, moduleName)));
+      quickNavEntries.push({ id: "analysis", label: mod.properties.analysis.label || "Session analysis", icon: "bar_chart", iconOnly: true });
+    }
+    if (has("peaks")) {
+      const b = Panels.make({ id: "peaks", title: mod.properties.peaks.label || "Top periods", x: 350, y: 650, w: 300 });
+      b.appendChild(track(renderProperty(client, moduleName, "peaks", { framed: false })));
+      quickNavEntries.push({ id: "peaks", label: mod.properties.peaks.label || "Top periods", icon: "list", iconOnly: true });
     }
     // The profile-centric "Parameters" box (buildParamsPanel, render.js) is
     // not built here — it opens on demand from the gear button (app.js),

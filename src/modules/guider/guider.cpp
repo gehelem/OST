@@ -926,6 +926,30 @@ void Guider::runLogAnalysis()
         QString::number(p.amplitudePx * r.pixelScaleArcsecPerPx, 'f', 2)
     });
 
+    // Scalar summary for the front-end - same numbers as the logInfo above,
+    // as a property so the UI can show them without scraping the log.
+    getEltInt("analysis", "frames")->setValue(r.frameCount);
+    getEltFloat("analysis", "pixelScale")->setValue(r.pixelScaleArcsecPerPx);
+    getEltFloat("analysis", "rmsRA")->setValue(r.rmsRaPx);
+    getEltFloat("analysis", "rmsDEC")->setValue(r.rmsDecPx);
+    getEltFloat("analysis", "peakRA")->setValue(r.peakRaPx);
+    getEltFloat("analysis", "peakDEC")->setValue(r.peakDecPx);
+    getEltFloat("analysis", "elongation")->setValue(r.elongation);
+    getEltFloat("analysis", "driftRA")->setValue(r.driftRaPxPerMin);
+    getEltFloat("analysis", "driftDEC")->setValue(r.driftDecPxPerMin);
+    getEltFloat("analysis", "polarAlignErr")->setValue(r.polarAlignErrArcmin, true);
+
+    // Top periods, same data as the logInfo loop above but as a small grid
+    // so the UI can show it as a table.
+    getProperty("peaks")->clearGrid();
+    getProperty("peaks")->setGridLimit((int)r.topPeriods.size());
+    for (const auto &p : r.topPeriods)
+    {
+        getEltFloat("peaks", "period")->setValue(p.periodS);
+        getEltFloat("peaks", "amplitude")->setValue(p.amplitudePx, true);
+        getProperty("peaks")->push();
+    }
+
     // Full spectrum for the front-end graph - replaces the previous one each
     // time "analyse" is clicked, it is a snapshot, not a running series.
     getProperty("spectrum")->clearGrid();
