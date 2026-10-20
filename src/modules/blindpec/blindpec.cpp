@@ -951,6 +951,7 @@ void BlindPec::runLogAnalysis()
     getEltFloat("analysis", "pixelScale")->setValue(r.pixelScaleArcsecPerPx);
     getEltFloat("analysis", "rmsRA")->setValue(r.rmsRaPx);
     getEltFloat("analysis", "rmsDEC")->setValue(r.rmsDecPx);
+    getEltFloat("analysis", "rmsTotal")->setValue(r.rmsTotalPx);
     getEltFloat("analysis", "peakRA")->setValue(r.peakRaPx);
     getEltFloat("analysis", "peakDEC")->setValue(r.peakDecPx);
     getEltFloat("analysis", "elongation")->setValue(r.elongation);

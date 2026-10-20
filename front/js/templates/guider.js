@@ -442,9 +442,16 @@ function pulseAxisRow(axisLabel, leftVal, rightVal, leftName, rightName, maxVal)
 // styling as buildCompactRms below, just arranged in a CSS grid to roughly
 // halve the height.
 const ANALYSIS_DECIMALS = {
-  frames: 0, duration: null, pixelScale: 2, rmsRA: 2, rmsDEC: 2, peakRA: 2, peakDEC: 2,
+  frames: 0, duration: null, pixelScale: 2, rmsRA: 2, rmsDEC: 2, rmsTotal: 2, peakRA: 2, peakDEC: 2,
   elongation: 2, driftRA: 3, driftDEC: 3, polarAlignErr: 1,
 };
+
+// Fields stored in pixels that should also show their arcsec equivalent
+// (Gilles, 2026-10-20: "montre aussi les chiffres en deux versions,
+// arcsecondes(pixels)") - driftRA/driftDEC are px/min, so their arcsec
+// side is "/min too; everything else here is a plain px distance.
+const ANALYSIS_PX_FIELDS = new Set(["rmsRA", "rmsDEC", "rmsTotal", "peakRA", "peakDEC", "driftRA", "driftDEC"]);
+const ANALYSIS_PER_MIN_FIELDS = new Set(["driftRA", "driftDEC"]);
 
 // "duration" is stored in seconds (int element, libs/phd2loganalyzer.h's
 // durationS) - displayed as hh:mm:ss here rather than a raw second count.
@@ -462,11 +469,19 @@ function buildAnalysisPanel(client, moduleName) {
     wrap.innerHTML = "";
     if (!prop) return;
     const e = prop.elements;
+    const pxScale = (e.pixelScale && typeof e.pixelScale.value === "number") ? e.pixelScale.value : 0;
     for (const key of Object.keys(ANALYSIS_DECIMALS)) {
       if (!e[key]) continue;
       const v = e[key].value;
-      const txt = key === "duration" ? formatDuration(v)
-        : typeof v === "number" ? v.toFixed(ANALYSIS_DECIMALS[key]) : String(v ?? "");
+      const dec = ANALYSIS_DECIMALS[key];
+      let txt;
+      if (key === "duration") txt = formatDuration(v);
+      else if (typeof v !== "number") txt = String(v ?? "");
+      else if (ANALYSIS_PX_FIELDS.has(key) && pxScale > 0) {
+        const perMin = ANALYSIS_PER_MIN_FIELDS.has(key);
+        txt = `${(v * pxScale).toFixed(dec)}"${perMin ? "/min" : ""} (${v.toFixed(dec)}px${perMin ? "/min" : ""})`;
+      }
+      else txt = v.toFixed(dec);
       wrap.appendChild(el("div", { class: "rms-compact-item" }, [
         el("span", { class: "muted small", text: e[key].label || key }),
         el("span", { class: "mono small", text: txt }),

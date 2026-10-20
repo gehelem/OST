@@ -28,7 +28,7 @@ public:
         double durationS = 0;                      // elapsed time, first to last frame
         double pixelScaleArcsecPerPx = 0;
 
-        double rmsRaPx = 0, rmsDecPx = 0;
+        double rmsRaPx = 0, rmsDecPx = 0, rmsTotalPx = 0;
         double peakRaPx = 0, peakDecPx = 0;
         double elongation = 0;                    // 0 (round) .. 1 (elongated)
         double driftRaPxPerMin = 0, driftDecPxPerMin = 0;

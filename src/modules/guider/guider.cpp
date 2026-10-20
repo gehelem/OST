@@ -907,12 +907,13 @@ void Guider::runLogAnalysis()
         return;
     }
 
-    logInfo("Guide log analysis (%1 frames): RMS RA=%2px (%3\") DEC=%4px (%5\") | peak RA=%6px DEC=%7px | "
-            "drift RA=%8px/min DEC=%9px/min | elongation=%10 | polar align error=%11'",
+    logInfo("Guide log analysis (%1 frames): RMS RA=%2px (%3\") DEC=%4px (%5\") Total=%6px (%7\") | "
+            "peak RA=%8px DEC=%9px | drift RA=%10px/min DEC=%11px/min | elongation=%12 | polar align error=%13'",
     {
         QString::number(r.frameCount),
         QString::number(r.rmsRaPx, 'f', 2), QString::number(r.rmsRaPx * r.pixelScaleArcsecPerPx, 'f', 2),
         QString::number(r.rmsDecPx, 'f', 2), QString::number(r.rmsDecPx * r.pixelScaleArcsecPerPx, 'f', 2),
+        QString::number(r.rmsTotalPx, 'f', 2), QString::number(r.rmsTotalPx * r.pixelScaleArcsecPerPx, 'f', 2),
         QString::number(r.peakRaPx, 'f', 2), QString::number(r.peakDecPx, 'f', 2),
         QString::number(r.driftRaPxPerMin, 'f', 3), QString::number(r.driftDecPxPerMin, 'f', 3),
         QString::number(r.elongation, 'f', 2),
@@ -933,6 +934,7 @@ void Guider::runLogAnalysis()
     getEltFloat("analysis", "pixelScale")->setValue(r.pixelScaleArcsecPerPx);
     getEltFloat("analysis", "rmsRA")->setValue(r.rmsRaPx);
     getEltFloat("analysis", "rmsDEC")->setValue(r.rmsDecPx);
+    getEltFloat("analysis", "rmsTotal")->setValue(r.rmsTotalPx);
     getEltFloat("analysis", "peakRA")->setValue(r.peakRaPx);
     getEltFloat("analysis", "peakDEC")->setValue(r.peakDecPx);
     getEltFloat("analysis", "elongation")->setValue(r.elongation);

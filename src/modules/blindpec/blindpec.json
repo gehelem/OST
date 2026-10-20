@@ -161,40 +161,46 @@
                 "order":"05",
                 "format": "9.99"
             },
+            "rmsTotal": {
+                "type":"float",
+                "label": "RMS Total",
+                "order":"06",
+                "format": "9.99"
+            },
             "peakRA": {
                 "type":"float",
                 "label": "Peak RA",
-                "order":"06",
+                "order":"07",
                 "format": "9.99"
             },
             "peakDEC": {
                 "type":"float",
                 "label": "Peak DEC",
-                "order":"07",
+                "order":"08",
                 "format": "9.99"
             },
             "elongation": {
                 "type":"float",
                 "label": "Elongation",
-                "order":"08",
+                "order":"09",
                 "format": "9.99"
             },
             "driftRA": {
                 "type":"float",
                 "label": "Drift RA",
-                "order":"09",
+                "order":"10",
                 "format": "9.999"
             },
             "driftDEC": {
                 "type":"float",
                 "label": "Drift DEC",
-                "order":"10",
+                "order":"11",
                 "format": "9.999"
             },
             "polarAlignErr": {
                 "type":"float",
                 "label": "Polar align error",
-                "order":"11",
+                "order":"12",
                 "format": "9.9"
             }
         }

@@ -232,6 +232,7 @@ PHD2LogAnalyzer::Result PHD2LogAnalyzer::Analyze(const QString &logFilePath, int
         }
         res.rmsRaPx = std::sqrt(fit.varx);
         res.rmsDecPx = std::sqrt(fit.vary);
+        res.rmsTotalPx = std::sqrt(res.rmsRaPx * res.rmsRaPx + res.rmsDecPx * res.rmsDecPx);
         res.peakRaPx = peakR;
         res.peakDecPx = peakD;
 
