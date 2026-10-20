@@ -427,6 +427,27 @@ function buildAnalysisPanel(client, moduleName) {
   return wrap;
 }
 
+// Single scrollable stack for everything "actions.analyse" produces -
+// replaces the 3 separate panels (analysis/peaks/spectrum) this template
+// started with (Gilles, 2026-10-20: "regroupe les infos sur une seule
+// fenetre analyse"). Panels.make()'s own body already scrolls when its
+// content overflows (components.css), so no height juggling needed here
+// the way the standalone "Session analysis" panel needed earlier.
+function buildAnalyseWindow(client, moduleName) {
+  const wrap = el("div", { class: "guider-analyse" });
+  const disposers = [];
+  function section(titleText, node) {
+    wrap.appendChild(el("div", { class: "prop-label", style: "margin:10px 0 6px;" }, titleText));
+    wrap.appendChild(node);
+    disposers.push(node._dispose);
+  }
+  section("Session analysis", buildAnalysisPanel(client, moduleName));
+  section("Top periods", renderProperty(client, moduleName, "peaks", { framed: false }));
+  section("RA PE spectrum", buildSpectrumChartPanel(client, moduleName));
+  wrap._dispose = () => { while (disposers.length) { const d = disposers.pop(); if (d) d(); } };
+  return wrap;
+}
+
 export function buildCompactRms(client, moduleName) {
   const wrap = el("div", { class: "rms-compact" });
   const unsub = client.subscribe(client.topics.property(moduleName, "values"), (prop) => {
@@ -550,28 +571,20 @@ export function mount(client, moduleName) {
       quickNavEntries.push({ id: "guiding", label: mod.properties.guiding.label || "Guiding", icon: "browse_activity", iconOnly: true });
     }
     if (has("drift")) {
-      const b = Panels.make({ id: "drift", title: mod.properties.drift.label || "Drift", x: 990, y: 92, w: 340 });
+      const b = Panels.make({ id: "drift", title: mod.properties.drift.label || "Drift", x: 20, y: 680, w: 300 });
       b.appendChild(track(buildDriftChartPanel(client, moduleName)));
       quickNavEntries.push({ id: "drift", label: mod.properties.drift.label || "Drift", icon: "scatter_plot", iconOnly: true });
     }
-    if (has("spectrum")) {
-      const b = Panels.make({ id: "spectrum", title: mod.properties.spectrum.label || "RA PE spectrum", x: 990, y: 520, w: 340 });
-      b.appendChild(track(buildSpectrumChartPanel(client, moduleName)));
-      quickNavEntries.push({ id: "spectrum", label: mod.properties.spectrum.label || "RA PE spectrum", icon: "query_stats", iconOnly: true });
-    }
-    // "analysis"/"peaks" are plain scalar values / a short grid table -
-    // the generic renderer (renderProperty, framed:false since Panels.make
-    // already draws a title bar) already does exactly this, no bespoke
-    // chart needed like spectrum/drift/guiding above.
-    if (has("analysis")) {
-      const b = Panels.make({ id: "analysis", title: mod.properties.analysis.label || "Session analysis", x: 660, y: 650, w: 300 });
-      b.appendChild(track(buildAnalysisPanel(client, moduleName)));
-      quickNavEntries.push({ id: "analysis", label: mod.properties.analysis.label || "Session analysis", icon: "bar_chart", iconOnly: true });
-    }
-    if (has("peaks")) {
-      const b = Panels.make({ id: "peaks", title: mod.properties.peaks.label || "Top periods", x: 350, y: 650, w: 300 });
-      b.appendChild(track(renderProperty(client, moduleName, "peaks", { framed: false })));
-      quickNavEntries.push({ id: "peaks", label: mod.properties.peaks.label || "Top periods", icon: "list", iconOnly: true });
+    // "analyse" window: one panel for everything "actions.analyse" produces
+    // (Gilles, 2026-10-20: "regroupe les infos sur une seule fenetre
+    // analyse" - was 3 separate panels, now one scrollable stack: scalar
+    // summary, top-periods table, full spectrum chart).
+    if (has("analysis") || has("peaks") || has("spectrum")) {
+      const title = (mod.properties.actions && mod.properties.actions.elements.analyse
+        && mod.properties.actions.elements.analyse.label) || "Analyse";
+      const b = Panels.make({ id: "analyse", title, x: 990, y: 92, w: 340 });
+      b.appendChild(track(buildAnalyseWindow(client, moduleName, mod)));
+      quickNavEntries.push({ id: "analyse", label: title, icon: "query_stats", iconOnly: true });
     }
     // The profile-centric "Parameters" box (buildParamsPanel, render.js) is
     // not built here — it opens on demand from the gear button (app.js),
