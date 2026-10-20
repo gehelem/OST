@@ -1585,6 +1585,19 @@ void Guider::SMComputeGuide()
         rmsTotal = sqrt(square(rmsRA) + square(rmsDEC));
     }
 
+    // A rolling RMS built from only a couple of samples is dominated by
+    // whatever residual happened to land first - typically still elevated
+    // right after the forced no-correction first frame (SMComputeGuide's
+    // own _firstGuideFrame block). Not yet a meaningful "is guiding
+    // stable" signal, so hold it at 0 until the window has filled up a
+    // bit - same spirit as excluding that first frame from correction.
+    // Matters beyond cosmetics: Sequencer aborts the moment live rmsTotal
+    // exceeds guideparameters.rmsthreshold even once (sequencer.cpp), so
+    // an early transient here previously could abort a perfectly fine run.
+    enum { MIN_RMS_SAMPLES = 5 };
+    if (_dRAvector.size() < MIN_RMS_SAMPLES)
+        rmsRA = rmsDEC = rmsTotal = 0;
+
     getProperty("drift")->setGridLimit(rmsOver);
     getProperty("guiding")->setGridLimit(rmsOver);
 
