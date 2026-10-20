@@ -3,6 +3,7 @@
 #include <indimodule.h>
 #include <fileio.h>
 #include <phd2guidelog.h>
+#include <phd2loganalyzer.h>
 #include <solver.h>
 #include "startracker.h"
 
@@ -134,6 +135,7 @@ class MODULE_INIT Guider  : public IndiModule
         void   writeGuideLogRow(double driftRA, double driftDE, double driftRAeff, double driftDEeff,
                                  int revRA, int revDE);  ///< from SMComputeGuide, after pulses are decided
         void   closeGuideLog();                          ///< "Guiding Ends" / "Log closed" + close (from SMAbort)
+        void   runLogAnalysis();                         ///< read the (possibly still-open) guide log and logInfo the stats
 
         // ==================== State Machines (3 phases: Init → Calibration → Guiding) ====================
         QStateMachine _SMInit;          ///< State machine: Connection and star reference detection

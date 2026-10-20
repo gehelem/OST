@@ -1121,6 +1121,11 @@ bool IndiModule::defineMeAsGuider()
     b->setDirectEdit(true);
     b->setPreIcon("shuffle");
     pm->addElt(b);
+    b = new  OST::ElementBool("analyse", "Analyse", "guid60", "");
+    b->setValue(false, false);
+    b->setDirectEdit(true);
+    b->setPreIcon("query_stats");
+    pm->addElt(b);
     mIsGuider = true;
     return true;
 

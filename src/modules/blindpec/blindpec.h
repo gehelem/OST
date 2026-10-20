@@ -36,6 +36,7 @@
 #include <indimodule.h>
 #include <fileio.h>
 #include <phd2guidelog.h>
+#include <phd2loganalyzer.h>
 #include <opencv2/opencv.hpp>
 #include "pecmeter.h"
 
@@ -198,6 +199,7 @@ class MODULE_INIT BlindPec : public IndiModule
         void   openGuideLog();                          ///< create the file + PHD2 header (from enterGuide)
         void   writeGuideLogRow(double raErr, double crossErr, double needPx);
         void   closeGuideLog();                         ///< "Guiding Ends" / "Log closed" + close (from SMAbort)
+        void   runLogAnalysis();                        ///< read the (possibly still-open) guide log and logInfo the stats
 
         inline double square(double v) { return v * v; }
 

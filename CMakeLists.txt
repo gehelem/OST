@@ -245,6 +245,8 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/phd2guidelog.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/phd2guidelog.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/phd2loganalyzer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/phd2loganalyzer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/stretch.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/stretch.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/bayer.c
@@ -261,6 +263,7 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/phd2guidelog.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/phd2loganalyzer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/stretch.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/bayer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/dms.h

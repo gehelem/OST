@@ -219,6 +219,13 @@ void BlindPec::onExternalEvent(OST::ExtEvent event)
         }
         return;
     }
+
+    if (event.eltkey == "analyse")
+    {
+        if (getEltBool(event.prpkey, event.eltkey)->setValue(false, true))
+            runLogAnalysis();
+        return;
+    }
 }
 
 // ======================================================================
@@ -907,6 +914,34 @@ void BlindPec::writeGuideLogRow(double raErr, double crossErr, double needPx)
 void BlindPec::closeGuideLog()
 {
     _guideLog.close();
+}
+
+void BlindPec::runLogAnalysis()
+{
+    const PHD2LogAnalyzer::Result r = PHD2LogAnalyzer::Analyze(_guideLog.fileName());
+    if (!r.ok)
+    {
+        logWarning("Guide log analysis: %1", {r.error});
+        return;
+    }
+
+    // DEC is not guided here (RA-only), so DEC stats are just noise/seeing.
+    logInfo("Guide log analysis (%1 frames): RMS RA=%2px (%3\") | peak RA=%4px | drift RA=%5px/min | "
+            "elongation=%6",
+    {
+        QString::number(r.frameCount),
+        QString::number(r.rmsRaPx, 'f', 2), QString::number(r.rmsRaPx * r.pixelScaleArcsecPerPx, 'f', 2),
+        QString::number(r.peakRaPx, 'f', 2),
+        QString::number(r.driftRaPxPerMin, 'f', 3),
+        QString::number(r.elongation, 'f', 2)
+    });
+
+    for (const auto &p : r.topPeriods)
+        logInfo("Guide log analysis: RA periodic error - period=%1s amplitude=%2px (%3\")",
+    {
+        QString::number(p.periodS, 'f', 1), QString::number(p.amplitudePx, 'f', 3),
+        QString::number(p.amplitudePx * r.pixelScaleArcsecPerPx, 'f', 2)
+    });
 }
 
 // ---- Phase: guiding ------------------------------------------------------

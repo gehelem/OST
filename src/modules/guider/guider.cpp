@@ -246,6 +246,11 @@ void Guider::onExternalEvent(OST::ExtEvent event)
                 logInfo("Calibration data reset - recalibration required before guiding");
             }
         }
+        if (event.eltkey == "analyse")
+        {
+            if (getEltBool(event.prpkey, event.eltkey)->setValue(false, true))
+                runLogAnalysis();
+        }
     }
 }
 
@@ -891,6 +896,35 @@ void Guider::writeGuideLogRow(double driftRA, double driftDE, double driftRAeff,
 void Guider::closeGuideLog()
 {
     _guideLog.close();
+}
+
+void Guider::runLogAnalysis()
+{
+    const PHD2LogAnalyzer::Result r = PHD2LogAnalyzer::Analyze(_guideLog.fileName());
+    if (!r.ok)
+    {
+        logWarning("Guide log analysis: %1", {r.error});
+        return;
+    }
+
+    logInfo("Guide log analysis (%1 frames): RMS RA=%2px (%3\") DEC=%4px (%5\") | peak RA=%6px DEC=%7px | "
+            "drift RA=%8px/min DEC=%9px/min | elongation=%10 | polar align error=%11'",
+    {
+        QString::number(r.frameCount),
+        QString::number(r.rmsRaPx, 'f', 2), QString::number(r.rmsRaPx * r.pixelScaleArcsecPerPx, 'f', 2),
+        QString::number(r.rmsDecPx, 'f', 2), QString::number(r.rmsDecPx * r.pixelScaleArcsecPerPx, 'f', 2),
+        QString::number(r.peakRaPx, 'f', 2), QString::number(r.peakDecPx, 'f', 2),
+        QString::number(r.driftRaPxPerMin, 'f', 3), QString::number(r.driftDecPxPerMin, 'f', 3),
+        QString::number(r.elongation, 'f', 2),
+        r.polarAlignErrArcmin > 0 ? QString::number(r.polarAlignErrArcmin, 'f', 1) : "N/A"
+    });
+
+    for (const auto &p : r.topPeriods)
+        logInfo("Guide log analysis: RA periodic error - period=%1s amplitude=%2px (%3\")",
+    {
+        QString::number(p.periodS, 'f', 1), QString::number(p.amplitudePx, 'f', 3),
+        QString::number(p.amplitudePx * r.pixelScaleArcsecPerPx, 'f', 2)
+    });
 }
 
 void Guider::SMRequestFrameReset()
