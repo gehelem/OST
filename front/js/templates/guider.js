@@ -452,6 +452,9 @@ const ANALYSIS_DECIMALS = {
 // side is "/min too; everything else here is a plain px distance.
 const ANALYSIS_PX_FIELDS = new Set(["rmsRA", "rmsDEC", "rmsTotal", "peakRA", "peakDEC", "driftRA", "driftDEC"]);
 const ANALYSIS_PER_MIN_FIELDS = new Set(["driftRA", "driftDEC"]);
+// Plain unit suffix, no px/arcsec dual display - polarAlignErrArcmin is
+// already in arcminutes (Barrett's formula), not a pixel distance.
+const ANALYSIS_UNITS = { polarAlignErr: "'" };
 
 // "duration" is stored in seconds (int element, libs/phd2loganalyzer.h's
 // durationS) - displayed as hh:mm:ss here rather than a raw second count.
@@ -481,7 +484,7 @@ function buildAnalysisPanel(client, moduleName) {
         const perMin = ANALYSIS_PER_MIN_FIELDS.has(key);
         txt = `${(v * pxScale).toFixed(dec)}"${perMin ? "/min" : ""} (${v.toFixed(dec)}px${perMin ? "/min" : ""})`;
       }
-      else txt = v.toFixed(dec);
+      else txt = v.toFixed(dec) + (ANALYSIS_UNITS[key] || "");
       wrap.appendChild(el("div", { class: "rms-compact-item" }, [
         el("span", { class: "muted small", text: e[key].label || key }),
         el("span", { class: "mono small", text: txt }),
