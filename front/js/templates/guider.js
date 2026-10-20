@@ -283,6 +283,67 @@ export function buildDriftChartPanel(client, moduleName, opts) {
   return wrap;
 }
 
+// -------------------------------------------------------------- spectrum
+// RA periodic-error spectrum (period vs amplitude), pushed as a one-shot
+// snapshot by the "actions.analyse" button (libs/phd2loganalyzer.{h,cpp}),
+// not a live-streaming series like drift/guiding - each click replaces
+// the previous curve. Log-scale X: periods span roughly the worm period
+// down to a couple of seconds, a linear axis would crush the short end.
+function spectrumPoints(prop) {
+  const rows = prop.rows || [];
+  const gp = (prop && prop.graphParams) || { X: "period", Y: "amplitude" };
+  return rows.map((r) => ({ x: num(r[gp.X]), y: num(r[gp.Y]) })).filter((pt) => isFinite(pt.x) && isFinite(pt.y) && pt.x > 0);
+}
+
+export function buildSpectrumChartPanel(client, moduleName) {
+  const wrap = el("div", { class: "gd-chart" });
+  const canvas = el("canvas");
+  wrap.appendChild(canvas);
+  let chart = null;
+  const grey = "rgba(255,255,255,0.55)";
+  const grid = { color: "rgba(255,255,255,0.08)" };
+
+  const unsub = client.subscribe(client.topics.property(moduleName, "spectrum"), (prop) => {
+    if (!prop) return;
+    const pts = spectrumPoints(prop);
+    const gp = prop.graphParams || {};
+    if (!chart) {
+      chart = new window.Chart(canvas.getContext("2d"), {
+        type: "line",
+        data: {
+          datasets: [{
+            label: "RA PE", data: pts, parsing: false,
+            borderColor: "#4fc3f7", backgroundColor: "#4fc3f7",
+            borderWidth: 1.5, pointRadius: 1.5, tension: 0,
+          }],
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false, animation: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: {
+              type: "logarithmic",
+              title: { display: true, text: (prop.elements[gp.X] && prop.elements[gp.X].label) || "Period (s)", color: grey, font: { size: 10 } },
+              ticks: { color: grey, font: { size: 9 } }, grid,
+            },
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: (prop.elements[gp.Y] && prop.elements[gp.Y].label) || "Amplitude (px)", color: grey, font: { size: 10 } },
+              ticks: { color: grey, font: { size: 9 } }, grid,
+            },
+          },
+        },
+      });
+      return;
+    }
+    chart.data.datasets[0].data = pts;
+    chart.update("none");
+  });
+
+  wrap._dispose = () => { unsub(); if (chart) { chart.destroy(); chart = null; } };
+  return wrap;
+}
+
 // --------------------------------------------------------------- values
 // Bespoke "values" panel (Gilles, 2026-10-03, on the plain generic table
 // it used to be: "rends-la plus graphique") - matches OstErix/Rooster's
@@ -461,6 +522,11 @@ export function mount(client, moduleName) {
       const b = Panels.make({ id: "drift", title: mod.properties.drift.label || "Drift", x: 990, y: 92, w: 340 });
       b.appendChild(track(buildDriftChartPanel(client, moduleName)));
       quickNavEntries.push({ id: "drift", label: mod.properties.drift.label || "Drift", icon: "scatter_plot", iconOnly: true });
+    }
+    if (has("spectrum")) {
+      const b = Panels.make({ id: "spectrum", title: mod.properties.spectrum.label || "RA PE spectrum", x: 990, y: 520, w: 340 });
+      b.appendChild(track(buildSpectrumChartPanel(client, moduleName)));
+      quickNavEntries.push({ id: "spectrum", label: mod.properties.spectrum.label || "RA PE spectrum", icon: "query_stats", iconOnly: true });
     }
     // The profile-centric "Parameters" box (buildParamsPanel, render.js) is
     // not built here — it opens on demand from the gear button (app.js),
