@@ -930,53 +930,70 @@ void Guider::runLogAnalysis()
 
     // Scalar summary for the front-end - same numbers as the logInfo above,
     // as a property so the UI can show them without scraping the log.
-    getEltInt("analysis", "frames")->setValue(r.frameCount);
-    getEltInt("analysis", "duration")->setValue(qRound(r.durationS));
-    getEltFloat("analysis", "pixelScale")->setValue(r.pixelScaleArcsecPerPx);
-    getEltFloat("analysis", "rmsRA")->setValue(r.rmsRaPx);
-    getEltFloat("analysis", "rmsDEC")->setValue(r.rmsDecPx);
-    getEltFloat("analysis", "rmsTotal")->setValue(r.rmsTotalPx);
-    getEltFloat("analysis", "peakRA")->setValue(r.peakRaPx);
-    getEltFloat("analysis", "peakDEC")->setValue(r.peakDecPx);
-    getEltFloat("analysis", "elongation")->setValue(r.elongation);
-    getEltFloat("analysis", "driftRA")->setValue(r.driftRaPxPerMin);
-    getEltFloat("analysis", "driftDEC")->setValue(r.driftDecPxPerMin);
+    // setValue()'s single-arg overload defaults emitEvent to TRUE (see
+    // elementtemplate.h) - every call below needs the explicit "false" or
+    // each one fires its own "ea", not just the last/signaling one as
+    // intended.
+    getEltInt("analysis", "frames")->setValue(r.frameCount, false);
+    getEltInt("analysis", "duration")->setValue(qRound(r.durationS), false);
+    getEltFloat("analysis", "pixelScale")->setValue(r.pixelScaleArcsecPerPx, false);
+    getEltFloat("analysis", "rmsRA")->setValue(r.rmsRaPx, false);
+    getEltFloat("analysis", "rmsDEC")->setValue(r.rmsDecPx, false);
+    getEltFloat("analysis", "rmsTotal")->setValue(r.rmsTotalPx, false);
+    getEltFloat("analysis", "peakRA")->setValue(r.peakRaPx, false);
+    getEltFloat("analysis", "peakDEC")->setValue(r.peakDecPx, false);
+    getEltFloat("analysis", "elongation")->setValue(r.elongation, false);
+    getEltFloat("analysis", "driftRA")->setValue(r.driftRaPxPerMin, false);
+    getEltFloat("analysis", "driftDEC")->setValue(r.driftDecPxPerMin, false);
     getEltFloat("analysis", "polarAlignErr")->setValue(r.polarAlignErrArcmin, true);
 
     // Top periods, same data as the logInfo loop above but as a small grid
     // so the UI can show it as a table. Amplitude in arcsec here (unlike
     // the px-based Peak struct) - raw pixels aren't meaningful across
     // different setups/pixel scales.
+    //
+    // Pushed silently, one row at a time, then a single emitAll() - pushing
+    // non-silently here would fire one "ea" per setValue(..., true) PLUS one
+    // "gc" per push(), i.e. ~2 websocket messages per point (hundreds of
+    // points on a long session): a message flood that stutters the UI for
+    // no benefit, since nothing needs to render mid-build anyway (Gilles,
+    // 2026-10-20: "tu envoies le graphe avec des ea, autant que de lignes -
+    // c'est la mort de l'ui"). Every setValue() below needs the explicit
+    // "false" - the single-arg overload defaults emitEvent to true.
     getProperty("peaks")->clearGrid();
     getProperty("peaks")->setGridLimit((int)r.topPeriods.size());
     for (const auto &p : r.topPeriods)
     {
-        getEltFloat("peaks", "period")->setValue(p.periodS);
-        getEltFloat("peaks", "amplitude")->setValue(p.amplitudePx * r.pixelScaleArcsecPerPx, true);
-        getProperty("peaks")->push();
+        getEltFloat("peaks", "period")->setValue(p.periodS, false);
+        getEltFloat("peaks", "amplitude")->setValue(p.amplitudePx * r.pixelScaleArcsecPerPx, false);
+        getProperty("peaks")->push(true);
     }
+    getProperty("peaks")->emitAll();
 
     // Full spectrum for the front-end graph - replaces the previous one each
     // time "analyse" is clicked, it is a snapshot, not a running series.
     // Raw and corrected share the grid, told apart by the "series" column
     // (SXY graph type - see libs/phd2loganalyzer.h's own doc comment).
-    // Amplitude in arcsec, same reasoning as peaks above.
+    // Amplitude in arcsec, same reasoning as peaks above. Silent push +
+    // single emitAll() at the end, same reasoning as peaks above too - this
+    // one can run into the hundreds of rows, so it matters even more here.
     getProperty("spectrum")->clearGrid();
     getProperty("spectrum")->setGridLimit((int)(r.spectrumRaw.size() + r.spectrumCorrected.size()));
     for (const auto &p : r.spectrumRaw)
     {
-        getEltString("spectrum", "series")->setValue("raw");
-        getEltFloat("spectrum", "period")->setValue(p.periodS);
-        getEltFloat("spectrum", "amplitude")->setValue(p.amplitudePx * r.pixelScaleArcsecPerPx, true);
-        getProperty("spectrum")->push();
+        getEltString("spectrum", "series")->setValue("raw", false);
+        getEltFloat("spectrum", "period")->setValue(p.periodS, false);
+        getEltFloat("spectrum", "amplitude")->setValue(p.amplitudePx * r.pixelScaleArcsecPerPx, false);
+        getProperty("spectrum")->push(true);
     }
     for (const auto &p : r.spectrumCorrected)
     {
-        getEltString("spectrum", "series")->setValue("corrected");
-        getEltFloat("spectrum", "period")->setValue(p.periodS);
-        getEltFloat("spectrum", "amplitude")->setValue(p.amplitudePx * r.pixelScaleArcsecPerPx, true);
-        getProperty("spectrum")->push();
+        getEltString("spectrum", "series")->setValue("corrected", false);
+        getEltFloat("spectrum", "period")->setValue(p.periodS, false);
+        getEltFloat("spectrum", "amplitude")->setValue(p.amplitudePx * r.pixelScaleArcsecPerPx, false);
+        getProperty("spectrum")->push(true);
     }
+    getProperty("spectrum")->emitAll();
 }
 
 void Guider::SMRequestFrameReset()
