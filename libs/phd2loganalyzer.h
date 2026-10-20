@@ -34,6 +34,7 @@ public:
         double polarAlignErrArcmin = 0;            // 0 if declination unknown
 
         std::vector<Peak> topPeriods;              // RA worm spectrum, strongest first
+        std::vector<Peak> spectrum;                 // full RA worm spectrum, for graphing
     };
 
     // maxPeaks: how many of the strongest RA periodic-error components to report.

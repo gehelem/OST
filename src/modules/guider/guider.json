@@ -155,6 +155,36 @@
             }
         }
     },
+    "spectrum": {
+        "devcat": "Control",
+        "group": "",
+        "order":"Control360",
+        "permission": 0,
+        "label": "RA PE spectrum",
+        "hasGrid":true,
+        "showElts":false,
+        "showGrid":false,
+        "gridLimit":2000,
+        "graphType":"XY",
+        "graphParams":{
+            "X":"period",
+            "Y":"amplitude"
+        },
+        "e": {
+            "period": {
+                "type":"float",
+                "label": "Period",
+                "order":"01",
+                "format": "9999.9"
+            },
+            "amplitude": {
+                "type":"float",
+                "label": "Amplitude",
+                "order":"02",
+                "format": "9.999"
+            }
+        }
+    },
     "drift": {
         "devcat": "Control",
         "group": "",

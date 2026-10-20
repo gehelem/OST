@@ -257,6 +257,10 @@ PHD2LogAnalyzer::Result PHD2LogAnalyzer::Analyze(const QString &logFilePath, int
             amplitude[i] = gsl_complex_abs(*z) * scale;
         }
 
+        res.spectrum.reserve(nfft);
+        for (size_t i = 0; i < nfft; i++)
+            res.spectrum.push_back({period[i], amplitude[i]});
+
         // Keep only local maxima (a spectral line spans several adjacent bins
         // otherwise, reporting the "top N" would just repeat the same peak).
         std::vector<PHD2LogAnalyzer::Peak> peaks;

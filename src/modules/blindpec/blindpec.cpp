@@ -942,6 +942,17 @@ void BlindPec::runLogAnalysis()
         QString::number(p.periodS, 'f', 1), QString::number(p.amplitudePx, 'f', 3),
         QString::number(p.amplitudePx * r.pixelScaleArcsecPerPx, 'f', 2)
     });
+
+    // Full spectrum for the front-end graph - replaces the previous one each
+    // time "analyse" is clicked, it is a snapshot, not a running series.
+    getProperty("spectrum")->clearGrid();
+    getProperty("spectrum")->setGridLimit((int)r.spectrum.size());
+    for (const auto &p : r.spectrum)
+    {
+        getEltFloat("spectrum", "period")->setValue(p.periodS);
+        getEltFloat("spectrum", "amplitude")->setValue(p.amplitudePx, true);
+        getProperty("spectrum")->push();
+    }
 }
 
 // ---- Phase: guiding ------------------------------------------------------
