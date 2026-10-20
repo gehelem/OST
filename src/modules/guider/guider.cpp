@@ -819,10 +819,79 @@ void Guider::SMInitGuide()
         QString(getBool("revCorrections", "revDE") ? "on" : "off")
     });
 
+    openGuideLog();
+
     emit InitGuideDone();
     setStateEvent(OST::Busy, "initguidedone", "initguidedone", "init guide done");
 
 }
+
+// ======================================================================
+//  PHD2-format GuideLog (see libs/phd2guidelog.h) - unlike BlindPEC this
+//  module guides both axes, so DEC columns carry real data.
+// ======================================================================
+void Guider::openGuideLog()
+{
+    const double xAngle = _calCcdOrientation * 180.0 / PI;
+    const double decDiv = qMax(cos(_mountDEC * PI / 180.0), 0.05);
+    const double calPulseRACompensated = (decDiv > 1e-6) ? _calPulseRA / decDiv : 0.0;
+    const double xRate = (calPulseRACompensated > 1e-6) ? 1000.0 / calPulseRACompensated : 0.0;
+    const double yRate = (_calPulseDEC > 1e-6) ? 1000.0 / _calPulseDEC : 0.0;
+    const int    pulsemin = getInt("guideParams", "pulsemin");
+
+    PHD2GuideLog::HeaderInfo h;
+    h.equipmentProfile   = "Guider";
+    h.exposureMs          = qRound(getFloat("parms", "exposure") * 1000.0);
+    h.xAngleDeg           = xAngle;
+    h.xRateArcsecS        = xRate;
+    h.yAngleDeg           = xAngle - 90.0;
+    h.yRateArcsecS        = yRate;
+    h.minMoveX            = (calPulseRACompensated > 1e-6) ? pulsemin / calPulseRACompensated : 0.0;
+    h.minMoveY            = (_calPulseDEC > 1e-6) ? pulsemin / _calPulseDEC : 0.0;
+    h.xGuideAlgorithm     = "PI";
+    h.yGuideAlgorithm     = "PI";
+    h.maxRaDurationMs     = getInt("guideParams", "pulsemax");
+    h.maxDecDurationMs    = getInt("guideParams", "pulsemax");
+    h.decGuideMode        = "On";
+    h.raGuideSpeedArcsecS = xRate;
+    h.mountRAHours        = _mountRA;
+    h.mountDECDeg         = _mountDEC;
+
+    _guideLog.open(getWebroot(), "PHD2_GuideLog", h);
+    if (_guideLog.isOpen())
+        logInfo("PHD2 GuideLog: %1", {_guideLog.fileName()});
+    else
+        logWarning("Could not open GuideLog in %1 - PHD2-format logging disabled", {getWebroot()});
+}
+
+void Guider::writeGuideLogRow(double driftRA, double driftDE, double driftRAeff, double driftDEeff,
+                               int revRA, int revDE)
+{
+    // PHD sign convention here: positive RARawDistance <=> a West pulse,
+    // positive DECRawDistance <=> a South pulse. The control loop above
+    // picks East/North when revRA*drift or revDE*drift is positive, so RA
+    // needs the sign flipped to match; DEC already comes out right.
+    PHD2GuideLog::Row r;
+    r.dx               = _dxFirst;
+    r.dy               = _dyFirst;
+    r.raRawDistance    = -revRA * driftRA;
+    r.raGuideDistance  = -revRA * driftRAeff;
+    r.decRawDistance   = revDE * driftDE;
+    r.decGuideDistance = revDE * driftDEeff;
+    r.raDurationMs     = (_pulseW > 0) ? _pulseW : (_pulseE > 0) ? _pulseE : 0;
+    r.raDirection      = (_pulseW > 0) ? "W" : (_pulseE > 0) ? "E" : "";
+    r.decDurationMs    = (_pulseS > 0) ? _pulseS : (_pulseN > 0) ? _pulseN : 0;
+    r.decDirection     = (_pulseS > 0) ? "S" : (_pulseN > 0) ? "N" : "";
+    r.snr              = _image->getStats().SNR;
+
+    _guideLog.writeRow(r);
+}
+
+void Guider::closeGuideLog()
+{
+    _guideLog.close();
+}
+
 void Guider::SMRequestFrameReset()
 {
     //logInfo("SMRequestFrameReset");
@@ -1465,6 +1534,8 @@ void Guider::SMComputeGuide()
     setStateEvent(OST::Busy, "guiding", "guideSNR", "guide SNR",
                   qRound(_image->getStats().SNR));
 
+    writeGuideLogRow(_driftRA, _driftDE, driftRAeff, driftDEeff, revRA, revDE);
+
     emit ComputeGuideDone();
 }
 void Guider::SMRequestPulses()
@@ -1610,6 +1681,7 @@ void Guider::OnSucessSEP()
 void Guider::SMAbort()
 {
     logInfo("Aborting guiding");
+    closeGuideLog();
     disarmWatchdog();
     _expectingFrame = false;
     getEltBool("actions", "calibrate")->setValue(false, false);

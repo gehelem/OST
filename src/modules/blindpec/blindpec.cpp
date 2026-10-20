@@ -847,78 +847,40 @@ void BlindPec::enterGuide()
 // is 0 / empty.
 void BlindPec::openGuideLog()
 {
-    if (_guideLog.isOpen())
-        _guideLog.close();
-
-    const QString ts    = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
-    const QString fname  = getWebroot() + "/PHD2_GuideLog_" +
-                           QDateTime::currentDateTime().toString("yyyy-MM-dd_HHmmss") + ".txt";
-    _guideLog.setFileName(fname);
-    if (!_guideLog.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
-    {
-        logWarning("Could not open GuideLog %1 - PHD2-format logging disabled", {fname});
-        return;
-    }
-    _glFrame = 0;
-    _glT0    = nowMs();
-
-    // C-locale number formatting (QString::number never localises; unlike arg()).
-    auto n = [](double v, int p)
-    {
-        return QString::number(v, 'f', p);
-    };
-
     const double xAngle   = _theta * 180.0 / M_PI;
     const double xRate    = (_G > 1e-6) ? 1000.0 / _G : 0.0;                 // px/s during a guide pulse
     const double minMove  = (_G > 1e-6) ? getInt("guideParams", "pulsemin") / _G : 0.0;
     const int    expMs    = (int)std::lround(getFloat("parms", "exposure") * 1000.0);
     const double raSpeed  = _guideRateK * SIDEREAL_ARCSEC_PER_S;            // a-s/s
 
-    QString h;
-    h += "PHD2 version 2.6.13 [OST BlindPEC], Log version 2.5. Log enabled at " + ts + "\n";
-    h += "\n";
-    h += "Guiding Begins at " + ts + "\n";
-    h += "Equipment Profile = BlindPEC\n";
-    h += "Dither = RA only, Dither scale = 1.000, Image noise reduction = none, Guide-frame time lapse = 0, Server disabled\n";
-    h += "Pixel scale = " + n(_arcsecPerPx, 2) + " arc-sec/px, Binning = 1, Focal length = 800 mm\n";
-    h += "Exposure = " + QString::number(expMs) + " ms\n";
-    h += "Mount = \"Mount\", connected, guiding enabled, xAngle = " + n(xAngle, 1) +
-         ", xRate = " + n(xRate, 3) + ", yAngle = " + n(xAngle - 90.0, 1) +
-         ", yRate = " + n(xRate, 3) + ", parity = +/+\n";
-    h += "X guide algorithm = Lead-compensated PI, Minimum move = " + n(minMove, 3) + "\n";
-    h += "Y guide algorithm = None, Minimum move = 0.000\n";
-    h += "Max RA duration = " + QString::number(getInt("guideParams", "pulsemax")) +
-         ", Max DEC duration = 0, DEC guide mode = Off\n";
-    h += "RA Guide Speed = " + n(raSpeed, 1) + " a-s/s, Dec Guide Speed = N/A, Cal Dec = 0.0, "
-         "Last Cal Issue = None, Timestamp = " + ts + "\n";
-    h += "RA = " + n(_mountRA, 2) + " hr, Dec = " + n(_mountDEC, 1) +
-         " deg, Hour angle = N/A hr, Pier side = N/A, Rotator pos = N/A, Alt = " + n(_mountALT, 1) +
-         " deg, Az = " + n(_mountAZ, 1) + " deg\n";
-    h += "Lock position = 0.000, 0.000, Star position = 0.000, 0.000, HFD = 2.00 px\n";
-    h += "Frame,Time,mount,dx,dy,RARawDistance,DECRawDistance,RAGuideDistance,DECGuideDistance,"
-         "RADuration,RADirection,DECDuration,DECDirection,XStep,YStep,StarMass,SNR,ErrorCode\n";
+    PHD2GuideLog::HeaderInfo h;
+    h.equipmentProfile    = "BlindPEC";
+    h.pixelScaleArcsecPerPx = _arcsecPerPx;
+    h.exposureMs           = expMs;
+    h.xAngleDeg            = xAngle;
+    h.xRateArcsecS         = xRate;
+    h.yAngleDeg            = xAngle - 90.0;   // DEC isn't actually guided here
+    h.yRateArcsecS         = xRate;
+    h.minMoveX             = minMove;
+    h.maxRaDurationMs      = getInt("guideParams", "pulsemax");
+    h.raGuideSpeedArcsecS  = raSpeed;
+    h.mountRAHours         = _mountRA;
+    h.mountDECDeg          = _mountDEC;
+    h.mountALTDeg          = _mountALT;
+    h.mountAZDeg           = _mountAZ;
 
-    _guideLog.write(h.toUtf8());
-    _guideLog.flush();
-    logInfo("PHD2 GuideLog: %1", {fname});
+    _guideLog.open(getWebroot(), "PHD2_GuideLog", h);
+    if (_guideLog.isOpen())
+        logInfo("PHD2 GuideLog: %1", {_guideLog.fileName()});
+    else
+        logWarning("Could not open GuideLog in %1 - PHD2-format logging disabled", {getWebroot()});
 }
 
 void BlindPec::writeGuideLogRow(double raErr, double crossErr, double needPx)
 {
-    if (!_guideLog.isOpen())
-        return;
-    _glFrame++;
-
-    auto n = [](double v, int p)
-    {
-        return QString::number(v, 'f', p);
-    };
-
     // dx,dy are camera-frame in PHD; rebuild them from the along/cross residual
     // so PHD Log Viewer's scatter plot stays meaningful.
     const double ct = std::cos(_theta), sn = std::sin(_theta);
-    const double dx = raErr * ct - crossErr * sn;
-    const double dy = raErr * sn + crossErr * ct;
 
     // PHD sign convention: positive RARawDistance <=> a West pulse. Derive the
     // sign from the direction that nulls the current error (so it is defined
@@ -929,33 +891,21 @@ void BlindPec::writeGuideLogRow(double raErr, double crossErr, double needPx)
         raRawSigned = -raRawSigned;
     const double s = (raRawSigned >= 0.0) ? 1.0 : -1.0;
 
-    const double raRaw   = s * std::fabs(raErr);
-    const double raGuide = s * std::fabs(needPx);
-    const int    raDurMs = (_pulseW > 0) ? _pulseW : (_pulseE > 0) ? _pulseE : 0;
-    const char  *raDir   = (_pulseW > 0) ? "W" : (_pulseE > 0) ? "E" : "";
-
+    PHD2GuideLog::Row r;
+    r.dx              = raErr * ct - crossErr * sn;
+    r.dy              = raErr * sn + crossErr * ct;
+    r.raRawDistance   = s * std::fabs(raErr);
+    r.raGuideDistance = s * std::fabs(needPx);
+    r.raDurationMs    = (_pulseW > 0) ? _pulseW : (_pulseE > 0) ? _pulseE : 0;
+    r.raDirection     = (_pulseW > 0) ? "W" : (_pulseE > 0) ? "E" : "";
     // NCC trust metric [~0..1] shown on PHD's SNR axis; StarMass has no analogue.
-    const double snr      = _measResp * 100.0;
-    const double starMass = 1000.0;
-    const double tSec     = (nowMs() - _glT0) / 1000.0;
+    r.snr             = _measResp * 100.0;
 
-    QString row = QString::number(_glFrame) + "," + n(tSec, 3) + ",\"Mount\"," +
-                  n(dx, 3) + "," + n(dy, 3) + "," +
-                  n(raRaw, 3) + ",0.000," + n(raGuide, 3) + ",0.000," +
-                  QString::number(raDurMs) + "," + raDir + ",0,,,," +
-                  n(starMass, 0) + "," + n(snr, 2) + ",0\n";
-
-    _guideLog.write(row.toUtf8());
-    _guideLog.flush();
+    _guideLog.writeRow(r);
 }
 
 void BlindPec::closeGuideLog()
 {
-    if (!_guideLog.isOpen())
-        return;
-    const QString ts = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
-    _guideLog.write(QString("Guiding Ends at " + ts + "\n\nLog closed at " + ts + "\n").toUtf8());
-    _guideLog.flush();
     _guideLog.close();
 }
 

@@ -2,6 +2,7 @@
 #define GUIDER_MODULE_h_
 #include <indimodule.h>
 #include <fileio.h>
+#include <phd2guidelog.h>
 #include <solver.h>
 #include "startracker.h"
 
@@ -123,6 +124,16 @@ class MODULE_INIT Guider  : public IndiModule
         double _calCcdOrientation = 0;      ///< CCD orientation (radians) from calibration
         double _calMountDEC = 0;            ///< Mount DEC at calibration time (for compensation)
         int _itt = 0;  ///< Iteration counter
+
+        // ==================== PHD2-format GuideLog ====================
+        // Written to getWebroot() (next to the JPEG preview) so it can be
+        // opened directly in PHD Log Viewer. One "Guiding Begins ... Guiding
+        // Ends" block per guiding run.
+        PHD2GuideLog _guideLog;
+        void   openGuideLog();                          ///< create the file + PHD2 header (from SMInitGuide)
+        void   writeGuideLogRow(double driftRA, double driftDE, double driftRAeff, double driftDEeff,
+                                 int revRA, int revDE);  ///< from SMComputeGuide, after pulses are decided
+        void   closeGuideLog();                          ///< "Guiding Ends" / "Log closed" + close (from SMAbort)
 
         // ==================== State Machines (3 phases: Init → Calibration → Guiding) ====================
         QStateMachine _SMInit;          ///< State machine: Connection and star reference detection
