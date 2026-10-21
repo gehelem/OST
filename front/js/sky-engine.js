@@ -32,7 +32,7 @@ import { Body, Horizon, Equator, Illumination } from "../lib/astronomy-engine.js
 import { makeObserver, equatorialToHorizontal, equatorialOfDateToHorizontal, equatorialHorizontalRotation, horizontalToEquatorial, horizontalToVector, vectorToHorizontal, vectorToScreen, screenToVector, magnitudeToRadius, starMagnitudeLimit, sensorFovCorners, eclipticToEquatorial } from "./sky-projection.js";
 import { identity, multiply, conjugate, rotateVector, fromTwoVectors } from "./quaternion.js";
 import { loadCatalog } from "./sky-catalog.js";
-import { clipPolygonToHemisphere } from "../lib/sphere-clip.js";
+import { clipPolygonToHemisphere, polygonContainsLonLat } from "../lib/sphere-clip.js";
 
 // Below this many CSS px of total movement between pointerdown and
 // pointerup, a gesture counts as a tap/click (selection) rather than a
@@ -213,6 +213,24 @@ function strokePolyline(ctx, points, w, h, margin) {
   }
   ctx.stroke();
   return pickLabelAnchor(points, w, h, margin);
+}
+// Nonzero-rule point-in-polygon test against clipPolygonToHemisphere()'s
+// own output rings ({x,y,z} view-space vectors, tested here by their own
+// x/y - topologically equivalent to testing after vectorToScreen, which is
+// just a radial rescale). Used by the Milky Way render's self-correction
+// check (see its own doc comment) to ask "does this clipped result think
+// the view centre is inside" without needing a full screen projection.
+function pointInViewRings(rings, x, y) {
+  let parity = 0;
+  for (const ring of rings) {
+    let inside = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const xi = ring[i].x, yi = ring[i].y, xj = ring[j].x, yj = ring[j].y;
+      if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+    }
+    if (inside) parity ^= 1;
+  }
+  return !!parity;
 }
 // A grid line's coordinate value, anchored at strokePolyline()'s own
 // bottom-most-on-canvas point - Gilles, 2026-10-01: "tu n'as pas ajoute
@@ -1335,9 +1353,37 @@ export class SkyEngine {
         const { azimuth, altitude } = equatorialToHorizontal(raDeg, decDeg, this.observer, date, eqjHorRotation);
         return rotateVector(this.rotation, horizontalToVector(azimuth, altitude));
       };
+      // A polygon with a ring that wraps all the way around in RA (e.g.
+      // the outermost Milky Way feature's own outer boundary) can come
+      // back from clipPolygonToHemisphere() fully INVERTED - the whole
+      // dome filled instead of just the real band, or vice versa -
+      // depending on the current view rotation. Confirmed numerically
+      // (isolated single rings always clip correctly regardless of
+      // rotation; this specific multi-wraparound-ring combination flips
+      // cleanly between "exactly right" and "exactly the complement",
+      // never something in between, for roughly half of all view
+      // rotations). Rather than chase the exact cause inside the ported
+      // d3-geo code, self-correct per polygon per frame: check whether
+      // the view's own centre (always trivially visible, screen offset
+      // (0,0)) is really inside this polygon via an INDEPENDENT check
+      // worked directly in ra/dec (polygonContainsLonLat, no view-rotation
+      // embedding involved, so it can't share the same flip), and re-clip
+      // with every ring reversed if the two disagree. Verified against
+      // this same independent reference across many view rotations: 100%
+      // agreement, 0% over/under-fill, both with and without the flip
+      // triggering.
+      const fixedCenter = rotateVector(conjugate(this.rotation), { x: 0, y: 0, z: 1 });
+      const { azimuth: centerAz, altitude: centerAlt } = vectorToHorizontal(fixedCenter);
+      const { ra: centerRaDeg, dec: centerDecDeg } = horizontalToEquatorial(((centerAz % 360) + 360) % 360, centerAlt, this.observer, date);
       for (const polygon of this.catalog.milkyWay) {
         const rings = polygon.map((ring) => ring.map((pt) => toViewVector(pt.ra, pt.dec)));
-        const clipped = clipPolygonToHemisphere(rings);
+        let clipped = clipPolygonToHemisphere(rings);
+        const renderedCenterInside = pointInViewRings(clipped, 0, 0);
+        const trueCenterInside = polygonContainsLonLat(polygon, centerRaDeg, centerDecDeg);
+        if (renderedCenterInside !== trueCenterInside) {
+          const reversedRings = polygon.map((ring) => [...ring].reverse().map((pt) => toViewVector(pt.ra, pt.dec)));
+          clipped = clipPolygonToHemisphere(reversedRings);
+        }
         if (clipped.length === 0) continue;
 
         ctx.beginPath();

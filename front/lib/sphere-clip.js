@@ -466,3 +466,24 @@ export function clipPolygonToHemisphere(rings) {
   transform.polygonEnd();
   return outputRings;
 }
+
+/**
+ * Point-in-spherical-polygon test worked directly in native (lon,lat)
+ * degrees (e.g. ra/dec) - `polygon` is an array of rings, each ring an
+ * array of {lon,lat} (or any pair of fields named differently; pass
+ * `[p.ra, p.dec]` via the accessor-free {lon,lat} shape expected here)
+ * points in degrees. Same polygonContains() this file's own clip uses
+ * internally for its startInside determination, exposed standalone with
+ * NO view-rotation embedding involved at all - an independent oracle a
+ * caller can cross-check a view-embedded clip result against. See
+ * sky-engine.js's own Milky Way rendering for why that's needed: a
+ * polygon with a ring that wraps all the way around in longitude can come
+ * back from clipPolygonToHemisphere() fully inverted for about half of
+ * all view rotations, and this is cheap enough to run every frame as a
+ * self-correction check.
+ */
+export function polygonContainsLonLat(polygon, lonDeg, latDeg) {
+  const toRad = (deg) => (deg * pi) / 180;
+  const rings = polygon.map((ring) => ring.map((p) => [toRad(p.ra ?? p.lon), toRad(p.dec ?? p.lat)]));
+  return polygonContains(rings, [toRad(lonDeg), toRad(latDeg)]);
+}
