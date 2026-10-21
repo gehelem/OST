@@ -88,6 +88,7 @@ const STRINGS = {
   "chrome.connect": { en: "Connect", fr: "Connecter", de: "Verbinden", it: "Connetti", es: "Conectar" },
   "chrome.disconnect": { en: "Disconnect", fr: "Déconnecter", de: "Trennen", it: "Disconnetti", es: "Desconectar" },
   "chrome.resize": { en: "Resize", fr: "Redimensionner", de: "Größe ändern", it: "Ridimensiona", es: "Redimensionar" },
+  "chrome.hide": { en: "Hide", fr: "Masquer", de: "Ausblenden", it: "Nascondi", es: "Ocultar" },
   "chrome.parametersPrefix": { en: "Parameters — ", fr: "Paramètres — ", de: "Parameter — ", it: "Parametri — ", es: "Parámetros — " },
   "chrome.recentServers": { en: "Recent servers", fr: "Serveurs récents", de: "Letzte Server", it: "Server recenti", es: "Servidores recientes" },
   "chrome.noHistoryYet": { en: "No history yet.", fr: "Aucun historique pour l'instant.", de: "Noch kein Verlauf.", it: "Ancora nessuna cronologia.", es: "Aún no hay historial." },
