@@ -410,13 +410,15 @@ function buildSettingsPanel(engine, hipsBg) {
   });
   wrap.appendChild(el("label", { class: "form-row", style: "cursor:pointer" }, [projCb, el("span", { text: t("navigator.stereographic") })]));
 
-  // Mosaic assistant (Gilles, 2026-10-21: "ajoute un bouton 'mosaic
-  // assistant', qui doit ouvrir une modale") - content deliberately left
-  // minimal for now, detailed in a follow-up step; this is just the entry
-  // point. Same .dialog-overlay/.dialog shell as the search panel's own
-  // catalog-selection modal in this file.
+  // Mosaic definition (Gilles, 2026-10-21: "ajoute un bouton 'mosaic
+  // assistant' ... qui doit ouvrir une modale", then, once a blocking
+  // modal turned out to defeat the point of watching the grid update live
+  // while adjusting it: "la transformer en fenetre flottante"). The actual
+  // panel (buildMosaicDefinitionPanel()) is created once at mount() time
+  // like every other panel in this file - this button just toggles its
+  // visibility, same mechanism as a quicknav icon.
   const mosaicBtn = el("button", { type: "button", class: "btn btn-sm", text: t("navigator.mosaicDefinition") });
-  mosaicBtn.addEventListener("click", () => openMosaicDefinitionModal(engine));
+  mosaicBtn.addEventListener("click", () => Panels.togglePanel("mosaicDefinition"));
   wrap.appendChild(el("div", { class: "form-row" }, [mosaicBtn]));
 
   wrap._dispose = () => { engine.onZoomChange = null; engine.onRotationChange = null; engine.onHipsFailure = null; };
@@ -443,10 +445,15 @@ function saveMosaicSettings(state) {
   try { localStorage.setItem(MOSAIC_SETTINGS_KEY, JSON.stringify(state)); } catch (e) { /* ignore */ }
 }
 
-function openMosaicDefinitionModal(engine) {
+/** The Mosaic definition panel's body - a plain floating panel (draggable,
+ * non-blocking) rather than the blocking modal this started as, so the
+ * grid drawn on the dome (sky-engine.js's own framing-preview block) can
+ * be watched updating live while these fields are adjusted - a modal's own
+ * backdrop would hide the dome entirely regardless of where the dialog box
+ * itself sat, defeating that. */
+function buildMosaicDefinitionPanel(engine) {
   const state = loadMosaicSettings();
-  const overlay = el("div", { class: "dialog-overlay" });
-  const close = () => overlay.remove();
+  const wrap = el("div");
 
   function numberField(value, min, max) {
     return el("input", { type: "number", class: "field-input tiny", min: String(min), max: String(max), step: "1", value: String(value) });
@@ -463,36 +470,28 @@ function openMosaicDefinitionModal(engine) {
     colsInput.value = String(state.cols);
     overlapInput.value = String(state.overlap);
     saveMosaicSettings(state);
-    // Live update - the mosaic grid itself (sky-engine.js's own framing-
-    // preview block) reads these same three fields on the engine, not
-    // localStorage directly, same pattern as every other display setting.
-    if (engine) {
-      engine.mosaicRows = state.rows;
-      engine.mosaicCols = state.cols;
-      engine.mosaicOverlapPercent = state.overlap;
-      engine.render();
-    }
+    // Live update - the mosaic grid itself reads these same three fields
+    // on the engine, not localStorage directly, same pattern as every
+    // other display setting.
+    engine.mosaicRows = state.rows;
+    engine.mosaicCols = state.cols;
+    engine.mosaicOverlapPercent = state.overlap;
+    engine.render();
   }
   rowsInput.addEventListener("change", persist);
   colsInput.addEventListener("change", persist);
   overlapInput.addEventListener("change", persist);
 
-  const gridRow = el("div", { class: "form-row" }, [
+  wrap.appendChild(el("div", { class: "form-row" }, [
     el("span", { text: t("navigator.mosaicRows") }), rowsInput,
     el("span", { text: t("navigator.mosaicCols") }), colsInput,
-  ]);
-  const overlapRow = el("div", { class: "form-row" }, [
+  ]));
+  wrap.appendChild(el("div", { class: "form-row" }, [
     el("span", { text: t("navigator.mosaicOverlap") }), overlapInput, el("span", { text: "%" }),
-  ]);
+  ]));
 
-  const dialog = el("div", { class: "dialog" }, [
-    el("div", { class: "dialog-header" }, [el("h3", { text: t("navigator.mosaicDefinition") }), iconButton("close", t("common.close"), close)]),
-    gridRow,
-    overlapRow,
-  ]);
-  overlay.appendChild(dialog);
-  overlay.addEventListener("click", (ev) => { if (ev.target === overlay) close(); });
-  document.getElementById("dialog-root").appendChild(overlay);
+  wrap._dispose = () => {};
+  return wrap;
 }
 
 /**
@@ -1113,6 +1112,15 @@ export function mount(client, moduleName) {
       const timeNavPanel = Panels.make({ id: "timenav", title: t("navigator.timeNav"), x: 340, y: 463, w: 300, collapsed: true });
       timeNavPanel.appendChild(track(buildTimeNavPanel(sky.engine, () => simulatedTime, setSimTime)));
       quickNavEntries.push({ id: "timenav", label: t("navigator.timeNavQuicknav"), icon: "schedule", iconOnly: true });
+
+      // Mosaic definition - own panel (not nested inside Settings) so it
+      // can stay open, draggable, next to the dome while its grid updates
+      // live (see buildMosaicDefinitionPanel()'s own doc comment). Reached
+      // either from its Settings-panel button or this quicknav icon, same
+      // togglePanel() either way.
+      const mosaicPanel = Panels.make({ id: "mosaicDefinition", title: t("navigator.mosaicDefinition"), x: 660, y: 330, w: 260, collapsed: true });
+      mosaicPanel.appendChild(track(buildMosaicDefinitionPanel(sky.engine)));
+      quickNavEntries.push({ id: "mosaicDefinition", label: t("navigator.mosaicDefinition"), icon: "grid_view", iconOnly: true });
 
       // "Center on mount" (Gilles, 2026-10-06: "ajoute un bouton
       // 'align_flex_center' ... pas de fenetre associee ... centrer la vue
