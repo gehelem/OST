@@ -29,7 +29,7 @@
 // everything else in this app, not a menu at the tap position.
 
 import { Body, Horizon, Equator, Illumination } from "../lib/astronomy-engine.js";
-import { makeObserver, equatorialToHorizontal, equatorialOfDateToHorizontal, equatorialHorizontalRotation, horizontalToEquatorial, horizontalToVector, vectorToHorizontal, vectorToScreen, screenToVector, magnitudeToRadius, starMagnitudeLimit, sensorFovCorners, eclipticToEquatorial } from "./sky-projection.js";
+import { makeObserver, equatorialToHorizontal, equatorialOfDateToHorizontal, equatorialHorizontalRotation, horizontalToEquatorial, horizontalOfDateToEquatorial, horizontalToVector, vectorToHorizontal, vectorToScreen, screenToVector, magnitudeToRadius, starMagnitudeLimit, sensorFovCorners, eclipticToEquatorial } from "./sky-projection.js";
 import { identity, multiply, conjugate, rotateVector, fromTwoVectors } from "./quaternion.js";
 import { loadCatalog } from "./sky-catalog.js";
 import { clipPolygonToHemisphere, polygonContainsLonLat } from "../lib/sphere-clip.js";
@@ -1681,6 +1681,64 @@ export class SkyEngine {
           ctx.lineTo(center.x, center.y + R);
           ctx.stroke();
         }
+      }
+    }
+
+    // Framing preview: the same sensor rectangle as above, but centred on
+    // the current VIEW instead of the mount's own live position - lets a
+    // user pan/zoom the dome to wherever they're considering slewing next
+    // and see how it would frame, without actually moving anything. Same
+    // showSensorFov toggle (no separate setting), drawn in orange (same
+    // hue as the mount reticle above, but this one tracks the view, not
+    // the telescope) so the two are never mistaken for each other.
+    //
+    // Orientation caveat: there is no live rotator feedback, so this
+    // reuses sensorOrientationDeg - the last successful plate SOLVE's own
+    // orientation, wherever in the sky that solve actually happened. For
+    // an equatorial mount that stays correct anywhere on the SAME side of
+    // the meridian as that solve, but a meridian flip (or this preview
+    // simply pointing at the opposite side of the sky from where the
+    // mount currently is) rotates the real framing by 180deg with nothing
+    // here to detect or correct it - same underlying gap as the mount's
+    // own frame above (no pier-side data available at all yet, see
+    // notes/NOTES-frontend-ostcore-planetarium.md).
+    if (this.showSensorFov && this.sensorFovWidthDeg > 0 && this.sensorFovHeightDeg > 0) {
+      const viewCenterHoriz = vectorToHorizontal(rotateVector(conjugate(this.rotation), { x: 0, y: 0, z: 1 }));
+      const { ra: viewCenterRaDeg, dec: viewCenterDecDeg } = horizontalOfDateToEquatorial(
+        ((viewCenterHoriz.azimuth % 360) + 360) % 360, viewCenterHoriz.altitude, this.observer, date,
+      );
+      const previewCorners = sensorFovCorners(
+        viewCenterRaDeg, viewCenterDecDeg,
+        this.sensorFovWidthDeg, this.sensorFovHeightDeg,
+        this.sensorOrientationDeg, this.observer, date,
+      ).map((h) => toScreen(horizontalToVector(h.azimuth, h.altitude)));
+      if (previewCorners.every((c) => c.visible)) {
+        ctx.strokeStyle = "#ff9800";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(previewCorners[0].x, previewCorners[0].y);
+        for (let i = 1; i < previewCorners.length; i++) ctx.lineTo(previewCorners[i].x, previewCorners[i].y);
+        ctx.closePath();
+        ctx.stroke();
+
+        // Same "this way up" marker as the mount's own frame - doubly
+        // useful here given the orientation caveat above, so the
+        // assumption being made is at least visible at a glance.
+        const topMidX = (previewCorners[0].x + previewCorners[1].x) / 2;
+        const topMidY = (previewCorners[0].y + previewCorners[1].y) / 2;
+        let dx = topMidX - cx, dy = topMidY - cy;
+        const dlen = Math.hypot(dx, dy) || 1;
+        dx /= dlen; dy /= dlen;
+        const perpX = -dy, perpY = dx;
+        const TIP_LEN = 12, BASE_HALF = 6;
+        const tipX = topMidX + dx * TIP_LEN, tipY = topMidY + dy * TIP_LEN;
+        ctx.fillStyle = "#ff9800";
+        ctx.beginPath();
+        ctx.moveTo(tipX, tipY);
+        ctx.lineTo(topMidX + perpX * BASE_HALF, topMidY + perpY * BASE_HALF);
+        ctx.lineTo(topMidX - perpX * BASE_HALF, topMidY - perpY * BASE_HALF);
+        ctx.closePath();
+        ctx.fill();
       }
     }
 

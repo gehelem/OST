@@ -23,7 +23,7 @@
 import {
   Observer, Spherical, VectorFromSphere, RotateVector,
   HorizonFromVector, VectorFromHorizon, EquatorFromVector,
-  Rotation_EQJ_HOR, Rotation_HOR_EQJ, Rotation_EQD_HOR, Rotation_ECL_EQJ,
+  Rotation_EQJ_HOR, Rotation_HOR_EQJ, Rotation_EQD_HOR, Rotation_HOR_EQD, Rotation_ECL_EQJ,
   Body, Equator, Horizon,
 } from "../lib/astronomy-engine.js";
 
@@ -94,6 +94,20 @@ export function equatorialOfDateToHorizontal(raDeg, decDeg, observer, date) {
   const horVec = RotateVector(Rotation_EQD_HOR(date, observer), eqdVec);
   const sphere = HorizonFromVector(horVec, "normal");
   return { azimuth: sphere.lon, altitude: sphere.lat };
+}
+
+/**
+ * Inverse of equatorialOfDateToHorizontal() above: {azimuth, altitude}
+ * (degrees) -> RA/Dec (degrees, OF DATE, same EQD convention
+ * sensorFovCorners()/mountposition already use - NOT horizontalToEquatorial()'s
+ * own J2000 result below, which would need a separate precession step to
+ * compare against of-date coordinates like mountRaDeg/mountDecDeg).
+ */
+export function horizontalOfDateToEquatorial(azimuthDeg, altitudeDeg, observer, date) {
+  const horVec = VectorFromHorizon(new Spherical(Math.min(altitudeDeg, 89.999), azimuthDeg, 1), date, "normal");
+  const eqdVec = RotateVector(Rotation_HOR_EQD(date, observer), horVec);
+  const equ = EquatorFromVector(eqdVec); // {ra: hours, dec: degrees}
+  return { ra: equ.ra * 15, dec: equ.dec };
 }
 
 // A fixed, arbitrary instant - VectorFromSphere() takes a `time` argument
