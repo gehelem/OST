@@ -291,11 +291,12 @@ const GROUND_MASK_BISECT_STEPS = 10;
 const MESSIER_DIR_EPS_DEG = 0.01;
 
 /**
- * Returns the boundary of the *sky* portion of the currently visible dome,
- * as an array of {x,y} points (offsets from the dome centre) - or `null`
- * if the whole visible dome is real sky (nothing to mask, the common case
- * at the default zenith-centred view), or the string "none" if the whole
- * visible dome is below the real horizon (fully masked).
+ * Returns the boundary between sky and ground on the currently visible
+ * dome, as `{ points, isGroundPoly }` (points: {x,y} offsets from the dome
+ * centre) - or `null` if the whole visible dome is real sky (nothing to
+ * mask, the common case at the default zenith-centred view), or the string
+ * "none" if the whole visible dome is below the real horizon (fully
+ * masked).
  *
  * The true horizon is a great circle (alt=0 is always 90° from the
  * zenith), so under an arbitrary rotation + orthographic projection it
@@ -303,11 +304,19 @@ const MESSIER_DIR_EPS_DEG = 0.01;
  * curve. Rather than tracing that curve analytically (messy once it also
  * has to be closed off along the dome's own edge), this walks a ray from
  * the dome's centre to its edge at each of GROUND_MASK_RAYS angles and
- * binary-searches each ray for the altitude=0 crossing - naturally
- * produces a simple polygon (every point already expressed in its own
- * polar form) that handles every case uniformly: a ray with no crossing
- * just collapses to the centre (fully ground) or extends fully to the
- * edge (fully sky).
+ * binary-searches each ray for the altitude=0 crossing.
+ *
+ * This only produces a simple polygon when traced from a centre that's
+ * actually ON the side being traced - every ray from such a point crosses
+ * the horizon at most once, so "collapse to the centre" (no sky/ground
+ * this far out) or "extend fully to the edge" (this whole ray agrees)
+ * both stay well-defined. `isGroundPoly` says which side `points`
+ * actually describes: sky when the dome's own centre is itself sky (the
+ * common case), ground when it's below the horizon instead - tracing the
+ * *sky* boundary from a ground-side centre would have half the rays
+ * (the ones that never reach any sky at all) collapse onto that centre,
+ * producing a degenerate sliver instead of the real shape rather than the
+ * true region. The caller clips to the complement when it's ground.
  */
 function computeSkyPolygon(domeRadius, rotation, projection) {
   const centerAlt = altitudeAtOffset(0, 0, domeRadius, rotation, projection);
@@ -322,7 +331,7 @@ function computeSkyPolygon(domeRadius, rotation, projection) {
     if (!edgeIsSky) anyGround = true; else anySky = true;
     let r;
     if (edgeIsSky === centerIsSky) {
-      r = centerIsSky ? domeRadius : 0; // whole ray agrees - no crossing to find
+      r = domeRadius; // whole ray agrees with the centre's own side - no crossing to find
     } else {
       let lo = 0, hi = domeRadius;
       for (let k = 0; k < GROUND_MASK_BISECT_STEPS; k++) {
@@ -336,7 +345,7 @@ function computeSkyPolygon(domeRadius, rotation, projection) {
   }
   if (!anyGround) return null;
   if (!anySky) return "none";
-  return points;
+  return { points, isGroundPoly: !centerIsSky };
 }
 
 // No more per-body fixed `radius` (Gilles, 2026-10-01: "adapte la taille
@@ -1008,6 +1017,34 @@ export class SkyEngine {
         ctx.beginPath(); // empty path -> clip to nothing, hides everything after
         ctx.clip();
         groundClipActive = true;
+      } else if (skyPoly && skyPoly.isGroundPoly) {
+        // The dome's own centre is itself below the horizon - computeSkyPolygon()
+        // traced the GROUND region instead (the only side that's actually
+        // star-shaped from that centre, see its own doc comment). Paint
+        // just that polygon ground-coloured directly, no need to blanket
+        // the whole dome first and undo it afterwards like the sky-traced
+        // branch below does - everything outside it already has its
+        // normal background (opaque bgColor, or left transparent for
+        // showHips) from the top of render(). Then clip everything drawn
+        // after this to the complement (circle minus that polygon) via an
+        // evenodd path - same resulting clip region as the other branch,
+        // reached from the opposite side.
+        ctx.fillStyle = fg.ground;
+        ctx.beginPath();
+        skyPoly.points.forEach((p, i) => {
+          if (i === 0) ctx.moveTo(cx + p.x, cy + p.y); else ctx.lineTo(cx + p.x, cy + p.y);
+        });
+        ctx.closePath();
+        ctx.fill();
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, domeRadius, 0, 2 * Math.PI);
+        skyPoly.points.forEach((p, i) => {
+          if (i === 0) ctx.moveTo(cx + p.x, cy + p.y); else ctx.lineTo(cx + p.x, cy + p.y);
+        });
+        ctx.closePath();
+        ctx.clip("evenodd");
+        groundClipActive = true;
       } else if (skyPoly) {
         ctx.fillStyle = fg.ground;
         ctx.beginPath();
@@ -1015,7 +1052,7 @@ export class SkyEngine {
         ctx.fill();
         ctx.save();
         ctx.beginPath();
-        skyPoly.forEach((p, i) => {
+        skyPoly.points.forEach((p, i) => {
           if (i === 0) ctx.moveTo(cx + p.x, cy + p.y); else ctx.lineTo(cx + p.x, cy + p.y);
         });
         ctx.closePath();
