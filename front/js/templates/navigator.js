@@ -410,8 +410,80 @@ function buildSettingsPanel(engine, hipsBg) {
   });
   wrap.appendChild(el("label", { class: "form-row", style: "cursor:pointer" }, [projCb, el("span", { text: t("navigator.stereographic") })]));
 
+  // Mosaic assistant (Gilles, 2026-10-21: "ajoute un bouton 'mosaic
+  // assistant', qui doit ouvrir une modale") - content deliberately left
+  // minimal for now, detailed in a follow-up step; this is just the entry
+  // point. Same .dialog-overlay/.dialog shell as the search panel's own
+  // catalog-selection modal in this file.
+  const mosaicBtn = el("button", { type: "button", class: "btn btn-sm", text: t("navigator.mosaicDefinition") });
+  mosaicBtn.addEventListener("click", openMosaicDefinitionModal);
+  wrap.appendChild(el("div", { class: "form-row" }, [mosaicBtn]));
+
   wrap._dispose = () => { engine.onZoomChange = null; engine.onRotationChange = null; engine.onHipsFailure = null; };
   return wrap;
+}
+
+// Persisted the same way search-catalog prefs are (SEARCH_CATALOGS_KEY
+// above) - a client-side preference with no server round-trip, own
+// localStorage key rather than folding into DISPLAY_SETTINGS_KEY since
+// it's not an engine field at all. Gilles, 2026-10-21: rows/cols 1-9
+// (default 1), overlap 10-30% (default 20%).
+const MOSAIC_SETTINGS_KEY = "ostcore-ui3.navigator.mosaic";
+function loadMosaicSettings() {
+  let d = {};
+  try { d = JSON.parse(localStorage.getItem(MOSAIC_SETTINGS_KEY)) || {}; } catch (e) { /* ignore */ }
+  const clamp = (v, lo, hi, dflt) => (Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : dflt);
+  return {
+    rows: clamp(d.rows, 1, 9, 1),
+    cols: clamp(d.cols, 1, 9, 1),
+    overlap: clamp(d.overlap, 10, 30, 20),
+  };
+}
+function saveMosaicSettings(state) {
+  try { localStorage.setItem(MOSAIC_SETTINGS_KEY, JSON.stringify(state)); } catch (e) { /* ignore */ }
+}
+
+function openMosaicDefinitionModal() {
+  const state = loadMosaicSettings();
+  const overlay = el("div", { class: "dialog-overlay" });
+  const close = () => overlay.remove();
+
+  function numberField(value, min, max) {
+    return el("input", { type: "number", class: "field-input tiny", min: String(min), max: String(max), step: "1", value: String(value) });
+  }
+  const rowsInput = numberField(state.rows, 1, 9);
+  const colsInput = numberField(state.cols, 1, 9);
+  const overlapInput = numberField(state.overlap, 10, 30);
+  const clamp = (v, lo, hi, dflt) => (Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : dflt);
+  function persist() {
+    state.rows = clamp(parseInt(rowsInput.value, 10), 1, 9, 1);
+    state.cols = clamp(parseInt(colsInput.value, 10), 1, 9, 1);
+    state.overlap = clamp(parseInt(overlapInput.value, 10), 10, 30, 20);
+    rowsInput.value = String(state.rows);
+    colsInput.value = String(state.cols);
+    overlapInput.value = String(state.overlap);
+    saveMosaicSettings(state);
+  }
+  rowsInput.addEventListener("change", persist);
+  colsInput.addEventListener("change", persist);
+  overlapInput.addEventListener("change", persist);
+
+  const gridRow = el("div", { class: "form-row" }, [
+    el("span", { text: t("navigator.mosaicRows") }), rowsInput,
+    el("span", { text: t("navigator.mosaicCols") }), colsInput,
+  ]);
+  const overlapRow = el("div", { class: "form-row" }, [
+    el("span", { text: t("navigator.mosaicOverlap") }), overlapInput, el("span", { text: "%" }),
+  ]);
+
+  const dialog = el("div", { class: "dialog" }, [
+    el("div", { class: "dialog-header" }, [el("h3", { text: t("navigator.mosaicDefinition") }), iconButton("close", t("common.close"), close)]),
+    gridRow,
+    overlapRow,
+  ]);
+  overlay.appendChild(dialog);
+  overlay.addEventListener("click", (ev) => { if (ev.target === overlay) close(); });
+  document.getElementById("dialog-root").appendChild(overlay);
 }
 
 /**

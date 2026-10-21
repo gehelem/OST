@@ -430,8 +430,12 @@ input[type="range"]::-moz-range-thumb {
    tabs of properties — so it gets a roomier default width than a small
    confirm/edit dialog, still capped by .dialog's own max-width:90vw. */
 .dialog.params-dialog { width: 680px; }
-.params-dialog .dialog-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3); }
-.params-dialog .dialog-header h3 { margin: 0; }
+/* Generic dialog "title + close button" shape - was scoped to
+   .params-dialog only, which silently left every OTHER .dialog-header
+   (search catalogs, mosaic assistant...) unstyled - title and close
+   button just fell into normal block flow with no spacing. */
+.dialog-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3); }
+.dialog-header h3 { margin: 0; }
 .form-table td { padding: 5px 6px; }
 
 /* The setup wizard (js/wizard.js, issue #238) - same roomier-than-default
