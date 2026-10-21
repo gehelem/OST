@@ -29,7 +29,7 @@
 // everything else in this app, not a menu at the tap position.
 
 import { Body, Horizon, Equator, Illumination } from "../lib/astronomy-engine.js";
-import { makeObserver, equatorialToHorizontal, equatorialOfDateToHorizontal, equatorialHorizontalRotation, horizontalToEquatorial, horizontalOfDateToEquatorial, horizontalToVector, vectorToHorizontal, vectorToScreen, screenToVector, magnitudeToRadius, starMagnitudeLimit, sensorFovCorners, eclipticToEquatorial } from "./sky-projection.js";
+import { makeObserver, equatorialToHorizontal, equatorialOfDateToHorizontal, equatorialHorizontalRotation, horizontalToEquatorial, horizontalOfDateToEquatorial, horizontalToVector, vectorToHorizontal, vectorToScreen, screenToVector, magnitudeToRadius, starMagnitudeLimit, sensorFovCorners, sensorMosaicTileCorners, eclipticToEquatorial } from "./sky-projection.js";
 import { identity, multiply, conjugate, rotateVector, fromTwoVectors } from "./quaternion.js";
 import { loadCatalog } from "./sky-catalog.js";
 import { clipPolygonToHemisphere, polygonContainsLonLat } from "../lib/sphere-clip.js";
@@ -489,6 +489,16 @@ export class SkyEngine {
     // sensorFovCorners()'s own doc comment for the rotation convention
     // and its one unverified assumption (the sign).
     this.sensorOrientationDeg = 0;
+    // Mosaic definition (Gilles, 2026-10-21: "un ensemble de rectangles
+    // (lignes x colonnes) se recouvrant selon le % defini") - persisted by
+    // templates/navigator.js's own Mosaic definition dialog
+    // (MOSAIC_SETTINGS_KEY), applied here as plain public fields the same
+    // way every other display setting works. The framing-preview block
+    // below draws cols x rows tiles instead of a single frame whenever
+    // either is >1, still centred as a WHOLE on the current view.
+    this.mosaicRows = 1;
+    this.mosaicCols = 1;
+    this.mosaicOverlapPercent = 20;
     // Gilles, 2026-10-01: "dans le cadre du capteur de la camera essaie de
     // m'afficher l'image prise ... toujours en optionnel" - a heavier,
     // speculative extra unlike showMountPosition/showSensorFov above.
@@ -1707,25 +1717,46 @@ export class SkyEngine {
       const { ra: viewCenterRaDeg, dec: viewCenterDecDeg } = horizontalOfDateToEquatorial(
         ((viewCenterHoriz.azimuth % 360) + 360) % 360, viewCenterHoriz.altitude, this.observer, date,
       );
-      const previewCorners = sensorFovCorners(
+      const cols = Math.max(1, this.mosaicCols || 1), rows = Math.max(1, this.mosaicRows || 1);
+      const overlapFraction = Math.max(0, Math.min(0.9, (this.mosaicOverlapPercent || 0) / 100));
+      ctx.strokeStyle = "#ff9800";
+      ctx.lineWidth = 1.5;
+      // Every tile shares the same single grid, itself centred as a WHOLE
+      // on the view (Gilles, 2026-10-21: "le centrage du motif affiche
+      // doit toujours correspondre au centre de l'affichage") -
+      // sensorMosaicTileCorners()'s own cols/rows centring does that, 1x1
+      // degenerating to exactly the single-frame case this replaced.
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const tileCorners = sensorMosaicTileCorners(
+            viewCenterRaDeg, viewCenterDecDeg,
+            this.sensorFovWidthDeg, this.sensorFovHeightDeg,
+            this.sensorOrientationDeg, cols, rows, col, row, overlapFraction,
+            this.observer, date,
+          ).map((h) => toScreen(horizontalToVector(h.azimuth, h.altitude)));
+          if (!tileCorners.every((c) => c.visible)) continue;
+          ctx.beginPath();
+          ctx.moveTo(tileCorners[0].x, tileCorners[0].y);
+          for (let i = 1; i < tileCorners.length; i++) ctx.lineTo(tileCorners[i].x, tileCorners[i].y);
+          ctx.closePath();
+          ctx.stroke();
+        }
+      }
+
+      // "This way up" marker, drawn once for the whole grid (every tile
+      // shares the same orientation) rather than once per tile - doubly
+      // useful given the orientation caveat above, so the assumption being
+      // made is at least visible at a glance. Based on the single centred
+      // frame regardless of grid size, same marker geometry the mount's
+      // own frame above uses.
+      const markerCorners = sensorFovCorners(
         viewCenterRaDeg, viewCenterDecDeg,
         this.sensorFovWidthDeg, this.sensorFovHeightDeg,
         this.sensorOrientationDeg, this.observer, date,
       ).map((h) => toScreen(horizontalToVector(h.azimuth, h.altitude)));
-      if (previewCorners.every((c) => c.visible)) {
-        ctx.strokeStyle = "#ff9800";
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(previewCorners[0].x, previewCorners[0].y);
-        for (let i = 1; i < previewCorners.length; i++) ctx.lineTo(previewCorners[i].x, previewCorners[i].y);
-        ctx.closePath();
-        ctx.stroke();
-
-        // Same "this way up" marker as the mount's own frame - doubly
-        // useful here given the orientation caveat above, so the
-        // assumption being made is at least visible at a glance.
-        const topMidX = (previewCorners[0].x + previewCorners[1].x) / 2;
-        const topMidY = (previewCorners[0].y + previewCorners[1].y) / 2;
+      if (markerCorners.every((c) => c.visible)) {
+        const topMidX = (markerCorners[0].x + markerCorners[1].x) / 2;
+        const topMidY = (markerCorners[0].y + markerCorners[1].y) / 2;
         let dx = topMidX - cx, dy = topMidY - cy;
         const dlen = Math.hypot(dx, dy) || 1;
         dx /= dlen; dy /= dlen;

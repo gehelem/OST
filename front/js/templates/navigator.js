@@ -416,7 +416,7 @@ function buildSettingsPanel(engine, hipsBg) {
   // point. Same .dialog-overlay/.dialog shell as the search panel's own
   // catalog-selection modal in this file.
   const mosaicBtn = el("button", { type: "button", class: "btn btn-sm", text: t("navigator.mosaicDefinition") });
-  mosaicBtn.addEventListener("click", openMosaicDefinitionModal);
+  mosaicBtn.addEventListener("click", () => openMosaicDefinitionModal(engine));
   wrap.appendChild(el("div", { class: "form-row" }, [mosaicBtn]));
 
   wrap._dispose = () => { engine.onZoomChange = null; engine.onRotationChange = null; engine.onHipsFailure = null; };
@@ -443,7 +443,7 @@ function saveMosaicSettings(state) {
   try { localStorage.setItem(MOSAIC_SETTINGS_KEY, JSON.stringify(state)); } catch (e) { /* ignore */ }
 }
 
-function openMosaicDefinitionModal() {
+function openMosaicDefinitionModal(engine) {
   const state = loadMosaicSettings();
   const overlay = el("div", { class: "dialog-overlay" });
   const close = () => overlay.remove();
@@ -463,6 +463,15 @@ function openMosaicDefinitionModal() {
     colsInput.value = String(state.cols);
     overlapInput.value = String(state.overlap);
     saveMosaicSettings(state);
+    // Live update - the mosaic grid itself (sky-engine.js's own framing-
+    // preview block) reads these same three fields on the engine, not
+    // localStorage directly, same pattern as every other display setting.
+    if (engine) {
+      engine.mosaicRows = state.rows;
+      engine.mosaicCols = state.cols;
+      engine.mosaicOverlapPercent = state.overlap;
+      engine.render();
+    }
   }
   rowsInput.addEventListener("change", persist);
   colsInput.addEventListener("change", persist);
@@ -873,6 +882,10 @@ function buildSkyDome(client, moduleName, onSelect, getTime) {
   // wheel-zoom -> persist wiring (engine.onZoomChange).
   const savedSettings = loadDisplaySettings();
   Object.assign(engine, savedSettings);
+  const savedMosaic = loadMosaicSettings();
+  engine.mosaicRows = savedMosaic.rows;
+  engine.mosaicCols = savedMosaic.cols;
+  engine.mosaicOverlapPercent = savedMosaic.overlap;
   hipsBg.setEnabled(engine.showHips);
   // "leger par defaut, mais parametrable" (Gilles, 2026-09-29) - actually
   // reads back whichever depth was last chosen (buildSettingsPanel()'s own
