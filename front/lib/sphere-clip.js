@@ -418,17 +418,31 @@ const clipHemisphere = makeHemisphereClip();
 // This project's own vectors have v.z as the "view center" axis
 // (sky-projection.js: visible iff v.z>=0); circle.js's own fixed clip-plane
 // normal is n1=[1,0,0], i.e. its (lambda=0,phi=0) direction is the
-// CARTESIAN X axis - remap so our z becomes their x. This remap MUST be an
-// orientation-PRESERVING permutation (determinant +1, e.g. the cyclic
-// (x,y,z)->(z,x,y) used here), not a plain axis swap (determinant -1) - an
-// odd permutation silently flips which ring winding counts as "exterior".
-// (vz,vx,vy) is a 3-cycle, so it keeps orientation: real GeoJSON data
-// (standard lambda=atan2(y,x), phi=asin(z) convention) needs no reversal
-// through this mapping, as confirmed against the real mw.json.
-function toLocalSpherical(v) { return [Math.atan2(v.x, v.z), asin(Math.max(-1, Math.min(1, v.y)))]; }
+// CARTESIAN X axis - remap so our z becomes their x, via the cyclic
+// (x,y,z)->(z,x,y) permutation below (determinant +1, not a plain axis
+// swap - an odd permutation would silently flip which ring winding counts
+// as "exterior", on top of the mirroring this same function already has
+// to correct, see next paragraph).
+//
+// The extra `-lambda` negation compensates for a SEPARATE mirroring that
+// has nothing to do with the remap above: this project's own vectors are
+// built via sky-projection.js's horizontalToVector(azimuth, altitude),
+// whose compass convention (azimuth increasing CLOCKWISE, 0=North/90=East)
+// embeds a ring's points in the opposite handedness from the standard
+// math convention (longitude increasing counterclockwise) that circle.js's
+// own winding-sensitive logic (polygonContains et al.) assumes, and that
+// celestial-data/mw.json's own rings are authored in (RFC 7946, confirmed
+// directly against the raw ra/dec data). Without this negation, every
+// ring arrives mirrored and polygonContains() gets "which side is
+// interior" backwards - confirmed empirically: a small ring entirely
+// outside the visible hemisphere was treated as containing the WHOLE
+// dome in 198/198 test directions without this negation, 0/198 with it
+// (matches the reported symptom: the Milky Way fill starting well past
+// its real boundary into an unrelated region of sky).
+function toLocalSpherical(v) { return [-Math.atan2(v.x, v.z), asin(Math.max(-1, Math.min(1, v.y)))]; }
 function fromLocalSpherical(lambda, phi) {
   const cosPhi = Math.cos(phi);
-  return { x: cosPhi * Math.sin(lambda), y: Math.sin(phi), z: cosPhi * Math.cos(lambda) };
+  return { x: cosPhi * Math.sin(-lambda), y: Math.sin(phi), z: cosPhi * Math.cos(-lambda) };
 }
 
 /**
