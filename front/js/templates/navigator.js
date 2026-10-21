@@ -37,9 +37,10 @@ import * as Panels from "../panels.js";
 import { SkyEngine, ZOOM_MIN, ZOOM_MAX } from "../sky-engine.js";
 import { createHipsBackground } from "../hips-background.js";
 import { STAR_DEPTHS } from "../sky-catalog.js";
-import { sunAltitudeCurve, altitudeCurve } from "../sky-projection.js";
+import { sunAltitudeCurve, altitudeCurve, mosaicTileCenterRaDec } from "../sky-projection.js";
 import { t } from "../i18n.js";
 import { mediaUrl } from "../../core/index.js";
+import { showToast } from "../toast.js";
 
 function fmtDeg(v) { return v.toFixed(3) + "°"; }
 function fmtHours(raDeg) {
@@ -122,7 +123,13 @@ function buildSelectionPanel(client, moduleName, getEngine, getSimTime) {
   const info = el("div", { class: "muted small", text: t("navigator.tapToSelect") });
   const gotoBtn = el("button", { class: "btn btn-primary btn-sm", disabled: true }, [el("span", { class: "material-icons", style: "font-size:15px;vertical-align:middle" }, "gps_fixed"), " " + t("navigator.goto")]);
   const plannerBtn = el("button", { class: "btn btn-sm", disabled: true }, t("navigator.addToPlanner"));
-  const actionsRow = el("div", { class: "form-row" }, [gotoBtn, plannerBtn]);
+  // Mosaic definition's own own tile grid, centred on this selection
+  // (Gilles, 2026-10-21: "ajoute un bouton 'add mosaic to planner'") -
+  // same enabled/disabled gating as the other two action buttons; the
+  // actual action (what gets sent to the planner) is a follow-up step,
+  // this is the entry point.
+  const mosaicToPlannerBtn = el("button", { class: "btn btn-sm", disabled: true }, t("navigator.addMosaicToPlanner"));
+  const actionsRow = el("div", { class: "form-row" }, [gotoBtn, plannerBtn, mosaicToPlannerBtn]);
   // The "ce soir" visibility arc (Gilles, 2026-10-02, on astro2001's own
   // per-object fiche: "modifie [...] pour afficher toutes les infos sur
   // l'objet selectionne, donc faire ce joli graphique d'altitude sur
@@ -150,8 +157,43 @@ function buildSelectionPanel(client, moduleName, getEngine, getSimTime) {
 
   gotoBtn.addEventListener("click", () => client.setValue(moduleName, "actions", "gototarget", true));
   plannerBtn.addEventListener("click", () => client.setValue(moduleName, "actions", "addtoplanner", true));
+  // One "add to planner" per mosaic tile (Gilles, 2026-10-21: "pour chacun
+  // de ces centres il faut envoyer un ordre 'add to planner' avec le nom
+  // de l'objet avec un suffixe, et les bonnes coordonnees") - same
+  // target.targetname/targetra/targetde + actions.addtoplanner round trip
+  // plannerBtn's own handler uses for a single object, just repeated once
+  // per (row,col) with that tile's own centre (mosaicTileCenterRaDec(),
+  // pure RA/Dec tangent-plane geometry - no observer/date/live view
+  // involved, unlike the dome's own preview rendering) and a name
+  // suffixed "<name> Mosaic - <row>x<col>" (1-indexed).
+  mosaicToPlannerBtn.addEventListener("click", () => {
+    if (!lastObj) return;
+    const engine = getEngine();
+    if (!engine || !(engine.sensorFovWidthDeg > 0) || !(engine.sensorFovHeightDeg > 0)) {
+      showToast(t("navigator.mosaicNoFov"), 2);
+      return;
+    }
+    const cols = Math.max(1, engine.mosaicCols || 1);
+    const rows = Math.max(1, engine.mosaicRows || 1);
+    const overlapFraction = Math.max(0, Math.min(0.9, (engine.mosaicOverlapPercent || 0) / 100));
+    const baseName = lastName || t("navigator.point");
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const { ra, dec } = mosaicTileCenterRaDec(
+          lastObj.ra, lastObj.dec, engine.sensorFovWidthDeg, engine.sensorFovHeightDeg,
+          engine.sensorOrientationDeg, cols, rows, col, row, overlapFraction,
+        );
+        const tileName = `${baseName} Mosaic - ${row + 1}x${col + 1}`;
+        client.setValue(moduleName, "target", "targetname", tileName);
+        client.setValue(moduleName, "target", "targetra", ra / 15); // degrees -> hours, see onSelect()'s own comment
+        client.setValue(moduleName, "target", "targetde", dec);
+        client.setValue(moduleName, "actions", "addtoplanner", true);
+      }
+    }
+  });
 
   let lastObj = null;
+  let lastName = null;
 
   function redrawChart() {
     if (!lastObj) return;
@@ -215,11 +257,13 @@ function buildSelectionPanel(client, moduleName, getEngine, getSimTime) {
     if (obj.mag !== undefined) info.appendChild(el("div", { class: "muted small", text: t("navigator.magPrefix") + obj.mag }));
     gotoBtn.disabled = false;
     plannerBtn.disabled = false;
+    mosaicToPlannerBtn.disabled = false;
     client.setValue(moduleName, "target", "targetname", name);
     client.setValue(moduleName, "target", "targetra", obj.ra / 15); // degrees -> hours, see this function's own doc comment
     client.setValue(moduleName, "target", "targetde", obj.dec);
 
     lastObj = obj;
+    lastName = name;
     chartCanvas.classList.remove("hidden");
     infoRows.classList.remove("hidden");
     redrawChart();

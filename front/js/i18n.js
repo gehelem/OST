@@ -212,6 +212,8 @@ const STRINGS = {
   "navigator.tapToSelect": { en: "Tap a star or object on the sky to select it.", fr: "Touchez une étoile ou un objet du ciel pour le sélectionner.", de: "Tippen Sie auf einen Stern oder ein Objekt am Himmel, um es auszuwählen.", it: "Tocca una stella o un oggetto del cielo per selezionarlo.", es: "Toque una estrella u objeto del cielo para seleccionarlo." },
   "navigator.goto": { en: "GOTO", fr: "GOTO", de: "GOTO", it: "GOTO", es: "GOTO" },
   "navigator.addToPlanner": { en: "Add to planner", fr: "Ajouter au planificateur", de: "Zum Planer hinzufügen", it: "Aggiungi al pianificatore", es: "Añadir al planificador" },
+  "navigator.addMosaicToPlanner": { en: "Add mosaic to planner", fr: "Ajouter la mosaïque au planificateur", de: "Mosaik zum Planer hinzufügen", it: "Aggiungi mosaico al pianificatore", es: "Añadir mosaico al planificador" },
+  "navigator.mosaicNoFov": { en: "Sensor field of view not available yet (camera/optics not configured)", fr: "Champ du capteur indisponible (caméra/optique non configurée)", de: "Sensor-Gesichtsfeld noch nicht verfügbar (Kamera/Optik nicht konfiguriert)", it: "Campo del sensore non disponibile (fotocamera/ottica non configurata)", es: "Campo del sensor no disponible (cámara/óptica no configurada)" },
   "navigator.star": { en: "Star", fr: "Étoile", de: "Stern", it: "Stella", es: "Estrella" },
   "navigator.dso": { en: "DSO", fr: "OCP", de: "DSO", it: "OCP", es: "OCP" },
   "navigator.point": { en: "Point", fr: "Point", de: "Punkt", it: "Punto", es: "Punto" },

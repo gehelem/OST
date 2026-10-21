@@ -263,15 +263,49 @@ export function sensorFovCorners(raDeg, decDeg, fovWidthDeg, fovHeightDeg, orien
  * lines, matching how two real camera frames placed side by side for a
  * mosaic actually relate to each other.
  */
-export function sensorMosaicTileCorners(raDeg, decDeg, fovWidthDeg, fovHeightDeg, orientationDeg, cols, rows, col, row, overlapFraction, observer, date) {
-  const basis = sensorFovBasis(raDeg, decDeg, orientationDeg, date);
+// Shared by sensorMosaicTileCorners()/mosaicTileCenterRaDec() below - a
+// tile's own (offsetRightTan, offsetUpTan) displacement from the grid's
+// overall centre, in the same tangent-plane units fovTileCornersFromBasis()
+// already uses for the tile's own half-extents.
+function mosaicTileOffsetTan(fovWidthDeg, fovHeightDeg, cols, rows, col, row, overlapFraction) {
   const tanW = Math.tan(((fovWidthDeg / 2) * Math.PI) / 180);
   const tanH = Math.tan(((fovHeightDeg / 2) * Math.PI) / 180);
   const stepRight = 2 * tanW * (1 - overlapFraction);
   const stepUp = 2 * tanH * (1 - overlapFraction);
-  const offsetRightTan = (col - (cols - 1) / 2) * stepRight;
-  const offsetUpTan = (row - (rows - 1) / 2) * stepUp;
+  return {
+    offsetRightTan: (col - (cols - 1) / 2) * stepRight,
+    offsetUpTan: (row - (rows - 1) / 2) * stepUp,
+  };
+}
+
+export function sensorMosaicTileCorners(raDeg, decDeg, fovWidthDeg, fovHeightDeg, orientationDeg, cols, rows, col, row, overlapFraction, observer, date) {
+  const basis = sensorFovBasis(raDeg, decDeg, orientationDeg, date);
+  const { offsetRightTan, offsetUpTan } = mosaicTileOffsetTan(fovWidthDeg, fovHeightDeg, cols, rows, col, row, overlapFraction);
   return fovTileCornersFromBasis(basis, fovWidthDeg, fovHeightDeg, offsetRightTan, offsetUpTan, observer, date);
+}
+
+/**
+ * The RA/Dec (same epoch as the raDeg/decDeg given in - this project only
+ * ever calls it with the J2000 catalog coordinates a selected object's own
+ * target.targetra/targetde already use) of ONE tile's own CENTRE in a
+ * `cols` x `rows` mosaic grid - companion to sensorMosaicTileCorners()
+ * above (which projects a tile's corners onto the CURRENT screen for one
+ * instant) for handing a tile's pointing coordinate to the planner
+ * instead: no observer/date/horizontal-frame conversion at all, since
+ * "where is this grid cell on the sky" is a pure RA/Dec tangent-plane
+ * question, independent of when or from where it's asked -
+ * sensorFovBasis() itself never actually uses its own `date` argument (see
+ * eclipticToEquatorial()'s own doc comment on VectorFromSphere), so
+ * ECLIPTIC_TIME_PLACEHOLDER is reused here rather than threading a real
+ * one through for no reason.
+ */
+export function mosaicTileCenterRaDec(raDeg, decDeg, fovWidthDeg, fovHeightDeg, orientationDeg, cols, rows, col, row, overlapFraction) {
+  const basis = sensorFovBasis(raDeg, decDeg, orientationDeg, ECLIPTIC_TIME_PLACEHOLDER);
+  const { offsetRightTan, offsetUpTan } = mosaicTileOffsetTan(fovWidthDeg, fovHeightDeg, cols, rows, col, row, overlapFraction);
+  const offset = v3add(v3scale(basis.imageRight, offsetRightTan), v3scale(basis.imageUp, offsetUpTan));
+  const centerVec = v3norm(v3add(basis.center, offset));
+  const eq = EquatorFromVector(centerVec); // {ra: hours, dec: degrees}
+  return { ra: eq.ra * 15, dec: eq.dec };
 }
 
 /**
