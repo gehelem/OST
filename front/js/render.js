@@ -267,7 +267,25 @@ function buildEditControl(client, moduleName, el_, elName, buffer, opts) {
     const datalist = el("datalist", { id: listId });
     for (const label of new Set(Object.values(lov))) datalist.appendChild(el("option", { value: label }));
     const input = el("input", { type: "text", class: "field-input", list: listId, value: buffer[elName] ?? "" });
-    input.addEventListener("change", () => { buffer[elName] = input.value; if (opts && opts.onChange) opts.onChange(); });
+    // The browser filters the datalist's own suggestion dropdown against
+    // whatever text is already in the field, so an existing value hides
+    // every other option until it's deleted by hand. Clearing the field
+    // on focus restores the full suggestion list; if nothing new was
+    // typed or picked before the field is left, the blur handler below
+    // puts the original text back rather than committing an empty value.
+    let shownValue = input.value;
+    input.addEventListener("focus", () => {
+      shownValue = input.value;
+      input.value = "";
+    });
+    input.addEventListener("change", () => {
+      if (input.value === "") return; // restored on blur below, nothing picked/typed
+      buffer[elName] = input.value;
+      if (opts && opts.onChange) opts.onChange();
+    });
+    input.addEventListener("blur", () => {
+      if (input.value === "") input.value = shownValue;
+    });
     const wrap = el("span", { class: "compound-input" });
     wrap.append(input, datalist);
     return wrap;
@@ -798,13 +816,17 @@ function renderPropertyBody(client, moduleName, propName, prop, editTracker) {
       // A local one-field buffer is enough - there's no bulk Save left to
       // share it with.
       //
-      // A select/LOV is already a complete, deliberate choice the instant
-      // it changes, so it sends immediately, same as the bool buttons
-      // above. A free-typed field (number/text/date/time) instead commits
-      // on leaving the field (focusout), not on every keystroke - see the
+      // A constrained LOV (native <select>) is already a complete,
+      // deliberate choice the instant it changes, so it sends
+      // immediately, same as the bool buttons above. Everything else -
+      // free-typed fields (number/text/date/time) and a non-constrained
+      // LOV (free-text input with a <datalist> of suggestions, still
+      // typeable by hand) - behaves like free text and instead commits on
+      // leaving the field (focusout), not on every keystroke: see the
       // else branch below.
       const fieldBuffer = { [name]: e.value };
-      if (client.resolveLov(moduleName, e)) {
+      const lov = client.resolveLov(moduleName, e);
+      if (lov && e.lovConstrained) {
         const ctrl = buildEditControl(client, moduleName, e, name, fieldBuffer, {
           onChange: () => client.setValue(moduleName, propName, name, fieldBuffer[name]),
         });

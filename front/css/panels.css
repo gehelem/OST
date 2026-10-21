@@ -418,6 +418,14 @@
   text-transform: uppercase; color: var(--text-secondary);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+.panel-float-close {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; border-radius: var(--radius-sm);
+  background: transparent; border: 1px solid transparent; color: var(--text-muted);
+  cursor: pointer; flex-shrink: 0; padding: 0; transition: all 0.15s ease;
+}
+.panel-float-close .material-icons { font-size: 14px; }
+.panel-float-close:hover { color: var(--btn-danger); background: rgba(var(--error-rgb), 0.12); border-color: var(--border-subtle); }
 .panel-float-body { padding: var(--space-3) var(--space-4); overflow: auto; max-height: 74vh; }
 /* Gilles, 2026-10-03: "soit la fenetre est completement masquee (invisible)
  * soit elle est completement visible jamais elle ne doit avoir cet etat

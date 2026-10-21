@@ -93,6 +93,7 @@ function insertSorted(panel, z) {
 // depuis le debut". Kept a steady ~10px buffer below that edge across the
 // .mod-btn height change above (92 -> 100).
 import { t } from "./i18n.js";
+import { icon } from "./dom.js";
 
 const SAFE_TOP = 100;
 
@@ -384,6 +385,21 @@ export function make(opts) {
   title.textContent = opts.title || id;
   bar.appendChild(grip);
   bar.appendChild(title);
+
+  // Hides the panel exactly like clicking its own quicknav button would
+  // (togglePanel(), same "collapsed" state and persistence) - a second,
+  // closer-at-hand way to reach the one show/hide mechanism this app
+  // already has, not a separate minimize concept.
+  const closeBtn = document.createElement("button");
+  closeBtn.type = "button";
+  closeBtn.className = "panel-float-close";
+  closeBtn.title = t("chrome.hide");
+  closeBtn.appendChild(icon("close", { small: true }));
+  closeBtn.addEventListener("mousedown", (e) => e.stopPropagation());
+  closeBtn.addEventListener("touchstart", (e) => e.stopPropagation(), { passive: true });
+  closeBtn.addEventListener("click", (e) => { e.stopPropagation(); togglePanel(id); });
+  bar.appendChild(closeBtn);
+
   panel.appendChild(bar);
 
   const body = document.createElement("div");

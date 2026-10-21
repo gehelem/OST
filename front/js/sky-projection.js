@@ -23,7 +23,7 @@
 import {
   Observer, Spherical, VectorFromSphere, RotateVector,
   HorizonFromVector, VectorFromHorizon, EquatorFromVector,
-  Rotation_EQJ_HOR, Rotation_HOR_EQJ, Rotation_EQD_HOR, Rotation_ECL_EQJ,
+  Rotation_EQJ_HOR, Rotation_HOR_EQJ, Rotation_EQD_HOR, Rotation_HOR_EQD, Rotation_ECL_EQJ,
   Body, Equator, Horizon,
 } from "../lib/astronomy-engine.js";
 
@@ -94,6 +94,20 @@ export function equatorialOfDateToHorizontal(raDeg, decDeg, observer, date) {
   const horVec = RotateVector(Rotation_EQD_HOR(date, observer), eqdVec);
   const sphere = HorizonFromVector(horVec, "normal");
   return { azimuth: sphere.lon, altitude: sphere.lat };
+}
+
+/**
+ * Inverse of equatorialOfDateToHorizontal() above: {azimuth, altitude}
+ * (degrees) -> RA/Dec (degrees, OF DATE, same EQD convention
+ * sensorFovCorners()/mountposition already use - NOT horizontalToEquatorial()'s
+ * own J2000 result below, which would need a separate precession step to
+ * compare against of-date coordinates like mountRaDeg/mountDecDeg).
+ */
+export function horizontalOfDateToEquatorial(azimuthDeg, altitudeDeg, observer, date) {
+  const horVec = VectorFromHorizon(new Spherical(Math.min(altitudeDeg, 89.999), azimuthDeg, 1), date, "normal");
+  const eqdVec = RotateVector(Rotation_HOR_EQD(date, observer), horVec);
+  const equ = EquatorFromVector(eqdVec); // {ra: hours, dec: degrees}
+  return { ra: equ.ra * 15, dec: equ.dec };
 }
 
 // A fixed, arbitrary instant - VectorFromSphere() takes a `time` argument
@@ -178,7 +192,13 @@ const FOV_TANGENT_EPS_DEG = 1e-4;
  * zenith (and just as irrelevant in practice: no telescope points at the
  * pole to the arcsecond).
  */
-export function sensorFovCorners(raDeg, decDeg, fovWidthDeg, fovHeightDeg, orientationDeg, observer, date) {
+// The pointing direction plus its own rotated tangent-plane basis
+// (imageUp/imageRight - celestial North/East at that direction, rotated by
+// `orientationDeg` the same way sensorFovCorners()'s own doc comment
+// describes) - factored out of that function so sensorMosaicTileCorners()
+// below can place several tiles in the SAME shared tangent plane without
+// recomputing it per tile.
+function sensorFovBasis(raDeg, decDeg, orientationDeg, date) {
   const center = VectorFromSphere(new Spherical(decDeg, raDeg, 1), date);
   // Centered difference (samples on both sides of center, not just one) -
   // halves the truncation error of the tangent-direction estimate versus
@@ -200,18 +220,92 @@ export function sensorFovCorners(raDeg, decDeg, fovWidthDeg, fovHeightDeg, orien
     const kDotV = v3dot(center, v);
     return v3add(v3add(v3scale(v, cosT), v3scale(kCrossV, sinT)), v3scale(center, kDotV * (1 - cosT)));
   }
-  const imageUp = rotateAroundCenter(north);
-  const imageRight = rotateAroundCenter(east);
+  return { center, imageUp: rotateAroundCenter(north), imageRight: rotateAroundCenter(east) };
+}
 
+// Shared by sensorFovCorners()/sensorMosaicTileCorners() below: 4 corners
+// of a fovWidthDeg x fovHeightDeg tile centred at a (offsetRightTan,
+// offsetUpTan) displacement - in the SAME tangent-plane units the corner
+// half-extents themselves use (tan of the half-angle), not degrees, so
+// combining a tile's own half-size with a mosaic step offset is a plain
+// addition in one consistent coordinate system, not two different angular
+// measures - from the basis's own pointing direction, converted back to
+// {azimuth,altitude} via the observer's of-date horizontal frame.
+function fovTileCornersFromBasis(basis, fovWidthDeg, fovHeightDeg, offsetRightTan, offsetUpTan, observer, date) {
   const tanW = Math.tan(((fovWidthDeg / 2) * Math.PI) / 180);
   const tanH = Math.tan(((fovHeightDeg / 2) * Math.PI) / 180);
   return [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([sx, sy]) => {
-    const offset = v3add(v3scale(imageRight, tanW * sx), v3scale(imageUp, tanH * sy));
-    const cornerVec = v3norm(v3add(center, offset));
+    const offset = v3add(
+      v3scale(basis.imageRight, offsetRightTan + tanW * sx),
+      v3scale(basis.imageUp, offsetUpTan + tanH * sy),
+    );
+    const cornerVec = v3norm(v3add(basis.center, offset));
     const horVec = RotateVector(Rotation_EQD_HOR(date, observer), cornerVec);
     const sphere = HorizonFromVector(horVec, "normal");
     return { azimuth: sphere.lon, altitude: sphere.lat };
   });
+}
+
+export function sensorFovCorners(raDeg, decDeg, fovWidthDeg, fovHeightDeg, orientationDeg, observer, date) {
+  const basis = sensorFovBasis(raDeg, decDeg, orientationDeg, date);
+  return fovTileCornersFromBasis(basis, fovWidthDeg, fovHeightDeg, 0, 0, observer, date);
+}
+
+/**
+ * Corners of ONE tile (0-indexed `col`/`row`) of a `cols` x `rows` mosaic
+ * grid of `fovWidthDeg` x `fovHeightDeg` tiles overlapping by
+ * `overlapFraction` (0-1) - the grid's own geometric centre, not any one
+ * tile, lands on (raDeg,decDeg). Tile steps are placed in the same
+ * tangent-plane/gnomonic basis sensorFovCorners() uses for a single frame
+ * (see that function's own doc comment for why, and the orientation
+ * convention) - adjacent tiles line up edge-to-edge (minus the requested
+ * overlap) along the IMAGE's own rotated right/up axes, not RA/Dec grid
+ * lines, matching how two real camera frames placed side by side for a
+ * mosaic actually relate to each other.
+ */
+// Shared by sensorMosaicTileCorners()/mosaicTileCenterRaDec() below - a
+// tile's own (offsetRightTan, offsetUpTan) displacement from the grid's
+// overall centre, in the same tangent-plane units fovTileCornersFromBasis()
+// already uses for the tile's own half-extents.
+function mosaicTileOffsetTan(fovWidthDeg, fovHeightDeg, cols, rows, col, row, overlapFraction) {
+  const tanW = Math.tan(((fovWidthDeg / 2) * Math.PI) / 180);
+  const tanH = Math.tan(((fovHeightDeg / 2) * Math.PI) / 180);
+  const stepRight = 2 * tanW * (1 - overlapFraction);
+  const stepUp = 2 * tanH * (1 - overlapFraction);
+  return {
+    offsetRightTan: (col - (cols - 1) / 2) * stepRight,
+    offsetUpTan: (row - (rows - 1) / 2) * stepUp,
+  };
+}
+
+export function sensorMosaicTileCorners(raDeg, decDeg, fovWidthDeg, fovHeightDeg, orientationDeg, cols, rows, col, row, overlapFraction, observer, date) {
+  const basis = sensorFovBasis(raDeg, decDeg, orientationDeg, date);
+  const { offsetRightTan, offsetUpTan } = mosaicTileOffsetTan(fovWidthDeg, fovHeightDeg, cols, rows, col, row, overlapFraction);
+  return fovTileCornersFromBasis(basis, fovWidthDeg, fovHeightDeg, offsetRightTan, offsetUpTan, observer, date);
+}
+
+/**
+ * The RA/Dec (same epoch as the raDeg/decDeg given in - this project only
+ * ever calls it with the J2000 catalog coordinates a selected object's own
+ * target.targetra/targetde already use) of ONE tile's own CENTRE in a
+ * `cols` x `rows` mosaic grid - companion to sensorMosaicTileCorners()
+ * above (which projects a tile's corners onto the CURRENT screen for one
+ * instant) for handing a tile's pointing coordinate to the planner
+ * instead: no observer/date/horizontal-frame conversion at all, since
+ * "where is this grid cell on the sky" is a pure RA/Dec tangent-plane
+ * question, independent of when or from where it's asked -
+ * sensorFovBasis() itself never actually uses its own `date` argument (see
+ * eclipticToEquatorial()'s own doc comment on VectorFromSphere), so
+ * ECLIPTIC_TIME_PLACEHOLDER is reused here rather than threading a real
+ * one through for no reason.
+ */
+export function mosaicTileCenterRaDec(raDeg, decDeg, fovWidthDeg, fovHeightDeg, orientationDeg, cols, rows, col, row, overlapFraction) {
+  const basis = sensorFovBasis(raDeg, decDeg, orientationDeg, ECLIPTIC_TIME_PLACEHOLDER);
+  const { offsetRightTan, offsetUpTan } = mosaicTileOffsetTan(fovWidthDeg, fovHeightDeg, cols, rows, col, row, overlapFraction);
+  const offset = v3add(v3scale(basis.imageRight, offsetRightTan), v3scale(basis.imageUp, offsetUpTan));
+  const centerVec = v3norm(v3add(basis.center, offset));
+  const eq = EquatorFromVector(centerVec); // {ra: hours, dec: degrees}
+  return { ra: eq.ra * 15, dec: eq.dec };
 }
 
 /**

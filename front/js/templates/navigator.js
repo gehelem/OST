@@ -37,9 +37,10 @@ import * as Panels from "../panels.js";
 import { SkyEngine, ZOOM_MIN, ZOOM_MAX } from "../sky-engine.js";
 import { createHipsBackground } from "../hips-background.js";
 import { STAR_DEPTHS } from "../sky-catalog.js";
-import { sunAltitudeCurve, altitudeCurve } from "../sky-projection.js";
+import { sunAltitudeCurve, altitudeCurve, mosaicTileCenterRaDec } from "../sky-projection.js";
 import { t } from "../i18n.js";
 import { mediaUrl } from "../../core/index.js";
+import { showToast } from "../toast.js";
 
 function fmtDeg(v) { return v.toFixed(3) + "°"; }
 function fmtHours(raDeg) {
@@ -109,6 +110,41 @@ function drawDayNightBackground(ctx, w, h, sunSamples) {
  * here was the actual cause of a GOTO landing in a "weird position" (Gilles,
  * 2026-09-30) — a 15x error, not the smaller J2000/of-date precession gap
  * fixed alongside it in sky-projection.js. */
+/** Shared by "Add to planner"/"Add mosaic to planner" below - lets the
+ * user pick which Sequencer profile the planner should use for this
+ * target, instead of the backend's own former hardcoded "default" (Gilles,
+ * 2026-10-21). Same controller-scope "profiles-<Type>" lov render.js's own
+ * openLoadProfileDialog() already uses for a module's OWN profile picker,
+ * fixed here to "profiles-Sequencer" since this picks a profile for a
+ * DIFFERENT module (whichever Sequencer the planner is configured
+ * against), not this module's own classname. `onConfirm(profileName)`
+ * fires once, only on an actual pick-and-confirm - never on cancel. */
+function openSequencerProfilePicker(client, onConfirm) {
+  const select = el("select", { class: "field-input" });
+  const unsubscribe = client.subscribe(client.topics.lovs(), (lovs) => {
+    const lov = (lovs && lovs["profiles-Sequencer"]) || null;
+    const options = (lov && Object.keys(lov.values || {})) || [];
+    const current = select.value;
+    select.innerHTML = "";
+    select.appendChild(el("option", { value: "", text: options.length ? t("common.chooseProfile") : t("common.noProfilesYet") }));
+    for (const name of options) select.appendChild(el("option", { value: name, text: name }));
+    if (options.includes(current)) select.value = current;
+  });
+  const overlay = el("div", { class: "dialog-overlay" });
+  const close = () => { unsubscribe(); overlay.remove(); };
+  const dialog = el("div", { class: "dialog" }, [
+    el("div", { class: "dialog-header" }, [el("h3", { text: t("navigator.chooseSequencerProfile") }), iconButton("close", t("common.close"), close)]),
+    el("div", { class: "form-row" }, [select]),
+    el("div", { class: "dialog-actions" }, [
+      el("button", { class: "btn", onclick: close }, t("common.cancel")),
+      el("button", { class: "btn btn-primary", onclick: () => { const picked = select.value; close(); if (picked) onConfirm(picked); } }, t("navigator.sendToPlanner")),
+    ]),
+  ]);
+  overlay.appendChild(dialog);
+  overlay.addEventListener("click", (ev) => { if (ev.target === overlay) close(); });
+  document.getElementById("dialog-root").appendChild(overlay);
+}
+
 /**
  * `getEngine`/`getSimTime`: closures, not values, deliberately - this is
  * built (in mount()'s own build()) BEFORE the engine exists yet (its own
@@ -122,7 +158,13 @@ function buildSelectionPanel(client, moduleName, getEngine, getSimTime) {
   const info = el("div", { class: "muted small", text: t("navigator.tapToSelect") });
   const gotoBtn = el("button", { class: "btn btn-primary btn-sm", disabled: true }, [el("span", { class: "material-icons", style: "font-size:15px;vertical-align:middle" }, "gps_fixed"), " " + t("navigator.goto")]);
   const plannerBtn = el("button", { class: "btn btn-sm", disabled: true }, t("navigator.addToPlanner"));
-  const actionsRow = el("div", { class: "form-row" }, [gotoBtn, plannerBtn]);
+  // Mosaic definition's own own tile grid, centred on this selection
+  // (Gilles, 2026-10-21: "ajoute un bouton 'add mosaic to planner'") -
+  // same enabled/disabled gating as the other two action buttons; the
+  // actual action (what gets sent to the planner) is a follow-up step,
+  // this is the entry point.
+  const mosaicToPlannerBtn = el("button", { class: "btn btn-sm", disabled: true }, t("navigator.addMosaicToPlanner"));
+  const actionsRow = el("div", { class: "form-row" }, [gotoBtn, plannerBtn, mosaicToPlannerBtn]);
   // The "ce soir" visibility arc (Gilles, 2026-10-02, on astro2001's own
   // per-object fiche: "modifie [...] pour afficher toutes les infos sur
   // l'objet selectionne, donc faire ce joli graphique d'altitude sur
@@ -149,9 +191,59 @@ function buildSelectionPanel(client, moduleName, getEngine, getSimTime) {
   wrap.appendChild(infoRows);
 
   gotoBtn.addEventListener("click", () => client.setValue(moduleName, "actions", "gototarget", true));
-  plannerBtn.addEventListener("click", () => client.setValue(moduleName, "actions", "addtoplanner", true));
+  // Both planner buttons ask which Sequencer profile to use first (Gilles,
+  // 2026-10-21: the backend used to hardcode "default" - target.targetprofile
+  // is new, read by Navigator::addTargeToPlanner() instead now) - one pick
+  // per click, reused for every tile in the mosaic case ("un seul profil
+  // pour une mosaique").
+  plannerBtn.addEventListener("click", () => {
+    openSequencerProfilePicker(client, (profile) => {
+      client.setValue(moduleName, "target", "targetprofile", profile);
+      client.setValue(moduleName, "actions", "addtoplanner", true);
+    });
+  });
+  // One "add to planner" per mosaic tile (Gilles, 2026-10-21: "pour chacun
+  // de ces centres il faut envoyer un ordre 'add to planner' avec le nom
+  // de l'objet avec un suffixe, et les bonnes coordonnees") - same
+  // target.targetname/targetra/targetde + actions.addtoplanner round trip
+  // plannerBtn's own handler uses for a single object, just repeated once
+  // per (row,col) with that tile's own centre (mosaicTileCenterRaDec(),
+  // pure RA/Dec tangent-plane geometry - no observer/date/live view
+  // involved, unlike the dome's own preview rendering) and a name
+  // suffixed "<name> Mosaic - <row>x<col>" (1-indexed). FOV checked before
+  // even asking for a profile - no point picking one for a mosaic that
+  // can't be computed anyway.
+  mosaicToPlannerBtn.addEventListener("click", () => {
+    if (!lastObj) return;
+    const engine = getEngine();
+    if (!engine || !(engine.sensorFovWidthDeg > 0) || !(engine.sensorFovHeightDeg > 0)) {
+      showToast(t("navigator.mosaicNoFov"), 2);
+      return;
+    }
+    openSequencerProfilePicker(client, (profile) => {
+      const cols = Math.max(1, engine.mosaicCols || 1);
+      const rows = Math.max(1, engine.mosaicRows || 1);
+      const overlapFraction = Math.max(0, Math.min(0.9, (engine.mosaicOverlapPercent || 0) / 100));
+      const baseName = lastName || t("navigator.point");
+      client.setValue(moduleName, "target", "targetprofile", profile);
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const { ra, dec } = mosaicTileCenterRaDec(
+            lastObj.ra, lastObj.dec, engine.sensorFovWidthDeg, engine.sensorFovHeightDeg,
+            engine.sensorOrientationDeg, cols, rows, col, row, overlapFraction,
+          );
+          const tileName = `${baseName} Mosaic - ${row + 1}x${col + 1}`;
+          client.setValue(moduleName, "target", "targetname", tileName);
+          client.setValue(moduleName, "target", "targetra", ra / 15); // degrees -> hours, see onSelect()'s own comment
+          client.setValue(moduleName, "target", "targetde", dec);
+          client.setValue(moduleName, "actions", "addtoplanner", true);
+        }
+      }
+    });
+  });
 
   let lastObj = null;
+  let lastName = null;
 
   function redrawChart() {
     if (!lastObj) return;
@@ -215,11 +307,13 @@ function buildSelectionPanel(client, moduleName, getEngine, getSimTime) {
     if (obj.mag !== undefined) info.appendChild(el("div", { class: "muted small", text: t("navigator.magPrefix") + obj.mag }));
     gotoBtn.disabled = false;
     plannerBtn.disabled = false;
+    mosaicToPlannerBtn.disabled = false;
     client.setValue(moduleName, "target", "targetname", name);
     client.setValue(moduleName, "target", "targetra", obj.ra / 15); // degrees -> hours, see this function's own doc comment
     client.setValue(moduleName, "target", "targetde", obj.dec);
 
     lastObj = obj;
+    lastName = name;
     chartCanvas.classList.remove("hidden");
     infoRows.classList.remove("hidden");
     redrawChart();
@@ -410,7 +504,87 @@ function buildSettingsPanel(engine, hipsBg) {
   });
   wrap.appendChild(el("label", { class: "form-row", style: "cursor:pointer" }, [projCb, el("span", { text: t("navigator.stereographic") })]));
 
+  // Mosaic definition (Gilles, 2026-10-21: "ajoute un bouton 'mosaic
+  // assistant' ... qui doit ouvrir une modale", then, once a blocking
+  // modal turned out to defeat the point of watching the grid update live
+  // while adjusting it: "la transformer en fenetre flottante"). The actual
+  // panel (buildMosaicDefinitionPanel()) is created once at mount() time
+  // like every other panel in this file - this button just toggles its
+  // visibility, same mechanism as a quicknav icon.
+  const mosaicBtn = el("button", { type: "button", class: "btn btn-sm", text: t("navigator.mosaicDefinition") });
+  mosaicBtn.addEventListener("click", () => Panels.togglePanel("mosaicDefinition"));
+  wrap.appendChild(el("div", { class: "form-row" }, [mosaicBtn]));
+
   wrap._dispose = () => { engine.onZoomChange = null; engine.onRotationChange = null; engine.onHipsFailure = null; };
+  return wrap;
+}
+
+// Persisted the same way search-catalog prefs are (SEARCH_CATALOGS_KEY
+// above) - a client-side preference with no server round-trip, own
+// localStorage key rather than folding into DISPLAY_SETTINGS_KEY since
+// it's not an engine field at all. Gilles, 2026-10-21: rows/cols 1-9
+// (default 1), overlap 10-30% (default 20%).
+const MOSAIC_SETTINGS_KEY = "ostcore-ui3.navigator.mosaic";
+function loadMosaicSettings() {
+  let d = {};
+  try { d = JSON.parse(localStorage.getItem(MOSAIC_SETTINGS_KEY)) || {}; } catch (e) { /* ignore */ }
+  const clamp = (v, lo, hi, dflt) => (Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : dflt);
+  return {
+    rows: clamp(d.rows, 1, 9, 1),
+    cols: clamp(d.cols, 1, 9, 1),
+    overlap: clamp(d.overlap, 10, 30, 20),
+  };
+}
+function saveMosaicSettings(state) {
+  try { localStorage.setItem(MOSAIC_SETTINGS_KEY, JSON.stringify(state)); } catch (e) { /* ignore */ }
+}
+
+/** The Mosaic definition panel's body - a plain floating panel (draggable,
+ * non-blocking) rather than the blocking modal this started as, so the
+ * grid drawn on the dome (sky-engine.js's own framing-preview block) can
+ * be watched updating live while these fields are adjusted - a modal's own
+ * backdrop would hide the dome entirely regardless of where the dialog box
+ * itself sat, defeating that. */
+function buildMosaicDefinitionPanel(engine) {
+  const state = loadMosaicSettings();
+  const wrap = el("div");
+
+  function numberField(value, min, max) {
+    return el("input", { type: "number", class: "field-input tiny", min: String(min), max: String(max), step: "1", value: String(value) });
+  }
+  const rowsInput = numberField(state.rows, 1, 9);
+  const colsInput = numberField(state.cols, 1, 9);
+  const overlapInput = numberField(state.overlap, 10, 30);
+  const clamp = (v, lo, hi, dflt) => (Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : dflt);
+  function persist() {
+    state.rows = clamp(parseInt(rowsInput.value, 10), 1, 9, 1);
+    state.cols = clamp(parseInt(colsInput.value, 10), 1, 9, 1);
+    state.overlap = clamp(parseInt(overlapInput.value, 10), 10, 30, 20);
+    rowsInput.value = String(state.rows);
+    colsInput.value = String(state.cols);
+    overlapInput.value = String(state.overlap);
+    saveMosaicSettings(state);
+    // Live update - the mosaic grid itself reads these same three fields
+    // on the engine, not localStorage directly, same pattern as every
+    // other display setting.
+    engine.mosaicRows = state.rows;
+    engine.mosaicCols = state.cols;
+    engine.mosaicOverlapPercent = state.overlap;
+    engine.render();
+  }
+  rowsInput.addEventListener("change", persist);
+  colsInput.addEventListener("change", persist);
+  overlapInput.addEventListener("change", persist);
+
+  wrap.appendChild(el("div", { class: "form-row" }, [
+    el("span", { text: t("navigator.mosaicRows") }), rowsInput,
+    el("span", { text: t("navigator.mosaicCols") }), colsInput,
+  ]));
+  wrap.appendChild(el("div", { class: "form-row" }, [
+    el("span", { text: t("navigator.mosaicOverlap") }), overlapInput, el("span", { text: "%" }),
+  ]));
+
+  wrap._dispose = () => {};
   return wrap;
 }
 
@@ -801,6 +975,10 @@ function buildSkyDome(client, moduleName, onSelect, getTime) {
   // wheel-zoom -> persist wiring (engine.onZoomChange).
   const savedSettings = loadDisplaySettings();
   Object.assign(engine, savedSettings);
+  const savedMosaic = loadMosaicSettings();
+  engine.mosaicRows = savedMosaic.rows;
+  engine.mosaicCols = savedMosaic.cols;
+  engine.mosaicOverlapPercent = savedMosaic.overlap;
   hipsBg.setEnabled(engine.showHips);
   // "leger par defaut, mais parametrable" (Gilles, 2026-09-29) - actually
   // reads back whichever depth was last chosen (buildSettingsPanel()'s own
@@ -1028,6 +1206,15 @@ export function mount(client, moduleName) {
       const timeNavPanel = Panels.make({ id: "timenav", title: t("navigator.timeNav"), x: 340, y: 463, w: 300, collapsed: true });
       timeNavPanel.appendChild(track(buildTimeNavPanel(sky.engine, () => simulatedTime, setSimTime)));
       quickNavEntries.push({ id: "timenav", label: t("navigator.timeNavQuicknav"), icon: "schedule", iconOnly: true });
+
+      // Mosaic definition - own panel (not nested inside Settings) so it
+      // can stay open, draggable, next to the dome while its grid updates
+      // live (see buildMosaicDefinitionPanel()'s own doc comment). Reached
+      // either from its Settings-panel button or this quicknav icon, same
+      // togglePanel() either way.
+      const mosaicPanel = Panels.make({ id: "mosaicDefinition", title: t("navigator.mosaicDefinition"), x: 660, y: 330, w: 260, collapsed: true });
+      mosaicPanel.appendChild(track(buildMosaicDefinitionPanel(sky.engine)));
+      quickNavEntries.push({ id: "mosaicDefinition", label: t("navigator.mosaicDefinition"), icon: "grid_view", iconOnly: true });
 
       // "Center on mount" (Gilles, 2026-10-06: "ajoute un bouton
       // 'align_flex_center' ... pas de fenetre associee ... centrer la vue

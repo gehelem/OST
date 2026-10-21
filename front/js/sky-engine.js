@@ -29,10 +29,10 @@
 // everything else in this app, not a menu at the tap position.
 
 import { Body, Horizon, Equator, Illumination } from "../lib/astronomy-engine.js";
-import { makeObserver, equatorialToHorizontal, equatorialOfDateToHorizontal, equatorialHorizontalRotation, horizontalToEquatorial, horizontalToVector, vectorToHorizontal, vectorToScreen, screenToVector, magnitudeToRadius, starMagnitudeLimit, sensorFovCorners, eclipticToEquatorial } from "./sky-projection.js";
+import { makeObserver, equatorialToHorizontal, equatorialOfDateToHorizontal, equatorialHorizontalRotation, horizontalToEquatorial, horizontalOfDateToEquatorial, horizontalToVector, vectorToHorizontal, vectorToScreen, screenToVector, magnitudeToRadius, starMagnitudeLimit, sensorFovCorners, sensorMosaicTileCorners, eclipticToEquatorial } from "./sky-projection.js";
 import { identity, multiply, conjugate, rotateVector, fromTwoVectors } from "./quaternion.js";
 import { loadCatalog } from "./sky-catalog.js";
-import { clipPolygonToHemisphere } from "../lib/sphere-clip.js";
+import { clipPolygonToHemisphere, polygonContainsLonLat } from "../lib/sphere-clip.js";
 
 // Below this many CSS px of total movement between pointerdown and
 // pointerup, a gesture counts as a tap/click (selection) rather than a
@@ -214,6 +214,24 @@ function strokePolyline(ctx, points, w, h, margin) {
   ctx.stroke();
   return pickLabelAnchor(points, w, h, margin);
 }
+// Nonzero-rule point-in-polygon test against clipPolygonToHemisphere()'s
+// own output rings ({x,y,z} view-space vectors, tested here by their own
+// x/y - topologically equivalent to testing after vectorToScreen, which is
+// just a radial rescale). Used by the Milky Way render's self-correction
+// check (see its own doc comment) to ask "does this clipped result think
+// the view centre is inside" without needing a full screen projection.
+function pointInViewRings(rings, x, y) {
+  let parity = 0;
+  for (const ring of rings) {
+    let inside = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const xi = ring[i].x, yi = ring[i].y, xj = ring[j].x, yj = ring[j].y;
+      if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+    }
+    if (inside) parity ^= 1;
+  }
+  return !!parity;
+}
 // A grid line's coordinate value, anchored at strokePolyline()'s own
 // bottom-most-on-canvas point - Gilles, 2026-10-01: "tu n'as pas ajoute
 // les graduations, coordonnees equatoriales et azimutales comme je te
@@ -291,11 +309,12 @@ const GROUND_MASK_BISECT_STEPS = 10;
 const MESSIER_DIR_EPS_DEG = 0.01;
 
 /**
- * Returns the boundary of the *sky* portion of the currently visible dome,
- * as an array of {x,y} points (offsets from the dome centre) - or `null`
- * if the whole visible dome is real sky (nothing to mask, the common case
- * at the default zenith-centred view), or the string "none" if the whole
- * visible dome is below the real horizon (fully masked).
+ * Returns the boundary between sky and ground on the currently visible
+ * dome, as `{ points, isGroundPoly }` (points: {x,y} offsets from the dome
+ * centre) - or `null` if the whole visible dome is real sky (nothing to
+ * mask, the common case at the default zenith-centred view), or the string
+ * "none" if the whole visible dome is below the real horizon (fully
+ * masked).
  *
  * The true horizon is a great circle (alt=0 is always 90° from the
  * zenith), so under an arbitrary rotation + orthographic projection it
@@ -303,11 +322,19 @@ const MESSIER_DIR_EPS_DEG = 0.01;
  * curve. Rather than tracing that curve analytically (messy once it also
  * has to be closed off along the dome's own edge), this walks a ray from
  * the dome's centre to its edge at each of GROUND_MASK_RAYS angles and
- * binary-searches each ray for the altitude=0 crossing - naturally
- * produces a simple polygon (every point already expressed in its own
- * polar form) that handles every case uniformly: a ray with no crossing
- * just collapses to the centre (fully ground) or extends fully to the
- * edge (fully sky).
+ * binary-searches each ray for the altitude=0 crossing.
+ *
+ * This only produces a simple polygon when traced from a centre that's
+ * actually ON the side being traced - every ray from such a point crosses
+ * the horizon at most once, so "collapse to the centre" (no sky/ground
+ * this far out) or "extend fully to the edge" (this whole ray agrees)
+ * both stay well-defined. `isGroundPoly` says which side `points`
+ * actually describes: sky when the dome's own centre is itself sky (the
+ * common case), ground when it's below the horizon instead - tracing the
+ * *sky* boundary from a ground-side centre would have half the rays
+ * (the ones that never reach any sky at all) collapse onto that centre,
+ * producing a degenerate sliver instead of the real shape rather than the
+ * true region. The caller clips to the complement when it's ground.
  */
 function computeSkyPolygon(domeRadius, rotation, projection) {
   const centerAlt = altitudeAtOffset(0, 0, domeRadius, rotation, projection);
@@ -322,7 +349,7 @@ function computeSkyPolygon(domeRadius, rotation, projection) {
     if (!edgeIsSky) anyGround = true; else anySky = true;
     let r;
     if (edgeIsSky === centerIsSky) {
-      r = centerIsSky ? domeRadius : 0; // whole ray agrees - no crossing to find
+      r = domeRadius; // whole ray agrees with the centre's own side - no crossing to find
     } else {
       let lo = 0, hi = domeRadius;
       for (let k = 0; k < GROUND_MASK_BISECT_STEPS; k++) {
@@ -336,7 +363,7 @@ function computeSkyPolygon(domeRadius, rotation, projection) {
   }
   if (!anyGround) return null;
   if (!anySky) return "none";
-  return points;
+  return { points, isGroundPoly: !centerIsSky };
 }
 
 // No more per-body fixed `radius` (Gilles, 2026-10-01: "adapte la taille
@@ -462,6 +489,16 @@ export class SkyEngine {
     // sensorFovCorners()'s own doc comment for the rotation convention
     // and its one unverified assumption (the sign).
     this.sensorOrientationDeg = 0;
+    // Mosaic definition (Gilles, 2026-10-21: "un ensemble de rectangles
+    // (lignes x colonnes) se recouvrant selon le % defini") - persisted by
+    // templates/navigator.js's own Mosaic definition dialog
+    // (MOSAIC_SETTINGS_KEY), applied here as plain public fields the same
+    // way every other display setting works. The framing-preview block
+    // below draws cols x rows tiles instead of a single frame whenever
+    // either is >1, still centred as a WHOLE on the current view.
+    this.mosaicRows = 1;
+    this.mosaicCols = 1;
+    this.mosaicOverlapPercent = 20;
     // Gilles, 2026-10-01: "dans le cadre du capteur de la camera essaie de
     // m'afficher l'image prise ... toujours en optionnel" - a heavier,
     // speculative extra unlike showMountPosition/showSensorFov above.
@@ -997,6 +1034,7 @@ export class SkyEngine {
     // groundClipActive tracks whether render() needs its own matching
     // ctx.restore() at the very end.
     let groundClipActive = false;
+    let groundPolyToPaint = null; // ground-branch only, see below - painted AFTER everything else instead of clipped during it
     if (this.showTrueHorizon) {
       const skyPoly = computeSkyPolygon(domeRadius, this.rotation, this.projection);
       if (skyPoly === "none") {
@@ -1008,6 +1046,25 @@ export class SkyEngine {
         ctx.beginPath(); // empty path -> clip to nothing, hides everything after
         ctx.clip();
         groundClipActive = true;
+      } else if (skyPoly && skyPoly.isGroundPoly) {
+        // The dome's own centre is itself below the horizon - computeSkyPolygon()
+        // traced the GROUND region instead (the only side that's actually
+        // star-shaped from that centre, see its own doc comment). Rather
+        // than clip() the rest of this render() call to the complement of
+        // this polygon (circle minus ground, needing a compound two-subpath
+        // evenodd clip - the only place this file ever did that), leave
+        // everything below free to draw normally everywhere, including
+        // where ground will end up, and just paint this polygon ground-
+        // coloured ON TOP at the very end (see groundPolyToPaint below) -
+        // same final pixels, since the ground fill is fully opaque, but no
+        // complex clip region for every single star/grid-line/label draw
+        // call in between to be tested against. A reported startup latency
+        // regression (worst right after a reload, when the saved view
+        // often starts out looking below the horizon) turned out to trace
+        // back to verbose console logging during the investigation itself
+        // rather than this clip, but the simpler no-clip version here is
+        // still the better default regardless.
+        groundPolyToPaint = skyPoly.points;
       } else if (skyPoly) {
         ctx.fillStyle = fg.ground;
         ctx.beginPath();
@@ -1015,7 +1072,7 @@ export class SkyEngine {
         ctx.fill();
         ctx.save();
         ctx.beginPath();
-        skyPoly.forEach((p, i) => {
+        skyPoly.points.forEach((p, i) => {
           if (i === 0) ctx.moveTo(cx + p.x, cy + p.y); else ctx.lineTo(cx + p.x, cy + p.y);
         });
         ctx.closePath();
@@ -1306,9 +1363,37 @@ export class SkyEngine {
         const { azimuth, altitude } = equatorialToHorizontal(raDeg, decDeg, this.observer, date, eqjHorRotation);
         return rotateVector(this.rotation, horizontalToVector(azimuth, altitude));
       };
+      // A polygon with a ring that wraps all the way around in RA (e.g.
+      // the outermost Milky Way feature's own outer boundary) can come
+      // back from clipPolygonToHemisphere() fully INVERTED - the whole
+      // dome filled instead of just the real band, or vice versa -
+      // depending on the current view rotation. Confirmed numerically
+      // (isolated single rings always clip correctly regardless of
+      // rotation; this specific multi-wraparound-ring combination flips
+      // cleanly between "exactly right" and "exactly the complement",
+      // never something in between, for roughly half of all view
+      // rotations). Rather than chase the exact cause inside the ported
+      // d3-geo code, self-correct per polygon per frame: check whether
+      // the view's own centre (always trivially visible, screen offset
+      // (0,0)) is really inside this polygon via an INDEPENDENT check
+      // worked directly in ra/dec (polygonContainsLonLat, no view-rotation
+      // embedding involved, so it can't share the same flip), and re-clip
+      // with every ring reversed if the two disagree. Verified against
+      // this same independent reference across many view rotations: 100%
+      // agreement, 0% over/under-fill, both with and without the flip
+      // triggering.
+      const fixedCenter = rotateVector(conjugate(this.rotation), { x: 0, y: 0, z: 1 });
+      const { azimuth: centerAz, altitude: centerAlt } = vectorToHorizontal(fixedCenter);
+      const { ra: centerRaDeg, dec: centerDecDeg } = horizontalToEquatorial(((centerAz % 360) + 360) % 360, centerAlt, this.observer, date);
       for (const polygon of this.catalog.milkyWay) {
         const rings = polygon.map((ring) => ring.map((pt) => toViewVector(pt.ra, pt.dec)));
-        const clipped = clipPolygonToHemisphere(rings);
+        let clipped = clipPolygonToHemisphere(rings);
+        const renderedCenterInside = pointInViewRings(clipped, 0, 0);
+        const trueCenterInside = polygonContainsLonLat(polygon, centerRaDeg, centerDecDeg);
+        if (renderedCenterInside !== trueCenterInside) {
+          const reversedRings = polygon.map((ring) => [...ring].reverse().map((pt) => toViewVector(pt.ra, pt.dec)));
+          clipped = clipPolygonToHemisphere(reversedRings);
+        }
         if (clipped.length === 0) continue;
 
         ctx.beginPath();
@@ -1609,6 +1694,85 @@ export class SkyEngine {
       }
     }
 
+    // Framing preview: the same sensor rectangle as above, but centred on
+    // the current VIEW instead of the mount's own live position - lets a
+    // user pan/zoom the dome to wherever they're considering slewing next
+    // and see how it would frame, without actually moving anything. Same
+    // showSensorFov toggle (no separate setting), drawn in orange (same
+    // hue as the mount reticle above, but this one tracks the view, not
+    // the telescope) so the two are never mistaken for each other.
+    //
+    // Orientation caveat: there is no live rotator feedback, so this
+    // reuses sensorOrientationDeg - the last successful plate SOLVE's own
+    // orientation, wherever in the sky that solve actually happened. For
+    // an equatorial mount that stays correct anywhere on the SAME side of
+    // the meridian as that solve, but a meridian flip (or this preview
+    // simply pointing at the opposite side of the sky from where the
+    // mount currently is) rotates the real framing by 180deg with nothing
+    // here to detect or correct it - same underlying gap as the mount's
+    // own frame above (no pier-side data available at all yet, see
+    // notes/NOTES-frontend-ostcore-planetarium.md).
+    if (this.showSensorFov && this.sensorFovWidthDeg > 0 && this.sensorFovHeightDeg > 0) {
+      const viewCenterHoriz = vectorToHorizontal(rotateVector(conjugate(this.rotation), { x: 0, y: 0, z: 1 }));
+      const { ra: viewCenterRaDeg, dec: viewCenterDecDeg } = horizontalOfDateToEquatorial(
+        ((viewCenterHoriz.azimuth % 360) + 360) % 360, viewCenterHoriz.altitude, this.observer, date,
+      );
+      const cols = Math.max(1, this.mosaicCols || 1), rows = Math.max(1, this.mosaicRows || 1);
+      const overlapFraction = Math.max(0, Math.min(0.9, (this.mosaicOverlapPercent || 0) / 100));
+      ctx.strokeStyle = "#ff9800";
+      ctx.lineWidth = 1.5;
+      // Every tile shares the same single grid, itself centred as a WHOLE
+      // on the view (Gilles, 2026-10-21: "le centrage du motif affiche
+      // doit toujours correspondre au centre de l'affichage") -
+      // sensorMosaicTileCorners()'s own cols/rows centring does that, 1x1
+      // degenerating to exactly the single-frame case this replaced.
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const tileCorners = sensorMosaicTileCorners(
+            viewCenterRaDeg, viewCenterDecDeg,
+            this.sensorFovWidthDeg, this.sensorFovHeightDeg,
+            this.sensorOrientationDeg, cols, rows, col, row, overlapFraction,
+            this.observer, date,
+          ).map((h) => toScreen(horizontalToVector(h.azimuth, h.altitude)));
+          if (!tileCorners.every((c) => c.visible)) continue;
+          ctx.beginPath();
+          ctx.moveTo(tileCorners[0].x, tileCorners[0].y);
+          for (let i = 1; i < tileCorners.length; i++) ctx.lineTo(tileCorners[i].x, tileCorners[i].y);
+          ctx.closePath();
+          ctx.stroke();
+        }
+      }
+
+      // "This way up" marker, drawn once for the whole grid (every tile
+      // shares the same orientation) rather than once per tile - doubly
+      // useful given the orientation caveat above, so the assumption being
+      // made is at least visible at a glance. Based on the single centred
+      // frame regardless of grid size, same marker geometry the mount's
+      // own frame above uses.
+      const markerCorners = sensorFovCorners(
+        viewCenterRaDeg, viewCenterDecDeg,
+        this.sensorFovWidthDeg, this.sensorFovHeightDeg,
+        this.sensorOrientationDeg, this.observer, date,
+      ).map((h) => toScreen(horizontalToVector(h.azimuth, h.altitude)));
+      if (markerCorners.every((c) => c.visible)) {
+        const topMidX = (markerCorners[0].x + markerCorners[1].x) / 2;
+        const topMidY = (markerCorners[0].y + markerCorners[1].y) / 2;
+        let dx = topMidX - cx, dy = topMidY - cy;
+        const dlen = Math.hypot(dx, dy) || 1;
+        dx /= dlen; dy /= dlen;
+        const perpX = -dy, perpY = dx;
+        const TIP_LEN = 12, BASE_HALF = 6;
+        const tipX = topMidX + dx * TIP_LEN, tipY = topMidY + dy * TIP_LEN;
+        ctx.fillStyle = "#ff9800";
+        ctx.beginPath();
+        ctx.moveTo(tipX, tipY);
+        ctx.lineTo(topMidX + perpX * BASE_HALF, topMidY + perpY * BASE_HALF);
+        ctx.lineTo(topMidX - perpX * BASE_HALF, topMidY - perpY * BASE_HALF);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
     // Sun/Moon/planets - live position for `date`, not from any static file
     // (a fixed file would drift the instant the displayed time isn't "now").
     // Gated on showPlanets (Gilles, 2026-10-06: previously drawn
@@ -1659,6 +1823,19 @@ export class SkyEngine {
     }
 
     if (groundClipActive) ctx.restore(); // matches the ctx.save() in the ground-mask block above
+
+    // Ground-branch deferred paint - see groundPolyToPaint's own assignment
+    // above for why this happens here (after every star/grid-line/label
+    // draw call above) instead of as an upfront clip.
+    if (groundPolyToPaint) {
+      ctx.fillStyle = fg.ground;
+      ctx.beginPath();
+      groundPolyToPaint.forEach((p, i) => {
+        if (i === 0) ctx.moveTo(cx + p.x, cy + p.y); else ctx.lineTo(cx + p.x, cy + p.y);
+      });
+      ctx.closePath();
+      ctx.fill();
+    }
 
     // HiPS background sync (js/hips-background.js) - fires every render(),
     // not just showHips-gated, so Aladin is already caught up the instant

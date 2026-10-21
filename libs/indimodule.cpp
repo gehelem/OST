@@ -1321,6 +1321,11 @@ bool IndiModule::defineMeAsNavigator()
     f->setDirectEdit(true);
     f->setAutoUpdate(true);
     pmtarget->addElt(f);
+    s = new  OST::ElementString("targetprofile", "Target profile", "nav53", "");
+    s->setDirectEdit(true);
+    s->setAutoUpdate(true);
+    s->setGlobalLov("profiles-Sequencer", OST::LovScope::Controller);
+    pmtarget->addElt(s);
 
     mIsNavigator = true;
     return true;

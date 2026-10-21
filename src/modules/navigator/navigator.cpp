@@ -770,7 +770,13 @@ void Navigator::addTargeToPlanner()
     eltData["object"] = getString("target", "targetname");
     eltData["ra"] = getFloat("target", "targetra");
     eltData["dec"] = getFloat("target", "targetde");
-    eltData["profile"] = "default";
+    // Was hardcoded "default" - the UI now lets the user pick a real
+    // Sequencer profile before sending this (front/js/templates/
+    // navigator.js's own profile-picker dialog), falling back to
+    // "default" only if that field was left empty.
+    QString profile = getString("target", "targetprofile");
+    if (profile.isEmpty()) profile = "default";
+    eltData["profile"] = profile;
     logInfo("Current target sent to %1", {getString("slaves", "plannermodule")});
 
     otherModuleCreateLine(getString("slaves", "plannermodule"), "planning", eltData);
