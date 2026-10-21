@@ -110,6 +110,41 @@ function drawDayNightBackground(ctx, w, h, sunSamples) {
  * here was the actual cause of a GOTO landing in a "weird position" (Gilles,
  * 2026-09-30) — a 15x error, not the smaller J2000/of-date precession gap
  * fixed alongside it in sky-projection.js. */
+/** Shared by "Add to planner"/"Add mosaic to planner" below - lets the
+ * user pick which Sequencer profile the planner should use for this
+ * target, instead of the backend's own former hardcoded "default" (Gilles,
+ * 2026-10-21). Same controller-scope "profiles-<Type>" lov render.js's own
+ * openLoadProfileDialog() already uses for a module's OWN profile picker,
+ * fixed here to "profiles-Sequencer" since this picks a profile for a
+ * DIFFERENT module (whichever Sequencer the planner is configured
+ * against), not this module's own classname. `onConfirm(profileName)`
+ * fires once, only on an actual pick-and-confirm - never on cancel. */
+function openSequencerProfilePicker(client, onConfirm) {
+  const select = el("select", { class: "field-input" });
+  const unsubscribe = client.subscribe(client.topics.lovs(), (lovs) => {
+    const lov = (lovs && lovs["profiles-Sequencer"]) || null;
+    const options = (lov && Object.keys(lov.values || {})) || [];
+    const current = select.value;
+    select.innerHTML = "";
+    select.appendChild(el("option", { value: "", text: options.length ? t("common.chooseProfile") : t("common.noProfilesYet") }));
+    for (const name of options) select.appendChild(el("option", { value: name, text: name }));
+    if (options.includes(current)) select.value = current;
+  });
+  const overlay = el("div", { class: "dialog-overlay" });
+  const close = () => { unsubscribe(); overlay.remove(); };
+  const dialog = el("div", { class: "dialog" }, [
+    el("div", { class: "dialog-header" }, [el("h3", { text: t("navigator.chooseSequencerProfile") }), iconButton("close", t("common.close"), close)]),
+    el("div", { class: "form-row" }, [select]),
+    el("div", { class: "dialog-actions" }, [
+      el("button", { class: "btn", onclick: close }, t("common.cancel")),
+      el("button", { class: "btn btn-primary", onclick: () => { const picked = select.value; close(); if (picked) onConfirm(picked); } }, t("navigator.sendToPlanner")),
+    ]),
+  ]);
+  overlay.appendChild(dialog);
+  overlay.addEventListener("click", (ev) => { if (ev.target === overlay) close(); });
+  document.getElementById("dialog-root").appendChild(overlay);
+}
+
 /**
  * `getEngine`/`getSimTime`: closures, not values, deliberately - this is
  * built (in mount()'s own build()) BEFORE the engine exists yet (its own
@@ -156,7 +191,17 @@ function buildSelectionPanel(client, moduleName, getEngine, getSimTime) {
   wrap.appendChild(infoRows);
 
   gotoBtn.addEventListener("click", () => client.setValue(moduleName, "actions", "gototarget", true));
-  plannerBtn.addEventListener("click", () => client.setValue(moduleName, "actions", "addtoplanner", true));
+  // Both planner buttons ask which Sequencer profile to use first (Gilles,
+  // 2026-10-21: the backend used to hardcode "default" - target.targetprofile
+  // is new, read by Navigator::addTargeToPlanner() instead now) - one pick
+  // per click, reused for every tile in the mosaic case ("un seul profil
+  // pour une mosaique").
+  plannerBtn.addEventListener("click", () => {
+    openSequencerProfilePicker(client, (profile) => {
+      client.setValue(moduleName, "target", "targetprofile", profile);
+      client.setValue(moduleName, "actions", "addtoplanner", true);
+    });
+  });
   // One "add to planner" per mosaic tile (Gilles, 2026-10-21: "pour chacun
   // de ces centres il faut envoyer un ordre 'add to planner' avec le nom
   // de l'objet avec un suffixe, et les bonnes coordonnees") - same
@@ -165,7 +210,9 @@ function buildSelectionPanel(client, moduleName, getEngine, getSimTime) {
   // per (row,col) with that tile's own centre (mosaicTileCenterRaDec(),
   // pure RA/Dec tangent-plane geometry - no observer/date/live view
   // involved, unlike the dome's own preview rendering) and a name
-  // suffixed "<name> Mosaic - <row>x<col>" (1-indexed).
+  // suffixed "<name> Mosaic - <row>x<col>" (1-indexed). FOV checked before
+  // even asking for a profile - no point picking one for a mosaic that
+  // can't be computed anyway.
   mosaicToPlannerBtn.addEventListener("click", () => {
     if (!lastObj) return;
     const engine = getEngine();
@@ -173,23 +220,26 @@ function buildSelectionPanel(client, moduleName, getEngine, getSimTime) {
       showToast(t("navigator.mosaicNoFov"), 2);
       return;
     }
-    const cols = Math.max(1, engine.mosaicCols || 1);
-    const rows = Math.max(1, engine.mosaicRows || 1);
-    const overlapFraction = Math.max(0, Math.min(0.9, (engine.mosaicOverlapPercent || 0) / 100));
-    const baseName = lastName || t("navigator.point");
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        const { ra, dec } = mosaicTileCenterRaDec(
-          lastObj.ra, lastObj.dec, engine.sensorFovWidthDeg, engine.sensorFovHeightDeg,
-          engine.sensorOrientationDeg, cols, rows, col, row, overlapFraction,
-        );
-        const tileName = `${baseName} Mosaic - ${row + 1}x${col + 1}`;
-        client.setValue(moduleName, "target", "targetname", tileName);
-        client.setValue(moduleName, "target", "targetra", ra / 15); // degrees -> hours, see onSelect()'s own comment
-        client.setValue(moduleName, "target", "targetde", dec);
-        client.setValue(moduleName, "actions", "addtoplanner", true);
+    openSequencerProfilePicker(client, (profile) => {
+      const cols = Math.max(1, engine.mosaicCols || 1);
+      const rows = Math.max(1, engine.mosaicRows || 1);
+      const overlapFraction = Math.max(0, Math.min(0.9, (engine.mosaicOverlapPercent || 0) / 100));
+      const baseName = lastName || t("navigator.point");
+      client.setValue(moduleName, "target", "targetprofile", profile);
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const { ra, dec } = mosaicTileCenterRaDec(
+            lastObj.ra, lastObj.dec, engine.sensorFovWidthDeg, engine.sensorFovHeightDeg,
+            engine.sensorOrientationDeg, cols, rows, col, row, overlapFraction,
+          );
+          const tileName = `${baseName} Mosaic - ${row + 1}x${col + 1}`;
+          client.setValue(moduleName, "target", "targetname", tileName);
+          client.setValue(moduleName, "target", "targetra", ra / 15); // degrees -> hours, see onSelect()'s own comment
+          client.setValue(moduleName, "target", "targetde", dec);
+          client.setValue(moduleName, "actions", "addtoplanner", true);
+        }
       }
-    }
+    });
   });
 
   let lastObj = null;
