@@ -1006,6 +1006,7 @@ export class SkyEngine {
     // groundClipActive tracks whether render() needs its own matching
     // ctx.restore() at the very end.
     let groundClipActive = false;
+    let groundPolyToPaint = null; // ground-branch only, see below - painted AFTER everything else instead of clipped during it
     if (this.showTrueHorizon) {
       const skyPoly = computeSkyPolygon(domeRadius, this.rotation, this.projection);
       if (skyPoly === "none") {
@@ -1020,31 +1021,22 @@ export class SkyEngine {
       } else if (skyPoly && skyPoly.isGroundPoly) {
         // The dome's own centre is itself below the horizon - computeSkyPolygon()
         // traced the GROUND region instead (the only side that's actually
-        // star-shaped from that centre, see its own doc comment). Paint
-        // just that polygon ground-coloured directly, no need to blanket
-        // the whole dome first and undo it afterwards like the sky-traced
-        // branch below does - everything outside it already has its
-        // normal background (opaque bgColor, or left transparent for
-        // showHips) from the top of render(). Then clip everything drawn
-        // after this to the complement (circle minus that polygon) via an
-        // evenodd path - same resulting clip region as the other branch,
-        // reached from the opposite side.
-        ctx.fillStyle = fg.ground;
-        ctx.beginPath();
-        skyPoly.points.forEach((p, i) => {
-          if (i === 0) ctx.moveTo(cx + p.x, cy + p.y); else ctx.lineTo(cx + p.x, cy + p.y);
-        });
-        ctx.closePath();
-        ctx.fill();
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(cx, cy, domeRadius, 0, 2 * Math.PI);
-        skyPoly.points.forEach((p, i) => {
-          if (i === 0) ctx.moveTo(cx + p.x, cy + p.y); else ctx.lineTo(cx + p.x, cy + p.y);
-        });
-        ctx.closePath();
-        ctx.clip("evenodd");
-        groundClipActive = true;
+        // star-shaped from that centre, see its own doc comment). Rather
+        // than clip() the rest of this render() call to the complement of
+        // this polygon (circle minus ground, needing a compound two-subpath
+        // evenodd clip - the only place this file ever did that), leave
+        // everything below free to draw normally everywhere, including
+        // where ground will end up, and just paint this polygon ground-
+        // coloured ON TOP at the very end (see groundPolyToPaint below) -
+        // same final pixels, since the ground fill is fully opaque, but no
+        // complex clip region for every single star/grid-line/label draw
+        // call in between to be tested against. A reported startup latency
+        // regression (worst right after a reload, when the saved view
+        // often starts out looking below the horizon) turned out to trace
+        // back to verbose console logging during the investigation itself
+        // rather than this clip, but the simpler no-clip version here is
+        // still the better default regardless.
+        groundPolyToPaint = skyPoly.points;
       } else if (skyPoly) {
         ctx.fillStyle = fg.ground;
         ctx.beginPath();
@@ -1696,6 +1688,19 @@ export class SkyEngine {
     }
 
     if (groundClipActive) ctx.restore(); // matches the ctx.save() in the ground-mask block above
+
+    // Ground-branch deferred paint - see groundPolyToPaint's own assignment
+    // above for why this happens here (after every star/grid-line/label
+    // draw call above) instead of as an upfront clip.
+    if (groundPolyToPaint) {
+      ctx.fillStyle = fg.ground;
+      ctx.beginPath();
+      groundPolyToPaint.forEach((p, i) => {
+        if (i === 0) ctx.moveTo(cx + p.x, cy + p.y); else ctx.lineTo(cx + p.x, cy + p.y);
+      });
+      ctx.closePath();
+      ctx.fill();
+    }
 
     // HiPS background sync (js/hips-background.js) - fires every render(),
     // not just showHips-gated, so Aladin is already caught up the instant
