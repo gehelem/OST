@@ -575,8 +575,6 @@ input[type="range"]::-moz-range-thumb {
  * canvas look as .altitude-chart above, just square and centred rather
  * than full-width (it has no horizontal interaction to stretch for). */
 .polar-error-canvas { display: block; width: 160px; height: 160px; margin: var(--space-2) auto 0; border-radius: var(--radius-sm); border: 1px solid var(--border); }
-.polar-error-rows { margin-top: var(--space-2); font-family: var(--font-mono); font-size: 12.5px; }
-.polar-error-row { line-height: 1.6; }
 
 /* Bordered/accented "value box" look, born on guider's own "values" panel
  * (Gilles, 2026-10-03: "rends-la plus graphique") for its RMS figures
@@ -598,7 +596,12 @@ input[type="range"]::-moz-range-thumb {
 .pulse-bar-center { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--border-strong); }
 .pulse-bar-fill { position: absolute; top: 0; bottom: 0; background: var(--accent); }
 .pulse-bar-value { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text); text-shadow: 0 0 3px var(--bg), 0 0 3px var(--bg), 0 0 3px var(--bg); pointer-events: none; }
-.cal-quality-row { display: flex; align-items: center; gap: var(--space-1); margin-top: var(--space-3); }
+/* Dot + label row, born on guider's own calibration-quality line
+ * (renamed from .cal-quality-row once polar's own azimuth/altitude/total
+ * error rows wanted the same look - same "rename once a second module
+ * wants it" pattern as .value-row/.value-box above). */
+.status-row { display: flex; align-items: center; gap: var(--space-1); margin-top: var(--space-3); }
+.status-row + .status-row { margin-top: var(--space-1); }
 
 /* OST server discovery (Android app only, js/zeroconf.js) - #discover-row
  * is hidden by default (app.js only shows it once zeroconf.isAvailable()

@@ -584,7 +584,7 @@ function buildValuesPanel(client, moduleName) {
     // detail a cet endroit ... laisse juste le calibration quality en
     // petit sous les pulses".
     if (calQualEl) {
-      wrap.appendChild(el("div", { class: "cal-quality-row" }, [
+      wrap.appendChild(el("div", { class: "status-row" }, [
         statusDot(calQualEl.value),
         el("span", { class: "muted small", text: calQualEl.label || "Calibration quality" }),
       ]));

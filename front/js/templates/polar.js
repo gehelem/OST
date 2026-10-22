@@ -17,7 +17,7 @@
 // template doesn't explicitly list.
 
 import { buildScaffoldTemplate } from "./scaffold.js";
-import { el } from "../dom.js";
+import { el, statusDot } from "../dom.js";
 
 // Small canvas arrow, tip at (x1,y1) - shared by the azimuth/altitude
 // arrows below, same simple "line + triangular head" look used elsewhere
@@ -41,14 +41,24 @@ function drawArrow(ctx, x0, y0, x1, y1, color) {
 }
 
 // Below 0.5' a polar alignment is good, past 10' it's bad enough to be
-// worth fixing before imaging - same three-band read the numeric rows
+// worth fixing before imaging - same three-band read the status dots
 // below use, on the arcmin figure (the finer-grained of the two units
 // "errors" carries, same value as the degree one, just rescaled).
-function errorColor(arcmin) {
+// Returns a statusDot()-style index (dom.js: 1 ok/green, 2 busy/amber, 3
+// error/red).
+function errorStatus(arcmin) {
   const a = Math.abs(arcmin);
-  if (a < 0.5) return "#66bb6a";
-  if (a <= 10) return "#ffca28";
-  return "#ef5350";
+  if (a < 0.5) return 1;
+  if (a <= 10) return 2;
+  return 3;
+}
+
+// Server labels end in a bare "°" (structure.en.md: labels come already
+// translated) - dropped here since the degree VALUE already carries its
+// own ° right next to it; keeping the label's own trailing one too would
+// just print it twice.
+function stripDegSuffix(label, fallback) {
+  return label ? label.replace(/\s*°\s*$/, "") : fallback;
 }
 
 // Graphical read of "errors" (Polar error) - a horizontal arrow for
@@ -58,27 +68,21 @@ function errorColor(arcmin) {
 // regardless of how big either one actually is. Sign sets direction:
 // positive azimuth error points right, positive altitude error points
 // up (screen-space y grows downward, hence the unary minus). The actual
-// figures go in three rows below the canvas instead of printed on top
-// of the arrows themselves (Gilles, 2026-10-22: illegible there), each
-// colored by errorColor() above.
+// figures go in three status-dot rows below the canvas (dom.js's own
+// statusDot(), same look as every other status line in this app) rather
+// than printed on top of the arrows themselves (Gilles, 2026-10-22:
+// illegible there).
 function buildPolarErrorArrows(client, moduleName) {
   const w = 160, h = 160;
   const canvas = el("canvas", { class: "polar-error-canvas", width: String(w), height: String(h) });
   const ctx = canvas.getContext("2d");
   const cx = w / 2, cy = h / 2;
   const maxLen = Math.min(w, h) / 2 - 16;
-  const rows = el("div", { class: "polar-error-rows" });
-  const altRow = el("div", { class: "polar-error-row" });
-  const azRow = el("div", { class: "polar-error-row" });
-  const totRow = el("div", { class: "polar-error-row" });
-  rows.append(altRow, azRow, totRow);
+  const rows = el("div");
   const fmtSigned = (deg) => `${deg >= 0 ? "+" : ""}${deg.toFixed(2)}°`;
-  function setRow(row, label, deg, arcmin, signed) {
-    row.style.color = errorColor(arcmin);
-    row.textContent = `${label} ${signed ? fmtSigned(deg) : deg.toFixed(2) + "°"} - ${arcmin.toFixed(2)}'`;
-  }
   const unsub = client.subscribe(client.topics.property(moduleName, "errors"), (prop) => {
     ctx.clearRect(0, 0, w, h);
+    rows.innerHTML = "";
     if (!prop) return;
     const e = prop.elements;
     const az = (e.erraz && e.erraz.value) || 0;
@@ -97,9 +101,18 @@ function buildPolarErrorArrows(client, moduleName) {
     drawArrow(ctx, cx, cy, cx + az * scale, cy, "#4fc3f7");
     drawArrow(ctx, cx, cy, cx, cy - alt * scale, "#ffb74d");
 
-    setRow(altRow, "Alt", alt, altmn, true);
-    setRow(azRow, "Az", az, azmn, true);
-    setRow(totRow, "Tot", tot, totmn, false);
+    rows.appendChild(el("div", { class: "status-row" }, [
+      statusDot(errorStatus(altmn)),
+      el("span", { class: "muted small", text: `${stripDegSuffix(e.erralt && e.erralt.label, "Altitude error")} ${fmtSigned(alt)} ${altmn.toFixed(2)}'` }),
+    ]));
+    rows.appendChild(el("div", { class: "status-row" }, [
+      statusDot(errorStatus(azmn)),
+      el("span", { class: "muted small", text: `${stripDegSuffix(e.erraz && e.erraz.label, "Azimuth error")} ${fmtSigned(az)} ${azmn.toFixed(2)}'` }),
+    ]));
+    rows.appendChild(el("div", { class: "status-row" }, [
+      statusDot(errorStatus(totmn)),
+      el("span", { class: "muted small", text: `${stripDegSuffix(e.errtot && e.errtot.label, "Total error")} ${tot.toFixed(2)}° ${totmn.toFixed(2)}'` }),
+    ]));
   });
   const wrap = el("div");
   wrap.append(canvas, rows);
