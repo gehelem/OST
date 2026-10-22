@@ -34,7 +34,10 @@ import { buildScaffoldTemplate } from "./scaffold.js";
 export const mount = buildScaffoldTemplate([
   { id: "planning", x: 20, y: 92, w: 420, icon: "list", iconOnly: true, framed: false },
   { id: "liveplanning", x: 460, y: 92, w: 460, icon: "browse_activity", iconOnly: true, framed: false },
-  { id: "progress", x: 20, y: 330, w: 300, icon: "progress_activity", iconOnly: true, framed: false },
+  // Folded into the Actions panel's own optional slot instead of its own
+  // standalone window (Gilles, 2026-10-22) - same move as inspector's
+  // Analysis selection.
+  { id: "progress", foldIntoActions: true },
 ], undefined, {
   otherPanel: false,
   imageQuickPanel: false,
