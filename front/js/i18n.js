@@ -250,8 +250,6 @@ const STRINGS = {
   "navigator.zoom": { en: "Zoom", fr: "Zoom", de: "Zoom", it: "Zoom", es: "Zoom" },
   "navigator.displaySettings": { en: "Display settings", fr: "Réglages d'affichage", de: "Anzeigeeinstellungen", it: "Impostazioni di visualizzazione", es: "Ajustes de visualización" },
   "navigator.settingsQuicknav": { en: "Settings", fr: "Réglages", de: "Einstellungen", it: "Impostazioni", es: "Ajustes" },
-  "navigator.timeNav": { en: "Time navigator", fr: "Navigation temporelle", de: "Zeitnavigator", it: "Navigatore temporale", es: "Navegador temporal" },
-  "navigator.timeNavQuicknav": { en: "Time", fr: "Temps", de: "Zeit", it: "Tempo", es: "Tiempo" },
   "navigator.centerOnMount": { en: "Center on mount", fr: "Centrer sur la monture", de: "Auf Montierung zentrieren", it: "Centra sulla montatura", es: "Centrar en la montura" },
   "navigator.search": { en: "Search", fr: "Recherche", de: "Suche", it: "Ricerca", es: "Búsqueda" },
   "navigator.searchPlaceholder": { en: "Object name...", fr: "Nom de l'objet...", de: "Objektname...", it: "Nome dell'oggetto...", es: "Nombre del objeto..." },

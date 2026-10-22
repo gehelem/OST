@@ -151,7 +151,8 @@ export function moduleLifecycle(client, moduleName, build, extraDispose) {
  *     "addtoplanner" goes through a Sequencer-profile picker there, not a
  *     bare toggle).
  *   - node: appended right after the generic buttons, before the last-log
- *     line footer.
+ *     line footer - a single node, or an array of them (each in its own
+ *     slot, in order) when more than one piece of content is folded in.
  */
 export function renderActionsPanel(client, moduleName, mod, track, quickNavEntries, pos, extra) {
   if (!("actions" in mod.properties)) return;
@@ -159,7 +160,8 @@ export function renderActionsPanel(client, moduleName, mod, track, quickNavEntri
   const label = mod.properties.actions.label || t("common.actions");
   const b = Panels.make({ id: "actions", title: label, x: p.x, y: p.y, w: p.w });
   b.appendChild(track(renderProperty(client, moduleName, "actions", { framed: false, excludeElements: extra && extra.excludeElements })));
-  if (extra && extra.node) b.appendChild(track(extra.node));
+  const extraNodes = extra && extra.node ? [].concat(extra.node) : [];
+  for (const n of extraNodes) b.appendChild(track(n));
   b.appendChild(track(renderLastLogLine(client, moduleName)));
   quickNavEntries.push({ id: "actions", label, icon: "apps", iconOnly: true });
 }

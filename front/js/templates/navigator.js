@@ -13,9 +13,11 @@
 // Selection (Gilles, 2026-09-29: "point epineux : la selection d'un objet,
 // on fait comment ?"): a tap/click on the dome (sky-engine.js's own
 // onSelect, not a right-click/long-press — see that file's header for the
-// mobile-compatibility reasoning) opens/updates a regular "Selection"
-// panel with the picked object's info + GOTO/Add-to-planner buttons - same
-// interaction language as the rest of this app, no context menu anywhere.
+// mobile-compatibility reasoning) updates the picked object's info + GOTO/
+// Add-to-planner state - same interaction language as the rest of this
+// app, no context menu anywhere. Originally its own floating "Selection"
+// panel, later folded into "Actions" together with the time navigator
+// (Gilles, 2026-10-22), see renderActionsPanel()'s own doc comment.
 //
 // Still not wired: search/results (text search still only reachable via
 // the generic "Other" catch-all panel), the horizon/terrestrial and
@@ -1149,6 +1151,13 @@ export function mount(client, moduleName) {
       selection.onTimeChange();
     }
 
+    // Time navigator - folded into Actions too, same move as Selection
+    // just above (Gilles, 2026-10-22: "integre la fonction de la fenetre
+    // 'time navigator' dans la fenetre actions"). Only buildable once
+    // there's an engine to drive it, same guard the settings/mosaic panels
+    // further down already use.
+    const timeNavNode = sky.engine ? buildTimeNavPanel(sky.engine, () => simulatedTime, setSimTime) : null;
+
     // No "header" panel any more (render.js's own renderModuleView doc
     // comment: Gilles, 2026-10-03, "la supprimer completement").
 
@@ -1157,16 +1166,18 @@ export function mount(client, moduleName) {
     // first (focus.js/guider.js's own build()); navigator.js was the one
     // outlier, pushing it after Selection/Settings/Time instead.
     //
-    // Selection used to be its own panel; folded in here instead (Gilles,
-    // 2026-10-22: "ce qui me permettrait de supprimer la fenetre
-    // selection"), appended via `extra.node` right after the original
-    // generic action buttons ("Center target"/"Add to planner"/"Abort
-    // navigator", unchanged - "les boutons actions originaux doivent
-    // rester"). The complement below them is whatever Selection had that
-    // isn't already one of those: the mosaic variant (no single-action
-    // equivalent) plus the selected object's own info/altitude chart.
+    // Selection (and now the time navigator) used to be their own panels;
+    // folded in here instead (Gilles, 2026-10-22: "ce qui me permettrait
+    // de supprimer la fenetre selection", then "integre la fonction de la
+    // fenetre 'time navigator' dans la fenetre actions"), appended via
+    // `extra.node` right after the original generic action buttons
+    // ("Center target"/"Add to planner"/"Abort navigator", unchanged -
+    // "les boutons actions originaux doivent rester"). Selection's own
+    // complement is whatever it had beyond those: the mosaic variant (no
+    // single-action equivalent) plus the selected object's own
+    // info/altitude chart.
     renderActionsPanel(client, moduleName, mod, track, quickNavEntries, undefined, {
-      node: selection.node,
+      node: [selection.node, timeNavNode].filter(Boolean),
     });
 
     // "Search" (Gilles, 2026-10-06: "nouveau bouton 'search' ... associe a
@@ -1197,10 +1208,6 @@ export function mount(client, moduleName) {
       // icon/iconOnly fields as the Stats/Guiding graph/Drift buttons just
       // before).
       quickNavEntries.push({ id: "settings", label: t("navigator.settingsQuicknav"), icon: "tune", iconOnly: true });
-
-      const timeNavPanel = Panels.make({ id: "timenav", title: t("navigator.timeNav"), x: 340, y: 463, w: 300, collapsed: true });
-      timeNavPanel.appendChild(track(buildTimeNavPanel(sky.engine, () => simulatedTime, setSimTime)));
-      quickNavEntries.push({ id: "timenav", label: t("navigator.timeNavQuicknav"), icon: "schedule", iconOnly: true });
 
       // Mosaic definition - own panel (not nested inside Settings) so it
       // can stay open, draggable, next to the dome while its grid updates
