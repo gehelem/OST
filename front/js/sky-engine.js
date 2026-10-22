@@ -1740,6 +1740,27 @@ export class SkyEngine {
           for (let i = 1; i < tileCorners.length; i++) ctx.lineTo(tileCorners[i].x, tileCorners[i].y);
           ctx.closePath();
           ctx.stroke();
+
+          // Tile label ("L<row>C<col>", 1-indexed) - same hue as the tile
+          // outline but lighter (lower alpha), sized off the tile's own
+          // rendered height so it scales with zoom like the outline does.
+          const tileCx = (tileCorners[0].x + tileCorners[1].x + tileCorners[2].x + tileCorners[3].x) / 4;
+          const tileCy = (tileCorners[0].y + tileCorners[1].y + tileCorners[2].y + tileCorners[3].y) / 4;
+          const tileTopMidX = (tileCorners[0].x + tileCorners[1].x) / 2;
+          const tileTopMidY = (tileCorners[0].y + tileCorners[1].y) / 2;
+          const tileBotMidX = (tileCorners[2].x + tileCorners[3].x) / 2;
+          const tileBotMidY = (tileCorners[2].y + tileCorners[3].y) / 2;
+          const tileHeightPx = Math.hypot(tileBotMidX - tileTopMidX, tileBotMidY - tileTopMidY);
+          const labelFontPx = tileHeightPx * (1 / 3);
+          if (labelFontPx > 2) {
+            ctx.save();
+            ctx.fillStyle = "rgba(255, 152, 0, 0.55)";
+            ctx.font = `${labelFontPx}px sans-serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(`L${row + 1}C${col + 1}`, tileCx, tileCy);
+            ctx.restore();
+          }
         }
       }
 
