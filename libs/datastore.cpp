@@ -24,14 +24,21 @@ void Datastore::setMetadata(const QString key, const QVariant value)
 
 OST::PropertyMulti* Datastore::getProperty(QString pProperty)
 {
-    if (!mStore.contains(pProperty))
+    OST::PropertyMulti* result;
+    bool found;
+    {
+        QMutexLocker locker(&mStoreMutex);
+        found = mStore.contains(pProperty);
+        result = mStore[pProperty];
+    }
+    if (!found)
     {
         qDebug() << "getProperty - property not found :" << pProperty;
         logWarning("getProperty - property %1 not found", {pProperty});
         //return nullptr;
     }
 
-    return mStore[pProperty];
+    return result;
 }
 OST::ElementBase* Datastore::getEltBase(QString pProperty, QString pElement)
 {
@@ -391,10 +398,13 @@ void Datastore::loadOstPropertiesFromFile(const QString &pFileName)
             OST::PropertyMulti *rp = OST::PropertyFactory::createProperty(key, tt);
             if (rp != nullptr)
             {
-                mStore[key] = rp;
+                {
+                    QMutexLocker locker(&mStoreMutex);
+                    mStore[key] = rp;
+                }
                 connect(rp, &OST::PropertyMulti::prpEvent, this, &Datastore::onPropertyEvent);
                 connect(rp, &OST::PropertyMulti::logMessage, this, &Datastore::onPropertyLog);
-                mStore[key]->setState(OST::State::Idle, true);
+                rp->setState(OST::State::Idle, true);
 
             }
             else
@@ -530,19 +540,25 @@ QVariantMap Datastore::getProfile(void)
 
 void Datastore::deleteOstProperty(const QString &pPropertyName)
 {
-    if (!mStore.contains(pPropertyName))
+    OST::PropertyMulti* taken;
     {
-        logWarning("Can't delete inexistant property %1", {pPropertyName});
-        return;
+        QMutexLocker locker(&mStoreMutex);
+        if (!mStore.contains(pPropertyName))
+        {
+            locker.unlock();
+            logWarning("Can't delete inexistant property %1", {pPropertyName});
+            return;
+        }
+        // Issue #233 - was `mStore.remove(pPropertyName)`: QMap::remove()
+        // only drops the map entry, it never calls delete on the pointer
+        // that was in it - take() gets the same removal plus the pointer
+        // back, so it can actually be freed. PropertyMulti's own destructor
+        // (fixed alongside this one) now frees its elements in turn, so this
+        // one delete cascades correctly instead of leaking the whole
+        // property/element subtree on every deletion, not just a module kill.
+        taken = mStore.take(pPropertyName);
     }
-    // Issue #233 - was `mStore.remove(pPropertyName)`: QMap::remove()
-    // only drops the map entry, it never calls delete on the pointer
-    // that was in it - take() gets the same removal plus the pointer
-    // back, so it can actually be freed. PropertyMulti's own destructor
-    // (fixed alongside this one) now frees its elements in turn, so this
-    // one delete cascades correctly instead of leaking the whole
-    // property/element subtree on every deletion, not just a module kill.
-    delete mStore.take(pPropertyName);
+    delete taken;
     emit datastoreEvent(OST::EvType::dp, pPropertyName, nullptr,  nullptr, nullptr, this);
 }
 

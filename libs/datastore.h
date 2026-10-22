@@ -4,6 +4,8 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
+#include <QMutex>
+#include <QMutexLocker>
 #include <propertytextdumper.h>
 #include <propertyjsondumper.h>
 #include <propertyupdate.h>
@@ -62,6 +64,7 @@ class Datastore : public QObject
         };
         QMap<QString, OST::PropertyMulti*> getStore(void)
         {
+            QMutexLocker locker(&mStoreMutex);
             return mStore;
         }
         QMap<QString, OST::LovBase*> getGlobLovs(void)
@@ -98,14 +101,18 @@ class Datastore : public QObject
         OST::LovString* getGlovString(QString pLov);
         bool createProperty(OST::PropertyMulti* pProperty)
         {
-            if (mStore.contains(pProperty->key()))
             {
-                logWarning("createProperty - property %1 already exists.", {pProperty->key()});
-                return false;
+                QMutexLocker locker(&mStoreMutex);
+                if (mStore.contains(pProperty->key()))
+                {
+                    locker.unlock();
+                    logWarning("createProperty - property %1 already exists.", {pProperty->key()});
+                    return false;
+                }
+                mStore[pProperty->key()] = pProperty;
             }
-            mStore[pProperty->key()] = pProperty;
-            connect(mStore[pProperty->key()], &OST::PropertyMulti::prpEvent, this, &Datastore::onPropertyEvent);
-            connect(mStore[pProperty->key()], &OST::PropertyMulti::logMessage, this, &Datastore::onPropertyLog);
+            connect(pProperty, &OST::PropertyMulti::prpEvent, this, &Datastore::onPropertyEvent);
+            connect(pProperty, &OST::PropertyMulti::logMessage, this, &Datastore::onPropertyLog);
             onPropertyEvent(OST::EvType::ap, QVariant(), nullptr, pProperty); // force property creation event
             return true;
         }
@@ -172,6 +179,14 @@ class Datastore : public QObject
         void logCritical(const QString &message, const QVariantList &args = {});
 
     private:
+        // mStore is read (getProperty()/getStore()) from whatever thread
+        // delivers a queued datastoreEvent - typically the Qt main thread -
+        // while a module can insert/delete a property from an INDI client
+        // callback running on that connection's own socket thread
+        // (IndiModule inherits INDI::BaseClient directly, uncoupled from
+        // any particular thread). mStoreMutex keeps those from touching the
+        // underlying QMap at the same time.
+        mutable QMutex mStoreMutex;
         QMap<QString, OST::PropertyMulti*> mStore;
         QMap<QString, OST::LovBase*> mGlobLov;
         QVariantMap mMetadata;
