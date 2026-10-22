@@ -176,7 +176,19 @@ export class Datastore {
    * null when the element has no LOV at all.
    */
   resolveLov(moduleName, element) {
-    if (element.listOfValues) return element.listOfValues;
+    if (element.listOfValues) {
+      // Local LOVs are wire-encoded as an ordered array of [value, label]
+      // pairs (e.g. inspector.json's zoning, sequencer.json's frametype),
+      // not the {value: label} map every other LOV source (globallov)
+      // already is - normalize here so callers can treat every LOV the
+      // same way regardless of source.
+      if (Array.isArray(element.listOfValues)) {
+        const map = {};
+        for (const pair of element.listOfValues) map[pair[0]] = pair[1];
+        return map;
+      }
+      return element.listOfValues;
+    }
     if (!element.globallov) return null;
     const mod = this.modules[moduleName];
     let lov;

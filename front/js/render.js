@@ -279,9 +279,17 @@ function buildEditControl(client, moduleName, el_, elName, buffer, opts) {
     // devices.camera/.mount/... (indimodule.cpp's giveMeADevice(), shared
     // by nearly every module) - a device not yet in the catalog still has
     // to be typeable by hand, by design, not a bug to route around.
+    // Each suggestion's `value` is the real stored value (what lands in
+    // the field, and what gets sent on commit below) - its `label` is
+    // only the displayed suggestion text, per the datalist spec's own
+    // value/label split for exactly this "shown text differs from
+    // submitted value" case (e.g. zoning's int keys / "04x04"-style
+    // labels). For a LOV where key and label are already the same string
+    // (e.g. a device name), this is a no-op - both attributes end up
+    // identical, same as before.
     const listId = "lov-opts-" + (++lovDatalistSeq);
     const datalist = el("datalist", { id: listId });
-    for (const label of new Set(Object.values(lov))) datalist.appendChild(el("option", { value: label }));
+    for (const [k, label] of Object.entries(lov)) datalist.appendChild(el("option", { value: k, label }));
     const input = el("input", { type: "text", class: "field-input", list: listId, value: buffer[elName] ?? "" });
     // The browser filters the datalist's own suggestion dropdown against
     // whatever text is already in the field, so an existing value hides
@@ -296,7 +304,13 @@ function buildEditControl(client, moduleName, el_, elName, buffer, opts) {
     });
     input.addEventListener("change", () => {
       if (input.value === "") return; // restored on blur below, nothing picked/typed
-      buffer[elName] = input.value;
+      // Free-typed text still works for any value the LOV doesn't list
+      // (e.g. zoning's 11, outside its suggested squares) - only a picked
+      // suggestion's own numeric key goes through parseInt/parseFloat
+      // cleanly; a typed non-numeric string on an int/float element is
+      // left to the backend's own validation, same as every other field.
+      const n = type === "int" ? parseInt(input.value, 10) : type === "float" ? parseFloat(input.value) : NaN;
+      buffer[elName] = Number.isNaN(n) ? input.value : n;
       if (opts && opts.onChange) opts.onChange();
     });
     input.addEventListener("blur", () => {
