@@ -139,13 +139,27 @@ export function moduleLifecycle(client, moduleName, build, extraDispose) {
  * "apps" (the classic multi-square grid) is a deliberate choice, not a
  * stand-in for "dashboard_customize" (which does resolve fine now). The
  * panel's own title bar is unaffected, it keeps its normal text label.
+ *
+ * `extra` lets a template fold its own module-specific content into this
+ * same panel instead of keeping it in a separate one (Gilles, 2026-10-22,
+ * on navigator.js's "Actions" vs "Selection": "la partie optionnelle
+ * devrait inclure les choses non redondantes de selection ... ce qui me
+ * permettrait de supprimer la fenetre selection"):
+ *   - excludeElements: action names to skip from the generic bool-button
+ *     render below, because the caller's own `node` already exposes that
+ *     same command through a richer control (e.g. navigator.js's
+ *     "addtoplanner" goes through a Sequencer-profile picker there, not a
+ *     bare toggle).
+ *   - node: appended right after the generic buttons, before the last-log
+ *     line footer.
  */
-export function renderActionsPanel(client, moduleName, mod, track, quickNavEntries, pos) {
+export function renderActionsPanel(client, moduleName, mod, track, quickNavEntries, pos, extra) {
   if (!("actions" in mod.properties)) return;
   const p = { x: 20, y: 210, w: 300, ...pos };
   const label = mod.properties.actions.label || t("common.actions");
   const b = Panels.make({ id: "actions", title: label, x: p.x, y: p.y, w: p.w });
-  b.appendChild(track(renderProperty(client, moduleName, "actions", { framed: false })));
+  b.appendChild(track(renderProperty(client, moduleName, "actions", { framed: false, excludeElements: extra && extra.excludeElements })));
+  if (extra && extra.node) b.appendChild(track(extra.node));
   b.appendChild(track(renderLastLogLine(client, moduleName)));
   quickNavEntries.push({ id: "actions", label, icon: "apps", iconOnly: true });
 }
@@ -722,7 +736,10 @@ function openPropertyEditDialog(client, moduleName, propName, prop, formable) {
   (dialogRoot || document.body).appendChild(overlay);
 }
 
-function renderPropertyBody(client, moduleName, propName, prop, editTracker) {
+// excludeElements: element names skipped entirely (e.g. a caller showing
+// the same action through its own richer control elsewhere - see
+// renderActionsPanel()'s own doc comment).
+function renderPropertyBody(client, moduleName, propName, prop, editTracker, excludeElements) {
   const body = el("div", { class: "prop-body" });
 
   // freevalue is documented as a generic display field (structure.en.md),
@@ -776,6 +793,7 @@ function renderPropertyBody(client, moduleName, propName, prop, editTracker) {
     buttonRun = null;
   }
   for (const name of orderedElementNames(prop.elements)) {
+    if (excludeElements && excludeElements.includes(name)) continue;
     const e = prop.elements[name];
     const permOk = (prop.permission === 1 || prop.permission === 2) && prop.enabled !== false;
     const isGroupBtn = boolGroup.includes(name) && permOk;
@@ -964,7 +982,7 @@ export function renderProperty(client, moduleName, propName, opts) {
       }
       container.appendChild(header);
     }
-    container.appendChild(renderPropertyBody(client, moduleName, propName, prop, editTracker));
+    container.appendChild(renderPropertyBody(client, moduleName, propName, prop, editTracker, opts && opts.excludeElements));
   }
 
   const editTracker = {

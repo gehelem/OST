@@ -210,8 +210,6 @@ const STRINGS = {
 
   // ---- templates/navigator.js: the planetarium screen ---------------------
   "navigator.tapToSelect": { en: "Tap a star or object on the sky to select it.", fr: "Touchez une étoile ou un objet du ciel pour le sélectionner.", de: "Tippen Sie auf einen Stern oder ein Objekt am Himmel, um es auszuwählen.", it: "Tocca una stella o un oggetto del cielo per selezionarlo.", es: "Toque una estrella u objeto del cielo para seleccionarlo." },
-  "navigator.goto": { en: "GOTO", fr: "GOTO", de: "GOTO", it: "GOTO", es: "GOTO" },
-  "navigator.addToPlanner": { en: "Add to planner", fr: "Ajouter au planificateur", de: "Zum Planer hinzufügen", it: "Aggiungi al pianificatore", es: "Añadir al planificador" },
   "navigator.addMosaicToPlanner": { en: "Add mosaic to planner", fr: "Ajouter la mosaïque au planificateur", de: "Mosaik zum Planer hinzufügen", it: "Aggiungi mosaico al pianificatore", es: "Añadir mosaico al planificador" },
   "navigator.mosaicNoFov": { en: "Sensor field of view not available yet (camera/optics not configured)", fr: "Champ du capteur indisponible (caméra/optique non configurée)", de: "Sensor-Gesichtsfeld noch nicht verfügbar (Kamera/Optik nicht konfiguriert)", it: "Campo del sensore non disponibile (fotocamera/ottica non configurata)", es: "Campo del sensor no disponible (cámara/óptica no configurada)" },
   "navigator.chooseSequencerProfile": { en: "Choose a sequencer profile", fr: "Choisir un profil de séquenceur", de: "Sequenzer-Profil wählen", it: "Scegli un profilo del sequencer", es: "Elige un perfil de secuenciador" },
@@ -250,7 +248,6 @@ const STRINGS = {
   "navigator.catalogDepth.deepShort": { en: "Deep", fr: "Profond", de: "Tief", it: "Profondo", es: "Profundo" },
   "navigator.catalogDepth.fullShort": { en: "Full", fr: "Complet", de: "Vollständig", it: "Completo", es: "Completo" },
   "navigator.zoom": { en: "Zoom", fr: "Zoom", de: "Zoom", it: "Zoom", es: "Zoom" },
-  "navigator.selection": { en: "Selection", fr: "Sélection", de: "Auswahl", it: "Selezione", es: "Selección" },
   "navigator.displaySettings": { en: "Display settings", fr: "Réglages d'affichage", de: "Anzeigeeinstellungen", it: "Impostazioni di visualizzazione", es: "Ajustes de visualización" },
   "navigator.settingsQuicknav": { en: "Settings", fr: "Réglages", de: "Einstellungen", it: "Impostazioni", es: "Ajustes" },
   "navigator.timeNav": { en: "Time navigator", fr: "Navigation temporelle", de: "Zeitnavigator", it: "Navigatore temporale", es: "Navegador temporal" },

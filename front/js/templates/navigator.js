@@ -156,15 +156,14 @@ function openSequencerProfilePicker(client, onConfirm) {
 function buildSelectionPanel(client, moduleName, getEngine, getSimTime) {
   const wrap = el("div");
   const info = el("div", { class: "muted small", text: t("navigator.tapToSelect") });
-  const gotoBtn = el("button", { class: "btn btn-primary btn-sm", disabled: true }, [el("span", { class: "material-icons", style: "font-size:15px;vertical-align:middle" }, "gps_fixed"), " " + t("navigator.goto")]);
-  const plannerBtn = el("button", { class: "btn btn-sm", disabled: true }, t("navigator.addToPlanner"));
-  // Mosaic definition's own own tile grid, centred on this selection
-  // (Gilles, 2026-10-21: "ajoute un bouton 'add mosaic to planner'") -
-  // same enabled/disabled gating as the other two action buttons; the
-  // actual action (what gets sent to the planner) is a follow-up step,
-  // this is the entry point.
+  // "Center target"/"Add to planner" are covered by the generic "actions"
+  // buttons above this content (Gilles, 2026-10-22: "les boutons 'actions'
+  // originaux doivent rester" - no excludeElements for them anymore, see
+  // renderActionsPanel()'s caller) - only the mosaic variant lives here,
+  // since it's not a single backend action but a loop of them (one
+  // "addtoplanner" per tile), with no generic-button equivalent possible.
   const mosaicToPlannerBtn = el("button", { class: "btn btn-sm", disabled: true }, t("navigator.addMosaicToPlanner"));
-  const actionsRow = el("div", { class: "form-row" }, [gotoBtn, plannerBtn, mosaicToPlannerBtn]);
+  const actionsRow = el("div", { class: "form-row" }, [mosaicToPlannerBtn]);
   // The "ce soir" visibility arc (Gilles, 2026-10-02, on astro2001's own
   // per-object fiche: "modifie [...] pour afficher toutes les infos sur
   // l'objet selectionne, donc faire ce joli graphique d'altitude sur
@@ -190,26 +189,20 @@ function buildSelectionPanel(client, moduleName, getEngine, getSimTime) {
   wrap.appendChild(chartCanvas);
   wrap.appendChild(infoRows);
 
-  gotoBtn.addEventListener("click", () => client.setValue(moduleName, "actions", "gototarget", true));
-  // Both planner buttons ask which Sequencer profile to use first (Gilles,
-  // 2026-10-21: the backend used to hardcode "default" - target.targetprofile
-  // is new, read by Navigator::addTargeToPlanner() instead now) - one pick
-  // per click, reused for every tile in the mosaic case ("un seul profil
-  // pour une mosaique").
-  plannerBtn.addEventListener("click", () => {
-    openSequencerProfilePicker(client, (profile) => {
-      client.setValue(moduleName, "target", "targetprofile", profile);
-      client.setValue(moduleName, "actions", "addtoplanner", true);
-    });
-  });
+  // Asks which Sequencer profile to use first (Gilles, 2026-10-21: the
+  // backend used to hardcode "default" - target.targetprofile is new, read
+  // by Navigator::addTargeToPlanner() instead now), reused for every tile
+  // ("un seul profil pour une mosaique").
+  //
   // One "add to planner" per mosaic tile (Gilles, 2026-10-21: "pour chacun
   // de ces centres il faut envoyer un ordre 'add to planner' avec le nom
   // de l'objet avec un suffixe, et les bonnes coordonnees") - same
   // target.targetname/targetra/targetde + actions.addtoplanner round trip
-  // plannerBtn's own handler uses for a single object, just repeated once
-  // per (row,col) with that tile's own centre (mosaicTileCenterRaDec(),
-  // pure RA/Dec tangent-plane geometry - no observer/date/live view
-  // involved, unlike the dome's own preview rendering) and a name
+  // the generic "Add to planner" button uses for a single object, just
+  // repeated once per (row,col) with that tile's own centre
+  // (mosaicTileCenterRaDec(), pure RA/Dec tangent-plane geometry - no
+  // observer/date/live view involved, unlike the dome's own preview
+  // rendering) and a name
   // suffixed "<name> Mosaic - <row>x<col>" (1-indexed). FOV checked before
   // even asking for a profile - no point picking one for a mosaic that
   // can't be computed anyway.
@@ -305,8 +298,6 @@ function buildSelectionPanel(client, moduleName, getEngine, getSimTime) {
     info.appendChild(el("div", { text: name }));
     info.appendChild(el("div", { class: "muted small mono", text: `RA ${fmtHours(obj.ra)}  Dec ${fmtDeg(obj.dec)}` }));
     if (obj.mag !== undefined) info.appendChild(el("div", { class: "muted small", text: t("navigator.magPrefix") + obj.mag }));
-    gotoBtn.disabled = false;
-    plannerBtn.disabled = false;
     mosaicToPlannerBtn.disabled = false;
     client.setValue(moduleName, "target", "targetname", name);
     client.setValue(moduleName, "target", "targetra", obj.ra / 15); // degrees -> hours, see this function's own doc comment
@@ -1165,14 +1156,18 @@ export function mount(client, moduleName) {
     // 'actions' en premier") - every other template already calls this
     // first (focus.js/guider.js's own build()); navigator.js was the one
     // outlier, pushing it after Selection/Settings/Time instead.
-    renderActionsPanel(client, moduleName, mod, track, quickNavEntries);
-
-    const selectionPanel = Panels.make({ id: "selection", title: t("navigator.selection"), x: 340, y: 92, w: 300 });
-    selectionPanel.appendChild(track(selection.node));
-    // Icon-only (Gilles, 2026-10-03: "bouton 'selection' => juste icone =
-    // 'left_click'" - ligature verified against the vendored font first;
-    // "left_clic" doesn't exist, "left_click" does).
-    quickNavEntries.push({ id: "selection", label: t("navigator.selection"), icon: "left_click", iconOnly: true });
+    //
+    // Selection used to be its own panel; folded in here instead (Gilles,
+    // 2026-10-22: "ce qui me permettrait de supprimer la fenetre
+    // selection"), appended via `extra.node` right after the original
+    // generic action buttons ("Center target"/"Add to planner"/"Abort
+    // navigator", unchanged - "les boutons actions originaux doivent
+    // rester"). The complement below them is whatever Selection had that
+    // isn't already one of those: the mosaic variant (no single-action
+    // equivalent) plus the selected object's own info/altitude chart.
+    renderActionsPanel(client, moduleName, mod, track, quickNavEntries, undefined, {
+      node: selection.node,
+    });
 
     // "Search" (Gilles, 2026-10-06: "nouveau bouton 'search' ... associe a
     // une nouvelle fenetre") - see buildSearchPanel()'s own header comment
