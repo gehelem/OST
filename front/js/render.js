@@ -755,7 +755,7 @@ function openPropertyEditDialog(client, moduleName, propName, prop, formable) {
 // excludeElements: element names skipped entirely (e.g. a caller showing
 // the same action through its own richer control elsewhere - see
 // renderActionsPanel()'s own doc comment).
-function renderPropertyBody(client, moduleName, propName, prop, editTracker, excludeElements) {
+function renderPropertyBody(client, moduleName, propName, prop, editTracker, excludeElements, includeElements) {
   const body = el("div", { class: "prop-body" });
 
   // freevalue is documented as a generic display field (structure.en.md),
@@ -810,6 +810,7 @@ function renderPropertyBody(client, moduleName, propName, prop, editTracker, exc
   }
   for (const name of orderedElementNames(prop.elements)) {
     if (excludeElements && excludeElements.includes(name)) continue;
+    if (includeElements && !includeElements.includes(name)) continue;
     const e = prop.elements[name];
     const permOk = (prop.permission === 1 || prop.permission === 2) && prop.enabled !== false;
     const isGroupBtn = boolGroup.includes(name) && permOk;
@@ -968,6 +969,14 @@ function renderPropertyBody(client, moduleName, propName, prop, editTracker, exc
  * fork, so a caller whose OWN window chrome already frames the property
  * (render.js's own renderActionsPanel(), currently the only one) can ask
  * for the bare element list instead of a second, redundant frame around it.
+ *
+ * `opts.includeElements` - when given, only these element names are shown
+ * (everything else in the property is skipped), for a caller that wants
+ * just one or two fields out of a property with several (Gilles,
+ * 2026-10-22: a single "parms.exposure" field folded into inspector's
+ * Actions panel, out of "parms"'s several other fields).
+ * `opts.excludeElements` is the opposite - skip only these - and the two
+ * are independent filters, not meant to be combined.
  */
 export function renderProperty(client, moduleName, propName, opts) {
   const framed = !opts || opts.framed !== false;
@@ -1013,7 +1022,7 @@ export function renderProperty(client, moduleName, propName, opts) {
       }
       container.appendChild(header);
     }
-    container.appendChild(renderPropertyBody(client, moduleName, propName, prop, editTracker, opts && opts.excludeElements));
+    container.appendChild(renderPropertyBody(client, moduleName, propName, prop, editTracker, opts && opts.excludeElements, opts && opts.includeElements));
   }
 
   const editTracker = {

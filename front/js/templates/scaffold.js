@@ -68,8 +68,13 @@ import { t } from "../i18n.js";
  * false here rather than true — Actions is already its own bordered
  * panel, so a folded spec's own inner frame is a redundant one by
  * default, same reasoning as the generic "actions" buttons already in
- * that same panel; pass `framed: true` to keep it anyway).
+ * that same panel; pass `framed: true` to keep it anyway). `spec.
+ * includeElements`, if given, is passed straight through to
+ * renderProperty() (render.js's own doc comment on it) - lets a folded
+ * spec surface just one or two fields of a bigger property instead of
+ * all of it (e.g. inspector.js's own "parms.exposure").
  *
+
  * `imagePos`: optional `{x,y,w}` override for where the image/image-stats
  * panels default to (they'd otherwise land wherever a panelSpec also put
  * something, on a module with a lot of panels).
@@ -135,7 +140,7 @@ export function buildScaffoldTemplate(panelSpecs, imagePos, opts) {
         if (spec.custom) {
           foldedNodes.push(track(spec.custom(client, moduleName)));
         } else {
-          foldedNodes.push(track(renderProperty(client, moduleName, spec.id, { framed: spec.framed === true })));
+          foldedNodes.push(track(renderProperty(client, moduleName, spec.id, { framed: spec.framed === true, includeElements: spec.includeElements })));
           for (const extra of spec.extra || []) {
             if (has(extra)) foldedNodes.push(track(renderProperty(client, moduleName, extra, { framed: spec.framed === true })));
           }
