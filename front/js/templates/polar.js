@@ -129,4 +129,13 @@ export const mount = buildScaffoldTemplate([
   // replaces "errors"'s own former standalone panel entirely, now
   // redundant with this graphical+numeric read of the same property.
   { id: "polarErrorArrows", foldIntoActions: true, customProps: ["errors"], custom: buildPolarErrorArrows },
-]);
+], undefined, {
+  // Gilles, 2026-10-22: drop the small "Image" quick-stats panel/button
+  // (background + the deeper "Stats" panel stay - same as focus.js/
+  // guider.js/sequencer.js's own imageQuickPanel:false) and the "Other"
+  // catch-all entirely - "values" (its only occupant, see this file's
+  // own header comment) stays unreachable here, matching Rooster's own
+  // polar.component.html, which never surfaces it either.
+  imageQuickPanel: false,
+  otherPanel: false,
+});
