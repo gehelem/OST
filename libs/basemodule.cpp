@@ -452,7 +452,13 @@ void Basemodule::onDatastoreEvent(OST::EvType evt, QVariant data, OST::ElementBa
     /* catch profile changes */
     if (prp)
     {
-        if (prp->hasProfile() && !this->mCurrentProfileChanged && evt != OST::EvType::ps )
+        if (prp->hasProfile() && !this->mCurrentProfileChanged
+                && evt != OST::EvType::ps
+                && evt != OST::EvType::aa
+                && evt != OST::EvType::ap
+                && evt != OST::EvType::av
+                && evt != OST::EvType::el // a local LOV refresh is decorative, never a real profile value
+           )
         {
             mCurrentProfileChanged = true;
             emit moduleEvent(OST::EvType::fc, QVariant(), nullptr, nullptr, nullptr, this);
@@ -825,7 +831,8 @@ void Basemodule::otherModuleQuery(QString mod, QString queryName, QVariantMap pa
     event.data = M;
     emit interModuleRequest(event);
 };
-void Basemodule::setStateEvent(OST::State state, QString statedescription, QString event, QString eventdescription, double valNum, int valInt, QString valStr)
+void Basemodule::setStateEvent(OST::State state, QString statedescription, QString event, QString eventdescription,
+                               double valNum, int valInt, QString valStr)
 {
     QVariantMap m;
     m["state"] = OST::StateToInt(state);

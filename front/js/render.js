@@ -139,13 +139,29 @@ export function moduleLifecycle(client, moduleName, build, extraDispose) {
  * "apps" (the classic multi-square grid) is a deliberate choice, not a
  * stand-in for "dashboard_customize" (which does resolve fine now). The
  * panel's own title bar is unaffected, it keeps its normal text label.
+ *
+ * `extra` lets a template fold its own module-specific content into this
+ * same panel instead of keeping it in a separate one (Gilles, 2026-10-22,
+ * on navigator.js's "Actions" vs "Selection": "la partie optionnelle
+ * devrait inclure les choses non redondantes de selection ... ce qui me
+ * permettrait de supprimer la fenetre selection"):
+ *   - excludeElements: action names to skip from the generic bool-button
+ *     render below, because the caller's own `node` already exposes that
+ *     same command through a richer control (e.g. navigator.js's
+ *     "addtoplanner" goes through a Sequencer-profile picker there, not a
+ *     bare toggle).
+ *   - node: appended right after the generic buttons, before the last-log
+ *     line footer - a single node, or an array of them (each in its own
+ *     slot, in order) when more than one piece of content is folded in.
  */
-export function renderActionsPanel(client, moduleName, mod, track, quickNavEntries, pos) {
+export function renderActionsPanel(client, moduleName, mod, track, quickNavEntries, pos, extra) {
   if (!("actions" in mod.properties)) return;
   const p = { x: 20, y: 210, w: 300, ...pos };
   const label = mod.properties.actions.label || t("common.actions");
   const b = Panels.make({ id: "actions", title: label, x: p.x, y: p.y, w: p.w });
-  b.appendChild(track(renderProperty(client, moduleName, "actions", { framed: false })));
+  b.appendChild(track(renderProperty(client, moduleName, "actions", { framed: false, excludeElements: extra && extra.excludeElements })));
+  const extraNodes = extra && extra.node ? [].concat(extra.node) : [];
+  for (const n of extraNodes) b.appendChild(track(n));
   b.appendChild(track(renderLastLogLine(client, moduleName)));
   quickNavEntries.push({ id: "actions", label, icon: "apps", iconOnly: true });
 }
@@ -263,9 +279,17 @@ function buildEditControl(client, moduleName, el_, elName, buffer, opts) {
     // devices.camera/.mount/... (indimodule.cpp's giveMeADevice(), shared
     // by nearly every module) - a device not yet in the catalog still has
     // to be typeable by hand, by design, not a bug to route around.
+    // Each suggestion's `value` is the real stored value (what lands in
+    // the field, and what gets sent on commit below) - its `label` is
+    // only the displayed suggestion text, per the datalist spec's own
+    // value/label split for exactly this "shown text differs from
+    // submitted value" case (e.g. zoning's int keys / "04x04"-style
+    // labels). For a LOV where key and label are already the same string
+    // (e.g. a device name), this is a no-op - both attributes end up
+    // identical, same as before.
     const listId = "lov-opts-" + (++lovDatalistSeq);
     const datalist = el("datalist", { id: listId });
-    for (const label of new Set(Object.values(lov))) datalist.appendChild(el("option", { value: label }));
+    for (const [k, label] of Object.entries(lov)) datalist.appendChild(el("option", { value: k, label }));
     const input = el("input", { type: "text", class: "field-input", list: listId, value: buffer[elName] ?? "" });
     // The browser filters the datalist's own suggestion dropdown against
     // whatever text is already in the field, so an existing value hides
@@ -280,7 +304,13 @@ function buildEditControl(client, moduleName, el_, elName, buffer, opts) {
     });
     input.addEventListener("change", () => {
       if (input.value === "") return; // restored on blur below, nothing picked/typed
-      buffer[elName] = input.value;
+      // Free-typed text still works for any value the LOV doesn't list
+      // (e.g. zoning's 11, outside its suggested squares) - only a picked
+      // suggestion's own numeric key goes through parseInt/parseFloat
+      // cleanly; a typed non-numeric string on an int/float element is
+      // left to the backend's own validation, same as every other field.
+      const n = type === "int" ? parseInt(input.value, 10) : type === "float" ? parseFloat(input.value) : NaN;
+      buffer[elName] = Number.isNaN(n) ? input.value : n;
       if (opts && opts.onChange) opts.onChange();
     });
     input.addEventListener("blur", () => {
@@ -722,7 +752,10 @@ function openPropertyEditDialog(client, moduleName, propName, prop, formable) {
   (dialogRoot || document.body).appendChild(overlay);
 }
 
-function renderPropertyBody(client, moduleName, propName, prop, editTracker) {
+// excludeElements: element names skipped entirely (e.g. a caller showing
+// the same action through its own richer control elsewhere - see
+// renderActionsPanel()'s own doc comment).
+function renderPropertyBody(client, moduleName, propName, prop, editTracker, excludeElements, includeElements) {
   const body = el("div", { class: "prop-body" });
 
   // freevalue is documented as a generic display field (structure.en.md),
@@ -776,6 +809,8 @@ function renderPropertyBody(client, moduleName, propName, prop, editTracker) {
     buttonRun = null;
   }
   for (const name of orderedElementNames(prop.elements)) {
+    if (excludeElements && excludeElements.includes(name)) continue;
+    if (includeElements && !includeElements.includes(name)) continue;
     const e = prop.elements[name];
     const permOk = (prop.permission === 1 || prop.permission === 2) && prop.enabled !== false;
     const isGroupBtn = boolGroup.includes(name) && permOk;
@@ -876,7 +911,22 @@ function renderPropertyBody(client, moduleName, propName, prop, editTracker) {
         });
         valueCell.addEventListener("focusout", (ev) => {
           if (valueCell.contains(ev.relatedTarget)) return;
-          finish(dirty);
+          // A click anywhere in the SAME floating panel reparents it to
+          // raise it to front (panels.js's own raisePanel()), which blurs
+          // any focused descendant as a browser side effect of that DOM
+          // move - including the very field this click just focused.
+          // raisePanel() already restores that focus right after the
+          // move, synchronously, but acting on the blur immediately here
+          // would redraw (and destroy) this field before that restore
+          // ever runs. Deferred one tick instead: a genuinely left field
+          // still has focus elsewhere by then; a raise-induced blur has
+          // already been undone, so `document.activeElement` is back
+          // inside `valueCell` and there is nothing to finish. Confirmed
+          // live (Playwright) this was the actual cause of a field
+          // becoming unfocusable the instant it was clicked.
+          setTimeout(() => {
+            if (!valueCell.contains(document.activeElement)) finish(dirty);
+          }, 0);
         });
         valueCell.addEventListener("keydown", (ev) => {
           if (ev.key === "Escape") { ev.preventDefault(); finish(false); }
@@ -919,6 +969,14 @@ function renderPropertyBody(client, moduleName, propName, prop, editTracker) {
  * fork, so a caller whose OWN window chrome already frames the property
  * (render.js's own renderActionsPanel(), currently the only one) can ask
  * for the bare element list instead of a second, redundant frame around it.
+ *
+ * `opts.includeElements` - when given, only these element names are shown
+ * (everything else in the property is skipped), for a caller that wants
+ * just one or two fields out of a property with several (Gilles,
+ * 2026-10-22: a single "parms.exposure" field folded into inspector's
+ * Actions panel, out of "parms"'s several other fields).
+ * `opts.excludeElements` is the opposite - skip only these - and the two
+ * are independent filters, not meant to be combined.
  */
 export function renderProperty(client, moduleName, propName, opts) {
   const framed = !opts || opts.framed !== false;
@@ -964,7 +1022,7 @@ export function renderProperty(client, moduleName, propName, opts) {
       }
       container.appendChild(header);
     }
-    container.appendChild(renderPropertyBody(client, moduleName, propName, prop, editTracker));
+    container.appendChild(renderPropertyBody(client, moduleName, propName, prop, editTracker, opts && opts.excludeElements, opts && opts.includeElements));
   }
 
   const editTracker = {

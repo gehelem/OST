@@ -46,10 +46,17 @@ export const MAP_ITEMS = [
 
 export const mount = buildScaffoldTemplate(
   [
-    // Icon-only (Gilles, 2026-10-06: "sur analysis selection utilise
-    // l'icone 'ballot' sans libelle") - ligature checked against the
-    // vendored font before use, same as every other icon-only button here.
-    { id: "analysis", x: 20, y: 400, w: 300, icon: "ballot", iconOnly: true },
+    // Folded into the Actions panel's own optional slot instead of its own
+    // standalone window (Gilles, 2026-10-22) - same move as navigator's
+    // Selection/Time navigator panels and focus/guider's own Final
+    // result/Session values panels.
+    { id: "analysis", foldIntoActions: true },
+    // Just the exposure field out of "parms" (its gain/offset/bitdepth
+    // siblings stay Parameters-modal-only) - a dedicated inline spot to
+    // type into, requested (Gilles, 2026-10-22) right after the
+    // focus-loss fix above, to directly retest a directedit slider+number
+    // field living in the Actions panel.
+    { id: "parms", foldIntoActions: true, includeElements: ["exposure"] },
     {
       // Icon-only too (same thread, right before: "sur le bouton analysis
       // maps laisse uniquement une icone 'experiment'").

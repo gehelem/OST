@@ -30,6 +30,7 @@ Todas las claves de eventos enviadas por el servidor están en **minúsculas** (
 | [`ea`](#ea) | Actualización de todos los valores de elementos de una propiedad |
 | [`ee`](#ee) | Actualización de un solo valor de elemento |
 | [`ev`](#ev) | Actualización de un valor de elemento con sus restricciones |
+| [`el`](#el) | Cambio de la LOV local propia de un elemento |
 | [`ps`](#ps) | Actualización del estado y del estado activado de una propiedad |
 | [`dm`](#dm) | Módulo eliminado |
 | [`dp`](#dp) | Propiedad eliminada |
@@ -279,6 +280,31 @@ Actualiza el valor de un elemento y sus restricciones (min, max, format). La cla
               "min": -40.0,
               "max": 80.0,
               "format": "%.1f"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+## `el` — LOV local cambiada {#el}
+
+Enviado cuando la lista de valores local propia de un elemento (`listOfValues`) se añade, actualiza o vacía por iniciativa propia del servidor — p. ej. los nombres de las posiciones de una rueda de filtros (re)leídos desde el dispositivo. La clave empieza por `"el"`. Mismo formato de payload que [`ev`](#ev) (se incluyen el valor actual, las restricciones y `listOfValues`), pero a diferencia de `ev` esto nunca marca el perfil de una propiedad `hasprofile` como modificado ([`fc`](#fs)): una LOV local es decorativa, no un valor de perfil almacenado.
+
+```json
+{
+  "el-element's own local lov changed": {
+    "Sequencer": {
+      "p": {
+        "sequence": {
+          "e": {
+            "filter": {
+              "value": 1,
+              "listOfValues": { "1": "Luminance", "2": "Red", "3": "Green", "4": "Blue" }
             }
           }
         }

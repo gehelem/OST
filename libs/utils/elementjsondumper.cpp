@@ -18,7 +18,7 @@ namespace  OST
 QJsonObject ElementJsonDumper::dumpElementCommons(ElementBase *pElement)
 {
     QJsonObject json;
-    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return json;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev || mEvent == EvType::el) return json;
 
     json["label"] = pElement->label();
     json["order"] = pElement->order();
@@ -43,7 +43,7 @@ void ElementJsonDumper::visit(ElementBool *pElement, QVariantMap &data, bool &em
     QJsonObject json = dumpElementCommons(pElement);
     json["value"] = pElement->value();
     mResult = json;
-    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev || mEvent == EvType::el) return;
 
     json["type"] = "bool";
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
@@ -67,8 +67,8 @@ void ElementJsonDumper::visit(ElementInt *pElement, QVariantMap &data, bool &emi
     json["format"] = pElement->format();
     json["slider"] = pElement->slider();
     mResult = json;
-    // No early return on EvType::ev here (unlike ee/ea above): ev now also
-    // carries the lov-related fields below, so PropertyMulti::OnLovChanged()
+    // No early return on EvType::ev/el here (unlike ee/ea above): both
+    // carry the lov-related fields below, so PropertyMulti::OnLovChanged()
     // (issue #240 - a local lovAdd()/lovClear()/lovUpdate() used to never
     // reach any client at all, not even one already connected) has a real
     // payload to send instead of just a bare notification.
@@ -120,7 +120,7 @@ void ElementJsonDumper::visit(ElementFloat *pElement, QVariantMap &data, bool &e
     json["slider"] = pElement->slider();
     mResult = json;
     // See the matching comment in ElementInt's own visit() just above -
-    // no early return on ev, same reason.
+    // no early return on ev/el, same reason.
 
     if (pElement->getPreIcon() != "") json["preicon"] = pElement->getPreIcon();
     if (pElement->getPostIcon() != "") json["posticon"] = pElement->getPostIcon();
@@ -156,8 +156,8 @@ void ElementJsonDumper::visit(ElementString *pElement, QVariantMap &data, bool &
     mResult = json;
     if (mEvent == EvType::ee || mEvent == EvType::ea) return;
 
-    // ev falls through from here (unlike ee/ea above) - see the matching
-    // comment in ElementInt's own visit(): it now also carries the
+    // ev/el both fall through from here (unlike ee/ea above) - see the
+    // matching comment in ElementInt's own visit(): both carry the
     // lov-related fields below, needed for PropertyMulti::OnLovChanged()
     // (issue #240) to have a real payload.
     json["type"] = "string";
@@ -193,7 +193,7 @@ void ElementJsonDumper::visit(ElementLight *pElement, QVariantMap &data, bool &e
     QJsonObject json = dumpElementCommons(pElement);
     json["value"] = pElement->value();
     mResult = json;
-    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev || mEvent == EvType::el) return;
 
     json["type"] = "light";
     mResult = json;
@@ -294,7 +294,7 @@ void ElementJsonDumper::visit(ElementImg *pElement, QVariantMap &data, bool &emi
 
     json["value"] = imgdata;
     mResult = json;
-    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev || mEvent == EvType::el) return;
 
     json["type"] = "img";
 
@@ -321,7 +321,7 @@ void ElementJsonDumper::visit(ElementPrg *pElement, QVariantMap &data, bool &emi
     o["value"] = pElement->value().value;
     json["value"] = o;
     mResult = json;
-    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev || mEvent == EvType::el) return;
 
     json["type"] = "prg";
     if (pElement->prgType() == bar) json["prgtype"] = "bar";
@@ -339,7 +339,7 @@ void ElementJsonDumper::visit(ElementDate *pElement, QVariantMap &data, bool &em
     v["day"] = pElement->value().day();
     json["value"] = v;
     mResult = json;
-    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev || mEvent == EvType::el) return;
 
     json["type"] = "date";
     mResult = json;
@@ -356,7 +356,7 @@ void ElementJsonDumper::visit(ElementTime *pElement, QVariantMap &data, bool &em
     if (pElement->getUseMs()) v["ms"] = pElement->value().msec();
     json["value"] = v;
     mResult = json;
-    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev || mEvent == EvType::el) return;
 
     json["type"] = "time";
     json["usems"] = pElement->getUseMs();
@@ -378,7 +378,7 @@ void ElementJsonDumper::visit(ElementDateTime *pElement, QVariantMap &data, bool
     v["ms"] = pElement->value().time().msec();
     json["value"] = v;
     mResult = json;
-    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev) return;
+    if (mEvent == EvType::ee || mEvent == EvType::ea || mEvent == EvType::ev || mEvent == EvType::el) return;
 
     json["type"] = "datetime";
     mResult = json;

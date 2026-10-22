@@ -32,7 +32,7 @@
 // per server-messages.en.md ("the description part can change").
 const ONE_CHAR_CODES = new Set(["d", "l"]);
 const TWO_CHAR_CODES = new Set([
-  "aa", "ap", "ea", "ee", "ev", "ps", "dm", "dp",
+  "aa", "ap", "ea", "ee", "ev", "el", "ps", "dm", "dp",
   "gc", "gu", "gd", "gr",
   "lc", "lu", "ld",
   "fs", "fl", "fc",
@@ -176,7 +176,19 @@ export class Datastore {
    * null when the element has no LOV at all.
    */
   resolveLov(moduleName, element) {
-    if (element.listOfValues) return element.listOfValues;
+    if (element.listOfValues) {
+      // Local LOVs are wire-encoded as an ordered array of [value, label]
+      // pairs (e.g. inspector.json's zoning, sequencer.json's frametype),
+      // not the {value: label} map every other LOV source (globallov)
+      // already is - normalize here so callers can treat every LOV the
+      // same way regardless of source.
+      if (Array.isArray(element.listOfValues)) {
+        const map = {};
+        for (const pair of element.listOfValues) map[pair[0]] = pair[1];
+        return map;
+      }
+      return element.listOfValues;
+    }
     if (!element.globallov) return null;
     const mod = this.modules[moduleName];
     let lov;
@@ -236,6 +248,10 @@ export class Datastore {
       case "ea": return this._applyElementValues(payload);
       case "ee": return this._applyElementValues(payload);
       case "ev": return this._applyElementMeta(payload);
+      // "el" - a local listOfValues changed on its own, same payload shape
+      // as "ev", kept as a distinct wire code server-side only so it never
+      // marks a hasprofile property dirty there - no client-side meaning.
+      case "el": return this._applyElementMeta(payload);
       case "ps": return this._applyPropertyStatus(payload);
       case "dm": return this._applyModuleDeleted(payload);
       case "dp": return this._applyPropertyDeleted(payload);

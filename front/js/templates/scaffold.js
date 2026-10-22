@@ -56,6 +56,25 @@ import { t } from "../i18n.js";
  * single `spec.id` property to gate on. `spec.title` is required in this
  * case (no `mod.properties[spec.id].label` to fall back on).
  *
+ * `foldIntoActions: true` on a spec drops its own standalone panel and
+ * appends its content into the Actions panel's own optional/extra slot
+ * instead (render.js's own renderActionsPanel() `extra.node`) — same move
+ * as navigator's Selection/Time navigator panels and focus/guider's own
+ * hand-written templates folding their "Final result"/"Session values"
+ * panels in. `custom`/`customProps`/`extra` all still work the same way
+ * for a folded spec; only `x`/`y`/`w`/`icon`/`iconOnly` (nothing to
+ * position or give its own quicknav button to) and `title` (nothing to
+ * head a nested frame with) stop applying. `framed` still does (default
+ * false here rather than true — Actions is already its own bordered
+ * panel, so a folded spec's own inner frame is a redundant one by
+ * default, same reasoning as the generic "actions" buttons already in
+ * that same panel; pass `framed: true` to keep it anyway). `spec.
+ * includeElements`, if given, is passed straight through to
+ * renderProperty() (render.js's own doc comment on it) - lets a folded
+ * spec surface just one or two fields of a bigger property instead of
+ * all of it (e.g. inspector.js's own "parms.exposure").
+ *
+
  * `imagePos`: optional `{x,y,w}` override for where the image/image-stats
  * panels default to (they'd otherwise land wherever a panelSpec also put
  * something, on a module with a lot of panels).
@@ -109,13 +128,32 @@ export function buildScaffoldTemplate(panelSpecs, imagePos, opts) {
       // "header" panel either any more (render.js's own renderModuleView
       // doc comment: Gilles, 2026-10-03, "la supprimer completement").
 
-      renderActionsPanel(client, moduleName, mod, track, quickNavEntries);
+      // Folded specs (foldIntoActions: true) are built first so their node(s)
+      // can be handed straight to renderActionsPanel() as `extra.node` -
+      // same ordering navigator.js/focus.js/guider.js already use for their
+      // own hand-built equivalents.
+      const foldedNodes = [];
+      for (const spec of panelSpecs) {
+        if (!spec.foldIntoActions) continue;
+        const exists = spec.custom ? (spec.customProps || []).some(has) : has(spec.id);
+        if (!exists) continue;
+        if (spec.custom) {
+          foldedNodes.push(track(spec.custom(client, moduleName)));
+        } else {
+          foldedNodes.push(track(renderProperty(client, moduleName, spec.id, { framed: spec.framed === true, includeElements: spec.includeElements })));
+          for (const extra of spec.extra || []) {
+            if (has(extra)) foldedNodes.push(track(renderProperty(client, moduleName, extra, { framed: spec.framed === true })));
+          }
+        }
+      }
+      renderActionsPanel(client, moduleName, mod, track, quickNavEntries, undefined, { node: foldedNodes });
 
       const known = new Set(["actions", "image"]);
       for (const spec of panelSpecs) {
         known.add(spec.id);
         for (const extra of spec.extra || []) known.add(extra);
         for (const p of spec.customProps || []) known.add(p);
+        if (spec.foldIntoActions) continue;
         const exists = spec.custom ? (spec.customProps || []).some(has) : has(spec.id);
         if (!exists) continue;
         // spec.title, when a template gives one (e.g. focus.js's "Focus

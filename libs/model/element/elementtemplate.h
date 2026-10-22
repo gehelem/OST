@@ -17,9 +17,42 @@
 
 #include <elementbase.h>
 #include <lovsingle.h>
+#include <type_traits>
 
 namespace  OST
 {
+
+/**
+ * @brief Compile-time check for whether T supports operator!= (C++17 SFINAE).
+ *
+ * Used by setValue() below to skip emitting an element-changed event when
+ * the exact same value is written again (e.g. a module re-syncing a
+ * calibration-derived field on every run) - without needing operator!= to
+ * exist for every element value type. A few (ElementImg/ElementVideo/
+ * ElementPrg's own struct values) have no comparison operator at all;
+ * HasNotEqual<T>::value is false for those, and the write is always
+ * treated as a real change, same as before this check existed.
+ */
+template <typename T, typename = void>
+struct HasNotEqual : std::false_type {};
+template <typename T>
+struct HasNotEqual<T, std::void_t<decltype(std::declval<T>() != std::declval<T>())>> : std::true_type {};
+
+/**
+ * @brief Whether a setValue() call represents a real change worth emitting.
+ * @param wasNull The element's own isNull() state *before* this call - a
+ *   null-to-set transition is always a real change, regardless of whether
+ *   the new value happens to equal whatever stale value was last stored.
+ * @param oldValue / newValue Compared with operator!= when T supports it
+ *   (HasNotEqual<T>), otherwise always treated as changed.
+ */
+template <typename T>
+inline bool valueActuallyChanged(bool wasNull, const T &oldValue, const T &newValue)
+{
+    if (wasNull) return true;
+    if constexpr (HasNotEqual<T>::value) return oldValue != newValue;
+    else return true;
+}
 
 /**
  * @class ElementTemplate
@@ -120,7 +153,12 @@ class ElementTemplate: public ElementBase
         }
 
     protected:
-        T mValue;  /*!< Stored value of type T */
+        // Value-initialized (not left indeterminate) - setValue()'s own
+        // before/after comparison (valueActuallyChanged() above) reads this
+        // before the first real write for a scalar T (int/float/bool), and
+        // an indeterminate starting value there would risk comparing
+        // against garbage instead of a real "nothing set yet" baseline.
+        T mValue = T();  /*!< Stored value of type T */
 };
 /**
  * @class ElementTemplateNumeric
@@ -208,9 +246,10 @@ class ElementTemplateNumeric : public ElementTemplate<T>
                     return false;
                 }
             }
+            const bool changed = valueActuallyChanged(ElementBase::isNull(), ElementTemplate<T>::mValue, value);
             ElementTemplate<T>::mValue = value;
             ElementBase::setNull(false);
-            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ee, QVariant(), this);
+            if (emitEvent && changed) emit ElementBase::eltEvent(OST::EvType::ee, QVariant(), this);
             return true;
         }
 
@@ -501,9 +540,10 @@ class ElementTemplateNotNumeric : public ElementTemplate<T>
          */
         bool setValue(const T &value, const bool &emitEvent)
         {
+            const bool changed = valueActuallyChanged(ElementBase::isNull(), ElementTemplate<T>::mValue, value);
             ElementTemplate<T>::mValue = value;
             ElementBase::setNull(false);
-            if (emitEvent) emit ElementBase::eltEvent(OST::EvType::ee, QVariant(), this);
+            if (emitEvent && changed) emit ElementBase::eltEvent(OST::EvType::ee, QVariant(), this);
             return true;
         }
 
