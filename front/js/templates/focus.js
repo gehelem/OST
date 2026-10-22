@@ -4,9 +4,11 @@
 // on the plain generic table it used to render as: "la 'focus curve' est
 // trop minimale, regarde le graphique de rooster, avec la courbe de
 // regression et les barres d'erreur". progress stays on the generic
-// renderProperty() path (nothing wrong with it as a plain table), grouped
-// into one panel together with results (Gilles, 2026-10-03: "on va
-// regrouper les fenetres 'progress' et 'final result'"). results' own
+// renderProperty() path (nothing wrong with it as a plain table) —
+// originally grouped into its own panel together with results, both now
+// folded into the Actions panel's own optional slot instead (Gilles,
+// 2026-10-22: same move as navigator's Selection/Time navigator panels).
+// results' own
 // HFR/position got a further bespoke pass (Gilles, same day: "inspire toi
 // de l'affichage des valeurs RMS du guider pour afficher ... HFR et
 // position") — see buildResultsBoxes below, sharing guider.js's own
@@ -262,20 +264,21 @@ export function mount(client, moduleName) {
     // Profile load/save lives in the dedicated "Parameters" box (app.js's
     // gear button, buildParamsPanel in render.js) — not built here.
 
-    renderActionsPanel(client, moduleName, mod, track, quickNavEntries);
+    // "Final result" (HFR/position boxes) folded into the Actions panel's
+    // own optional/extra slot instead of its own standalone window, same
+    // move as navigator's Selection/Time navigator panels - built before
+    // renderActionsPanel() so it can be handed in as `extra.node`.
+    // "Progress" rides along in the same slot (it used to share the old
+    // "results" panel with it) - framed:false, same reasoning as the
+    // generic "actions" buttons just above it in this same window: Actions
+    // is already its own bordered panel, a second nested frame/header
+    // around a single spinner field would just waste space for nothing.
+    const resultsNode = has("results") ? track(buildResultsBoxes(client, moduleName)) : null;
+    const progressNode = has("progress") ? track(renderProperty(client, moduleName, "progress", { framed: false })) : null;
 
-    // "Final result" + "Progress" grouped into one panel (Gilles,
-    // 2026-10-03: "on va regrouper les fenetres 'progress' et 'final
-    // result'") — each keeps its own full renderProperty() header/label
-    // (same stacking scaffold.js's own panelSpec.extra does for a
-    // secondary property sharing a primary one's box).
-    if (has("results") || has("progress")) {
-      const title = (mod.properties.results && mod.properties.results.label) || "Final result";
-      const b = Panels.make({ id: "results", title, x: 20, y: 330, w: 300 });
-      if (has("results")) b.appendChild(track(buildResultsBoxes(client, moduleName)));
-      if (has("progress")) b.appendChild(track(renderProperty(client, moduleName, "progress")));
-      quickNavEntries.push({ id: "results", label: title });
-    }
+    renderActionsPanel(client, moduleName, mod, track, quickNavEntries, undefined, {
+      node: [resultsNode, progressNode].filter(Boolean),
+    });
     if (has("values")) {
       const b = Panels.make({ id: "values", title: mod.properties.values.label || "Focus curve", x: 350, y: 92, w: 480 });
       b.appendChild(track(buildFocusCurvePanel(client, moduleName)));
