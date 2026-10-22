@@ -1744,6 +1744,9 @@ export class SkyEngine {
           // Tile label ("L<row>C<col>", 1-indexed) - same hue as the tile
           // outline but lighter (lower alpha), sized off the tile's own
           // rendered height so it scales with zoom like the outline does.
+          // Skipped for a plain 1x1 mosaic - "L1C1" on the one and only
+          // frame has nothing to disambiguate.
+          if (rows === 1 && cols === 1) continue;
           const tileCx = (tileCorners[0].x + tileCorners[1].x + tileCorners[2].x + tileCorners[3].x) / 4;
           const tileCy = (tileCorners[0].y + tileCorners[1].y + tileCorners[2].y + tileCorners[3].y) / 4;
           const tileTopMidX = (tileCorners[0].x + tileCorners[1].x) / 2;
