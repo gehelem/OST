@@ -910,7 +910,22 @@ function renderPropertyBody(client, moduleName, propName, prop, editTracker, exc
         });
         valueCell.addEventListener("focusout", (ev) => {
           if (valueCell.contains(ev.relatedTarget)) return;
-          finish(dirty);
+          // A click anywhere in the SAME floating panel reparents it to
+          // raise it to front (panels.js's own raisePanel()), which blurs
+          // any focused descendant as a browser side effect of that DOM
+          // move - including the very field this click just focused.
+          // raisePanel() already restores that focus right after the
+          // move, synchronously, but acting on the blur immediately here
+          // would redraw (and destroy) this field before that restore
+          // ever runs. Deferred one tick instead: a genuinely left field
+          // still has focus elsewhere by then; a raise-induced blur has
+          // already been undone, so `document.activeElement` is back
+          // inside `valueCell` and there is nothing to finish. Confirmed
+          // live (Playwright) this was the actual cause of a field
+          // becoming unfocusable the instant it was clicked.
+          setTimeout(() => {
+            if (!valueCell.contains(document.activeElement)) finish(dirty);
+          }, 0);
         });
         valueCell.addEventListener("keydown", (ev) => {
           if (ev.key === "Escape") { ev.preventDefault(); finish(false); }
