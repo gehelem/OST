@@ -30,6 +30,7 @@ All server-sent event keys are **lowercase** (e.g. `d`, `ea`, `ap`, `gc`).
 | [`ea`](#ea) | Set all element values for a property |
 | [`ee`](#ee) | Set one element value |
 | [`ev`](#ev) | Set element value with updated constraints |
+| [`el`](#el) | Element's own local LOV changed |
 | [`ps`](#ps) | Property status and enabled update |
 | [`dm`](#dm) | Module deleted |
 | [`dp`](#dp) | Property deleted |
@@ -279,6 +280,31 @@ Updates an element's value and its constraints (min, max, format). Key starts wi
               "min": -40.0,
               "max": 80.0,
               "format": "%.1f"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+## `el` — Local LOV changed {#el}
+
+Sent when an element's own local list of values (`listOfValues`) is added to, updated, or cleared on the server's own initiative — e.g. a filter wheel's slot names being (re)read from the device. Key starts with `"el"`. Same payload shape as [`ev`](#ev) (current value, constraints, and `listOfValues` are all included), but unlike `ev` this never marks a `hasprofile` property's profile as changed ([`fc`](#fs)): a local LOV is decorative, not a stored profile value.
+
+```json
+{
+  "el-element's own local lov changed": {
+    "Sequencer": {
+      "p": {
+        "sequence": {
+          "e": {
+            "filter": {
+              "value": 1,
+              "listOfValues": { "1": "Luminance", "2": "Red", "3": "Green", "4": "Blue" }
             }
           }
         }

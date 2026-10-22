@@ -98,6 +98,7 @@ void PropertyJsonDumper::visit(PropertyMulti *pProperty)
             mResult = dumpSetAll(pProperty);
             break;
         case OST::EvType::ev:
+        case OST::EvType::el:
             mResult = dumpSetValueWithMinMax(pProperty);
             break;
         case OST::EvType::ps:

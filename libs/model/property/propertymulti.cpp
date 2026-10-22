@@ -619,10 +619,15 @@ void PropertyMulti::OnLovChanged(ElementBase* elt)
     // Was a dead stub (issue #240): a local lovAdd()/lovClear()/lovUpdate()
     // never reached any already-connected client at all, only a later full
     // module dump (reconnect/reload) would pick up the new LOV. Reuses the
-    // existing "ev" event/path (same as a min/max/format change,
-    // OnEltEvent() just above) - elementjsondumper.cpp now carries the
-    // lov-related fields on "ev" too, so this has a real payload to send.
-    emit PropertyBase::prpEvent(OST::EvType::ev, QVariant(), elt, this);
+    // "ev" wire payload shape (same as a min/max/format change,
+    // OnEltEvent() just above - elementjsondumper.cpp carries the
+    // lov-related fields on both "ev" and "el"), but its own distinct
+    // EvType - a LOV is decorative, so Basemodule::onDatastoreEvent()
+    // excludes "el" specifically from marking a hasprofile property
+    // dirty, unlike a real "ev" value/min/max/format change (reusing
+    // "ev" here used to mark a profile dirty on a mere LOV refresh,
+    // e.g. Sequencer::refreshFilterLov()).
+    emit PropertyBase::prpEvent(OST::EvType::el, QVariant(), elt, this);
 }
 void PropertyMulti::OnMessage(LogLevel l, QString m, QVariantList args)
 {

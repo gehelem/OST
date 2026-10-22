@@ -30,6 +30,7 @@ Alle vom Server gesendeten Ereignisschlüssel sind **klein geschrieben** (z. B. 
 | [`ea`](#ea) | Update aller Elementwerte einer Property |
 | [`ee`](#ee) | Update eines einzelnen Elementwerts |
 | [`ev`](#ev) | Update eines Elementwerts mit seinen Einschränkungen |
+| [`el`](#el) | Lokale LOV eines Elements geändert |
 | [`ps`](#ps) | Update von Status und Enabled-Zustand einer Property |
 | [`dm`](#dm) | Modul gelöscht |
 | [`dp`](#dp) | Property gelöscht |
@@ -279,6 +280,31 @@ Aktualisiert den Wert eines Elements sowie seine Einschränkungen (min, max, for
               "min": -40.0,
               "max": 80.0,
               "format": "%.1f"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+## `el` — Lokale LOV geändert {#el}
+
+Wird gesendet, wenn die eigene lokale Liste von Werten (`listOfValues`) eines Elements auf Initiative des Servers hinzugefügt, aktualisiert oder gelöscht wird — z. B. wenn die Filterrad-Slotnamen (neu) vom Gerät gelesen werden. Der Schlüssel beginnt mit `"el"`. Gleiches Payload-Format wie [`ev`](#ev) (aktueller Wert, Einschränkungen und `listOfValues` sind alle enthalten), aber im Gegensatz zu `ev` markiert dies niemals das Profil einer `hasprofile`-Property als geändert ([`fc`](#fs)): eine lokale LOV ist dekorativ, kein gespeicherter Profilwert.
+
+```json
+{
+  "el-element's own local lov changed": {
+    "Sequencer": {
+      "p": {
+        "sequence": {
+          "e": {
+            "filter": {
+              "value": 1,
+              "listOfValues": { "1": "Luminance", "2": "Red", "3": "Green", "4": "Blue" }
             }
           }
         }

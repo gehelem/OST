@@ -30,6 +30,7 @@ Toutes les clés d'événements envoyées par le serveur sont en **minuscules** 
 | [`ea`](#ea) | Mise à jour de toutes les valeurs d'éléments d'une propriété |
 | [`ee`](#ee) | Mise à jour d'une seule valeur d'élément |
 | [`ev`](#ev) | Mise à jour d'une valeur d'élément avec ses contraintes |
+| [`el`](#el) | LOV locale propre à l'élément modifiée |
 | [`ps`](#ps) | Mise à jour du statut et de l'état activé d'une propriété |
 | [`dm`](#dm) | Module supprimé |
 | [`dp`](#dp) | Propriété supprimée |
@@ -279,6 +280,31 @@ Met à jour la valeur d'un élément et ses contraintes (min, max, format). La c
               "min": -40.0,
               "max": 80.0,
               "format": "%.1f"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+## `el` — LOV locale modifiée {#el}
+
+Envoyé lorsque la liste de valeurs locale propre à un élément (`listOfValues`) est ajoutée, mise à jour ou effacée sur l'initiative du serveur — par exemple les noms des emplacements d'une roue à filtres (re)lus depuis le device. La clé commence par `"el"`. Même format de payload que [`ev`](#ev) (valeur courante, contraintes et `listOfValues` sont tous inclus), mais contrairement à `ev`, `el` ne marque jamais le profil d'une propriété `hasprofile` comme modifié ([`fc`](#fs)) : une LOV locale est décorative, pas une valeur de profil stockée.
+
+```json
+{
+  "el-element's own local lov changed": {
+    "Sequencer": {
+      "p": {
+        "sequence": {
+          "e": {
+            "filter": {
+              "value": 1,
+              "listOfValues": { "1": "Luminance", "2": "Red", "3": "Green", "4": "Blue" }
             }
           }
         }

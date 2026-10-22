@@ -224,6 +224,7 @@ enum class EvType
     ee,        /*!< set one element value */
     ea,        /*!< set all elements values (prop level) */
     ev,        /*!< set one element value/min/max/format */
+    el,        /*!< one element's own local lov changed (decorative, never marks a profile dirty - see Basemodule::onDatastoreEvent) */
     ps,        /*!< only property state */
     gc,        /*!< grid new line */
     gu,        /*!< grid update line  */
@@ -263,6 +264,8 @@ inline QString EvToString(EvType ev)
             return "ea";
         case OST::EvType::ev:
             return "ev-set one element value/min/max/format ";
+        case OST::EvType::el:
+            return "el-one element's own local lov changed";
         case OST::EvType::ps:
             return "ps-only property state";
         case OST::EvType::gc:

@@ -576,6 +576,7 @@ void Controller::onModuleEvent(OST::EvType evt, QVariant data, OST::ElementBase*
         case OST::EvType::gr: // "gr-grid reset"
         case OST::EvType::aa: // "aa-dump all data"
         case OST::EvType::ev: // "ev-set one element value/min/max/format "
+        case OST::EvType::el: // "el-one element's own local lov changed"
         case OST::EvType::ap: // "ap-dump all property data"
         case OST::EvType::ea: // "ea"
         {
