@@ -22,9 +22,9 @@
 // Still not wired: search/results (text search still only reachable via
 // the generic "Other" catch-all panel), the horizon/terrestrial and
 // camera-field views. The visibility bar / time-scrub control (Gilles,
-// 2026-10-02) IS wired since then - see buildTimeNavPanel()/
-// buildSelectionPanel()'s own per-object altitude arc further down - this
-// comment just hadn't been updated when that landed.
+// 2026-10-02) IS wired since then - see buildSelectionPanel()'s own
+// day/night canvas further down - this comment just hadn't been updated
+// when that landed.
 //
 // Real property names confirmed against src/modules/navigator/navigator.json
 // / libs/indimodule.cpp's defineMeAsNavigator()/giveMeALocation(): search,
@@ -155,7 +155,7 @@ function openSequencerProfilePicker(client, onConfirm) {
  * recently scrubbed to, read fresh on every redraw rather than captured
  * once.
  */
-function buildSelectionPanel(client, moduleName, getEngine, getSimTime) {
+function buildSelectionPanel(client, moduleName, getEngine, getSimTime, setSimTime) {
   const wrap = el("div");
   const info = el("div", { class: "muted small", text: t("navigator.tapToSelect") });
   // "Center target"/"Add to planner" are covered by the generic "actions"
@@ -164,15 +164,31 @@ function buildSelectionPanel(client, moduleName, getEngine, getSimTime) {
   // renderActionsPanel()'s caller) - only the mosaic variant lives here,
   // since it's not a single backend action but a loop of them (one
   // "addtoplanner" per tile), with no generic-button equivalent possible.
+  // "Mosaic definition" moved here from the display-settings panel (Gilles,
+  // 2026-10-22) - sits next to the mosaic action it actually configures
+  // rather than in the unrelated display-settings panel. Just toggles the
+  // floating panel built once in mount(), same mechanism as a quicknav icon.
+  const mosaicBtn = el("button", { type: "button", class: "btn btn-sm", text: t("navigator.mosaicDefinition") });
+  mosaicBtn.addEventListener("click", () => Panels.togglePanel("mosaicDefinition"));
   const mosaicToPlannerBtn = el("button", { class: "btn btn-sm", disabled: true }, t("navigator.addMosaicToPlanner"));
-  const actionsRow = el("div", { class: "form-row" }, [mosaicToPlannerBtn]);
+  const actionsRow = el("div", { class: "form-row" }, [mosaicBtn, mosaicToPlannerBtn]);
   // The "ce soir" visibility arc (Gilles, 2026-10-02, on astro2001's own
   // per-object fiche: "modifie [...] pour afficher toutes les infos sur
   // l'objet selectionne, donc faire ce joli graphique d'altitude sur
-  // 24h") - canvas (day/night gradient + altitude curve + "now" line) +
-  // the same rise/transit/set/max-altitude readout astro2001 shows below
-  // its own version. Hidden until something is actually selected.
+  // 24h") + the draggable time-scrub cursor (Gilles, 2026-10-02, after
+  // astro2001's own bottom time bar: "une fenetre supplementaire pour
+  // naviguer dans le temps") - one canvas for both now (Gilles,
+  // 2026-10-22: "je n'aurais pas voulu dupliquer l'affichage avec le
+  // dessin jour/nuit et la culmination ... n'en garde qu'un qui serve aux
+  // deux fonctions"), originally two separate panels each drawing their
+  // own copy of the same day/night gradient + "now" cursor. The altitude
+  // arc + its rise/transit/set/max-altitude readout only appear once
+  // something is actually selected; the gradient/cursor/drag-to-scrub
+  // work regardless, same as the old time-navigator panel did on its own.
   const chartCanvas = el("canvas", { class: "altitude-chart", width: "280", height: "90" });
+  const readout = el("div", { class: "muted small mono timenav-readout" });
+  const nowBtn = el("button", { class: "btn btn-sm", text: t("navigator.nowBtn") });
+  const timeRow = el("div", { class: "form-row" }, [readout, el("span", { class: "spacer" }), nowBtn]);
   const infoRows = el("div", { class: "metric-row-group hidden" });
   function metricRow(label) {
     const row = el("div", { class: "metric-row" }, [el("span", { class: "label", text: label }), el("span", { class: "value" })]);
@@ -184,11 +200,11 @@ function buildSelectionPanel(client, moduleName, getEngine, getSimTime) {
   const setVal = metricRow(t("navigator.set"));
   const maxAltVal = metricRow(t("navigator.maxAltitude"));
   const airmassVal = metricRow(t("navigator.airmassAtTransit"));
-  chartCanvas.classList.add("hidden");
 
   wrap.appendChild(info);
   wrap.appendChild(actionsRow);
   wrap.appendChild(chartCanvas);
+  wrap.appendChild(timeRow);
   wrap.appendChild(infoRows);
 
   // Asks which Sequencer profile to use first (Gilles, 2026-10-21: the
@@ -240,59 +256,107 @@ function buildSelectionPanel(client, moduleName, getEngine, getSimTime) {
   let lastObj = null;
   let lastName = null;
 
-  function redrawChart() {
-    if (!lastObj) return;
+  function redraw() {
     const engine = getEngine();
     if (!engine) return;
     const t0 = getSimTime() || new Date();
     const windowStart = nightWindowStart(t0);
     const sunSamples = sunAltitudeCurve(engine.observer, windowStart, 24, 10);
-    const curve = altitudeCurve(lastObj.ra, lastObj.dec, engine.observer, windowStart, 24, 10);
 
     const w = chartCanvas.width, h = chartCanvas.height;
     const ctx = chartCanvas.getContext("2d");
     ctx.clearRect(0, 0, w, h);
     drawDayNightBackground(ctx, w, h, sunSamples);
 
+    // Local-midnight reference tick - always exactly at mid-width, since
+    // the window itself is defined as starting at local noon (see
+    // nightWindowStart()'s own doc comment).
+    ctx.strokeStyle = "rgba(255,255,255,0.3)";
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h); ctx.stroke();
+
     // Altitude axis: 0deg at the bottom, 90deg at the top - below-horizon
     // stretches aren't drawn (nothing to show there, matches astro2001's
-    // own look: the arc only exists while the object is actually up).
-    const n = curve.samples.length;
-    ctx.strokeStyle = "#ffb74d";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    let penDown = false;
-    for (let i = 0; i < n; i++) {
-      const s = curve.samples[i];
-      const x = (i / (n - 1)) * w;
-      if (s.altitude < 0) { penDown = false; continue; }
-      const y = h - (s.altitude / 90) * h;
-      if (!penDown) { ctx.moveTo(x, y); penDown = true; } else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
+    // own look: the arc only exists while the object is actually up). Only
+    // once something is actually selected - the gradient/tick/"now" cursor
+    // above and below are meaningful on their own either way.
+    if (lastObj) {
+      const curve = altitudeCurve(lastObj.ra, lastObj.dec, engine.observer, windowStart, 24, 10);
+      const n = curve.samples.length;
+      ctx.strokeStyle = "#ffb74d";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      let penDown = false;
+      for (let i = 0; i < n; i++) {
+        const s = curve.samples[i];
+        const x = (i / (n - 1)) * w;
+        if (s.altitude < 0) { penDown = false; continue; }
+        const y = h - (s.altitude / 90) * h;
+        if (!penDown) { ctx.moveTo(x, y); penDown = true; } else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
 
-    // "Now" cursor - same vertical line language as the time navigator's
-    // own canvas, drawn here too so this mini chart stays legible on its
-    // own even with that other panel collapsed/out of view.
+      riseVal.textContent = fmtClock(curve.riseDate);
+      transitVal.textContent = fmtClock(curve.transitDate);
+      setVal.textContent = fmtClock(curve.setDate);
+      maxAltVal.textContent = curve.maxAltitude.toFixed(1) + "°";
+      // Airmass (plane-parallel approximation, sec(zenith angle) - a rough
+      // extinction proxy, not a real atmospheric model, same spirit as
+      // sky-engine.js's own existing "rough, not a real extinction model"
+      // dimming comment) - undefined/meaningless once the object never
+      // actually clears the horizon in this window.
+      airmassVal.textContent = curve.maxAltitude > 0 ? (1 / Math.sin(curve.maxAltitude * Math.PI / 180)).toFixed(2) : "—";
+    }
+
+    // "Now" cursor, drawn last so it stays legible on top of the curve.
     const frac = Math.max(0, Math.min(1, (t0.getTime() - windowStart.getTime()) / (24 * 3600000)));
     const cx = frac * w;
-    ctx.strokeStyle = "#ffffff";
+    ctx.strokeStyle = "#ffeb3b";
     ctx.globalAlpha = 0.8;
     ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, h); ctx.stroke();
     ctx.globalAlpha = 1;
 
-    riseVal.textContent = fmtClock(curve.riseDate);
-    transitVal.textContent = fmtClock(curve.transitDate);
-    setVal.textContent = fmtClock(curve.setDate);
-    maxAltVal.textContent = curve.maxAltitude.toFixed(1) + "°";
-    // Airmass (plane-parallel approximation, sec(zenith angle) - a rough
-    // extinction proxy, not a real atmospheric model, same spirit as
-    // sky-engine.js's own existing "rough, not a real extinction model"
-    // dimming comment) - undefined/meaningless once the object never
-    // actually clears the horizon in this window.
-    airmassVal.textContent = curve.maxAltitude > 0 ? (1 / Math.sin(curve.maxAltitude * Math.PI / 180)).toFixed(2) : "—";
+    readout.textContent = t0.toLocaleString();
+    nowBtn.disabled = getSimTime() == null;
   }
+
+  // Drag-to-scrub (ex-buildTimeNavPanel) - freezes the dome at the
+  // scrubbed instant (`setSimTime` doesn't re-arm itself); the "Now"
+  // button clears the override and resumes following real time. Works
+  // regardless of whether anything is selected, same as the old separate
+  // time-navigator panel did on its own.
+  function xToDate(clientX) {
+    const r = chartCanvas.getBoundingClientRect();
+    const frac = r.width ? Math.max(0, Math.min(1, (clientX - r.left) / r.width)) : 0;
+    const windowStart = nightWindowStart(getSimTime() || new Date());
+    return new Date(windowStart.getTime() + frac * 24 * 3600000);
+  }
+  let dragging = false;
+  function pointX(ev) { return ev.touches ? ev.touches[0].clientX : ev.clientX; }
+  function onDown(ev) { dragging = true; onMove(ev); }
+  function onMove(ev) {
+    if (!dragging) return;
+    setSimTime(xToDate(pointX(ev)));
+    if (ev.touches) ev.preventDefault();
+  }
+  function onUp() { dragging = false; }
+  chartCanvas.addEventListener("mousedown", onDown);
+  document.addEventListener("mousemove", onMove);
+  document.addEventListener("mouseup", onUp);
+  chartCanvas.addEventListener("touchstart", onDown, { passive: false });
+  document.addEventListener("touchmove", onMove, { passive: false });
+  document.addEventListener("touchend", onUp);
+  nowBtn.addEventListener("click", () => setSimTime(null));
+
+  // Own 1s tick for a live-updating "now" cursor/readout while "following
+  // now" - deliberately separate from buildSkyDome()'s own 30s dome-wide
+  // refresh (this is a tiny canvas, redrawing it every second is cheap;
+  // the full dome isn't). No initial call here - `getEngine()` isn't safe
+  // to call yet at construction time (mount()'s own forward-reference
+  // comment on `sky`); mount() kicks off the first real draw once it's
+  // actually ready, via onTimeChange() below.
+  const timer = setInterval(redraw, 1000);
 
   function onSelect(obj) {
     const name = obj.name || (obj.kind === "star" ? t("navigator.star") : obj.kind === "messier" ? obj.desig || t("navigator.dso") : t("navigator.point"));
@@ -307,17 +371,23 @@ function buildSelectionPanel(client, moduleName, getEngine, getSimTime) {
 
     lastObj = obj;
     lastName = name;
-    chartCanvas.classList.remove("hidden");
     infoRows.classList.remove("hidden");
-    redrawChart();
+    redraw();
   }
 
-  // Called by the time-navigator panel (see buildTimeNavPanel()) whenever
-  // the simulated time changes - a no-op until something is actually
-  // selected, same guard redrawChart() already has.
-  function onTimeChange() { redrawChart(); }
+  // Called whenever the simulated time changes, whether from this
+  // widget's own drag/Now interactions (via mount()'s setSimTime) or from
+  // mount() itself, once, as soon as the engine is actually ready (see
+  // the timer comment above).
+  function onTimeChange() { redraw(); }
 
-  wrap._dispose = () => {};
+  wrap._dispose = () => {
+    clearInterval(timer);
+    document.removeEventListener("mousemove", onMove);
+    document.removeEventListener("mouseup", onUp);
+    document.removeEventListener("touchmove", onMove);
+    document.removeEventListener("touchend", onUp);
+  };
   return { node: wrap, onSelect, onTimeChange };
 }
 
@@ -497,17 +567,6 @@ function buildSettingsPanel(engine, hipsBg) {
   });
   wrap.appendChild(el("label", { class: "form-row", style: "cursor:pointer" }, [projCb, el("span", { text: t("navigator.stereographic") })]));
 
-  // Mosaic definition (Gilles, 2026-10-21: "ajoute un bouton 'mosaic
-  // assistant' ... qui doit ouvrir une modale", then, once a blocking
-  // modal turned out to defeat the point of watching the grid update live
-  // while adjusting it: "la transformer en fenetre flottante"). The actual
-  // panel (buildMosaicDefinitionPanel()) is created once at mount() time
-  // like every other panel in this file - this button just toggles its
-  // visibility, same mechanism as a quicknav icon.
-  const mosaicBtn = el("button", { type: "button", class: "btn btn-sm", text: t("navigator.mosaicDefinition") });
-  mosaicBtn.addEventListener("click", () => Panels.togglePanel("mosaicDefinition"));
-  wrap.appendChild(el("div", { class: "form-row" }, [mosaicBtn]));
-
   wrap._dispose = () => { engine.onZoomChange = null; engine.onRotationChange = null; engine.onHipsFailure = null; };
   return wrap;
 }
@@ -578,94 +637,6 @@ function buildMosaicDefinitionPanel(engine) {
   ]));
 
   wrap._dispose = () => {};
-  return wrap;
-}
-
-/**
- * The time-navigator panel itself (Gilles, 2026-10-02, after astro2001's
- * own bottom time bar: "une fenetre supplementaire pour naviguer dans le
- * temps"). A draggable cursor over a day/night gradient (same look/scale
- * as the Selection panel's own per-object arc, see nightWindowStart()/
- * drawDayNightBackground() above - no altitude curve here, that part is
- * deliberately only in Selection, per Gilles's own split of the two
- * widgets). Dragging freezes the dome at the scrubbed instant (and stays
- * frozen - `setSimTime` doesn't re-arm itself); the "Now" button clears
- * the override and resumes following real time.
- */
-function buildTimeNavPanel(engine, getSimTime, setSimTime) {
-  const wrap = el("div", { class: "timenav" });
-  const canvas = el("canvas", { class: "timenav-canvas", width: "280", height: "48" });
-  const readout = el("div", { class: "muted small mono timenav-readout" });
-  const nowBtn = el("button", { class: "btn btn-sm", text: t("navigator.nowBtn") });
-  const row = el("div", { class: "form-row" }, [readout, el("span", { class: "spacer" }), nowBtn]);
-  wrap.appendChild(canvas);
-  wrap.appendChild(row);
-
-  function draw() {
-    const t0 = getSimTime() || new Date();
-    const windowStart = nightWindowStart(t0);
-    const w = canvas.width, h = canvas.height;
-    const ctx = canvas.getContext("2d");
-    const sunSamples = sunAltitudeCurve(engine.observer, windowStart, 24, 10);
-    drawDayNightBackground(ctx, w, h, sunSamples);
-
-    // Local-midnight reference tick - always exactly at mid-width, since
-    // the window itself is defined as starting at local noon (see
-    // nightWindowStart()'s own doc comment).
-    ctx.strokeStyle = "rgba(255,255,255,0.3)";
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h); ctx.stroke();
-
-    const frac = Math.max(0, Math.min(1, (t0.getTime() - windowStart.getTime()) / (24 * 3600000)));
-    const cx = frac * w;
-    ctx.strokeStyle = "#ffb300";
-    ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, h); ctx.stroke();
-
-    readout.textContent = t0.toLocaleString();
-    nowBtn.disabled = getSimTime() == null;
-  }
-
-  function xToDate(clientX) {
-    const r = canvas.getBoundingClientRect();
-    const frac = r.width ? Math.max(0, Math.min(1, (clientX - r.left) / r.width)) : 0;
-    const windowStart = nightWindowStart(getSimTime() || new Date());
-    return new Date(windowStart.getTime() + frac * 24 * 3600000);
-  }
-
-  let dragging = false;
-  function pointX(ev) { return ev.touches ? ev.touches[0].clientX : ev.clientX; }
-  function onDown(ev) { dragging = true; onMove(ev); }
-  function onMove(ev) {
-    if (!dragging) return;
-    setSimTime(xToDate(pointX(ev)));
-    draw();
-    if (ev.touches) ev.preventDefault();
-  }
-  function onUp() { dragging = false; }
-  canvas.addEventListener("mousedown", onDown);
-  document.addEventListener("mousemove", onMove);
-  document.addEventListener("mouseup", onUp);
-  canvas.addEventListener("touchstart", onDown, { passive: false });
-  document.addEventListener("touchmove", onMove, { passive: false });
-  document.addEventListener("touchend", onUp);
-  nowBtn.addEventListener("click", () => { setSimTime(null); draw(); });
-
-  // Own 1s tick for a live-updating cursor/readout while "following now" -
-  // deliberately separate from buildSkyDome()'s own 30s dome-wide refresh
-  // (this is a tiny canvas, redrawing it every second is cheap; the full
-  // dome isn't).
-  const timer = setInterval(draw, 1000);
-  draw();
-
-  wrap._dispose = () => {
-    clearInterval(timer);
-    document.removeEventListener("mousemove", onMove);
-    document.removeEventListener("mouseup", onUp);
-    document.removeEventListener("touchmove", onMove);
-    document.removeEventListener("touchend", onUp);
-  };
-  wrap._redraw = draw; // called by setSimTime() in mount() so other triggers of a time change (none yet besides this panel itself) stay in sync too
   return wrap;
 }
 
@@ -1131,32 +1102,31 @@ export function mount(client, moduleName) {
     const has = (name) => name in mod.properties;
     const quickNavEntries = [];
 
-    // `sky` is referenced inside these two closures before it's assigned
-    // below - safe, since neither is actually CALLED until well after this
-    // whole function has finished running (a user interaction, or the
-    // time-navigator's own setSimTime()), by which point `sky` is long
-    // since set. Same forward-reference pattern app.js's own
+    // `sky` is referenced inside this closure before it's assigned below -
+    // safe, since it's never actually CALLED until well after this whole
+    // function has finished running (a user interaction), by which point
+    // `sky` is long since set. Same forward-reference pattern app.js's own
     // logToggleEl listener already relies on (see its own comment).
-    const selection = buildSelectionPanel(client, moduleName, () => sky.engine, () => simulatedTime);
+    // `setSimTime` itself is a hoisted function declaration, so passing it
+    // here by value (not wrapped the same way) is already safe regardless
+    // of where it's textually defined below.
+    const selection = buildSelectionPanel(client, moduleName, () => sky.engine, () => simulatedTime, setSimTime);
     const sky = buildSkyDome(client, moduleName, selection.onSelect, () => simulatedTime || new Date());
     disposers.push(sky.dispose);
 
-    // Single entry point for every time change (today: only the
-    // time-navigator panel's own drag/Now button) - redraws the dome at
-    // the new instant and keeps the Selection panel's own "now" cursor
-    // (and, if the window itself shifted, its whole curve) in sync.
+    // Single entry point for every time change (selection.node's own
+    // drag/Now controls) - redraws the dome at the new instant and keeps
+    // the Actions panel's own "now" cursor (and, if the window itself
+    // shifted, the whole altitude curve) in sync.
     function setSimTime(d) {
       simulatedTime = d;
       if (sky.engine) sky.engine.render();
       selection.onTimeChange();
     }
-
-    // Time navigator - folded into Actions too, same move as Selection
-    // just above (Gilles, 2026-10-22: "integre la fonction de la fenetre
-    // 'time navigator' dans la fenetre actions"). Only buildable once
-    // there's an engine to drive it, same guard the settings/mosaic panels
-    // further down already use.
-    const timeNavNode = sky.engine ? buildTimeNavPanel(sky.engine, () => simulatedTime, setSimTime) : null;
+    // First real draw, now that `sky` is actually ready (selection.node's
+    // own canvas couldn't safely call getEngine() any earlier - see its
+    // own doc comment).
+    selection.onTimeChange();
 
     // No "header" panel any more (render.js's own renderModuleView doc
     // comment: Gilles, 2026-10-03, "la supprimer completement").
@@ -1166,18 +1136,18 @@ export function mount(client, moduleName) {
     // first (focus.js/guider.js's own build()); navigator.js was the one
     // outlier, pushing it after Selection/Settings/Time instead.
     //
-    // Selection (and now the time navigator) used to be their own panels;
+    // Selection and the time navigator used to be their own panels;
     // folded in here instead (Gilles, 2026-10-22: "ce qui me permettrait
     // de supprimer la fenetre selection", then "integre la fonction de la
-    // fenetre 'time navigator' dans la fenetre actions"), appended via
-    // `extra.node` right after the original generic action buttons
-    // ("Center target"/"Add to planner"/"Abort navigator", unchanged -
-    // "les boutons actions originaux doivent rester"). Selection's own
-    // complement is whatever it had beyond those: the mosaic variant (no
-    // single-action equivalent) plus the selected object's own
-    // info/altitude chart.
+    // fenetre 'time navigator' dans la fenetre actions", then, on the two
+    // having each drawn their own copy of the same day/night gradient/
+    // cursor: "n'en garde qu'un qui serve aux deux fonctions" - now a
+    // single canvas inside selection.node, see its own doc comment),
+    // appended via `extra.node` right after the original generic action
+    // buttons ("Center target"/"Add to planner"/"Abort navigator",
+    // unchanged - "les boutons actions originaux doivent rester").
     renderActionsPanel(client, moduleName, mod, track, quickNavEntries, undefined, {
-      node: [selection.node, timeNavNode].filter(Boolean),
+      node: selection.node,
     });
 
     // "Search" (Gilles, 2026-10-06: "nouveau bouton 'search' ... associe a

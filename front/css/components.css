@@ -559,13 +559,15 @@ input[type="range"]::-moz-range-thumb {
 .metric-row-group { margin-top: var(--space-2); }
 .banner { background: var(--accent-faint); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: var(--space-2) var(--space-3); margin-bottom: var(--space-3); font-size: 12.5px; }
 
-/* Time-navigator + Selection panel's own "ce soir" visibility arc
- * (Gilles, 2026-10-02, after astro2001's own day/night-gradient widgets)
- * - same framed-canvas look as .graph-canvas above, fixed intrinsic size
- * (no resize observer on these, unlike the sky dome itself - matches
- * .graph-canvas's own existing tradeoff). */
-.timenav-canvas, .altitude-chart { display: block; width: 100%; max-width: 280px; height: auto; aspect-ratio: 280 / 48; border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: ew-resize; margin-top: var(--space-2); }
-.altitude-chart { aspect-ratio: 280 / 90; cursor: default; margin-top: var(--space-3); }
+/* Selection panel's own merged day/night + time-scrub + "ce soir"
+ * visibility-arc canvas (Gilles, 2026-10-02, after astro2001's own
+ * day/night-gradient widgets; originally two separate canvases, merged
+ * into one 2026-10-22 - see buildSelectionPanel()'s own doc comment) -
+ * same framed-canvas look as .graph-canvas above, fixed intrinsic size
+ * (no resize observer on this, unlike the sky dome itself - matches
+ * .graph-canvas's own existing tradeoff). cursor:ew-resize - draggable
+ * horizontally to scrub time, regardless of whether anything is selected. */
+.altitude-chart { display: block; width: 100%; max-width: 280px; height: auto; aspect-ratio: 280 / 90; border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: ew-resize; margin-top: var(--space-2); }
 .timenav-readout { flex: 1 1 auto; }
 
 /* Bordered/accented "value box" look, born on guider's own "values" panel
