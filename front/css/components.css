@@ -363,6 +363,16 @@ input[type="range"]::-moz-range-thumb {
 .elt-row:first-child td { border-top: none; }
 .elt-label { color: var(--text-muted); white-space: nowrap; width: 1%; padding-right: var(--space-3); font-size: 12px; }
 .elt-value { width: 99%; }
+/* The Actions panel stacks several folded-in properties' own bare
+ * element tables one after another (renderActionsPanel()'s own
+ * extra.node) - .elt-row's default row padding/divider above is sized
+ * for a property filling its own standalone panel, too roomy once
+ * several of them are crammed into the same one (Gilles, 2026-10-22:
+ * "des interlignes inutiles de partout"). Spacing BETWEEN each folded
+ * property's own block still shows, just as one deliberate gap per
+ * boundary (the rule right below) rather than one per element row. */
+.panel-float[data-panel="actions"] .elt-row td { padding: 1px 4px; border-top: none; }
+.panel-float[data-panel="actions"] .property-bare + .property-bare { margin-top: var(--space-2); }
 /* A run of consecutive self-descriptive buttons (render.js's own
  * renderPropertyBody(), the "actions" property above all) - Gilles,
  * 2026-10-03: "si on a une suite de boutons il sont affiches les uns au

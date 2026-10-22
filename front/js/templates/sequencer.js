@@ -34,14 +34,12 @@ export const mount = buildScaffoldTemplate(
     // = 'list'") and no inner frame either (same thread, right after:
     // "idem sur 'sequence'").
     { id: "sequence", x: 350, y: 92, w: 340, icon: "list", iconOnly: true, framed: false },
-    // No inner frame either (same thread, right after: "idem sur
-    // 'object'").
-    { id: "object", x: 350, y: 330, w: 300, framed: false },
-    // Icon-only too (same thread, right after: "bouton 'progress' =>
-    // seulement icone = 'progress_activity'"), and no inner frame either
-    // (same thread yet again: "pas besoin du cadre car une seule
-    // propriete" - the outer panel box above already gives it one).
-    { id: "progress", x: 20, y: 330, w: 300, icon: "progress_activity", iconOnly: true, framed: false },
+    // "progress" and "object" folded into the Actions panel's own
+    // optional slot instead of their own standalone windows (Gilles,
+    // 2026-10-22) - same move as polar's states/inspector's Analysis
+    // selection. This order (progress above object) is deliberate.
+    { id: "progress", foldIntoActions: true },
+    { id: "object", foldIntoActions: true },
     // Run-time copy of "sequence" with per-line progress, read-only
     // (permission:0) - rebuilt on each start, not persisted (issue #241).
     // Placed/sized by guesswork, not measured against a real dump - drag
