@@ -570,6 +570,14 @@ input[type="range"]::-moz-range-thumb {
 .altitude-chart { display: block; width: 100%; max-width: 280px; height: auto; aspect-ratio: 280 / 90; border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: ew-resize; margin-top: var(--space-2); }
 .timenav-readout { flex: 1 1 auto; }
 
+/* Polar module's azimuth/altitude error arrows, folded into the Actions
+ * panel below its "states" buttons - same fixed-intrinsic-size framed-
+ * canvas look as .altitude-chart above, just square and centred rather
+ * than full-width (it has no horizontal interaction to stretch for). */
+.polar-error-canvas { display: block; width: 160px; height: 160px; margin: var(--space-2) auto 0; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+.polar-error-rows { margin-top: var(--space-2); font-family: var(--font-mono); font-size: 12.5px; }
+.polar-error-row { line-height: 1.6; }
+
 /* Bordered/accented "value box" look, born on guider's own "values" panel
  * (Gilles, 2026-10-03: "rends-la plus graphique") for its RMS figures
  * (matches OstErix/Rooster's own guider.component.css, green left-border
