@@ -629,12 +629,13 @@ export function mount(client, moduleName) {
     // "header" panel either any more (render.js's own renderModuleView
     // doc comment: Gilles, 2026-10-03, "la supprimer completement").
 
-    renderActionsPanel(client, moduleName, mod, track, quickNavEntries);
-    if (has("values")) {
-      const b = Panels.make({ id: "values", title: mod.properties.values.label || "Session values", x: 20, y: 470, w: 300 });
-      b.appendChild(track(buildValuesPanel(client, moduleName)));
-      quickNavEntries.push({ id: "values", label: mod.properties.values.label || "Session values" });
-    }
+    // "Session values" (RMS/pulse boxes + calibration quality dot) folded
+    // into the Actions panel's own optional/extra slot instead of its own
+    // standalone window - same move as navigator's Selection/Time
+    // navigator panels and focus's Final result/Progress.
+    renderActionsPanel(client, moduleName, mod, track, quickNavEntries, undefined, {
+      node: has("values") ? track(buildValuesPanel(client, moduleName)) : null,
+    });
     // No small "Image" quick-stats panel/button here (Gilles, 2026-10-03:
     // "supprime le bouton 'image' et la fenetre associee") - the
     // background already shows the picture full-screen, and the "Stats"
