@@ -19,6 +19,9 @@
 import { buildScaffoldTemplate } from "./scaffold.js";
 
 export const mount = buildScaffoldTemplate([
-  { id: "states", x: 20, y: 330, w: 300 },
+  // Folded into the Actions panel's own optional slot instead of its own
+  // standalone window (Gilles, 2026-10-22) - same move as inspector's
+  // Analysis selection/planner's progress.
+  { id: "states", foldIntoActions: true },
   { id: "errors", x: 350, y: 330, w: 300 },
 ]);
