@@ -1425,6 +1425,17 @@ export class SkyEngine {
       }
     }
 
+    // Collected across stars/messier/planets below instead of drawn
+    // immediately, then sorted brightest-first and decluttered in one
+    // shared pass once every marker is placed (right after the planets
+    // loop) - same reasoning as placeDeclutteredLabels() above for the
+    // grid's own labels: drawing each layer's labels independently is
+    // exactly what produces overlapping, illegible text at high object
+    // density. The brighter object keeps its label; a fainter one whose
+    // label would overlap an already-placed one just goes label-less -
+    // its marker (dot/ellipse) is still drawn either way.
+    const objectLabelCandidates = [];
+
     // Stars. Day mode keeps its own fixed, stricter cutoff (only the
     // handful bright enough to plausibly still show up against a lit sky -
     // rough, not a real extinction model, see the dayMode comment above
@@ -1443,7 +1454,6 @@ export class SkyEngine {
     // own starsFromGeoJson() doc comment: most have none, `name` stays
     // undefined for those) get a label - not a magnitude cutoff of their
     // own, just whatever's already passing starMagLimit above.
-    if (this.showNames) { ctx.font = uiFont(11); ctx.textAlign = "left"; ctx.textBaseline = "middle"; }
     for (const s of this.catalog.stars) {
       if (s.mag > starMagLimit) continue;
       const p = project(s.ra, s.dec);
@@ -1460,7 +1470,7 @@ export class SkyEngine {
       ctx.beginPath();
       ctx.arc(p.x, p.y, r, 0, 2 * Math.PI);
       ctx.fill();
-      if (this.showNames && s.name) ctx.fillText(s.name, p.x + r + 3 * labelScale, p.y);
+      if (this.showNames && s.name) objectLabelCandidates.push({ x: p.x + r + 3 * labelScale, y: p.y, text: s.name, mag: s.mag, fontPx: 11, color: fg.star });
     }
 
     // Messier objects: real angular size when the catalog has it (Gilles,
@@ -1492,7 +1502,6 @@ export class SkyEngine {
       // present (unlike stars' proper names), not the longer `alt` common
       // name - shorter, and consistent with how every other chart labels
       // these.
-      if (this.showNames) { ctx.font = uiFont(11); ctx.textAlign = "left"; ctx.textBaseline = "middle"; }
       for (const m of this.catalog.messier) {
         const p = project(m.ra, m.dec);
         if (!p.visible) continue;
@@ -1562,7 +1571,7 @@ export class SkyEngine {
         ctx.beginPath();
         ctx.ellipse(p.x, p.y, rx, ry, rotation, 0, 2 * Math.PI);
         ctx.stroke();
-        if (this.showNames && m.name) ctx.fillText(m.name, p.x + rx + 3 * labelScale, p.y);
+        if (this.showNames && m.name) objectLabelCandidates.push({ x: p.x + rx + 3 * labelScale, y: p.y, text: m.name, mag: m.mag ?? 99, fontPx: 11, color: fg.messier });
       }
     }
 
@@ -1802,8 +1811,6 @@ export class SkyEngine {
     // Gated on showPlanets (Gilles, 2026-10-06: previously drawn
     // unconditionally, no toggle existed at all).
     if (this.showPlanets) {
-      ctx.textAlign = "left";
-      ctx.font = uiFont(10);
       for (const p of PLANETS) {
         const equ = Equator(p.body, date, this.observer, true, true);
         const h = Horizon(date, this.observer, equ.ra, equ.dec, "normal");
@@ -1842,7 +1849,32 @@ export class SkyEngine {
         ctx.beginPath();
         ctx.arc(scr.x, scr.y, radiusPx, 0, 2 * Math.PI);
         ctx.fill();
-        ctx.fillText(p.label, scr.x + radiusPx + 3 * labelScale, scr.y);
+        // Unconditional (not gated on showNames, unlike stars/messier
+        // above) - there are at most 7 of these, always worth naming.
+        objectLabelCandidates.push({ x: scr.x + radiusPx + 3 * labelScale, y: scr.y, text: p.label, mag: illum.mag, fontPx: 10, color: p.color });
+      }
+    }
+
+    // Declutter pass: brightest (lowest mag) first, real measureText()-
+    // based bounding boxes (labels vary a lot in length - "M" vs
+    // "Andromeda Galaxy"), later/fainter candidates simply skipped on any
+    // overlap rather than drawn on top of an already-placed label.
+    if (objectLabelCandidates.length) {
+      objectLabelCandidates.sort((a, b) => a.mag - b.mag);
+      const placedBoxes = [];
+      const padX = 3, padY = 2;
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      for (const c of objectLabelCandidates) {
+        ctx.font = uiFont(c.fontPx);
+        const textWidth = ctx.measureText(c.text).width;
+        const halfH = (c.fontPx * labelScale) / 2;
+        const box = { left: c.x - padX, right: c.x + textWidth + padX, top: c.y - halfH - padY, bottom: c.y + halfH + padY };
+        const overlaps = placedBoxes.some((b) => box.left < b.right && box.right > b.left && box.top < b.bottom && box.bottom > b.top);
+        if (overlaps) continue;
+        placedBoxes.push(box);
+        ctx.fillStyle = c.color;
+        ctx.fillText(c.text, c.x, c.y);
       }
     }
 
