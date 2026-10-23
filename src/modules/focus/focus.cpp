@@ -490,7 +490,7 @@ void Focus::SMFindStars()
     {
         double variance = OST::laplacianVarianceSharpness(_image->getImageBuffer(), stats.width, stats.height,
                            stats.bytesPerPixel, stats.min[0], stats.max[0]);
-        _sharpnessQuality = (variance > 0) ? (1.0 / variance) : 99;
+        _sharpnessQuality = (variance > 0) ? (100.0 / variance) : 99;
         logInfo("Sharpness variance: %1 (quality score %2)", {variance, _sharpnessQuality});
         pMachine->submitEvent("FindStarsDone");
         return;
