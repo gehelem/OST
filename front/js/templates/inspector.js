@@ -48,11 +48,13 @@ export const MAP_ITEMS = [
 // "Sharpness" (Laplacian variance) result box, shown only while the
 // "sharpness" analysis toggle is on - same .value-row/.value-box boxed-
 // figure look as focus.js's buildResultsBoxes() (Gilles, 2026-10-23: same
-// presentation, for inspector's star-independent sharpness metric, right
-// in the "analysis maps" window next to the image thumbnails). Needs both
-// "sharpness" (the value) and "analysis" (the toggle) - two subscriptions
-// kept in sync through shared mutable state, same pattern buildImageGridPanel
-// uses per-tile just above.
+// presentation, for inspector's star-independent sharpness metric). Folded
+// into the Actions panel's optional slot, right after "exposure" (Gilles,
+// 2026-10-23: moved out of the "maps" window - more practical there, next
+// to the toggle that actually controls it). Needs both "sharpness" (the
+// value) and "analysis" (the toggle) - two subscriptions kept in sync
+// through shared mutable state, same pattern buildImageGridPanel uses
+// per-tile just above.
 function buildSharpnessResultBox(client, moduleName) {
   const wrap = el("div", { class: "value-row" });
   let enabled = false;
@@ -78,18 +80,6 @@ function buildSharpnessResultBox(client, moduleName) {
   return wrap;
 }
 
-// The "maps" panel's actual content: the image grid plus the sharpness
-// result box right below it, as one combined, disposable node.
-function buildMapsPanelContent(client, moduleName) {
-  const wrap = el("div", { class: "inspector-maps" });
-  const grid = buildImageGridPanel(client, moduleName, MAP_ITEMS);
-  const sharpness = buildSharpnessResultBox(client, moduleName);
-  wrap.appendChild(grid);
-  wrap.appendChild(sharpness);
-  wrap._dispose = () => { grid._dispose(); sharpness._dispose(); };
-  return wrap;
-}
-
 export const mount = buildScaffoldTemplate(
   [
     // Folded into the Actions panel's own optional slot instead of its own
@@ -103,12 +93,15 @@ export const mount = buildScaffoldTemplate(
     // focus-loss fix above, to directly retest a directedit slider+number
     // field living in the Actions panel.
     { id: "parms", foldIntoActions: true, includeElements: ["exposure"] },
+    // Right after "exposure" (Gilles, 2026-10-23) - see buildSharpnessResultBox().
+    { id: "sharpness-result", foldIntoActions: true, customProps: ["sharpness"],
+      custom: (client, moduleName) => buildSharpnessResultBox(client, moduleName) },
     {
       // Icon-only too (same thread, right before: "sur le bouton analysis
       // maps laisse uniquement une icone 'experiment'").
       id: "maps", title: "inspector.maps", x: 900, y: 92, w: 460, icon: "experiment", iconOnly: true,
-      customProps: ["hfr", "shape", "collim", "corners", "sharpness"],
-      custom: (client, moduleName) => buildMapsPanelContent(client, moduleName),
+      customProps: ["hfr", "shape", "collim", "corners"],
+      custom: (client, moduleName) => buildImageGridPanel(client, moduleName, MAP_ITEMS),
     },
   ],
   { x: 1380, y: 92, w: 260 },
