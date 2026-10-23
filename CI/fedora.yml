@@ -48,6 +48,11 @@ build-job-fedora:
     - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
+# SUSPENDED 2026-10-24 (Gilles): allow_failure already kept it from
+# blocking anything, but it fails every single run regardless (sandbox
+# limitation, see the file header above) - pure noise. Kept intact
+# (rules: never) rather than deleted, same convention as the other
+# suspended jobs in .gitlab-ci.yml - see notes/NOTES-ci-packaging-arch-fedora.md.
 test-job-fedora:
   stage: test
   image: fedora:latest
@@ -64,6 +69,4 @@ test-job-fedora:
     expire_in: 4 week
   allow_failure: true
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
-    - if: '$CI_COMMIT_TAG =~ /^[0-9]+\.[0-9]+\.[0-9]+$/'
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - when: never

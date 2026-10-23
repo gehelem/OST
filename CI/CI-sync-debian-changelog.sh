@@ -78,15 +78,17 @@ fi
 # A real tag release: point "release" (ostserver-stable's Launchpad
 # recipe source) at main's current tip, so that recipe always builds
 # exactly the last tag - no manual merge into release needed anymore.
-# Plain (non-force) push: if release ever gets a commit of its own that
-# isn't on main, this is rejected rather than overwriting it, same
-# non-fatal handling as above.
+# Force push: release's tip is never a pure ancestor of main's, even
+# right after merging main into it - that merge commit itself only
+# ever lives on release, so a plain push is rejected as non-fast-forward
+# every single time. release has no content of its own to lose - it's
+# meant to be a pure mirror now.
 if [ -n "${CI_COMMIT_TAG}" ]; then
     (
         set -e
         git config user.email "gilles@joag.fr"
         git config user.name "gilles"
         git fetch origin main
-        git push origin FETCH_HEAD:release
+        git push --force origin FETCH_HEAD:release
     ) || echo "release branch sync failed (non-fatal)"
 fi
