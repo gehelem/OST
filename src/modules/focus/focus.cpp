@@ -304,6 +304,15 @@ void Focus::startLoop()
 {
     logInfo("Start focus loop");
     getProperty("values")->clearGrid();
+    // The frontend draws its polynomial-fit trend curve off "the last row
+    // carrying a nonzero fitk2" (templates/focus.js's own focusCurveData()) -
+    // clearGrid() wipes the ROWS, but a stale nonzero fitk2 from a previous
+    // autofocus run stays on the element itself and would otherwise leak
+    // into every row this loop pushes, drawing a meaningless curve across
+    // the loop's fake frame-index range.
+    getEltFloat("values", "fitk0")->setValue(0, false);
+    getEltFloat("values", "fitk1")->setValue(0, false);
+    getEltFloat("values", "fitk2")->setValue(0, true);
     getProperty("parms")->disable();
     getProperty("devices")->disable();
     getProperty("parameters")->disable();
