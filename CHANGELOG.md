@@ -1,3 +1,10 @@
+## 0.0.18 (2026-10-23)
+
+### fixed (2 changes)
+
+- [Protect Datastore's property store with a mutex against cross-thread access](https://gitlab.ostserver.fr/ost/ostserver/-/commit/1536fe23e97e7e6ddde00d4e74b32b0ca59275bb) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/273))
+- [Protect LovSingle's value map with a mutex against cross-thread access](https://gitlab.ostserver.fr/ost/ostserver/-/commit/6b4aac93bba68456d572dc5e2089ae0834afc321) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/273))
+
 ## 0.0.17 (2026-10-22)
 
 ### fixed (47 changes)
