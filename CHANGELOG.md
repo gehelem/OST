@@ -1,3 +1,23 @@
+## 0.0.19 (2026-10-23)
+
+### changed (1 change)
+
+- [Rename Inspector's sharpness label and scale it like Focus does](https://gitlab.ostserver.fr/ost/ostserver/-/commit/0e8ed14c6134fc97dee3162a8a184a01ca8cbf55) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/274))
+
+### added (5 changes)
+
+- [Add a centered ROI to Focus's sharpness metric](https://gitlab.ostserver.fr/ost/ostserver/-/commit/4f4b1fa42977abcd7400baf32d1a1528b39150e4) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/274))
+- [Add a star-independent sharpness metric as an alternative in Focus](https://gitlab.ostserver.fr/ost/ostserver/-/commit/d8669c2abcfba96e38685be3c7bdd6d4306b6d17) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/274))
+- [Move Inspector's sharpness result into the Actions panel](https://gitlab.ostserver.fr/ost/ostserver/-/commit/7b26ee6d72c5f3f2f46c85b8722d15c3a5eef52e) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/274))
+- [Show Inspector's sharpness result in UI3's Analysis maps window](https://gitlab.ostserver.fr/ost/ostserver/-/commit/a532e833623edd87c345ba59de7eaa3f41a6a372) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/274))
+- [Add a shared image-quality library and a sharpness analysis option to Inspector](https://gitlab.ostserver.fr/ost/ostserver/-/commit/370e5584b884744a26503ca8ff647b8314e77e16) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/274))
+
+### fixed (3 changes)
+
+- [Reset the polynomial-fit coefficients when starting the focus loop](https://gitlab.ostserver.fr/ost/ostserver/-/commit/41c0d908ffef535a95e6080da4d1a230d0c91072) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/274))
+- [Scale the sharpness quality score by 100 instead of 1](https://gitlab.ostserver.fr/ost/ostserver/-/commit/b623e88fe2e2b18d4f46b906d9ce4b1370c4de2e) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/274))
+- [Wire up Focus's "loop" action](https://gitlab.ostserver.fr/ost/ostserver/-/commit/1cb4484bb65f614883865efafcfd99f4d3e5a862) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/274))
+
 ## 0.0.18 (2026-10-23)
 
 ### fixed (2 changes)
