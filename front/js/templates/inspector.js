@@ -33,6 +33,7 @@
 
 import { buildScaffoldTemplate } from "./scaffold.js";
 import { buildImageGridPanel } from "../imagelayer.js";
+import { el } from "../dom.js";
 
 // Exported too — reused as-is (same 4 properties) by views.js's Home
 // dashboard, Gilles, 2026-10-06: "sur inspector ajoute les 4 images de
@@ -43,6 +44,51 @@ export const MAP_ITEMS = [
   { propName: "collim", elName: "image", label: "Collimation map" },
   { propName: "corners", elName: "image", label: "Corners map" },
 ];
+
+// "Sharpness" (Laplacian variance) result box, shown only while the
+// "sharpness" analysis toggle is on - same .value-row/.value-box boxed-
+// figure look as focus.js's buildResultsBoxes() (Gilles, 2026-10-23: same
+// presentation, for inspector's star-independent sharpness metric, right
+// in the "analysis maps" window next to the image thumbnails). Needs both
+// "sharpness" (the value) and "analysis" (the toggle) - two subscriptions
+// kept in sync through shared mutable state, same pattern buildImageGridPanel
+// uses per-tile just above.
+function buildSharpnessResultBox(client, moduleName) {
+  const wrap = el("div", { class: "value-row" });
+  let enabled = false;
+  let latest = null;
+  function render() {
+    wrap.innerHTML = "";
+    if (!enabled || !latest || !latest.elements.variance) return;
+    const v = latest.elements.variance;
+    wrap.appendChild(el("div", { class: "value-box" }, [
+      el("div", { class: "value-box-label", text: v.label || "variance" }),
+      el("div", { class: "value-box-number", text: (v.value || 0).toFixed(2) }),
+    ]));
+  }
+  const unsubAnalysis = client.subscribe(client.topics.property(moduleName, "analysis"), (prop) => {
+    enabled = !!(prop && prop.elements.sharpness && prop.elements.sharpness.value);
+    render();
+  });
+  const unsubSharpness = client.subscribe(client.topics.property(moduleName, "sharpness"), (prop) => {
+    latest = prop;
+    render();
+  });
+  wrap._dispose = () => { unsubAnalysis(); unsubSharpness(); };
+  return wrap;
+}
+
+// The "maps" panel's actual content: the image grid plus the sharpness
+// result box right below it, as one combined, disposable node.
+function buildMapsPanelContent(client, moduleName) {
+  const wrap = el("div", { class: "inspector-maps" });
+  const grid = buildImageGridPanel(client, moduleName, MAP_ITEMS);
+  const sharpness = buildSharpnessResultBox(client, moduleName);
+  wrap.appendChild(grid);
+  wrap.appendChild(sharpness);
+  wrap._dispose = () => { grid._dispose(); sharpness._dispose(); };
+  return wrap;
+}
 
 export const mount = buildScaffoldTemplate(
   [
@@ -61,8 +107,8 @@ export const mount = buildScaffoldTemplate(
       // Icon-only too (same thread, right before: "sur le bouton analysis
       // maps laisse uniquement une icone 'experiment'").
       id: "maps", title: "inspector.maps", x: 900, y: 92, w: 460, icon: "experiment", iconOnly: true,
-      customProps: ["hfr", "shape", "collim", "corners"],
-      custom: (client, moduleName) => buildImageGridPanel(client, moduleName, MAP_ITEMS),
+      customProps: ["hfr", "shape", "collim", "corners", "sharpness"],
+      custom: (client, moduleName) => buildMapsPanelContent(client, moduleName),
     },
   ],
   { x: 1380, y: 92, w: 260 },
