@@ -271,6 +271,18 @@
                 "type":"bool",
                 "label": "Use sharpness metric (no stars needed)",
                 "value": false
+            },
+            "sharpnessroi": {
+                "order":"82",
+                "autoupdate":true,
+                "directedit":true,
+                "type":"float",
+                "label": "Sharpness ROI (% of frame, centered)",
+                "value": 100,
+                "format": "999",
+                "min": 1,
+                "max": 100,
+                "hint": "restricts the sharpness metric to a centered region of this width/height, as a percentage of the full frame - 100 = whole frame. Drawn as a red frame on the preview image whenever below 100"
             }
 
         }

@@ -173,6 +173,28 @@ void Focus::newBLOB(INDI::PropertyBlob b)
 
         int quality = getInt("parms", "jpegquality");
         QImage rawImage = _image->getRawQImage();
+
+        // Sharpness ROI frame, drawn on the preview only (never on the
+        // buffer the analysis itself reads) - see imagequality.h's own doc
+        // comment on laplacianVarianceSharpness() for the matching rect
+        // computation used there.
+        double roiPercent = getFloat("parameters", "sharpnessroi");
+        if (getBool("parameters", "usesharpness") && roiPercent < 100.0)
+        {
+            QImage overlay = rawImage.convertToFormat(QImage::Format_RGB32);
+            overlay.setColorTable(rawImage.colorTable());
+            int rw = qMax(1, int(overlay.width() * roiPercent / 100.0));
+            int rh = qMax(1, int(overlay.height() * roiPercent / 100.0));
+            int rx = (overlay.width() - rw) / 2;
+            int ry = (overlay.height() - rh) / 2;
+            QPainter painter(&overlay);
+            painter.setPen(QPen(Qt::red, 3));
+            painter.setBrush(Qt::NoBrush);
+            painter.drawRect(rx, ry, rw, rh);
+            painter.end();
+            rawImage = overlay;
+        }
+
         atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + ".jpeg", quality);
         OST::ImgData dta = _image->ImgStats();
         dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + ".jpeg";
@@ -347,7 +369,7 @@ void Focus::measureLoopFrame()
     if (getBool("parameters", "usesharpness"))
     {
         double variance = OST::laplacianVarianceSharpness(_image->getImageBuffer(), stats.width, stats.height,
-                           stats.bytesPerPixel, stats.min[0], stats.max[0]);
+                           stats.bytesPerPixel, stats.min[0], stats.max[0], getFloat("parameters", "sharpnessroi"));
         onLoopFrameMeasured((variance > 0) ? (100.0 / variance) : 99);
         return;
     }
@@ -498,7 +520,7 @@ void Focus::SMFindStars()
     if (getBool("parameters", "usesharpness"))
     {
         double variance = OST::laplacianVarianceSharpness(_image->getImageBuffer(), stats.width, stats.height,
-                           stats.bytesPerPixel, stats.min[0], stats.max[0]);
+                           stats.bytesPerPixel, stats.min[0], stats.max[0], getFloat("parameters", "sharpnessroi"));
         _sharpnessQuality = (variance > 0) ? (100.0 / variance) : 99;
         logInfo("Sharpness variance: %1 (quality score %2)", {variance, _sharpnessQuality});
         pMachine->submitEvent("FindStarsDone");

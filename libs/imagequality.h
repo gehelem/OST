@@ -21,10 +21,17 @@ namespace OST
 // applied, matching the convention used elsewhere in OST for 8-bit contour
 // work (cf. Inspector::analyzeFrame()).
 //
+// `roiPercent` (1-100, default 100 = full frame) restricts the analysis to a
+// centered square-ish region whose width/height are each roiPercent% of the
+// full frame's (e.g. 50 -> half width, half height, centered) - a caller
+// drawing a matching overlay rectangle for the user should compute it the
+// same way: w = width*roiPercent/100, h = height*roiPercent/100, centered.
+//
 // Assumes a mono buffer (bytesPerPixel 1 or 2); color/Bayer is not handled.
 // Returns 0 on an invalid/empty buffer.
 double laplacianVarianceSharpness(const uint8_t *buffer, int width, int height,
-                                  int bytesPerPixel, double statMin, double statMax);
+                                  int bytesPerPixel, double statMin, double statMax,
+                                  double roiPercent = 100.0);
 }
 
 #endif
