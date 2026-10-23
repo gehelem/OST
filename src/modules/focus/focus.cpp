@@ -80,21 +80,26 @@ void Focus::onExternalEvent(OST::ExtEvent event)
             if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
             {
                 getEltBool("actions", "autofocus")->setValue(false, true);
+                getEltBool("actions", "loop")->setValue(false, true);
                 getProperty(event.prpkey)->setState(OST::Ok, true);
                 getEltPrg("progress", "global")->setPrgValue(0, true);
                 getEltPrg("progress", "global")->setDynLabel("Aborted", true);
                 getProperty("parms")->enable();
                 getProperty("devices")->enable();
                 getProperty("parameters")->enable();
+                _loopRunning = false;
                 pMachine->submitEvent("abort");
                 pMachine->stop();
             }
         }
         if (event.eltkey == "loop")
         {
-            if (getEltBool(event.prpkey, event.eltkey)->setValue(false, true))
+            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
             {
-                getProperty(event.prpkey)->setState(OST::Ok, true);
+                getEltBool("actions", "autofocus")->setValue(false, true);
+                getEltBool("actions", "abortfocus")->setValue(false, true);
+                getProperty(event.prpkey)->setState(OST::Busy, true);
+                startLoop();
             }
         }
     }
@@ -158,7 +163,7 @@ void Focus::newBLOB(INDI::PropertyBlob b)
 {
     if
     (
-        (QString(b.getDeviceName()) == getString("devices", "camera")) && pMachine->isRunning()
+        (QString(b.getDeviceName()) == getString("devices", "camera")) && (pMachine->isRunning() || _loopRunning)
     )
     {
         delete _image;
@@ -178,6 +183,10 @@ void Focus::newBLOB(INDI::PropertyBlob b)
         {
             pMachine->submitEvent("ExposureDone");
             pMachine->submitEvent("ExposureBestDone");
+        }
+        else if (_loopRunning)
+        {
+            measureLoopFrame();
         }
 
     }
@@ -283,6 +292,96 @@ void Focus::startCoarse()
     pMachine->start();
     getEltPrg("progress", "global")->setPrgValue(0, true);
     getEltPrg("progress", "global")->setDynLabel("0/" + QString::number(_iterations), true);
+}
+
+// Continuous measure-only loop: no focuser move of its own (the point is to
+// watch the metric react live while the user turns the focuser by hand),
+// runs until "abortfocus". Reuses the same "values" chart as the autofocus
+// V-curve, plotted against an incrementing frame index (_loopIndex) instead
+// of a real focuser position - the chart has no other way to tell them
+// apart, so clearing the grid at start keeps the two readouts from mixing.
+void Focus::startLoop()
+{
+    logInfo("Start focus loop");
+    getProperty("values")->clearGrid();
+    getProperty("parms")->disable();
+    getProperty("devices")->disable();
+    getProperty("parameters")->disable();
+    if (!isServerConnected()) connectIndi();
+    connectDevice(getString("devices", "camera"));
+    setBLOBMode(B_ALSO, getString("devices", "camera").toStdString().c_str(), nullptr);
+    enableDirectBlobAccess(getString("devices", "camera").toStdString().c_str(), nullptr);
+
+    _loopIndex = 0;
+    _loopRunning = true;
+    setStateEvent(OST::Busy, "focusing", "startloop", "continuous focus measurement loop started");
+    requestLoopExposure();
+}
+
+void Focus::requestLoopExposure()
+{
+    if (!requestCapture(getString("devices", "camera"), getFloat("parms", "exposure"), getInt("parms", "gain"),
+                        getInt("parms", "offset")))
+    {
+        _loopRunning = false;
+        getEltBool("actions", "loop")->setValue(false, true);
+        getProperty("actions")->setState(OST::Error, true);
+    }
+}
+
+// Same StellarSolver-or-sharpness branch as SMFindStars(), but outside the
+// SCXML machine entirely - see newBLOB()'s own _loopRunning branch.
+void Focus::measureLoopFrame()
+{
+    stats = _image->getStats();
+
+    if (getBool("parameters", "usesharpness"))
+    {
+        double variance = OST::laplacianVarianceSharpness(_image->getImageBuffer(), stats.width, stats.height,
+                           stats.bytesPerPixel, stats.min[0], stats.max[0]);
+        onLoopFrameMeasured((variance > 0) ? (100.0 / variance) : 99);
+        return;
+    }
+
+    _solver.ResetSolver(stats, _image->getImageBuffer(), getInt("parameters", "zoning"));
+    connect(&_solver, &Solver::successSEP, this, &Focus::OnLoopSucessSEP);
+    _solver.FindStars(buildStarDetectionParameters());
+}
+
+void Focus::OnLoopSucessSEP()
+{
+    disconnect(&_solver, &Solver::successSEP, this, &Focus::OnLoopSucessSEP);
+    if (!_loopRunning)
+        return;
+
+    // A single starless frame shouldn't kill an otherwise-running monitoring
+    // loop (unlike the autofocus sweep's own harder "abort" on this) - skip
+    // plotting it and keep going.
+    if (_solver.stars.size() < 1)
+    {
+        logWarning("Focus loop - no stars found this frame, skipping");
+        requestLoopExposure();
+        return;
+    }
+    onLoopFrameMeasured(_solver.HFRavg * getSampling());
+}
+
+void Focus::onLoopFrameMeasured(double quality)
+{
+    if (!_loopRunning)
+        return;
+
+    _loopIndex++;
+    getEltInt("values", "focpos")->setValue(_loopIndex, false);
+    getEltFloat("values", "loopHFRavg")->setValue(quality, true);
+    getStore()["values"]->push();
+
+    OST::ImgData dta = getEltImg("image", "image")->value();
+    dta.HFRavg = quality;
+    getEltImg("image", "image")->setValue(dta, true);
+    getEltFloat("results", "hfr")->setValue(quality, true);
+
+    requestLoopExposure();
 }
 
 void Focus::SMRequestFrameReset()
