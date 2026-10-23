@@ -1,5 +1,6 @@
 #include "inspector.h"
 #include <QPainter>
+#include <imagequality.h>
 #include <opencv2/opencv.hpp>
 // OpenCV 5.0 (confirmed: Arch's current opencv package) moved
 // contourArea()/boundingRect() out of imgproc entirely, into a brand
@@ -435,6 +436,7 @@ void Inspector::OnNewImage()
 {
     bool const doInspect = getBool("analysis", "inspector");
     bool const doCollim  = getBool("analysis", "collimator");
+    bool const doSharp   = getBool("analysis", "sharpness");
 
     // A selection change mid-loop must not leave a stale map on screen next to
     // a fresh one built from a different source frame: as soon as an analysis
@@ -452,6 +454,9 @@ void Inspector::OnNewImage()
 
     getEltLight("states", "shooting")->setValue(OST::Idle, false);
     getEltLight("states", "analyzing")->setValue(OST::Busy, true);
+
+    if (doSharp)
+        computeSharpness();
 
     if (doCollim)
         analyzeFrame();
@@ -1191,6 +1196,24 @@ void Inspector::analyzeFrame(void)
     painter.end();
 
     publishCollimationImages(overlay);
+}
+
+// Star-independent focus-quality metric (Laplacian variance, see
+// imagequality.h) -- shared with other modules, no local image processing
+// here beyond publishing the result.
+void Inspector::computeSharpness(void)
+{
+    if (!_image)
+        return;
+
+    FITSImage::Statistic localStats = _image->getStats();
+    uint8_t *buffer = _image->getImageBuffer();
+    if (!buffer || localStats.width == 0 || localStats.height == 0)
+        return;
+
+    double variance = OST::laplacianVarianceSharpness(buffer, localStats.width, localStats.height,
+                       localStats.bytesPerPixel, localStats.min[0], localStats.max[0]);
+    getEltFloat("sharpness", "variance")->setValue(variance, true);
 }
 
 // The main image must stay virgin (raw frame, no drawing) -- like the

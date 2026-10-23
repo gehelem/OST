@@ -24,6 +24,14 @@
                 "directedit": true,
                 "autoupdate": true,
                 "value": false
+            },
+            "sharpness": {
+                "type": "bool",
+                "label": "Sharpness analysis (no stars needed)",
+                "order": "3",
+                "directedit": true,
+                "autoupdate": true,
+                "value": false
             }
         }
     },
@@ -200,6 +208,23 @@
                 "type": "light",
                 "label": "Quality",
                 "order": "6"
+            }
+        }
+    },
+    "sharpness": {
+        "devcat": "Control",
+        "group": "",
+        "order": "Control065",
+        "permission": 0,
+        "hasprofile": false,
+        "label": "Sharpness",
+        "e": {
+            "variance": {
+                "type": "float",
+                "label": "Laplacian variance",
+                "order": "1",
+                "value": 0,
+                "format": "99999.99"
             }
         }
     },
