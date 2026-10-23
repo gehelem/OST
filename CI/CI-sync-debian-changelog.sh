@@ -55,23 +55,38 @@ fi
 NEW_LINE="ostserver (${NEW_VERSION}) UNRELEASED; urgency=medium"
 echo "Computed debian/changelog version: ${NEW_VERSION}"
 
-if [ "$(head -1 debian/changelog)" = "${NEW_LINE}" ]; then
+if [ "$(head -1 debian/changelog)" != "${NEW_LINE}" ]; then
+    # Same job-token push pattern as CHANGELOG.md's own commit (see
+    # CI-upload-release-tag.sh) - isolated subshell, a failure here never
+    # affects the release/upload already done by the calling script.
+    (
+        set -e
+        git config user.email "gilles@joag.fr"
+        git config user.name "gilles"
+        git fetch origin main
+        git checkout -B main FETCH_HEAD
+        { printf '%s\n' "${NEW_LINE}"; tail -n +2 debian/changelog; } > debian/changelog.new
+        mv debian/changelog.new debian/changelog
+        git add debian/changelog
+        git commit -m "debian: sync changelog version to ${NEW_VERSION}"
+        git push origin main
+    ) || echo "debian/changelog sync failed (non-fatal)"
+else
     echo "debian/changelog already up to date, nothing to push"
-    exit 0
 fi
 
-# Same job-token push pattern as CHANGELOG.md's own commit (see
-# CI-upload-release-tag.sh) - isolated subshell, a failure here never
-# affects the release/upload already done by the calling script.
-(
-    set -e
-    git config user.email "gilles@joag.fr"
-    git config user.name "gilles"
-    git fetch origin main
-    git checkout -B main FETCH_HEAD
-    { printf '%s\n' "${NEW_LINE}"; tail -n +2 debian/changelog; } > debian/changelog.new
-    mv debian/changelog.new debian/changelog
-    git add debian/changelog
-    git commit -m "debian: sync changelog version to ${NEW_VERSION}"
-    git push origin main
-) || echo "debian/changelog sync failed (non-fatal)"
+# A real tag release: point "release" (ostserver-stable's Launchpad
+# recipe source) at main's current tip, so that recipe always builds
+# exactly the last tag - no manual merge into release needed anymore.
+# Plain (non-force) push: if release ever gets a commit of its own that
+# isn't on main, this is rejected rather than overwriting it, same
+# non-fatal handling as above.
+if [ -n "${CI_COMMIT_TAG}" ]; then
+    (
+        set -e
+        git config user.email "gilles@joag.fr"
+        git config user.name "gilles"
+        git fetch origin main
+        git push origin FETCH_HEAD:release
+    ) || echo "release branch sync failed (non-fatal)"
+fi
