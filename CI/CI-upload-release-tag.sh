@@ -87,3 +87,6 @@ if [ -n "$CHANGELOG_NOTES" ]; then
 else
     echo "no changelog notes, skipping CHANGELOG.md commit"
 fi
+
+echo "sync debian/changelog version"
+sh ./CI/CI-sync-debian-changelog.sh
