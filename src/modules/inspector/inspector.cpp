@@ -1213,7 +1213,10 @@ void Inspector::computeSharpness(void)
 
     double variance = OST::laplacianVarianceSharpness(buffer, localStats.width, localStats.height,
                        localStats.bytesPerPixel, localStats.min[0], localStats.max[0]);
-    getEltFloat("sharpness", "variance")->setValue(variance, true);
+    // Same 100/variance scaling as Focus's own sharpness metric (lower is
+    // sharper, consistent with how the rest of OST reads a focus-quality
+    // number), not the raw variance.
+    getEltFloat("sharpness", "variance")->setValue((variance > 0) ? (100.0 / variance) : 99, true);
 }
 
 // The main image must stay virgin (raw frame, no drawing) -- like the

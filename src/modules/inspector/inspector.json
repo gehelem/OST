@@ -221,7 +221,7 @@
         "e": {
             "variance": {
                 "type": "float",
-                "label": "Laplacian variance",
+                "label": "Sharpness",
                 "order": "1",
                 "value": 0,
                 "format": "99999.99"
