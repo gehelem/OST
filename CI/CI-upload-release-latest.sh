@@ -40,3 +40,6 @@ ASSETS="$ASSETS --assets-link {\"name\":\"ostserver-complete_latest_2604_amd64.d
 [ -f ${APK_FILE_LATEST} ] && ASSETS="$ASSETS --assets-link {\"name\":\"${APK_FILE_LATEST}\",\"url\":\"${PACKAGE_REGISTRY_LATEST}/${APK_FILE_LATEST}\"}"
 [ -f front/${WWW_ZIP_LATEST} ] && ASSETS="$ASSETS --assets-link {\"name\":\"${WWW_ZIP_LATEST}\",\"url\":\"${PACKAGE_REGISTRY_LATEST}/${WWW_ZIP_LATEST}\"}"
 release-cli create --name "latest" --tag-name latest $ASSETS
+
+echo "sync debian/changelog version"
+sh ./CI/CI-sync-debian-changelog.sh
