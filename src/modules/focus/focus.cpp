@@ -382,6 +382,21 @@ Parameters Focus::buildStarDetectionParameters()
 void Focus::SMFindStars()
 {
     stats = _image->getStats();
+
+    // Star-independent alternative (Moon/planets, or just no visible stars
+    // in frame): skip StellarSolver entirely, score the frame with the
+    // Laplacian-variance metric instead - synchronous, so FindStarsDone can
+    // be submitted right away instead of waiting on Solver::successSEP.
+    if (getBool("parameters", "usesharpness"))
+    {
+        double variance = OST::laplacianVarianceSharpness(_image->getImageBuffer(), stats.width, stats.height,
+                           stats.bytesPerPixel, stats.min[0], stats.max[0]);
+        _sharpnessQuality = (variance > 0) ? (1.0 / variance) : 99;
+        logInfo("Sharpness variance: %1 (quality score %2)", {variance, _sharpnessQuality});
+        pMachine->submitEvent("FindStarsDone");
+        return;
+    }
+
     _solver.ResetSolver(stats, _image->getImageBuffer(), getInt("parameters", "zoning"));
     connect(&_solver, &Solver::successSEP, this, &Focus::OnSucessSEP);
     _solver.FindStars(buildStarDetectionParameters());
@@ -575,15 +590,20 @@ void Focus::SMComputeResult()
 {
     //sendMessage("SMComputeResult");
     double ech = getSampling();
-    getEltFloat("values", "imgHFR")->setValue(_solver.HFRavg * ech, false);
-    getEltFloat("values", "imgHFRdev")->setValue(_solver.HFRavgDev * ech, true);
-    getEltFloat("results", "hfr")->setValue(_solver.HFRavg * ech, true);
+    bool const sharp = getBool("parameters", "usesharpness");
+    double finalQuality = sharp ? _sharpnessQuality : (_solver.HFRavg * ech);
+    double finalQualityDev = sharp ? 0 : (_solver.HFRavgDev * ech);
+    int finalStars = sharp ? 0 : static_cast<int>(_solver.stars.size());
+
+    getEltFloat("values", "imgHFR")->setValue(finalQuality, false);
+    getEltFloat("values", "imgHFRdev")->setValue(finalQualityDev, true);
+    getEltFloat("results", "hfr")->setValue(finalQuality, true);
     //getEltFloat("results", "pos")->setValue(int(_bestposfit), true);
 
     OST::ImgData dta = getEltImg("image", "image")->value();
-    dta.HFRavg = _solver.HFRavg * ech;
-    dta.HFRavgDev = _solver.HFRavgDev * ech;
-    dta.starsCount = _solver.stars.size();
+    dta.HFRavg = finalQuality;
+    dta.HFRavgDev = finalQualityDev;
+    dta.starsCount = finalStars;
     getEltImg("image", "image")->setValue(dta, true);
 
     // what should i do here ?
@@ -982,21 +1002,29 @@ void Focus::SMComputeLoopFrame()
 {
     //sendMessage("SMComputeLoopFrame");
     double ech = getSampling();
+    bool const sharp = getBool("parameters", "usesharpness");
     _loopIteration++;
-    _loopHFRavg = ((_loopIteration - 1) * _loopHFRavg + _solver.HFRavg * ech) / _loopIteration;
-    for (int i = 0; i < mZoning * mZoning; i++)
+    _loopHFRavg = ((_loopIteration - 1) * _loopHFRavg + (sharp ? _sharpnessQuality : _solver.HFRavg * ech)) /
+                  _loopIteration;
+    // No per-zone sharpness map (v1) - zones simply stay unpopulated in this
+    // mode, same as any other frame without enough data (see SMComputeResult's
+    // own "val == 0" fallback on the tilt heatmap).
+    if (!sharp)
     {
-        if (_solver.HFRavgZone[i] != 99)
+        for (int i = 0; i < mZoning * mZoning; i++)
         {
-            _zoneloopHFRavg[i] = (_zoneLoopIteration[i] * _zoneloopHFRavg[i] + _solver.HFRavgZone[i] * ech) /
-                                 (_zoneLoopIteration[i] + 1);
-            _zoneLoopIteration[i]++;
+            if (_solver.HFRavgZone[i] != 99)
+            {
+                _zoneloopHFRavg[i] = (_zoneLoopIteration[i] * _zoneloopHFRavg[i] + _solver.HFRavgZone[i] * ech) /
+                                     (_zoneLoopIteration[i] + 1);
+                _zoneLoopIteration[i]++;
 
+            }
         }
     }
     getEltFloat("values", "loopHFRavg")->setValue(_loopHFRavg, true);
-    getEltFloat("values", "imgHFR")->setValue(_solver.HFRavg, false);
-    getEltFloat("values", "imgHFRdev")->setValue(_solver.HFRavgDev * ech, true);
+    getEltFloat("values", "imgHFR")->setValue(sharp ? _sharpnessQuality : _solver.HFRavg, false);
+    getEltFloat("values", "imgHFRdev")->setValue(sharp ? 0 : _solver.HFRavgDev * ech, true);
 
     //qDebug() << "Loop    " << _loopIteration << "/" << _loopIterations << " = " <<  _solver.HFRavg;
 
@@ -1021,12 +1049,14 @@ void Focus::SMAlert()
 void Focus::SMFocusDone()
 {
     double ech = getSampling();
+    bool const sharp = getBool("parameters", "usesharpness");
+    double finalQuality = sharp ? _sharpnessQuality : (_solver.HFRavg * ech);
     logInfo("Focus done");
-    getEltFloat("results", "hfr")->setValue(_solver.HFRavg * ech, true);
+    getEltFloat("results", "hfr")->setValue(finalQuality, true);
 
     getProperty("actions")->setState(OST::Ok, true); // this will inform other modules
     getEltBool("actions", "autofocus")->setValue(false, true);
     pMachine->stop();
-    setStateEvent(OST::Ok, "ready", "focusdone", "focus finished", _solver.HFRavg * ech);
+    setStateEvent(OST::Ok, "ready", "focusdone", "focus finished", finalQuality);
 
 }

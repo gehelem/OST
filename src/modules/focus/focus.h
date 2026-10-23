@@ -3,6 +3,7 @@
 #include <indimodule.h>
 #include <fileio.h>
 #include <solver.h>
+#include <imagequality.h>
 #include <QScxmlStateMachine>
 
 #if defined(FOCUS_MODULE)
@@ -98,6 +99,14 @@ class MODULE_INIT Focus : public IndiModule
         QPointer<fileio> _image;
         Solver _solver;
         FITSImage::Statistic stats;
+
+        // Set by SMFindStars() when "parameters.usesharpness" is on, as the
+        // star-independent alternative to _solver.HFRavg (see imagequality.h).
+        // Inverse of the Laplacian variance, so it keeps the same "lower is
+        // better" convention as HFR - every comparison/parabola-minimum fit
+        // below (SMCompute, SMRequestGotoBest, ...) stays meaningful without
+        // caring which metric actually produced the value.
+        double _sharpnessQuality = 99;
 
 
 };

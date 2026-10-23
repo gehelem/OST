@@ -263,6 +263,14 @@
                 "min": 0,
                 "max": 200,
                 "hint": "rejects detections smaller than this radius - native default is 3.5px"
+            },
+            "usesharpness": {
+                "order":"80",
+                "autoupdate":true,
+                "directedit":true,
+                "type":"bool",
+                "label": "Use sharpness metric (no stars needed)",
+                "value": false
             }
 
         }
