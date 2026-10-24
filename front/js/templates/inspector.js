@@ -38,11 +38,15 @@ import { el } from "../dom.js";
 // Exported too — reused as-is (same 4 properties) by views.js's Home
 // dashboard, Gilles, 2026-10-06: "sur inspector ajoute les 4 images de
 // controle en vignettes toutes petites".
+// `requires` ties each tile to its own "analysis" toggle (see
+// buildImageGridPanel's own doc comment) - collim needs "Collimator
+// analysis", the other three need "Inspector analysis" (Gilles,
+// 2026-10-24: hide maps whose underlying analysis isn't even enabled).
 export const MAP_ITEMS = [
-  { propName: "hfr", elName: "image", label: "HFR map" },
-  { propName: "shape", elName: "image", label: "Shape map" },
-  { propName: "collim", elName: "image", label: "Collimation map" },
-  { propName: "corners", elName: "image", label: "Corners map" },
+  { propName: "hfr", elName: "image", label: "HFR map", requires: "inspector" },
+  { propName: "shape", elName: "image", label: "Shape map", requires: "inspector" },
+  { propName: "collim", elName: "image", label: "Collimation map", requires: "collimator" },
+  { propName: "corners", elName: "image", label: "Corners map", requires: "inspector" },
 ];
 
 // "Sharpness" (Laplacian variance) result box, shown only while the
