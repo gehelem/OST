@@ -33,8 +33,10 @@ set(CPACK_RPM_PACKAGE_RELEASE "${OST_DEBIAN_REVISION}")
 # for this package (CPack's auto-generated spec doesn't run the same
 # full find-requires machinery a hand-written SPEC + plain rpmbuild
 # would), so it needs listing explicitly here, same as nginx below for
-# the Complete component.
-set(_requires_common "libindi")
+# the Complete component. avahi is the running service our avahi-client
+# linkage talks to over D-Bus to publish mDNS discovery - never picked
+# up automatically either, nothing links against the daemon itself.
+set(_requires_common "libindi, avahi")
 
 # ---------------------------------------------------------------------------
 # ostserver (Runtime component)
