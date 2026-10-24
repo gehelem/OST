@@ -243,7 +243,14 @@ function startDrag(panel, bar, id, ev, sc) {
     // see bottomSafeLimit()'s own doc comment for why the old `lr.height -
     // 36` let a dragged panel's body slide most of the way under
     // #quicknav before this ever engaged.
-    let vy = Math.max(SAFE_TOP, Math.min(p.y - lr.top - oy, bottomLimit - r.height));
+    // SAFE_TOP * z, not bare SAFE_TOP - `vy` is viewport space here (not
+    // yet /z-converted), but SAFE_TOP is a LOCAL-space constant (same one
+    // make()'s own initial clamp writes straight into style.top) - left
+    // unconverted, a zoom above 1x let a dragged panel stop above where
+    // #modbar's own real (zoom-scaled) bottom edge actually was, caught
+    // live, Gilles 2026-10-24: "selon le niveau de zoom ... on arrive
+    // encore a mettre des fenetres sous la barre de menu superieure".
+    let vy = Math.max(SAFE_TOP * z, Math.min(p.y - lr.top - oy, bottomLimit - r.height));
     const snap = snapToOtherPanels(panel, vx, vy, r.width, r.height);
     vx += snap.dx;
     vy += snap.dy;
@@ -508,10 +515,16 @@ export function make(opts) {
  */
 function clampBottomIntoView(panel) {
   const bottomLimit = bottomSafeLimit();
+  // `overflow` (from getBoundingClientRect(), real viewport pixels) has
+  // to come back to local space (/ z) before it can be subtracted from
+  // `top` (already local - it's read straight out of style.top) -
+  // otherwise this nudges the panel up by the wrong amount whenever the
+  // UI isn't at its default 1x zoom (same local-vs-viewport mismatch as
+  // startDrag()'s own move handler, see its SAFE_TOP comment).
   const overflow = panel.getBoundingClientRect().bottom - bottomLimit;
   if (overflow > 0) {
     const top = parseFloat(panel.style.top) || 0;
-    panel.style.top = Math.max(SAFE_TOP, top - overflow) + "px";
+    panel.style.top = Math.max(SAFE_TOP, top - overflow / uiZoom()) + "px";
   }
 }
 
@@ -612,10 +625,14 @@ export function reorganizePanels(layout) {
   const bottomLimit = bottomSafeLimit();
   const margin = 16;
   const gap = 10;
-  // SAFE_TOP, not just the margin - the same top forbidden zone (under
-  // #modbar) every other panel placement already respects (make()'s own
-  // initial clamp, startDrag()'s move handler).
-  const top = Math.max(SAFE_TOP, lr.top + margin);
+  // SAFE_TOP * z, not just the margin - `top`/`colY` stay viewport-space
+  // throughout this function (only the final style/state writes below
+  // convert with / z), so the local-space SAFE_TOP constant needs the
+  // same * z most other viewport-space clamps against it already use
+  // (startDrag()'s own move handler, same reasoning in its SAFE_TOP
+  // comment) - otherwise a zoom above 1x still let a reorganized panel's
+  // top land above #modbar's real (zoom-scaled) bottom edge.
+  const top = Math.max(SAFE_TOP * z, lr.top + margin);
   // Capped at a quarter of the display, not half (Gilles, 2026-10-24: "on
   // voulait faire de la place au centre") - each column hugs its own
   // edge, leaving the middle free for the background/sky view instead of
