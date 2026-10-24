@@ -67,6 +67,7 @@ const loginToggleEl = document.getElementById("login-toggle");
 const logToggleEl = document.getElementById("log-toggle");
 const logBadgeDotEl = document.getElementById("log-badge-dot");
 const paramsToggleEl = document.getElementById("params-toggle");
+const hideAllToggleEl = document.getElementById("hide-all-toggle");
 const dialogRootEl = document.getElementById("dialog-root");
 const connectBtnLabelEl = document.getElementById("connect-btn-label");
 const disconnectBtnLabelEl = document.getElementById("disconnect-btn-label");
@@ -95,6 +96,7 @@ function syncLangButtons() {
 // current language, so those pick it up for free.
 function applyStaticLabels() {
   paramsToggleEl.title = t("chrome.parameters");
+  hideAllToggleEl.title = t("chrome.hideAllPanels");
   topRightMoreEl.title = t("chrome.moreMenu");
   zoomToggleEl.title = t("chrome.uiSize");
   themeToggle.title = t("chrome.toggleTheme");
@@ -410,6 +412,7 @@ function openParamsDialog() {
 }
 
 paramsToggleEl.addEventListener("click", () => { if (!paramsToggleEl.disabled) openParamsDialog(); });
+hideAllToggleEl.addEventListener("click", () => Panels.hideAllPanels());
 
 // ---- connection controls --------------------------------------------------
 

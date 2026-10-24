@@ -531,6 +531,24 @@ export function isPanelVisible(id) {
 }
 
 /**
+ * Collapses every currently-visible panel of the active scope - a plain
+ * one-shot action, not a toggle (Gilles, 2026-10-24: "masquer toutes les
+ * fenetres", re-showing one afterwards is still its own quicknav button,
+ * same as always). `live` already only ever holds the current scope's
+ * non-persistent panels (make()'s own `if (!opts.persistent) live.push`,
+ * reset on every Panels.clear() scope change), so nothing extra to filter
+ * out - the persistent log panel is untouched. Goes through togglePanel()
+ * for each one so every usual side effect (state persisted, quicknav
+ * button synced via the panelvisibility event) stays correct.
+ */
+export function hideAllPanels() {
+  for (const panel of live) {
+    const id = panel.dataset.panel;
+    if (id && isPanelVisible(id)) togglePanel(id);
+  }
+}
+
+/**
  * Shows or hides one panel by id (Gilles, 2026-09-27: the quicknav button
  * "doit masquer/demasquer la fenetre" and reflect which state it's in;
  * 2026-10-03: "c'est le bouton de la barre de menu qui affiche/masque la
