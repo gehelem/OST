@@ -538,8 +538,8 @@ export function isPanelVisible(id) {
  * persistent log panel is untouched. Goes through togglePanel() for each
  * one so every usual side effect (state persisted, quicknav button synced
  * via the panelvisibility event) stays correct. Paired with
- * showAllPanels()/allPanelsHidden() below - app.js's own quicknav button
- * swaps between the two depending on which one applies.
+ * reorganizePanels()/allPanelsHidden() below - app.js's own quicknav
+ * button swaps between the two depending on which one applies.
  */
 export function hideAllPanels() {
   for (const panel of live) {
@@ -548,13 +548,74 @@ export function hideAllPanels() {
   }
 }
 
-/** Shows every currently-hidden panel of the active scope back where it
- * already was (collapsing is a CSS class only - position/size are untouched
- * by it) - the inverse of hideAllPanels() above. */
-export function showAllPanels() {
-  for (const panel of live) {
+/**
+ * Shows every panel of the active scope and lays all of them out into two
+ * fixed-width columns - the inverse of hideAllPanels() above, but a real
+ * layout instead of just restoring each one's last saved position
+ * (Gilles, 2026-10-24: "je voudrais que les fenetres soient organisees
+ * sur 2 colonnes, une a gauche et une a droite, sans recouvrement au
+ * moins sur celle de gauche"). The "actions" panel (render.js's
+ * renderActionsPanel(), present on most modules) always goes first, so it
+ * lands top-left - every other panel follows in creation order (`live`'s
+ * own order, stable regardless of z-stacking - raisePanel() only ever
+ * reorders the DOM, never this array). The left column fills solidly top
+ * to bottom first; only once a panel would no longer fit above
+ * bottomSafeLimit() does the rest overflow into the right column -
+ * Gilles explicitly ruled out alternating between the two.
+ *
+ * Geometry is computed in viewport space (layerRect()/bottomSafeLimit()
+ * are already that), exactly like startDrag()/startResize() above, and
+ * only converted to local (pre-zoom) space with `/ z` right before each
+ * style/state write - same reasoning as uiZoom()'s own doc comment.
+ */
+export function reorganizePanels() {
+  const z = uiZoom();
+  const lr = layerRect();
+  const bottomLimit = bottomSafeLimit();
+  const margin = 16;
+  const gap = 10;
+  // SAFE_TOP, not just the margin - the same top forbidden zone (under
+  // #modbar) every other panel placement already respects (make()'s own
+  // initial clamp, startDrag()'s move handler).
+  const top = Math.max(SAFE_TOP, lr.top + margin);
+  // Capped at a quarter of the display, not half (Gilles, 2026-10-24: "on
+  // voulait faire de la place au centre") - each column hugs its own
+  // edge, leaving the middle free for the background/sky view instead of
+  // the two columns meeting in the center. The half-minus-margins figure
+  // stays as a fallback floor for a narrow viewport where a quarter alone
+  // would be under panel-float's own 200px min-width.
+  const colWidth = Math.min(lr.width / 4, (lr.width - margin * 3) / 2);
+  const colX = [lr.left + margin, lr.left + lr.width - margin - colWidth];
+
+  const ordered = [...live];
+  const actionsIdx = ordered.findIndex((panel) => panel.dataset.panel === "actions");
+  if (actionsIdx > 0) ordered.unshift(ordered.splice(actionsIdx, 1)[0]);
+
+  let col = 0;
+  let y = top;
+  for (const panel of ordered) {
     const id = panel.dataset.panel;
-    if (id && !isPanelVisible(id)) togglePanel(id);
+    if (!id) continue;
+    panel.classList.remove("collapsed");
+    panel.style.width = (colWidth / z) + "px";
+    const h = panel.getBoundingClientRect().height;
+    if (col === 0 && y > top && y + h > bottomLimit) {
+      col = 1;
+      y = top;
+    }
+    panel.style.left = (colX[col] / z) + "px";
+    panel.style.top = (y / z) + "px";
+
+    const sc = panel.dataset.scope || scope;
+    const st = loadState(sc, id);
+    st.x = parseInt(panel.style.left, 10);
+    st.y = parseInt(panel.style.top, 10);
+    st.w = parseInt(panel.style.width, 10);
+    st.collapsed = false;
+    saveState(sc, id, st);
+    notifyVisibility(id, true);
+
+    y += h + gap;
   }
 }
 

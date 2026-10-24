@@ -426,7 +426,7 @@ function openParamsDialog() {
 
 paramsToggleEl.addEventListener("click", () => { if (!paramsToggleEl.disabled) openParamsDialog(); });
 hideAllToggleEl.addEventListener("click", () => {
-  if (Panels.allPanelsHidden()) Panels.showAllPanels();
+  if (Panels.allPanelsHidden()) Panels.reorganizePanels();
   else Panels.hideAllPanels();
   updateHideAllToggle();
 });
