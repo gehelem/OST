@@ -93,7 +93,12 @@ export function discover(timeoutMs) {
       if (settled) return;
       settled = true;
       clearTimeout(timer);
-      try { ZeroConf.unwatch({ type: SERVICE_TYPE, domain: SERVICE_DOMAIN }); } catch (e) { /* ignore */ }
+      // close(), not unwatch() - the native plugin's watchService() only
+      // ever (re)builds its listener when its own browserManager is still
+      // null (ZeroConf.java), which unwatch() never resets. Every scan
+      // after the first one in a given app session would otherwise watch
+      // nothing at all and silently time out empty.
+      try { ZeroConf.close(); } catch (e) { /* ignore */ }
       resolve([...found.values()]);
     };
     const timer = setTimeout(finish, timeoutMs || 10000);
