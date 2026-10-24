@@ -531,21 +531,38 @@ export function isPanelVisible(id) {
 }
 
 /**
- * Collapses every currently-visible panel of the active scope - a plain
- * one-shot action, not a toggle (Gilles, 2026-10-24: "masquer toutes les
- * fenetres", re-showing one afterwards is still its own quicknav button,
- * same as always). `live` already only ever holds the current scope's
- * non-persistent panels (make()'s own `if (!opts.persistent) live.push`,
- * reset on every Panels.clear() scope change), so nothing extra to filter
- * out - the persistent log panel is untouched. Goes through togglePanel()
- * for each one so every usual side effect (state persisted, quicknav
- * button synced via the panelvisibility event) stays correct.
+ * Collapses every currently-visible panel of the active scope. `live`
+ * already only ever holds the current scope's non-persistent panels
+ * (make()'s own `if (!opts.persistent) live.push`, reset on every
+ * Panels.clear() scope change), so nothing extra to filter out - the
+ * persistent log panel is untouched. Goes through togglePanel() for each
+ * one so every usual side effect (state persisted, quicknav button synced
+ * via the panelvisibility event) stays correct. Paired with
+ * showAllPanels()/allPanelsHidden() below - app.js's own quicknav button
+ * swaps between the two depending on which one applies.
  */
 export function hideAllPanels() {
   for (const panel of live) {
     const id = panel.dataset.panel;
     if (id && isPanelVisible(id)) togglePanel(id);
   }
+}
+
+/** Shows every currently-hidden panel of the active scope back where it
+ * already was (collapsing is a CSS class only - position/size are untouched
+ * by it) - the inverse of hideAllPanels() above. */
+export function showAllPanels() {
+  for (const panel of live) {
+    const id = panel.dataset.panel;
+    if (id && !isPanelVisible(id)) togglePanel(id);
+  }
+}
+
+/** True once every panel of the active scope is hidden (and there's at
+ * least one to begin with) - what app.js's quicknav button uses to decide
+ * whether it currently means "hide all" or "show all". */
+export function allPanelsHidden() {
+  return live.length > 0 && live.every((panel) => panel.classList.contains("collapsed"));
 }
 
 /**

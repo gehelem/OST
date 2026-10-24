@@ -40,6 +40,7 @@ setQuickNavRoot(quicknavNavEl, quicknavSepEl);
 panelLayerEl.addEventListener("panelvisibility", (ev) => {
   const btn = quicknavNavEl.querySelector(`[data-panel-id="${ev.detail.id}"]`);
   if (btn) btn.classList.toggle("active", ev.detail.visible);
+  updateHideAllToggle();
 });
 // #panel-layer used to silently swallow every pointer event aimed at empty
 // canvas space (no panel there) before it could reach whatever's behind it
@@ -96,7 +97,7 @@ function syncLangButtons() {
 // current language, so those pick it up for free.
 function applyStaticLabels() {
   paramsToggleEl.title = t("chrome.parameters");
-  hideAllToggleEl.title = t("chrome.hideAllPanels");
+  updateHideAllToggle();
   topRightMoreEl.title = t("chrome.moreMenu");
   zoomToggleEl.title = t("chrome.uiSize");
   themeToggle.title = t("chrome.toggleTheme");
@@ -369,6 +370,18 @@ function isModuleView() {
   return activeView && activeView !== "__home" && activeView !== "__controller";
 }
 
+// Swaps the single quicknav button between "hide all" and "reorganize"
+// (Gilles, 2026-10-24) depending on whether every panel of the active
+// scope is currently hidden - recomputed on every panel visibility change
+// (the "panelvisibility" listener above) and every view switch
+// (renderContentNow() below), not just right after this button's own
+// click.
+function updateHideAllToggle() {
+  const allHidden = Panels.allPanelsHidden();
+  hideAllToggleEl.querySelector(".material-icons").textContent = allHidden ? "view_agenda" : "visibility_off";
+  hideAllToggleEl.title = t(allHidden ? "chrome.reorganizePanels" : "chrome.hideAllPanels");
+}
+
 function updateParamsToggle() {
   const mod = isModuleView() && client.get(client.topics.module(activeView));
   // Gilles, 2026-10-03: the Parameters box's own new "Info" tab (mod.infos
@@ -412,7 +425,11 @@ function openParamsDialog() {
 }
 
 paramsToggleEl.addEventListener("click", () => { if (!paramsToggleEl.disabled) openParamsDialog(); });
-hideAllToggleEl.addEventListener("click", () => Panels.hideAllPanels());
+hideAllToggleEl.addEventListener("click", () => {
+  if (Panels.allPanelsHidden()) Panels.showAllPanels();
+  else Panels.hideAllPanels();
+  updateHideAllToggle();
+});
 
 // ---- connection controls --------------------------------------------------
 
@@ -585,6 +602,7 @@ function renderContentNow() {
     // views) — client.subscribe() fires immediately too, harmless overlap.
     const unsubParamsWatch = client.subscribe(client.topics.module(activeView), updateParamsToggle);
     contentDispose = () => { result.dispose(); unsubParamsWatch(); };
+    updateHideAllToggle();
     return;
   }
 
@@ -593,6 +611,7 @@ function renderContentNow() {
   else result = renderController(client, settingsBoxEl);
   dockedViewEl.appendChild(result.node);
   contentDispose = result.dispose || null;
+  updateHideAllToggle();
 }
 
 function selectView(key) {
