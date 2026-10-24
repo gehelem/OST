@@ -140,9 +140,7 @@ const STRINGS = {
   "imagelayer.noAlternates": { en: "No image yet", fr: "Aucune image pour l'instant", de: "Noch kein Bild", it: "Nessuna immagine disponibile", es: "Aún no hay imagen" },
   "imagelayer.sequenceImage": { en: "Sequence image", fr: "Image de la séquence", de: "Sequenzbild", it: "Immagine della sequenza", es: "Imagen de la secuencia" },
 
-  // ---- views.js: modbar system entries, login, controller/files ----------
-  "views.files": { en: "Files", fr: "Fichiers", de: "Dateien", it: "File", es: "Archivos" },
-  "views.filesWip": { en: "Work in progress - File explorer", fr: "En cours de refonte - Explorateur de fichiers", de: "In Arbeit - Dateiexplorer", it: "In corso di revisione - Esploratore file", es: "En desarrollo - Explorador de archivos" },
+  // ---- views.js: modbar system entries, login, controller ----------------
   "views.logs": { en: "Logs", fr: "Journaux", de: "Protokolle", it: "Log", es: "Registros" },
   "views.connectionSettings": { en: "Connection & settings", fr: "Connexion et réglages", de: "Verbindung & Einstellungen", it: "Connessione e impostazioni", es: "Conexión y ajustes" },
   "views.loginRequired": { en: "Login required", fr: "Connexion requise", de: "Anmeldung erforderlich", it: "Accesso richiesto", es: "Inicio de sesión requerido" },
@@ -154,6 +152,7 @@ const STRINGS = {
   "views.serverLoad": { en: "Server load", fr: "Charge serveur", de: "Serverlast", it: "Carico server", es: "Carga del servidor" },
   "views.cpuLabel": { en: "CPU (1/5/15m)", fr: "CPU (1/5/15 min)", de: "CPU (1/5/15 Min)", it: "CPU (1/5/15 min)", es: "CPU (1/5/15 min)" },
   "views.ramLabel": { en: "RAM", fr: "RAM", de: "RAM", it: "RAM", es: "RAM" },
+  "views.modulesPanelTitle": { en: "Modules & configurations", fr: "Modules et configurations", de: "Module und Konfigurationen", it: "Moduli e configurazioni", es: "Módulos y configuraciones" },
   "views.configurations": { en: "Configurations", fr: "Configurations", de: "Konfigurationen", it: "Configurazioni", es: "Configuraciones" },
   "views.loadedModules": { en: "Loaded modules", fr: "Modules chargés", de: "Geladene Module", it: "Moduli caricati", es: "Módulos cargados" },
   "views.loadAModule": { en: "Load a module", fr: "Charger un module", de: "Modul laden", it: "Carica un modulo", es: "Cargar un módulo" },

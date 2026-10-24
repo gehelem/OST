@@ -23,10 +23,8 @@ function git(cmd, fallback) {
 }
 
 const data = {
-  // Falls back to the short commit hash when no tag is reachable (most
-  // builds, since this project only tags "latest" - see
-  // CI/CI-upload-release-latest.sh - not a running series of version
-  // tags) rather than failing outright.
+  // Falls back to the short commit hash when no tag is reachable (any
+  // commit between two releases) rather than failing outright.
   tag: git("git describe --tags --always", "unknown"),
   commit: git("git rev-parse --short HEAD", "unknown"),
   date: git("git log -1 --format=%cI", "unknown"),

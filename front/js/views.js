@@ -975,9 +975,12 @@ export function renderController(client, settingsBoxEl) {
   // changed") and redraws only its own sub-container, never the inputs
   // that live in the same panel.
 
-  // ---- Configurations ----
-  const confBody = makeSectionPanel("configurations", t("views.configurations"));
+  // ---- Configurations + Load a module + Loaded modules (one panel) ----
+  // Grouped into a single floating panel, sub-sections only - each keeps
+  // its own subscription/redraw scope below, unchanged otherwise.
+  const confBody = makeSectionPanel("modules-panel", t("views.modulesPanelTitle"));
   const confPanelEl = confBody.parentElement;
+  confBody.appendChild(el("div", { class: "muted small", text: t("views.configurations") }));
   const confList = el("ul");
   confBody.appendChild(confList);
   const nameInput = el("input", { type: "text", class: "field-input", placeholder: t("views.configNamePlaceholder") });
@@ -1000,37 +1003,7 @@ export function renderController(client, settingsBoxEl) {
   scope.subscribe(client.topics.controllerData("availableconfs"), renderConfigurations);
   scope.subscribe(client.topics.controllerData("currentconf"), renderConfigurations);
 
-  // ---- Loaded modules ----
-  // "Kill all" (Gilles, 2026-10-13, Controller screen only - explicitly
-  // NOT the setup wizard) - same client.killModule() loop a user would do
-  // by hand one row at a time, GlobalDatastore excluded same as the
-  // per-row button below (the backend itself refuses to kill it anyway,
-  // Controller::onExternalEvent's MK case). Disabled whenever there is
-  // nothing to kill, kept in sync by the same subscription that redraws
-  // the list.
-  const killAllBtn = el("button", { class: "btn btn-sm btn-danger", text: t("views.killAll"), onclick: killAll });
-  const modBody = makeSectionPanel("modules", t("views.loadedModules"));
-  const modPanelEl = modBody.parentElement;
-  modBody.appendChild(el("div", { class: "form-row" }, [killAllBtn]));
-  const modList = el("ul");
-  modBody.appendChild(modList);
-  function killAll() {
-    const names = (client.get(client.topics.modules()) || []).filter((n) => n !== "GlobalDatastore");
-    if (names.length === 0) return;
-    if (!confirm(t("views.killAllConfirm", { count: String(names.length) }))) return;
-    for (const name of names) client.killModule(name);
-  }
-  scope.subscribe(client.topics.modules(), (names) => {
-    modList.innerHTML = "";
-    const killable = (names || []).filter((n) => n !== "GlobalDatastore");
-    killAllBtn.disabled = killable.length === 0;
-    for (const name of names || []) {
-      const li = el("li");
-      li.appendChild(el("span", { class: "spacer mono small", text: name }));
-      if (name !== "GlobalDatastore") li.appendChild(el("button", { class: "btn btn-sm btn-danger", onclick: () => { if (confirm(t("views.unloadConfirm", { name }))) client.killModule(name); } }, t("views.kill")));
-      modList.appendChild(li);
-    }
-  });
+  confBody.appendChild(el("div", { class: "settings-sep" }));
 
   // ---- Load a module ----
   // labelInput is created once, outside any subscription — this is the
@@ -1042,12 +1015,11 @@ export function renderController(client, settingsBoxEl) {
   // first letter uppercased and the rest lowercased (see
   // controller.en.md's "profiles keying" warning — not a plain capitalize,
   // and not the same string as libSelect's own stripped value).
-  const libBody = makeSectionPanel("load-module", t("views.loadAModule"));
-  const libPanelEl = libBody.parentElement;
+  confBody.appendChild(el("div", { class: "muted small", text: t("views.loadAModule") }));
   const libSelect = el("select", { class: "field-input" });
   const labelInput = el("input", { type: "text", class: "field-input", placeholder: t("views.instanceLabelPlaceholder") });
   const profileSelect = el("select", { class: "field-input" });
-  libBody.appendChild(el("div", { class: "form-row" }, [libSelect, labelInput, profileSelect,
+  confBody.appendChild(el("div", { class: "form-row" }, [libSelect, labelInput, profileSelect,
     el("button", { class: "btn btn-primary btn-sm", onclick: () => { if (labelInput.value) client.loadModule(libSelect.value, labelInput.value, profileSelect.value || undefined); } }, t("views.load")),
   ]));
 
@@ -1085,6 +1057,39 @@ export function renderController(client, settingsBoxEl) {
   scope.subscribe(client.topics.controllerData("libraries"), rebuildLibSelect);
   scope.subscribe(client.topics.controllerData("profiles"), renderProfiles);
 
+  confBody.appendChild(el("div", { class: "settings-sep" }));
+
+  // ---- Loaded modules ----
+  // "Kill all" (Gilles, 2026-10-13, Controller screen only - explicitly
+  // NOT the setup wizard) - same client.killModule() loop a user would do
+  // by hand one row at a time, GlobalDatastore excluded same as the
+  // per-row button below (the backend itself refuses to kill it anyway,
+  // Controller::onExternalEvent's MK case). Disabled whenever there is
+  // nothing to kill, kept in sync by the same subscription that redraws
+  // the list.
+  confBody.appendChild(el("div", { class: "muted small", text: t("views.loadedModules") }));
+  const killAllBtn = el("button", { class: "btn btn-sm btn-danger", text: t("views.killAll"), onclick: killAll });
+  confBody.appendChild(el("div", { class: "form-row" }, [killAllBtn]));
+  const modList = el("ul");
+  confBody.appendChild(modList);
+  function killAll() {
+    const names = (client.get(client.topics.modules()) || []).filter((n) => n !== "GlobalDatastore");
+    if (names.length === 0) return;
+    if (!confirm(t("views.killAllConfirm", { count: String(names.length) }))) return;
+    for (const name of names) client.killModule(name);
+  }
+  scope.subscribe(client.topics.modules(), (names) => {
+    modList.innerHTML = "";
+    const killable = (names || []).filter((n) => n !== "GlobalDatastore");
+    killAllBtn.disabled = killable.length === 0;
+    for (const name of names || []) {
+      const li = el("li");
+      li.appendChild(el("span", { class: "spacer mono small", text: name }));
+      if (name !== "GlobalDatastore") li.appendChild(el("button", { class: "btn btn-sm btn-danger", onclick: () => { if (confirm(t("views.unloadConfirm", { name }))) client.killModule(name); } }, t("views.kill")));
+      modList.appendChild(li);
+    }
+  });
+
   // ---- INDI server & drivers ----
   const indiBody = makeSectionPanel("indi", "INDI");
   const indiPanelEl = indiBody.parentElement;
@@ -1095,37 +1100,6 @@ export function renderController(client, settingsBoxEl) {
   indiNode.classList.remove("panel");
   indiBody.appendChild(indiNode);
 
-  // ---- Server load (systemwatcher) ----
-  const swBody = makeSectionPanel("server-load", t("views.serverLoad"));
-  const swPanelEl = swBody.parentElement;
-  let swConnected = false, swHasData = false;
-  function updateSwVisibility() { swPanelEl.classList.toggle("hidden", !(swConnected && swHasData)); }
-  scope.subscribe(client.topics.controllerData("systemwatcher"), (sw) => {
-    swHasData = !!sw;
-    updateSwVisibility();
-    swBody.innerHTML = "";
-    if (!sw) return;
-    // Same ring-gauge treatment as the Home dashboard's own system card
-    // (ringGauge() above) for RAM/disks - every disk here, not just the
-    // compact card's first two.
-    const rings = el("div", { class: "home-ring-row" });
-    if (sw.ram) rings.appendChild(ringGauge((sw.ram.used_mb / sw.ram.total_mb) * 100, t("views.ramLabel")));
-    for (const d of sw.disks || []) rings.appendChild(ringGauge((d.used_gb / d.total_gb) * 100, d.mountpoint));
-    if (rings.children.length) swBody.appendChild(rings);
-    if (sw.cpu) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: t("views.cpuLabel") }), el("span", { class: "value", text: `${sw.cpu.load_1m} / ${sw.cpu.load_5m} / ${sw.cpu.load_15m}` })]));
-    for (const n of sw.network || []) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: n.iface }), el("span", { class: "value", text: `↓${n.rx_kbps.toFixed(1)} ↑${n.tx_kbps.toFixed(1)} kbps` })]));
-    // "temp", not "t" — the latter would shadow the i18n t() used all over this file.
-    for (const temp of sw.temperatures || []) swBody.appendChild(el("div", { class: "metric-row" }, [el("span", { class: "label", text: temp.type }), el("span", { class: "value", text: `${temp.temp_c.toFixed(1)} °C` })]));
-  });
-
-  // ---- Files ----
-  // Gilles, 2026-10-18: the old folder-tree/file-grid UI is being redone
-  // from scratch - a placeholder button + dialog until then, rather than
-  // the half-working previous version.
-  const filesBody = makeSectionPanel("files", t("views.files"));
-  const filesPanelEl = filesBody.parentElement;
-  filesBody.appendChild(el("button", { class: "btn btn-sm", onclick: openFilesWipDialog }, t("views.files")));
-
   updateQuickNav(quickNavEntries);
 
   // Every panel but the settings box reads live server data with nothing
@@ -1134,7 +1108,7 @@ export function renderController(client, settingsBoxEl) {
   // current status too, so this also covers the very first render. Their
   // quicknav buttons are disabled right alongside, rather than left
   // clickable toggles for a panel that's hidden regardless.
-  const otherPanels = [confPanelEl, modPanelEl, libPanelEl, indiPanelEl, filesPanelEl];
+  const otherPanels = [confPanelEl, indiPanelEl];
   const toggleableIds = quickNavEntries.map((e) => e.id).filter((id) => id !== "settings");
   const unsubStatus = client.onStatus((status) => {
     const connected = status === "connected";
@@ -1143,8 +1117,6 @@ export function renderController(client, settingsBoxEl) {
       const btn = getQuickNavButton(id);
       if (btn) btn.disabled = !connected;
     }
-    swConnected = connected;
-    updateSwVisibility();
   });
 
   return {
@@ -1156,19 +1128,6 @@ export function renderController(client, settingsBoxEl) {
       if (settingsBoxEl) settingsBoxEl.classList.add("hidden");
     },
   };
-}
-
-function openFilesWipDialog() {
-  const overlay = el("div", { class: "dialog-overlay" });
-  const close = () => overlay.remove();
-  const dialog = el("div", { class: "dialog" }, [
-    el("h3", { text: t("views.files") }),
-    el("p", { text: t("views.filesWip") }),
-    el("div", { class: "dialog-actions" }, [el("button", { class: "btn", onclick: close }, t("common.cancel"))]),
-  ]);
-  overlay.appendChild(dialog);
-  overlay.addEventListener("click", (ev) => { if (ev.target === overlay) close(); });
-  document.getElementById("dialog-root").appendChild(overlay);
 }
 
 // ---- always-on floating log panel ----------------------------------------
