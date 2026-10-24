@@ -187,6 +187,13 @@ setDialogRoot(document.getElementById("dialog-root"));
 
 let activeView = null; // module name, or "__home"/"__controller", or null
 let contentDispose = null; // disposes whatever subscriptions the current content view opened
+// A bespoke template's own optional PANEL_LAYOUT export (templates/
+// guider.js, etc. - Gilles, 2026-10-24: per-template reorganize rules,
+// since one generic layout doesn't fit every module) - read once per
+// renderContentNow() below, used by the reorganize button's own click
+// handler further down since it has no other way to reach "whichever
+// template is on screen right now".
+let activeReorganizeLayout = null;
 let loginShown = false;
 // Declared up here, not just above renderModbarNow() itself: client.onStatus()
 // below fires its callback synchronously on registration (like subscribe()),
@@ -435,7 +442,7 @@ hideAllToggleEl.addEventListener("click", () => {
   updateHideAllToggle();
 });
 reorganizeToggleEl.addEventListener("click", () => {
-  Panels.reorganizePanels();
+  Panels.reorganizePanels(activeReorganizeLayout);
   updateHideAllToggle();
 });
 
@@ -603,6 +610,7 @@ function renderContentNow() {
     // determine".
     const mod = client.get(client.topics.module(activeView));
     const bespoke = !getDisableTemplates(activeView) && mod && templates[mod.infos.template];
+    activeReorganizeLayout = (bespoke && bespoke.PANEL_LAYOUT) || null;
     const result = bespoke ? bespoke.mount(client, activeView) : renderModuleView(client, activeView);
     // Keeps the gear button's "unsaved changes" dot live while this same
     // module stays active (updateParamsToggle() already ran once above,
@@ -614,6 +622,7 @@ function renderContentNow() {
     return;
   }
 
+  activeReorganizeLayout = null;
   let result;
   if (activeView === "__home") result = renderHome(client, selectView);
   else result = renderController(client, settingsBoxEl);

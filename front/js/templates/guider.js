@@ -604,6 +604,24 @@ function buildValuesPanel(client, moduleName) {
   return wrap;
 }
 
+// Per-template reorganize layout (panels.js's own reorganizePanels(),
+// read by app.js off whichever bespoke template is active) - Gilles,
+// 2026-10-24, spelling out the exact arrangement he wants here instead
+// of the generic "fill left then right" fallback: actions, drift and the
+// image stats panel stacked in the left column (actions/image stats each
+// a quarter of the display both ways - a square tile each, same basis
+// for width and height fractions, see reorganizePanels()'s own doc
+// comment - drift smaller at a sixth, also square); the guiding graph
+// alone in the right column, half wide but only a quarter tall.
+// "analyse" stays hidden - new, it used to show by default.
+export const PANEL_LAYOUT = {
+  actions: { col: 0, order: 0, wFrac: 1 / 4, hFrac: 1 / 4 },
+  drift: { col: 0, order: 1, wFrac: 1 / 6, hFrac: 1 / 6 },
+  "image-stats": { col: 0, order: 2, wFrac: 1 / 4, hFrac: 1 / 4 },
+  guiding: { col: 1, order: 0, wFrac: 1 / 2, hFrac: 1 / 4 },
+  analyse: { hidden: true },
+};
+
 export function mount(client, moduleName) {
   Panels.setScope(moduleName);
   Panels.clear();

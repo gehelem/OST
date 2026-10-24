@@ -562,26 +562,51 @@ export function showAllPanels() {
 }
 
 /**
- * Always shows every panel of the active scope and lays all of them out
- * into two fixed-width columns, regardless of which ones were already
- * visible - a real layout instead of just restoring each one's last
- * saved position (Gilles, 2026-10-24: "je voudrais que les fenetres
- * soient organisees sur 2 colonnes, une a gauche et une a droite, sans
- * recouvrement au moins sur celle de gauche"). The "actions" panel
- * (render.js's renderActionsPanel(), present on most modules) always
- * goes first, so it lands top-left - every other panel follows in
- * creation order (`live`'s own order, stable regardless of z-stacking -
- * raisePanel() only ever reorders the DOM, never this array). The left
- * column fills solidly top to bottom first; only once a panel would no
- * longer fit above bottomSafeLimit() does the rest overflow into the
- * right column - Gilles explicitly ruled out alternating between the two.
+ * Shows every panel of the active scope (except any `layout` explicitly
+ * marks `hidden`) and lays all of them out into two fixed-width columns -
+ * a real layout instead of just restoring each one's last saved position
+ * (Gilles, 2026-10-24: "je voudrais que les fenetres soient organisees
+ * sur 2 colonnes, une a gauche et une a droite, sans recouvrement au
+ * moins sur celle de gauche").
+ *
+ * `layout`, if given, is a per-template override map (a bespoke
+ * template's own optional PANEL_LAYOUT export - e.g. templates/guider.js
+ * - app.js reads it off whichever one is active and passes it straight
+ * through): `{ [panelId]: { col, order, wFrac, hFrac, hidden } }`.
+ *   - col: 0 (left) or 1 (right).
+ *   - order: placement order within that column (ties keep `live`'s own
+ *     creation order - see below).
+ *   - wFrac/hFrac: this panel's width/height as a fraction of the
+ *     display's WIDTH, both of them - not lr.height for hFrac (Gilles,
+ *     2026-10-24, caught live: guider's "drift" at wFrac/hFrac both 1/6
+ *     came out non-square, since the viewport itself isn't square -
+ *     sharing one basis instead means equal w/hFrac values always give a
+ *     true square, and the two together directly give the panel's own
+ *     aspect ratio regardless of actual screen proportions). Omit either
+ *     to keep the generic column width / this panel's own natural
+ *     content height.
+ *   - hidden: true collapses it instead of showing it (Gilles, 2026-10-24,
+ *     guider's own "analyse" panel: "ca doit etre masque") - an explicit
+ *     per-template exception to "reorganize always shows everything".
+ *
+ * Any panel NOT named in `layout` (or when `layout` itself is omitted -
+ * every template without its own PANEL_LAYOUT) falls back to the
+ * original generic rule: the "actions" panel (render.js's own
+ * renderActionsPanel(), present on most modules) goes first so it lands
+ * top-left, every other such panel follows in `live`'s own creation order
+ * (stable regardless of z-stacking - raisePanel() only ever reorders the
+ * DOM, never this array), filling the left column solidly top to bottom
+ * before overflowing into the right one - Gilles explicitly ruled out
+ * alternating between the two. Hinted panels are placed first (by
+ * `order`), so an unhinted panel's fallback position starts from
+ * wherever the hinted ones already left each column's cursor.
  *
  * Geometry is computed in viewport space (layerRect()/bottomSafeLimit()
  * are already that), exactly like startDrag()/startResize() above, and
  * only converted to local (pre-zoom) space with `/ z` right before each
  * style/state write - same reasoning as uiZoom()'s own doc comment.
  */
-export function reorganizePanels() {
+export function reorganizePanels(layout) {
   const z = uiZoom();
   const lr = layerRect();
   const bottomLimit = bottomSafeLimit();
@@ -597,38 +622,84 @@ export function reorganizePanels() {
   // the two columns meeting in the center. The half-minus-margins figure
   // stays as a fallback floor for a narrow viewport where a quarter alone
   // would be under panel-float's own 200px min-width.
-  const colWidth = Math.min(lr.width / 4, (lr.width - margin * 3) / 2);
-  const colX = [lr.left + margin, lr.left + lr.width - margin - colWidth];
+  const defaultColWidth = Math.min(lr.width / 4, (lr.width - margin * 3) / 2);
+  const colX = [lr.left + margin, lr.left + lr.width - margin - defaultColWidth];
+  const colY = [top, top];
 
-  const ordered = [...live];
-  const actionsIdx = ordered.findIndex((panel) => panel.dataset.panel === "actions");
-  if (actionsIdx > 0) ordered.unshift(ordered.splice(actionsIdx, 1)[0]);
-
-  let col = 0;
-  let y = top;
-  for (const panel of ordered) {
+  function place(panel, col, width, height) {
     const id = panel.dataset.panel;
-    if (!id) continue;
     panel.classList.remove("collapsed");
-    panel.style.width = (colWidth / z) + "px";
-    const h = panel.getBoundingClientRect().height;
-    if (col === 0 && y > top && y + h > bottomLimit) {
-      col = 1;
-      y = top;
-    }
+    panel.style.width = (width / z) + "px";
     panel.style.left = (colX[col] / z) + "px";
-    panel.style.top = (y / z) + "px";
+    panel.style.top = (colY[col] / z) + "px";
+    let h;
+    if (height != null) {
+      // Lifts panel-float-body's own 74vh scroll cap (components.css'
+      // ".resized" rule) - same mechanism a manual drag-resize already
+      // uses, so an explicit hFrac actually fills its given height
+      // instead of the content silently staying capped/scrollable.
+      panel.classList.add("resized");
+      panel.style.height = (height / z) + "px";
+      h = height;
+    } else {
+      // Clears any height a PREVIOUS reorganize (or manual resize) left
+      // behind BEFORE measuring - otherwise a panel whose hint used to
+      // set hFrac, or that the user once dragged taller, would still
+      // report its stale forced height here instead of its real natural
+      // content size.
+      panel.classList.remove("resized");
+      panel.style.height = "";
+      h = panel.getBoundingClientRect().height;
+    }
 
     const sc = panel.dataset.scope || scope;
     const st = loadState(sc, id);
     st.x = parseInt(panel.style.left, 10);
     st.y = parseInt(panel.style.top, 10);
     st.w = parseInt(panel.style.width, 10);
+    if (height != null) st.h = parseInt(panel.style.height, 10); else delete st.h;
     st.collapsed = false;
     saveState(sc, id, st);
     notifyVisibility(id, true);
 
-    y += h + gap;
+    colY[col] += h + gap;
+  }
+
+  const hinted = [];
+  const unhinted = [];
+  for (const panel of live) {
+    const id = panel.dataset.panel;
+    const hint = id && layout && layout[id];
+    if (hint) hinted.push(panel); else unhinted.push(panel);
+  }
+  hinted.sort((a, b) => (layout[a.dataset.panel].order || 0) - (layout[b.dataset.panel].order || 0));
+  const actionsIdx = unhinted.findIndex((panel) => panel.dataset.panel === "actions");
+  if (actionsIdx > 0) unhinted.unshift(unhinted.splice(actionsIdx, 1)[0]);
+
+  for (const panel of hinted) {
+    const id = panel.dataset.panel;
+    const hint = layout[id];
+    if (hint.hidden) {
+      if (isPanelVisible(id)) togglePanel(id);
+      continue;
+    }
+    const col = hint.col || 0;
+    place(panel, col, hint.wFrac != null ? hint.wFrac * lr.width : defaultColWidth,
+      hint.hFrac != null ? hint.hFrac * lr.width : null);
+  }
+
+  let col = colY[0] <= colY[1] ? 0 : 1;
+  for (const panel of unhinted) {
+    const id = panel.dataset.panel;
+    if (!id) continue;
+    // Collapsed (display:none) panels measure zero height - has to come
+    // off before this pre-placement measurement, same as place() does
+    // for the panel it actually commits to a column right after.
+    panel.classList.remove("collapsed");
+    panel.style.width = (defaultColWidth / z) + "px";
+    const h = panel.getBoundingClientRect().height;
+    if (col === 0 && colY[0] > top && colY[0] + h > bottomLimit) col = 1;
+    place(panel, col, defaultColWidth, null);
   }
 }
 
