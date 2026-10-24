@@ -178,6 +178,8 @@ test-job-2604:
 
 release-job-tag:
   stage: release
+  variables:
+    GIT_DEPTH: "0"      # debian/changelog sync needs full tag history (git describe)
   dependencies:
     - build-job-2204
     - build-job-2404
@@ -214,6 +216,7 @@ release-job-latest:
   variables:
     DOC_FILE_LATEST: "documentation_latest.tar.gz"
     WWW_ZIP_LATEST: "ostcore_latest_www.zip"
+    GIT_DEPTH: "0"      # debian/changelog sync needs full tag history (git describe)
   script:
     - sh ./CI/CI-upload-release-latest.sh
   rules:

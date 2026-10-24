@@ -13,14 +13,18 @@
 #  define MODULE_INIT Q_DECL_IMPORT
 #endif
 
-// Image analysis module. Two independent, non-exclusive analyses can be run on
+// Image analysis module. Independent, non-exclusive analyses can be run on
 // each captured (or reloaded) frame, selected by the "inspector" / "collimator"
-// toggle actions:
+// / "sharpness" toggle actions:
 //  - inspector : StellarSolver on a focused frame -> HFR / shape / corners maps
 //                (tilt, field curvature, aberrations)
 //  - collimator: OpenCV on a defocused frame -> per-donut deformation vectors,
 //                collimation vector C by field-convergence fit, per-screw
 //                corrections (cf. collimator-spec.md)
+//  - sharpness : generic, star-independent focus-quality metric (Laplacian
+//                variance) -- usable on starless frames (Moon, planets).
+//                Relative to the scene, not an absolute measure: meaningful
+//                only when comparing frames of the same target/exposure.
 class MODULE_INIT Inspector : public IndiModule
 {
         Q_OBJECT
@@ -63,6 +67,12 @@ class MODULE_INIT Inspector : public IndiModule
         // D(P) = C - k*P across all of them. C (the collimation vector) feeds
         // the per-screw corrections. cf. collimator-spec.md.
         void analyzeFrame(void);
+
+        // sharpness analysis (any frame, OpenCV Laplacian variance). No star
+        // or donut detection involved -- see runInspection()/analyzeFrame()
+        // for the alternatives this complements.
+        void computeSharpness(void);
+
         void drawStarOverlay(QPainter &painter, const std::vector<cv::Point> &contour,
                              const cv::Point2d &center, const cv::Point2d &deform, double scale,
                              double sx, double sy);

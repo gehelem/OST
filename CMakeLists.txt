@@ -241,6 +241,8 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementupdate.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/imagequality.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/imagequality.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/phd2guidelog.cpp
@@ -261,6 +263,7 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/dbmanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/imagequality.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/phd2guidelog.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/phd2loganalyzer.h
@@ -306,6 +309,7 @@ set(BASE_PUBLIC_HEADERS
 )
 set_target_properties(ostbasemodule PROPERTIES PUBLIC_HEADER "${BASE_PUBLIC_HEADERS}")
 
+target_include_directories(ostbasemodule PRIVATE ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(ostbasemodule
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Concurrent
@@ -314,6 +318,7 @@ target_link_libraries(ostbasemodule
     ${STELLARSOLVER_LIBRARIES}
     ${INDI_LIBRARIES} ${CFITSIO_LIBRARIES} ${NOVA_LIBRARIES}
     ${GSL_LIBRARIES} ${ZLIB_LIBRARY}
+    ${OpenCV_LIBS}
     Threads::Threads
     z
 )

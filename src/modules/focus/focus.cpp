@@ -80,21 +80,26 @@ void Focus::onExternalEvent(OST::ExtEvent event)
             if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
             {
                 getEltBool("actions", "autofocus")->setValue(false, true);
+                getEltBool("actions", "loop")->setValue(false, true);
                 getProperty(event.prpkey)->setState(OST::Ok, true);
                 getEltPrg("progress", "global")->setPrgValue(0, true);
                 getEltPrg("progress", "global")->setDynLabel("Aborted", true);
                 getProperty("parms")->enable();
                 getProperty("devices")->enable();
                 getProperty("parameters")->enable();
+                _loopRunning = false;
                 pMachine->submitEvent("abort");
                 pMachine->stop();
             }
         }
         if (event.eltkey == "loop")
         {
-            if (getEltBool(event.prpkey, event.eltkey)->setValue(false, true))
+            if (getEltBool(event.prpkey, event.eltkey)->setValue(true, true))
             {
-                getProperty(event.prpkey)->setState(OST::Ok, true);
+                getEltBool("actions", "autofocus")->setValue(false, true);
+                getEltBool("actions", "abortfocus")->setValue(false, true);
+                getProperty(event.prpkey)->setState(OST::Busy, true);
+                startLoop();
             }
         }
     }
@@ -158,7 +163,7 @@ void Focus::newBLOB(INDI::PropertyBlob b)
 {
     if
     (
-        (QString(b.getDeviceName()) == getString("devices", "camera")) && pMachine->isRunning()
+        (QString(b.getDeviceName()) == getString("devices", "camera")) && (pMachine->isRunning() || _loopRunning)
     )
     {
         delete _image;
@@ -168,6 +173,28 @@ void Focus::newBLOB(INDI::PropertyBlob b)
 
         int quality = getInt("parms", "jpegquality");
         QImage rawImage = _image->getRawQImage();
+
+        // Sharpness ROI frame, drawn on the preview only (never on the
+        // buffer the analysis itself reads) - see imagequality.h's own doc
+        // comment on laplacianVarianceSharpness() for the matching rect
+        // computation used there.
+        double roiPercent = getFloat("parameters", "sharpnessroi");
+        if (getBool("parameters", "usesharpness") && roiPercent < 100.0)
+        {
+            QImage overlay = rawImage.convertToFormat(QImage::Format_RGB32);
+            overlay.setColorTable(rawImage.colorTable());
+            int rw = qMax(1, int(overlay.width() * roiPercent / 100.0));
+            int rh = qMax(1, int(overlay.height() * roiPercent / 100.0));
+            int rx = (overlay.width() - rw) / 2;
+            int ry = (overlay.height() - rh) / 2;
+            QPainter painter(&overlay);
+            painter.setPen(QPen(Qt::red, 3));
+            painter.setBrush(Qt::NoBrush);
+            painter.drawRect(rx, ry, rw, rh);
+            painter.end();
+            rawImage = overlay;
+        }
+
         atomicSaveJpeg(rawImage, getWebroot() + "/" + getModuleName() + QString(b.getDeviceName()) + ".jpeg", quality);
         OST::ImgData dta = _image->ImgStats();
         dta.mUrlJpeg = getModuleName() + QString(b.getDeviceName()) + ".jpeg";
@@ -178,6 +205,10 @@ void Focus::newBLOB(INDI::PropertyBlob b)
         {
             pMachine->submitEvent("ExposureDone");
             pMachine->submitEvent("ExposureBestDone");
+        }
+        else if (_loopRunning)
+        {
+            measureLoopFrame();
         }
 
     }
@@ -285,6 +316,105 @@ void Focus::startCoarse()
     getEltPrg("progress", "global")->setDynLabel("0/" + QString::number(_iterations), true);
 }
 
+// Continuous measure-only loop: no focuser move of its own (the point is to
+// watch the metric react live while the user turns the focuser by hand),
+// runs until "abortfocus". Reuses the same "values" chart as the autofocus
+// V-curve, plotted against an incrementing frame index (_loopIndex) instead
+// of a real focuser position - the chart has no other way to tell them
+// apart, so clearing the grid at start keeps the two readouts from mixing.
+void Focus::startLoop()
+{
+    logInfo("Start focus loop");
+    getProperty("values")->clearGrid();
+    // The frontend draws its polynomial-fit trend curve off "the last row
+    // carrying a nonzero fitk2" (templates/focus.js's own focusCurveData()) -
+    // clearGrid() wipes the ROWS, but a stale nonzero fitk2 from a previous
+    // autofocus run stays on the element itself and would otherwise leak
+    // into every row this loop pushes, drawing a meaningless curve across
+    // the loop's fake frame-index range.
+    getEltFloat("values", "fitk0")->setValue(0, false);
+    getEltFloat("values", "fitk1")->setValue(0, false);
+    getEltFloat("values", "fitk2")->setValue(0, true);
+    getProperty("parms")->disable();
+    getProperty("devices")->disable();
+    getProperty("parameters")->disable();
+    if (!isServerConnected()) connectIndi();
+    connectDevice(getString("devices", "camera"));
+    setBLOBMode(B_ALSO, getString("devices", "camera").toStdString().c_str(), nullptr);
+    enableDirectBlobAccess(getString("devices", "camera").toStdString().c_str(), nullptr);
+
+    _loopIndex = 0;
+    _loopRunning = true;
+    setStateEvent(OST::Busy, "focusing", "startloop", "continuous focus measurement loop started");
+    requestLoopExposure();
+}
+
+void Focus::requestLoopExposure()
+{
+    if (!requestCapture(getString("devices", "camera"), getFloat("parms", "exposure"), getInt("parms", "gain"),
+                        getInt("parms", "offset")))
+    {
+        _loopRunning = false;
+        getEltBool("actions", "loop")->setValue(false, true);
+        getProperty("actions")->setState(OST::Error, true);
+    }
+}
+
+// Same StellarSolver-or-sharpness branch as SMFindStars(), but outside the
+// SCXML machine entirely - see newBLOB()'s own _loopRunning branch.
+void Focus::measureLoopFrame()
+{
+    stats = _image->getStats();
+
+    if (getBool("parameters", "usesharpness"))
+    {
+        double variance = OST::laplacianVarianceSharpness(_image->getImageBuffer(), stats.width, stats.height,
+                           stats.bytesPerPixel, stats.min[0], stats.max[0], getFloat("parameters", "sharpnessroi"));
+        onLoopFrameMeasured((variance > 0) ? (100.0 / variance) : 99);
+        return;
+    }
+
+    _solver.ResetSolver(stats, _image->getImageBuffer(), getInt("parameters", "zoning"));
+    connect(&_solver, &Solver::successSEP, this, &Focus::OnLoopSucessSEP);
+    _solver.FindStars(buildStarDetectionParameters());
+}
+
+void Focus::OnLoopSucessSEP()
+{
+    disconnect(&_solver, &Solver::successSEP, this, &Focus::OnLoopSucessSEP);
+    if (!_loopRunning)
+        return;
+
+    // A single starless frame shouldn't kill an otherwise-running monitoring
+    // loop (unlike the autofocus sweep's own harder "abort" on this) - skip
+    // plotting it and keep going.
+    if (_solver.stars.size() < 1)
+    {
+        logWarning("Focus loop - no stars found this frame, skipping");
+        requestLoopExposure();
+        return;
+    }
+    onLoopFrameMeasured(_solver.HFRavg * getSampling());
+}
+
+void Focus::onLoopFrameMeasured(double quality)
+{
+    if (!_loopRunning)
+        return;
+
+    _loopIndex++;
+    getEltInt("values", "focpos")->setValue(_loopIndex, false);
+    getEltFloat("values", "loopHFRavg")->setValue(quality, true);
+    getStore()["values"]->push();
+
+    OST::ImgData dta = getEltImg("image", "image")->value();
+    dta.HFRavg = quality;
+    getEltImg("image", "image")->setValue(dta, true);
+    getEltFloat("results", "hfr")->setValue(quality, true);
+
+    requestLoopExposure();
+}
+
 void Focus::SMRequestFrameReset()
 {
     //sendMessage("SMRequestFrameReset");
@@ -382,6 +512,21 @@ Parameters Focus::buildStarDetectionParameters()
 void Focus::SMFindStars()
 {
     stats = _image->getStats();
+
+    // Star-independent alternative (Moon/planets, or just no visible stars
+    // in frame): skip StellarSolver entirely, score the frame with the
+    // Laplacian-variance metric instead - synchronous, so FindStarsDone can
+    // be submitted right away instead of waiting on Solver::successSEP.
+    if (getBool("parameters", "usesharpness"))
+    {
+        double variance = OST::laplacianVarianceSharpness(_image->getImageBuffer(), stats.width, stats.height,
+                           stats.bytesPerPixel, stats.min[0], stats.max[0], getFloat("parameters", "sharpnessroi"));
+        _sharpnessQuality = (variance > 0) ? (100.0 / variance) : 99;
+        logInfo("Sharpness variance: %1 (quality score %2)", {variance, _sharpnessQuality});
+        pMachine->submitEvent("FindStarsDone");
+        return;
+    }
+
     _solver.ResetSolver(stats, _image->getImageBuffer(), getInt("parameters", "zoning"));
     connect(&_solver, &Solver::successSEP, this, &Focus::OnSucessSEP);
     _solver.FindStars(buildStarDetectionParameters());
@@ -575,15 +720,20 @@ void Focus::SMComputeResult()
 {
     //sendMessage("SMComputeResult");
     double ech = getSampling();
-    getEltFloat("values", "imgHFR")->setValue(_solver.HFRavg * ech, false);
-    getEltFloat("values", "imgHFRdev")->setValue(_solver.HFRavgDev * ech, true);
-    getEltFloat("results", "hfr")->setValue(_solver.HFRavg * ech, true);
+    bool const sharp = getBool("parameters", "usesharpness");
+    double finalQuality = sharp ? _sharpnessQuality : (_solver.HFRavg * ech);
+    double finalQualityDev = sharp ? 0 : (_solver.HFRavgDev * ech);
+    int finalStars = sharp ? 0 : static_cast<int>(_solver.stars.size());
+
+    getEltFloat("values", "imgHFR")->setValue(finalQuality, false);
+    getEltFloat("values", "imgHFRdev")->setValue(finalQualityDev, true);
+    getEltFloat("results", "hfr")->setValue(finalQuality, true);
     //getEltFloat("results", "pos")->setValue(int(_bestposfit), true);
 
     OST::ImgData dta = getEltImg("image", "image")->value();
-    dta.HFRavg = _solver.HFRavg * ech;
-    dta.HFRavgDev = _solver.HFRavgDev * ech;
-    dta.starsCount = _solver.stars.size();
+    dta.HFRavg = finalQuality;
+    dta.HFRavgDev = finalQualityDev;
+    dta.starsCount = finalStars;
     getEltImg("image", "image")->setValue(dta, true);
 
     // what should i do here ?
@@ -982,21 +1132,29 @@ void Focus::SMComputeLoopFrame()
 {
     //sendMessage("SMComputeLoopFrame");
     double ech = getSampling();
+    bool const sharp = getBool("parameters", "usesharpness");
     _loopIteration++;
-    _loopHFRavg = ((_loopIteration - 1) * _loopHFRavg + _solver.HFRavg * ech) / _loopIteration;
-    for (int i = 0; i < mZoning * mZoning; i++)
+    _loopHFRavg = ((_loopIteration - 1) * _loopHFRavg + (sharp ? _sharpnessQuality : _solver.HFRavg * ech)) /
+                  _loopIteration;
+    // No per-zone sharpness map (v1) - zones simply stay unpopulated in this
+    // mode, same as any other frame without enough data (see SMComputeResult's
+    // own "val == 0" fallback on the tilt heatmap).
+    if (!sharp)
     {
-        if (_solver.HFRavgZone[i] != 99)
+        for (int i = 0; i < mZoning * mZoning; i++)
         {
-            _zoneloopHFRavg[i] = (_zoneLoopIteration[i] * _zoneloopHFRavg[i] + _solver.HFRavgZone[i] * ech) /
-                                 (_zoneLoopIteration[i] + 1);
-            _zoneLoopIteration[i]++;
+            if (_solver.HFRavgZone[i] != 99)
+            {
+                _zoneloopHFRavg[i] = (_zoneLoopIteration[i] * _zoneloopHFRavg[i] + _solver.HFRavgZone[i] * ech) /
+                                     (_zoneLoopIteration[i] + 1);
+                _zoneLoopIteration[i]++;
 
+            }
         }
     }
     getEltFloat("values", "loopHFRavg")->setValue(_loopHFRavg, true);
-    getEltFloat("values", "imgHFR")->setValue(_solver.HFRavg, false);
-    getEltFloat("values", "imgHFRdev")->setValue(_solver.HFRavgDev * ech, true);
+    getEltFloat("values", "imgHFR")->setValue(sharp ? _sharpnessQuality : _solver.HFRavg, false);
+    getEltFloat("values", "imgHFRdev")->setValue(sharp ? 0 : _solver.HFRavgDev * ech, true);
 
     //qDebug() << "Loop    " << _loopIteration << "/" << _loopIterations << " = " <<  _solver.HFRavg;
 
@@ -1021,12 +1179,14 @@ void Focus::SMAlert()
 void Focus::SMFocusDone()
 {
     double ech = getSampling();
+    bool const sharp = getBool("parameters", "usesharpness");
+    double finalQuality = sharp ? _sharpnessQuality : (_solver.HFRavg * ech);
     logInfo("Focus done");
-    getEltFloat("results", "hfr")->setValue(_solver.HFRavg * ech, true);
+    getEltFloat("results", "hfr")->setValue(finalQuality, true);
 
     getProperty("actions")->setState(OST::Ok, true); // this will inform other modules
     getEltBool("actions", "autofocus")->setValue(false, true);
     pMachine->stop();
-    setStateEvent(OST::Ok, "ready", "focusdone", "focus finished", _solver.HFRavg * ech);
+    setStateEvent(OST::Ok, "ready", "focusdone", "focus finished", finalQuality);
 
 }
