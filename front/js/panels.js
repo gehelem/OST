@@ -538,8 +538,11 @@ export function isPanelVisible(id) {
  * persistent log panel is untouched. Goes through togglePanel() for each
  * one so every usual side effect (state persisted, quicknav button synced
  * via the panelvisibility event) stays correct. Paired with
- * reorganizePanels()/allPanelsHidden() below - app.js's own quicknav
- * button swaps between the two depending on which one applies.
+ * showAllPanels()/allPanelsHidden() below - app.js's own hide/show
+ * quicknav button swaps between the two depending on which one applies.
+ * reorganizePanels() further below is a separate, always-show action,
+ * its own quicknav button (Gilles, 2026-10-24: two buttons instead of one
+ * three-state toggle, "c'est risque").
  */
 export function hideAllPanels() {
   for (const panel of live) {
@@ -548,20 +551,30 @@ export function hideAllPanels() {
   }
 }
 
+/** Shows every currently-hidden panel of the active scope back where it
+ * already was (collapsing is a CSS class only - position/size are
+ * untouched by it) - the inverse of hideAllPanels() above. */
+export function showAllPanels() {
+  for (const panel of live) {
+    const id = panel.dataset.panel;
+    if (id && !isPanelVisible(id)) togglePanel(id);
+  }
+}
+
 /**
- * Shows every panel of the active scope and lays all of them out into two
- * fixed-width columns - the inverse of hideAllPanels() above, but a real
- * layout instead of just restoring each one's last saved position
- * (Gilles, 2026-10-24: "je voudrais que les fenetres soient organisees
- * sur 2 colonnes, une a gauche et une a droite, sans recouvrement au
- * moins sur celle de gauche"). The "actions" panel (render.js's
- * renderActionsPanel(), present on most modules) always goes first, so it
- * lands top-left - every other panel follows in creation order (`live`'s
- * own order, stable regardless of z-stacking - raisePanel() only ever
- * reorders the DOM, never this array). The left column fills solidly top
- * to bottom first; only once a panel would no longer fit above
- * bottomSafeLimit() does the rest overflow into the right column -
- * Gilles explicitly ruled out alternating between the two.
+ * Always shows every panel of the active scope and lays all of them out
+ * into two fixed-width columns, regardless of which ones were already
+ * visible - a real layout instead of just restoring each one's last
+ * saved position (Gilles, 2026-10-24: "je voudrais que les fenetres
+ * soient organisees sur 2 colonnes, une a gauche et une a droite, sans
+ * recouvrement au moins sur celle de gauche"). The "actions" panel
+ * (render.js's renderActionsPanel(), present on most modules) always
+ * goes first, so it lands top-left - every other panel follows in
+ * creation order (`live`'s own order, stable regardless of z-stacking -
+ * raisePanel() only ever reorders the DOM, never this array). The left
+ * column fills solidly top to bottom first; only once a panel would no
+ * longer fit above bottomSafeLimit() does the rest overflow into the
+ * right column - Gilles explicitly ruled out alternating between the two.
  *
  * Geometry is computed in viewport space (layerRect()/bottomSafeLimit()
  * are already that), exactly like startDrag()/startResize() above, and

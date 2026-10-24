@@ -69,6 +69,7 @@ const logToggleEl = document.getElementById("log-toggle");
 const logBadgeDotEl = document.getElementById("log-badge-dot");
 const paramsToggleEl = document.getElementById("params-toggle");
 const hideAllToggleEl = document.getElementById("hide-all-toggle");
+const reorganizeToggleEl = document.getElementById("reorganize-toggle");
 const dialogRootEl = document.getElementById("dialog-root");
 const connectBtnLabelEl = document.getElementById("connect-btn-label");
 const disconnectBtnLabelEl = document.getElementById("disconnect-btn-label");
@@ -98,6 +99,7 @@ function syncLangButtons() {
 function applyStaticLabels() {
   paramsToggleEl.title = t("chrome.parameters");
   updateHideAllToggle();
+  reorganizeToggleEl.title = t("chrome.reorganizePanels");
   topRightMoreEl.title = t("chrome.moreMenu");
   zoomToggleEl.title = t("chrome.uiSize");
   themeToggle.title = t("chrome.toggleTheme");
@@ -371,15 +373,17 @@ function isModuleView() {
 }
 
 // Swaps the single quicknav button between "hide all" and "reorganize"
-// (Gilles, 2026-10-24) depending on whether every panel of the active
-// scope is currently hidden - recomputed on every panel visibility change
-// (the "panelvisibility" listener above) and every view switch
+// Swaps the hide/show quicknav button's icon between "hide all" and
+// "show all" (Gilles, 2026-10-24) depending on whether every panel of the
+// active scope is currently hidden - recomputed on every panel visibility
+// change (the "panelvisibility" listener above) and every view switch
 // (renderContentNow() below), not just right after this button's own
-// click.
+// click. Reorganize is a separate, always-the-same-icon action button -
+// see its own click handler below.
 function updateHideAllToggle() {
   const allHidden = Panels.allPanelsHidden();
-  hideAllToggleEl.querySelector(".material-icons").textContent = allHidden ? "view_agenda" : "visibility_off";
-  hideAllToggleEl.title = t(allHidden ? "chrome.reorganizePanels" : "chrome.hideAllPanels");
+  hideAllToggleEl.querySelector(".material-icons").textContent = allHidden ? "visibility" : "visibility_off";
+  hideAllToggleEl.title = t(allHidden ? "chrome.showAllPanels" : "chrome.hideAllPanels");
 }
 
 function updateParamsToggle() {
@@ -426,8 +430,12 @@ function openParamsDialog() {
 
 paramsToggleEl.addEventListener("click", () => { if (!paramsToggleEl.disabled) openParamsDialog(); });
 hideAllToggleEl.addEventListener("click", () => {
-  if (Panels.allPanelsHidden()) Panels.reorganizePanels();
+  if (Panels.allPanelsHidden()) Panels.showAllPanels();
   else Panels.hideAllPanels();
+  updateHideAllToggle();
+});
+reorganizeToggleEl.addEventListener("click", () => {
+  Panels.reorganizePanels();
   updateHideAllToggle();
 });
 
