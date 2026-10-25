@@ -114,6 +114,7 @@ export function clear() {
     try { if (typeof p._onClose === "function") p._onClose(); } catch (e) { /* ignore */ }
     p.remove();
   }
+  hiddenByToggle = null;
 }
 
 function layerRect() { return layer.getBoundingClientRect(); }
@@ -557,21 +558,34 @@ export function isPanelVisible(id) {
  * its own quicknav button (Gilles, 2026-10-24: two buttons instead of one
  * three-state toggle, "c'est risque").
  */
+let hiddenByToggle = null;
+
 export function hideAllPanels() {
+  // Remembers which panels this call actually hid, so showAllPanels()
+  // only restores those - a panel already hidden beforehand (manually,
+  // or by reorganizePanels()'s `hidden` hint) was never part of the
+  // customized layout "tout afficher" is meant to bring back (Gilles,
+  // 2026-10-25: re-showing everything regardless surfaced panels like
+  // "analyse" that reorganize deliberately keeps hidden).
+  hiddenByToggle = new Set();
   for (const panel of live) {
     const id = panel.dataset.panel;
-    if (id && isPanelVisible(id)) togglePanel(id);
+    if (id && isPanelVisible(id)) {
+      togglePanel(id);
+      hiddenByToggle.add(id);
+    }
   }
 }
 
-/** Shows every currently-hidden panel of the active scope back where it
- * already was (collapsing is a CSS class only - position/size are
- * untouched by it) - the inverse of hideAllPanels() above. */
+/** Shows back only the panels hideAllPanels() itself just hid, each at
+ * its already-saved position/size (collapsing is a CSS class only) -
+ * the inverse of hideAllPanels() above, not a blanket "show everything". */
 export function showAllPanels() {
   for (const panel of live) {
     const id = panel.dataset.panel;
-    if (id && !isPanelVisible(id)) togglePanel(id);
+    if (id && !isPanelVisible(id) && (!hiddenByToggle || hiddenByToggle.has(id))) togglePanel(id);
   }
+  hiddenByToggle = null;
 }
 
 /**
@@ -643,11 +657,11 @@ export function reorganizePanels(layout) {
   const colX = [lr.left + margin, lr.left + lr.width - margin - defaultColWidth];
   const colY = [top, top];
 
-  function place(panel, col, width, height) {
+  function place(panel, col, width, height, x) {
     const id = panel.dataset.panel;
     panel.classList.remove("collapsed");
     panel.style.width = (width / z) + "px";
-    panel.style.left = (colX[col] / z) + "px";
+    panel.style.left = ((x != null ? x : colX[col]) / z) + "px";
     panel.style.top = (colY[col] / z) + "px";
     let h;
     if (height != null) {
@@ -701,8 +715,13 @@ export function reorganizePanels(layout) {
       continue;
     }
     const col = hint.col || 0;
+    // xFrac lets a hint override the column's default edge-anchored x -
+    // needed when wFrac makes the panel wider than defaultColWidth
+    // (e.g. a half-width right-column panel), where anchoring to the
+    // column's own edge would push part of it past the display edge.
+    const x = hint.xFrac != null ? lr.left + hint.xFrac * lr.width : null;
     place(panel, col, hint.wFrac != null ? hint.wFrac * lr.width : defaultColWidth,
-      hint.hFrac != null ? hint.hFrac * lr.width : null);
+      hint.hFrac != null ? hint.hFrac * lr.width : null, x);
   }
 
   let col = colY[0] <= colY[1] ? 0 : 1;

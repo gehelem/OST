@@ -605,20 +605,21 @@ function buildValuesPanel(client, moduleName) {
 }
 
 // Per-template reorganize layout (panels.js's own reorganizePanels(),
-// read by app.js off whichever bespoke template is active) - Gilles,
-// 2026-10-24, spelling out the exact arrangement he wants here instead
-// of the generic "fill left then right" fallback: actions, drift and the
-// image stats panel stacked in the left column (actions/image stats each
-// a quarter of the display both ways - a square tile each, same basis
-// for width and height fractions, see reorganizePanels()'s own doc
-// comment - drift smaller at a sixth, also square); the guiding graph
-// alone in the right column, half wide but only a quarter tall.
-// "analyse" stays hidden - new, it used to show by default.
+// read by app.js off whichever bespoke template is active) - spells out
+// the exact arrangement instead of the generic "fill left then right"
+// fallback: actions and drift stacked in the left column (a quarter and
+// an eighth of the display wide, respectively), guiding alone in the
+// right column at half width, its left edge pinned to the display's
+// horizontal center via xFrac rather than the column's own default
+// right-edge anchor (which would push a half-width panel off-screen).
+// None of the three set hFrac, so each keeps its natural content height
+// instead of being forced/scroll-capped to a fraction of the display.
+// "image-stats" and "analyse" stay hidden - both used to show by default.
 export const PANEL_LAYOUT = {
-  actions: { col: 0, order: 0, wFrac: 1 / 4, hFrac: 1 / 4 },
-  drift: { col: 0, order: 1, wFrac: 1 / 6, hFrac: 1 / 6 },
-  "image-stats": { col: 0, order: 2, wFrac: 1 / 4, hFrac: 1 / 4 },
-  guiding: { col: 1, order: 0, wFrac: 1 / 2, hFrac: 1 / 4 },
+  actions: { col: 0, order: 0, wFrac: 1 / 4 },
+  drift: { col: 0, order: 1, wFrac: 1 / 8 },
+  "image-stats": { hidden: true },
+  guiding: { col: 1, order: 0, wFrac: 1 / 2, xFrac: 1 / 2 },
   analyse: { hidden: true },
 };
 
