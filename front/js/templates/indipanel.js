@@ -48,7 +48,17 @@ export function mount(client, moduleName) {
       return;
     }
 
-    const { noLevel1, tabs } = buildLayout(mod.properties);
+    // Anything already reachable from the Parameters box (render.js's
+    // buildParamsPanel(): every hasprofile property, plus
+    // serveractions/devicesactions specifically even though neither is
+    // hasprofile) is excluded from the main view too - each lives under
+    // its own level1 group here with nothing else in it (indipanel's own
+    // "parms"/serveractions/devicesactions), so dropping them also drops
+    // that now-redundant quicknav tab entirely, without this template
+    // having to hardcode the group's own backend-defined label text.
+    const properties = Object.fromEntries(Object.entries(mod.properties)
+      .filter(([n, p]) => p.hasprofile !== true && n !== "serveractions" && n !== "devicesactions"));
+    const { noLevel1, tabs } = buildLayout(properties);
     const groups = [];
     if (noLevel1.length) groups.push({ id: "general", label: t("common.general"), direct: noLevel1, groups: [] });
     for (const tab of tabs) groups.push({ id: "lvl-" + tab.name, label: tab.name || "(ungrouped)", direct: tab.direct, groups: tab.groups });
