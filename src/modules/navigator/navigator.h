@@ -3,6 +3,7 @@
 #include <indimodule.h>
 #include <fileio.h>
 #include <solver.h>
+#include <tetra3solver.h>
 
 #include <libastro.h>
 #include <libnova/julian_day.h>
@@ -36,6 +37,9 @@ class MODULE_INIT Navigator : public IndiModule
         void OnSucessSolve();
         void OnSolverLog(QString text);
         void OnNewImage();
+        void OnTetra3SuccessSolve();
+        void OnTetra3FailSolve();
+        void OnTetra3Log(QString text);
     protected:
         void onExternalEvent(OST::ExtEvent event) override;
 
@@ -52,6 +56,10 @@ class MODULE_INIT Navigator : public IndiModule
         void correctOffset(double solvedRA, double solvedDEC);
         bool checkCentering(double solvedRA, double solvedDEC, double targetRA, double targetDEC);
         void syncMountIfNeeded(double solvedRA, double solvedDEC);
+        // Common handling shared by both solver backends, see
+        // "solver" property (stellarsolver/tetra, OneOfMany).
+        void onSolved(FITSImage::Solution solution);
+        void onSolveFailed();
 
 
         QString mState = "idle";
@@ -59,6 +67,7 @@ class MODULE_INIT Navigator : public IndiModule
         QPointer<fileio> pImage;
 
         StellarSolver stellarSolver;
+        Tetra3Solver tetra3Solver;
         QList<FITSImage::Star> stars;
 
         /**

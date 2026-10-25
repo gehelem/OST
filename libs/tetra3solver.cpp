@@ -35,7 +35,9 @@ void Tetra3Solver::SolveStars(const QString &imageFitsPath, double fovEstimateDe
     mSolution = FITSImage::Solution();
 
     QStringList args;
-    args << mScriptPath << "--image" << imageFitsPath << "--database" << mDatabasePath;
+    args << mScriptPath << "--image" << imageFitsPath;
+    if (!mDatabasePath.isEmpty())
+        args << "--database" << mDatabasePath;
     if (fovEstimateDeg > 0.0)
         args << "--fov-estimate" << QString::number(fovEstimateDeg);
     if (fovMaxErrorDeg > 0.0)

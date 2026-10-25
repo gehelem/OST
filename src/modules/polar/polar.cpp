@@ -40,6 +40,9 @@ Polar::Polar(QString name, QString label, QString profile, QVariantMap available
     b->setDirectEdit(true);
     getProperty("solver")->addElt(b);
 
+    _tetra3Solver.setScriptPath("/home/gilles/claude/OST/OST/libs/tetra3solver/tetra3_solve.py");
+    connect(&_tetra3Solver, &Tetra3Solver::solverLog, this, &Polar::OnSolverLog);
+
     b = new OST::ElementBool("start", "Start", "0", "");
     b->setDirectEdit(true);
     getProperty("actions")->addElt( b);
@@ -811,6 +814,25 @@ void Polar::SMFindStars()
     }
 
     mStats = image->getStats();
+
+    // "solver" property (OneOfMany, stellarsolver/tetra) picks the
+    // backend - see notes/NOTES-backend-tetra3-plate-solver-evaluation.md.
+    // Only this immediate solve + its result (below) is backend-aware;
+    // the later alignment math (SMCompute()/SMCorrCompute()/
+    // SMComputeFinal()) still reads _solver.stellarSolver.getSolution()
+    // directly in several places - see ost/ostserver#246.
+    if (getEltBool("solver", "tetra")->value())
+    {
+        double fovWidthDeg = _ccdX * _ccdSampling / 3600.0;
+        QString tetra3FitsPath = getWebroot() + "/" + getModuleName() + "_tetra3.fits";
+        QList<fileio::Record> records;
+        image->saveAsFITS(tetra3FitsPath, mStats, image->getImageBuffer(), FITSImage::Solution(), records, false);
+        connect(&_tetra3Solver, &Tetra3Solver::successSolve, this, &Polar::OnTetra3SuccessSolve, Qt::UniqueConnection);
+        connect(&_tetra3Solver, &Tetra3Solver::failSolve,    this, &Polar::OnTetra3FailSolve,    Qt::UniqueConnection);
+        _tetra3Solver.SolveStars(tetra3FitsPath, fovWidthDeg);
+        return;
+    }
+
     _solver.ResetSolver(mStats, image->getImageBuffer());
     QStringList folders;
     folders.append("/usr/share/astrometry");
@@ -865,6 +887,29 @@ void Polar::OnFailSolve()
 void Polar::OnSolverLog(QString &text)
 {
     //logDebug(text);
+}
+void Polar::OnTetra3SuccessSolve()
+{
+    logInfo("Tetra3 finished");
+    auto solution = _tetra3Solver.getSolution();
+    OST::ImgData dta = image->ImgStats();
+    dta.mUrlJpeg = getModuleName() + ".jpeg";
+    dta.solverRA = solution.ra;
+    dta.solverDE = solution.dec;
+    dta.solverOrientation = solution.orientation;
+    dta.isSolved = true;
+    getEltImg("image", "image")->setValue(dta, true);
+
+    disconnect(&_tetra3Solver, &Tetra3Solver::successSolve, this, &Polar::OnTetra3SuccessSolve);
+    disconnect(&_tetra3Solver, &Tetra3Solver::failSolve,    this, &Polar::OnTetra3FailSolve);
+    emit FindStarsDone();
+}
+void Polar::OnTetra3FailSolve()
+{
+    logWarning("Tetra3 failed to find a solution");
+    disconnect(&_tetra3Solver, &Tetra3Solver::successSolve, this, &Polar::OnTetra3SuccessSolve);
+    disconnect(&_tetra3Solver, &Tetra3Solver::failSolve,    this, &Polar::OnTetra3FailSolve);
+    emit FindStarsFailed();
 }
 void Polar::SMAbort()
 {

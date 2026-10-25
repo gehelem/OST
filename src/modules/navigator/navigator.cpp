@@ -62,6 +62,13 @@ Navigator::Navigator(QString name, QString label, QString profile, QVariantMap a
     connect(&stellarSolver, &StellarSolver::logOutput, this, &Navigator::OnSolverLog);
     connect(&stellarSolver, &StellarSolver::ready, this, &Navigator::OnSucessSolve);
 
+    // "solver" property (stellarsolver/tetra) picks the backend in
+    // OnNewImage() - see notes/NOTES-backend-tetra3-plate-solver-evaluation.md.
+    tetra3Solver.setScriptPath("/home/gilles/claude/OST/OST/libs/tetra3solver/tetra3_solve.py");
+    connect(&tetra3Solver, &Tetra3Solver::solverLog,   this, &Navigator::OnTetra3Log);
+    connect(&tetra3Solver, &Tetra3Solver::successSolve, this, &Navigator::OnTetra3SuccessSolve);
+    connect(&tetra3Solver, &Tetra3Solver::failSolve,    this, &Navigator::OnTetra3FailSolve);
+
 }
 
 Navigator::~Navigator()
@@ -275,23 +282,39 @@ void Navigator::OnNewImage()
     {
         double wra = ra * 360 / 24;
         double wde = dec;
-        stellarSolver.loadNewImageBuffer(pImage->getStats(), pImage->getImageBuffer());
-        QStringList folders;
-        folders.append("/usr/share/astrometry/");
-        stellarSolver.setIndexFolderPaths(folders);
-        stellarSolver.setProperty("UseScale", true);
-        stellarSolver.setSearchScale(ech * 0.8, ech * 1.2, ScaleUnits::ARCSEC_PER_PIX);
-        stellarSolver.setProperty("UsePosition", true);
-        stellarSolver.setSearchPositionInDegrees(wra, wde);
-        stellarSolver.setParameters(StellarSolver::getBuiltInProfiles()[SSolver::Parameters::DEFAULT]);
-        stellarSolver.setProperty("ProcessType", SOLVE);
-        stellarSolver.setProperty("ExtractorType", EXTRACTOR_INTERNAL);
-        stellarSolver.setProperty("SolverType", SOLVER_STELLARSOLVER);
-        stellarSolver.setLogLevel(LOG_MSG);
-        stellarSolver.setSSLogLevel(LOG_NORMAL);
-        stellarSolver.setProperty("LogToFile", true);
-        stellarSolver.setProperty("LogFileName", getWebroot() + "/navigator_solver.log");
-        stellarSolver.start();
+
+        // "solver" property (OneOfMany, stellarsolver/tetra) picks the
+        // backend - see notes/NOTES-backend-tetra3-plate-solver-evaluation.md.
+        if (getEltBool("solver", "tetra")->value())
+        {
+            QString tetra3FitsPath = getWebroot() + "/" + getModuleName() + "_tetra3.fits";
+            QList<fileio::Record> records;
+            FITSImage::Statistic tetra3Stats = pImage->getStats();
+            pImage->saveAsFITS(tetra3FitsPath, tetra3Stats, pImage->getImageBuffer(), FITSImage::Solution(), records,
+                                false);
+            double fovEstimateDeg = ech * tetra3Stats.width / 3600.0;
+            tetra3Solver.SolveStars(tetra3FitsPath, fovEstimateDeg);
+        }
+        else
+        {
+            stellarSolver.loadNewImageBuffer(pImage->getStats(), pImage->getImageBuffer());
+            QStringList folders;
+            folders.append("/usr/share/astrometry/");
+            stellarSolver.setIndexFolderPaths(folders);
+            stellarSolver.setProperty("UseScale", true);
+            stellarSolver.setSearchScale(ech * 0.8, ech * 1.2, ScaleUnits::ARCSEC_PER_PIX);
+            stellarSolver.setProperty("UsePosition", true);
+            stellarSolver.setSearchPositionInDegrees(wra, wde);
+            stellarSolver.setParameters(StellarSolver::getBuiltInProfiles()[SSolver::Parameters::DEFAULT]);
+            stellarSolver.setProperty("ProcessType", SOLVE);
+            stellarSolver.setProperty("ExtractorType", EXTRACTOR_INTERNAL);
+            stellarSolver.setProperty("SolverType", SOLVER_STELLARSOLVER);
+            stellarSolver.setLogLevel(LOG_MSG);
+            stellarSolver.setSSLogLevel(LOG_NORMAL);
+            stellarSolver.setProperty("LogToFile", true);
+            stellarSolver.setProperty("LogFileName", getWebroot() + "/navigator_solver.log");
+            stellarSolver.start();
+        }
     }
 }
 void Navigator::onUpdateProperty(INDI::Property property)
@@ -452,24 +475,42 @@ void Navigator::OnSolverLog(QString text)
     //logInfo(text);
     //qDebug() << text;
 }
+void Navigator::OnTetra3Log(QString text)
+{
+    logInfo("Tetra3: %1", {text});
+}
+void Navigator::OnTetra3SuccessSolve()
+{
+    onSolved(tetra3Solver.getSolution());
+}
+void Navigator::OnTetra3FailSolve()
+{
+    onSolveFailed();
+}
 void Navigator::OnSucessSolve()
 {
     if (stellarSolver.failed())
     {
-        logError("Image NOT solved - Centering aborted");
         stellarSolver.abort();
-        getProperty("actions")->setState(OST::Error, true);
-        setStateEvent(OST::Error, "error", "solverfailed", "Solver failed");
-        // Issue #237 - same reset OnSucessSolve()'s own success path does
-        // further down: an error path left these buttons stuck instead.
-        getEltBool("actions", "gototarget")->setValue(false, false);
-        getEltBool("actions", "abortnavigator")->setValue(false, true);
-        mState = "idle";
-        mCurrentIteration = 0;
+        onSolveFailed();
         return;
     }
-    // Get solved coordinates
-    auto solution = stellarSolver.getSolution();
+    onSolved(stellarSolver.getSolution());
+}
+void Navigator::onSolveFailed()
+{
+    logError("Image NOT solved - Centering aborted");
+    getProperty("actions")->setState(OST::Error, true);
+    setStateEvent(OST::Error, "error", "solverfailed", "Solver failed");
+    // Issue #237 - same reset onSolved()'s own success path does further
+    // down: an error path left these buttons stuck instead.
+    getEltBool("actions", "gototarget")->setValue(false, false);
+    getEltBool("actions", "abortnavigator")->setValue(false, true);
+    mState = "idle";
+    mCurrentIteration = 0;
+}
+void Navigator::onSolved(FITSImage::Solution solution)
+{
     double solvedRA = solution.ra * 24 / 360;
     double solvedDEC = solution.dec;
     // Update image with solve data

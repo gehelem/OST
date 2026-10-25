@@ -3,6 +3,7 @@
 #include <indimodule.h>
 #include <fileio.h>
 #include <solver.h>
+#include <tetra3solver.h>
 
 #if defined(POLAR_MODULE)
 #  define MODULE_INIT Q_DECL_EXPORT
@@ -52,6 +53,8 @@ class MODULE_INIT Polar : public IndiModule
         void OnSucessSolve();
         void OnFailSolve();
         void OnSolverLog(QString &text);
+        void OnTetra3SuccessSolve();
+        void OnTetra3FailSolve();
     private:
         void updateProperty(INDI::Property property) override;
         void newBLOB(INDI::PropertyBlob pblob);
@@ -110,6 +113,7 @@ class MODULE_INIT Polar : public IndiModule
         QString _mount  = "Telescope Simulator";
         QStateMachine _machine;
         Solver _solver;
+        Tetra3Solver _tetra3Solver;
         double square(double value)
         {
             return value * value;

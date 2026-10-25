@@ -1578,7 +1578,7 @@ bool IndiModule::giveMeASolver()
     if (!getStore().contains("solver"))
     {
         OST::PropertyMulti* pm = new OST::PropertyMulti("solver", "Solver", OST::ReadWrite, "Solver", "", "0700",
-                false,
+                true,
                 false);
         pm->setRule(OST::SwitchsRule::OneOfMany);
         createProperty(pm);
