@@ -40,6 +40,7 @@ setQuickNavRoot(quicknavNavEl, quicknavSepEl);
 panelLayerEl.addEventListener("panelvisibility", (ev) => {
   const btn = quicknavNavEl.querySelector(`[data-panel-id="${ev.detail.id}"]`);
   if (btn) btn.classList.toggle("active", ev.detail.visible);
+  updateHideAllToggle();
 });
 // #panel-layer used to silently swallow every pointer event aimed at empty
 // canvas space (no panel there) before it could reach whatever's behind it
@@ -67,6 +68,8 @@ const loginToggleEl = document.getElementById("login-toggle");
 const logToggleEl = document.getElementById("log-toggle");
 const logBadgeDotEl = document.getElementById("log-badge-dot");
 const paramsToggleEl = document.getElementById("params-toggle");
+const hideAllToggleEl = document.getElementById("hide-all-toggle");
+const reorganizeToggleEl = document.getElementById("reorganize-toggle");
 const dialogRootEl = document.getElementById("dialog-root");
 const connectBtnLabelEl = document.getElementById("connect-btn-label");
 const disconnectBtnLabelEl = document.getElementById("disconnect-btn-label");
@@ -95,6 +98,8 @@ function syncLangButtons() {
 // current language, so those pick it up for free.
 function applyStaticLabels() {
   paramsToggleEl.title = t("chrome.parameters");
+  updateHideAllToggle();
+  reorganizeToggleEl.title = t("chrome.reorganizePanels");
   topRightMoreEl.title = t("chrome.moreMenu");
   zoomToggleEl.title = t("chrome.uiSize");
   themeToggle.title = t("chrome.toggleTheme");
@@ -182,6 +187,13 @@ setDialogRoot(document.getElementById("dialog-root"));
 
 let activeView = null; // module name, or "__home"/"__controller", or null
 let contentDispose = null; // disposes whatever subscriptions the current content view opened
+// A bespoke template's own optional PANEL_LAYOUT export (templates/
+// guider.js, etc. - Gilles, 2026-10-24: per-template reorganize rules,
+// since one generic layout doesn't fit every module) - read once per
+// renderContentNow() below, used by the reorganize button's own click
+// handler further down since it has no other way to reach "whichever
+// template is on screen right now".
+let activeReorganizeLayout = null;
 let loginShown = false;
 // Declared up here, not just above renderModbarNow() itself: client.onStatus()
 // below fires its callback synchronously on registration (like subscribe()),
@@ -367,6 +379,20 @@ function isModuleView() {
   return activeView && activeView !== "__home" && activeView !== "__controller";
 }
 
+// Swaps the single quicknav button between "hide all" and "reorganize"
+// Swaps the hide/show quicknav button's icon between "hide all" and
+// "show all" (Gilles, 2026-10-24) depending on whether every panel of the
+// active scope is currently hidden - recomputed on every panel visibility
+// change (the "panelvisibility" listener above) and every view switch
+// (renderContentNow() below), not just right after this button's own
+// click. Reorganize is a separate, always-the-same-icon action button -
+// see its own click handler below.
+function updateHideAllToggle() {
+  const allHidden = Panels.allPanelsHidden();
+  hideAllToggleEl.querySelector(".material-icons").textContent = allHidden ? "visibility" : "visibility_off";
+  hideAllToggleEl.title = t(allHidden ? "chrome.showAllPanels" : "chrome.hideAllPanels");
+}
+
 function updateParamsToggle() {
   const mod = isModuleView() && client.get(client.topics.module(activeView));
   // Gilles, 2026-10-03: the Parameters box's own new "Info" tab (mod.infos
@@ -410,6 +436,15 @@ function openParamsDialog() {
 }
 
 paramsToggleEl.addEventListener("click", () => { if (!paramsToggleEl.disabled) openParamsDialog(); });
+hideAllToggleEl.addEventListener("click", () => {
+  if (Panels.allPanelsHidden()) Panels.showAllPanels();
+  else Panels.hideAllPanels();
+  updateHideAllToggle();
+});
+reorganizeToggleEl.addEventListener("click", () => {
+  Panels.reorganizePanels(activeReorganizeLayout);
+  updateHideAllToggle();
+});
 
 // ---- connection controls --------------------------------------------------
 
@@ -545,6 +580,23 @@ function renderContentNow() {
   // panel-layer/quicknav mechanism as a module), alongside its docked
   // settings box - so it needs the quicknav bar on, unlike Home.
   const isController = activeView === "__controller";
+
+  // A bespoke template (templates/index.js) wins over the generic,
+  // level1-grouped renderer when infos.template names one we have — see
+  // templates/index.js's header for the fallback-safety note.
+  // getDisableTemplates(activeView) (the Parameters box's own per-module
+  // dev-mode checkbox, render.js) forces the generic one for THIS module
+  // regardless, Gilles: "je suis certain de pouvoir toucher toutes les
+  // proprietes lorsque le template n'est pas encore bien determine".
+  const mod = isModule && client.get(client.topics.module(activeView));
+  const bespoke = isModule && !getDisableTemplates(activeView) && mod && templates[mod.infos.template];
+  // A bespoke template can opt out of the floating #panel-layer entirely
+  // (its own `DOCKED` export - indipanel.js is the one case so far, see
+  // its own header) in favor of #docked-view instead, same container
+  // Home/Controller already use - needed here, ahead of the dockedViewEl
+  // toggle just below, which decides between the two containers.
+  const docked = !!(bespoke && bespoke.DOCKED);
+
   // #panel-layer stays visible regardless of isModule now (Gilles,
   // 2026-10-06: "sur la home, on doit pouvoir ouvrir les logs (sans
   // selection du module) ==> la il ne se passe rien") - the persistent
@@ -557,39 +609,49 @@ function renderContentNow() {
   // so it doesn't block anything over empty space, and Panels.clear()
   // (above) already wipes every non-persistent (per-module) panel on
   // every call to this function, docked view or not.
-  dockedViewEl.classList.toggle("hidden", isModule);
+  dockedViewEl.classList.toggle("hidden", isModule && !docked);
   // #quicknav's own visibility follows the module/controller view
   // directly, not whether it has nav entries to show — the actions zone
   // (params) is still relevant for a module with zero level1 groups.
   quicknavEl.classList.toggle("hidden", !isModule && !isController);
+  // Hide/show-all and reorganize only mean anything against the floating
+  // #panel-layer - a docked template has no panels for either to act on.
+  hideAllToggleEl.classList.toggle("hidden", docked);
+  reorganizeToggleEl.classList.toggle("hidden", docked);
   updateParamsToggle();
 
   if (isModule) {
-    // A bespoke template (templates/index.js) wins over the generic,
-    // level1-grouped renderer when infos.template names one we have —
-    // see templates/index.js's header for the fallback-safety note.
-    // getDisableTemplates(activeView) (the Parameters box's own per-module
-    // dev-mode checkbox, render.js) forces the generic one for THIS
-    // module regardless, Gilles: "je suis certain de pouvoir toucher
-    // toutes les proprietes lorsque le template n'est pas encore bien
-    // determine".
-    const mod = client.get(client.topics.module(activeView));
-    const bespoke = !getDisableTemplates(activeView) && mod && templates[mod.infos.template];
+    activeReorganizeLayout = (bespoke && bespoke.PANEL_LAYOUT) || null;
+    // Checked before mount()/build() ever runs - a fresh panel's own
+    // make() only sets its hardcoded default x/y/w, it doesn't persist
+    // anything until the user actually drags/resizes/toggles it, so this
+    // still reads as "nothing saved yet" afterwards too, but asking first
+    // reads clearly as "this module's own first-ever open" rather than
+    // relying on that incidental timing.
+    const isFreshScope = !docked && !Panels.hasSavedLayout(activeView);
     const result = bespoke ? bespoke.mount(client, activeView) : renderModuleView(client, activeView);
+    if (docked) dockedViewEl.appendChild(result.node);
+    // A cleared cache or a module opened for the very first time starts
+    // already organized instead of at each panel's own hardcoded default
+    // position - same reorganizePanels() the button itself calls.
+    if (isFreshScope) Panels.reorganizePanels(activeReorganizeLayout);
     // Keeps the gear button's "unsaved changes" dot live while this same
     // module stays active (updateParamsToggle() already ran once above,
     // this covers every subsequent profile.changed flip without switching
     // views) — client.subscribe() fires immediately too, harmless overlap.
     const unsubParamsWatch = client.subscribe(client.topics.module(activeView), updateParamsToggle);
     contentDispose = () => { result.dispose(); unsubParamsWatch(); };
+    updateHideAllToggle();
     return;
   }
 
+  activeReorganizeLayout = null;
   let result;
   if (activeView === "__home") result = renderHome(client, selectView);
   else result = renderController(client, settingsBoxEl);
   dockedViewEl.appendChild(result.node);
   contentDispose = result.dispose || null;
+  updateHideAllToggle();
 }
 
 function selectView(key) {

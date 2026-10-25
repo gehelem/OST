@@ -105,6 +105,25 @@ function saveState(sc, id, st) {
   try { localStorage.setItem(keyFor(sc, id), JSON.stringify(st)); } catch (e) { /* ignore */ }
 }
 
+/** True if this scope has never had anything saved - a cleared cache, or
+ * the very first time this module is ever opened (app.js's own
+ * renderContentNow(), right after mount()/build() first lays out its
+ * panels at their hardcoded default positions): calls reorganizePanels()
+ * once right away in that case instead, so a fresh module starts already
+ * organized rather than at those defaults. Scans every key rather than
+ * checking one panel id, since which ids a module even has isn't known
+ * from here. */
+export function hasSavedLayout(sc) {
+  const prefix = keyFor(sc, "");
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith(prefix)) return true;
+    }
+  } catch (e) { /* ignore */ }
+  return false;
+}
+
 export function setLayer(el) { layer = el; }
 export function setScope(s) { scope = s || ""; }
 
@@ -114,6 +133,7 @@ export function clear() {
     try { if (typeof p._onClose === "function") p._onClose(); } catch (e) { /* ignore */ }
     p.remove();
   }
+  hiddenByToggle = null;
 }
 
 function layerRect() { return layer.getBoundingClientRect(); }
@@ -243,7 +263,14 @@ function startDrag(panel, bar, id, ev, sc) {
     // see bottomSafeLimit()'s own doc comment for why the old `lr.height -
     // 36` let a dragged panel's body slide most of the way under
     // #quicknav before this ever engaged.
-    let vy = Math.max(SAFE_TOP, Math.min(p.y - lr.top - oy, bottomLimit - r.height));
+    // SAFE_TOP * z, not bare SAFE_TOP - `vy` is viewport space here (not
+    // yet /z-converted), but SAFE_TOP is a LOCAL-space constant (same one
+    // make()'s own initial clamp writes straight into style.top) - left
+    // unconverted, a zoom above 1x let a dragged panel stop above where
+    // #modbar's own real (zoom-scaled) bottom edge actually was, caught
+    // live, Gilles 2026-10-24: "selon le niveau de zoom ... on arrive
+    // encore a mettre des fenetres sous la barre de menu superieure".
+    let vy = Math.max(SAFE_TOP * z, Math.min(p.y - lr.top - oy, bottomLimit - r.height));
     const snap = snapToOtherPanels(panel, vx, vy, r.width, r.height);
     vx += snap.dx;
     vy += snap.dy;
@@ -508,10 +535,16 @@ export function make(opts) {
  */
 function clampBottomIntoView(panel) {
   const bottomLimit = bottomSafeLimit();
+  // `overflow` (from getBoundingClientRect(), real viewport pixels) has
+  // to come back to local space (/ z) before it can be subtracted from
+  // `top` (already local - it's read straight out of style.top) -
+  // otherwise this nudges the panel up by the wrong amount whenever the
+  // UI isn't at its default 1x zoom (same local-vs-viewport mismatch as
+  // startDrag()'s own move handler, see its SAFE_TOP comment).
   const overflow = panel.getBoundingClientRect().bottom - bottomLimit;
   if (overflow > 0) {
     const top = parseFloat(panel.style.top) || 0;
-    panel.style.top = Math.max(SAFE_TOP, top - overflow) + "px";
+    panel.style.top = Math.max(SAFE_TOP, top - overflow / uiZoom()) + "px";
   }
 }
 
@@ -528,6 +561,221 @@ function findPanel(id) {
 export function isPanelVisible(id) {
   const panel = findPanel(id);
   return !!panel && !panel.classList.contains("collapsed");
+}
+
+/**
+ * Collapses every currently-visible panel of the active scope. `live`
+ * already only ever holds the current scope's non-persistent panels
+ * (make()'s own `if (!opts.persistent) live.push`, reset on every
+ * Panels.clear() scope change), so nothing extra to filter out - the
+ * persistent log panel is untouched. Goes through togglePanel() for each
+ * one so every usual side effect (state persisted, quicknav button synced
+ * via the panelvisibility event) stays correct. Paired with
+ * showAllPanels()/allPanelsHidden() below - app.js's own hide/show
+ * quicknav button swaps between the two depending on which one applies.
+ * reorganizePanels() further below is a separate, always-show action,
+ * its own quicknav button (Gilles, 2026-10-24: two buttons instead of one
+ * three-state toggle, "c'est risque").
+ */
+let hiddenByToggle = null;
+
+export function hideAllPanels() {
+  // Remembers which panels this call actually hid, so showAllPanels()
+  // only restores those - a panel already hidden beforehand (manually,
+  // or by reorganizePanels()'s `hidden` hint) was never part of the
+  // customized layout "tout afficher" is meant to bring back (Gilles,
+  // 2026-10-25: re-showing everything regardless surfaced panels like
+  // "analyse" that reorganize deliberately keeps hidden).
+  hiddenByToggle = new Set();
+  for (const panel of live) {
+    const id = panel.dataset.panel;
+    if (id && isPanelVisible(id)) {
+      togglePanel(id);
+      hiddenByToggle.add(id);
+    }
+  }
+}
+
+/** Shows back only the panels hideAllPanels() itself just hid, each at
+ * its already-saved position/size (collapsing is a CSS class only) -
+ * the inverse of hideAllPanels() above, not a blanket "show everything". */
+export function showAllPanels() {
+  for (const panel of live) {
+    const id = panel.dataset.panel;
+    if (id && !isPanelVisible(id) && (!hiddenByToggle || hiddenByToggle.has(id))) togglePanel(id);
+  }
+  hiddenByToggle = null;
+}
+
+/**
+ * Shows every panel of the active scope (except any `layout` explicitly
+ * marks `hidden`) and lays all of them out into two fixed-width columns -
+ * a real layout instead of just restoring each one's last saved position
+ * (Gilles, 2026-10-24: "je voudrais que les fenetres soient organisees
+ * sur 2 colonnes, une a gauche et une a droite, sans recouvrement au
+ * moins sur celle de gauche").
+ *
+ * `layout`, if given, is a per-template override map (a bespoke
+ * template's own optional PANEL_LAYOUT export - e.g. templates/guider.js
+ * - app.js reads it off whichever one is active and passes it straight
+ * through): `{ [panelId]: { col, order, wFrac, hFrac, hidden } }`.
+ *   - col: 0 (left) or 1 (right).
+ *   - order: placement order within that column (ties keep `live`'s own
+ *     creation order - see below).
+ *   - wFrac/hFrac: this panel's width/height as a fraction of the
+ *     display's WIDTH, both of them - not lr.height for hFrac (Gilles,
+ *     2026-10-24, caught live: guider's "drift" at wFrac/hFrac both 1/6
+ *     came out non-square, since the viewport itself isn't square -
+ *     sharing one basis instead means equal w/hFrac values always give a
+ *     true square, and the two together directly give the panel's own
+ *     aspect ratio regardless of actual screen proportions). Omit either
+ *     to keep the generic column width / this panel's own natural
+ *     content height.
+ *   - hidden: true collapses it instead of showing it (Gilles, 2026-10-24,
+ *     guider's own "analyse" panel: "ca doit etre masque") - an explicit
+ *     per-template exception to "reorganize always shows everything".
+ *
+ * Any panel NOT named in `layout` (or when `layout` itself is omitted -
+ * every template without its own PANEL_LAYOUT) falls back to the
+ * original generic rule: the "actions" panel (render.js's own
+ * renderActionsPanel(), present on most modules) goes first so it lands
+ * top-left, every other such panel follows in `live`'s own creation order
+ * (stable regardless of z-stacking - raisePanel() only ever reorders the
+ * DOM, never this array), filling the left column solidly top to bottom
+ * before overflowing into the right one - Gilles explicitly ruled out
+ * alternating between the two. Hinted panels are placed first (by
+ * `order`), so an unhinted panel's fallback position starts from
+ * wherever the hinted ones already left each column's cursor.
+ *
+ * Geometry is computed in viewport space (layerRect()/bottomSafeLimit()
+ * are already that), exactly like startDrag()/startResize() above, and
+ * only converted to local (pre-zoom) space with `/ z` right before each
+ * style/state write - same reasoning as uiZoom()'s own doc comment.
+ */
+export function reorganizePanels(layout) {
+  const columns = 2;
+  const z = uiZoom();
+  const lr = layerRect();
+  const bottomLimit = bottomSafeLimit();
+  const margin = 16;
+  const gap = 10;
+  // SAFE_TOP * z, not just the margin - `top`/`colY` stay viewport-space
+  // throughout this function (only the final style/state writes below
+  // convert with / z), so the local-space SAFE_TOP constant needs the
+  // same * z most other viewport-space clamps against it already use
+  // (startDrag()'s own move handler, same reasoning in its SAFE_TOP
+  // comment) - otherwise a zoom above 1x still let a reorganized panel's
+  // top land above #modbar's real (zoom-scaled) bottom edge.
+  const top = Math.max(SAFE_TOP * z, lr.top + margin);
+  // Capped at a quarter of the display, not half - each column hugs its
+  // own edge, leaving the middle free for the background/sky view
+  // instead of the two columns meeting in the center. The
+  // half-minus-margins figure stays as a fallback floor for a narrow
+  // viewport where a quarter alone would be under panel-float's own
+  // 200px min-width.
+  const defaultColWidth = Math.min(lr.width / 4, (lr.width - margin * 3) / 2);
+  const colX = [lr.left + margin, lr.left + lr.width - margin - defaultColWidth];
+  const colY = new Array(columns).fill(top);
+
+  function place(panel, col, width, height, x) {
+    const id = panel.dataset.panel;
+    panel.classList.remove("collapsed");
+    panel.style.width = (width / z) + "px";
+    panel.style.left = ((x != null ? x : colX[col]) / z) + "px";
+    panel.style.top = (colY[col] / z) + "px";
+    let h;
+    if (height != null) {
+      // Lifts panel-float-body's own 74vh scroll cap (components.css'
+      // ".resized" rule) - same mechanism a manual drag-resize already
+      // uses, so an explicit hFrac actually fills its given height
+      // instead of the content silently staying capped/scrollable.
+      panel.classList.add("resized");
+      panel.style.height = (height / z) + "px";
+      h = height;
+    } else {
+      // Clears any height a PREVIOUS reorganize (or manual resize) left
+      // behind BEFORE measuring - otherwise a panel whose hint used to
+      // set hFrac, or that the user once dragged taller, would still
+      // report its stale forced height here instead of its real natural
+      // content size.
+      panel.classList.remove("resized");
+      panel.style.height = "";
+      h = panel.getBoundingClientRect().height;
+    }
+
+    const sc = panel.dataset.scope || scope;
+    const st = loadState(sc, id);
+    st.x = parseInt(panel.style.left, 10);
+    st.y = parseInt(panel.style.top, 10);
+    st.w = parseInt(panel.style.width, 10);
+    if (height != null) st.h = parseInt(panel.style.height, 10); else delete st.h;
+    st.collapsed = false;
+    saveState(sc, id, st);
+    notifyVisibility(id, true);
+
+    colY[col] += h + gap;
+  }
+
+  const hinted = [];
+  const unhinted = [];
+  for (const panel of live) {
+    const id = panel.dataset.panel;
+    const hint = id && layout && layout[id];
+    if (hint) hinted.push(panel); else unhinted.push(panel);
+  }
+  hinted.sort((a, b) => (layout[a.dataset.panel].order || 0) - (layout[b.dataset.panel].order || 0));
+  const actionsIdx = unhinted.findIndex((panel) => panel.dataset.panel === "actions");
+  if (actionsIdx > 0) unhinted.unshift(unhinted.splice(actionsIdx, 1)[0]);
+
+  for (const panel of hinted) {
+    const id = panel.dataset.panel;
+    const hint = layout[id];
+    if (hint.hidden) {
+      if (isPanelVisible(id)) togglePanel(id);
+      continue;
+    }
+    const col = hint.col || 0;
+    const width = hint.wFrac != null ? hint.wFrac * lr.width : defaultColWidth;
+    // xFrac lets a hint override the column's default edge-anchored x -
+    // needed for a half-width right-column panel (anchoring it to
+    // colX[1]'s own fixed slot, built for defaultColWidth, would push
+    // part of it past the display edge). With no xFrac, a right-column
+    // panel still right-aligns using its OWN width instead of that fixed
+    // slot - otherwise a narrower one (e.g. a sixth-width panel) landed
+    // at colX[1]'s left edge, flush with neither margin.
+    let x = hint.xFrac != null ? lr.left + hint.xFrac * lr.width : null;
+    if (x == null && col === 1) x = lr.left + lr.width - margin - width;
+    place(panel, col, width, hint.hFrac != null ? hint.hFrac * lr.width : null, x);
+  }
+
+  for (const panel of unhinted) {
+    const id = panel.dataset.panel;
+    if (!id) continue;
+    // Collapsed (display:none) panels measure zero height - has to come
+    // off before this pre-placement measurement, same as place() does
+    // for the panel it actually commits to a column right after.
+    panel.classList.remove("collapsed");
+    panel.style.width = (defaultColWidth / z) + "px";
+    const h = panel.getBoundingClientRect().height;
+    // Picked fresh for every panel, left to right, instead of a pointer
+    // that only ever moves right and stays there - that used to let one
+    // tall panel exile every later, smaller panel to the next column too.
+    // A still-empty column always qualifies regardless of overflow
+    // (colY[c] === top) - better one tall panel overflowing its own
+    // column than leaving it empty for an equally-tall next one.
+    let col = columns - 1;
+    for (let c = 0; c < columns; c++) {
+      if (colY[c] === top || colY[c] + h <= bottomLimit) { col = c; break; }
+    }
+    place(panel, col, defaultColWidth, null);
+  }
+}
+
+/** True once every panel of the active scope is hidden (and there's at
+ * least one to begin with) - what app.js's quicknav button uses to decide
+ * whether it currently means "hide all" or "show all". */
+export function allPanelsHidden() {
+  return live.length > 0 && live.every((panel) => panel.classList.contains("collapsed"));
 }
 
 /**

@@ -1044,7 +1044,7 @@ export function renderProperty(client, moduleName, propName, opts) {
 
 // ---- module layout: tabs by level1, groups by level2, ordered -----------
 
-function buildLayout(properties) {
+export function buildLayout(properties) {
   const noLevel1 = [];
   const tabsMap = new Map();
   for (const [name, p] of Object.entries(properties)) {
@@ -1083,7 +1083,7 @@ function buildLayout(properties) {
  * show (nothing to tab between), same rule buildParamsPanel's own level1
  * tabs already follow.
  */
-function fillLevel1Panel(container, client, moduleName, track, tab) {
+export function fillLevel1Panel(container, client, moduleName, track, tab) {
   const groups = tab.direct.length ? [{ name: "", items: tab.direct }, ...tab.groups] : tab.groups;
   if (groups.length <= 1) {
     for (const { name } of (groups[0] ? groups[0].items : [])) container.appendChild(track(renderProperty(client, moduleName, name)));
@@ -1139,9 +1139,12 @@ function renderInfosTab(mod) {
 /**
  * The dedicated "Parameters" box — ostnoctua's OstWidgets.params(), see
  * widgets.js: content-only (profile load/save toolbar + the module's
- * `hasprofile:true` properties, grouped into tabs by level1, plus a
- * plain-key/value "Info" tab for mod.infos — Gilles, 2026-10-03), appended
- * into whatever `container` the caller provides. Not shown by default and
+ * `hasprofile:true` properties, plus serveractions/devicesactions when
+ * present even though they aren't hasprofile themselves - see this
+ * function's own serveractions/devicesactions comment further down -
+ * grouped into tabs by level1, plus a plain-key/value "Info" tab for
+ * mod.infos — Gilles, 2026-10-03), appended into whatever `container` the
+ * caller provides. Not shown by default and
  * not one of the draggable floating panels — Gilles, 2026-09-26: it opens
  * on demand from a dedicated gear button (app.js's openParamsDialog) as a
  * focused modal, "au dessus du reste ... prend autant de place que
@@ -1170,7 +1173,14 @@ function renderInfosTab(mod) {
  * right away, without closing this modal.
  */
 export function buildParamsPanel(client, moduleName, mod, track, container, onTemplateToggle) {
-  const names = Object.keys(mod.properties).filter((n) => mod.properties[n].hasprofile === true);
+  const hasprofileNames = Object.keys(mod.properties).filter((n) => mod.properties[n].hasprofile === true);
+  // serveractions/devicesactions (indipanel: starting/stopping the INDI
+  // server, connecting/disconnecting its devices) are plain bool-action
+  // properties, not profile-backed, but shown here too regardless - the
+  // whole point being that a template never needs its own hardcoded
+  // "Parameters"/"INDI" panel just to reach them.
+  const extraNames = ["serveractions", "devicesactions"].filter((n) => n in mod.properties && !hasprofileNames.includes(n));
+  const names = [...hasprofileNames, ...extraNames];
   const hasInfos = mod.infos && Object.keys(mod.infos).length > 0;
   if (!names.length && !hasInfos) return false;
   const props = Object.fromEntries(names.map((n) => [n, mod.properties[n]]));
@@ -1180,8 +1190,10 @@ export function buildParamsPanel(client, moduleName, mod, track, container, onTe
 
   // Nothing to load/save without a hasprofile property - a bare Info tab
   // (no profile-backed settings at all) skips the profile bar instead of
-  // showing one with nothing underneath it to act on.
-  if (names.length) container.appendChild(track(renderProfileBar(client, moduleName, mod, onTemplateToggle)));
+  // showing one with nothing underneath it to act on. extraNames alone
+  // (no real hasprofile property) still doesn't earn one either - there's
+  // no profile for a plain action button to belong to.
+  if (hasprofileNames.length) container.appendChild(track(renderProfileBar(client, moduleName, mod, onTemplateToggle)));
 
   function fillGroup(target, tab) {
     if (tab.infosTab) { target.appendChild(renderInfosTab(mod)); return; }

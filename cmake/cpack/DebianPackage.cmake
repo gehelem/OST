@@ -130,8 +130,12 @@ set(CPACK_DEBIAN_RUNTIME_PACKAGE_SHLIBDEPS ON)
 # Only add what shlibdeps cannot detect: Qt SQL plugins are loaded at runtime
 # via Qt's plugin mechanism and have no ELF NEEDED entry in the binary; gsc
 # (Guide Star Catalog query tool) is invoked as an external subprocess, same
-# as the INDI driver binaries, not linked - no ELF NEEDED entry either.
-set(CPACK_DEBIAN_RUNTIME_PACKAGE_DEPENDS "libqt6sql6-sqlite, gsc")
+# as the INDI driver binaries, not linked - no ELF NEEDED entry either;
+# avahi-daemon is the running service our avahi-client linkage talks to
+# over D-Bus to publish mDNS discovery - shlibdeps only ever pulls in the
+# client library package (libavahi-client3), never the separate daemon
+# package, since nothing links against it directly.
+set(CPACK_DEBIAN_RUNTIME_PACKAGE_DEPENDS "libqt6sql6-sqlite, gsc, avahi-daemon")
 set(CPACK_DEBIAN_RUNTIME_PACKAGE_CONTROL_EXTRA
     "${CMAKE_CURRENT_LIST_DIR}/postinst"
     "${CMAKE_CURRENT_LIST_DIR}/prerm")
@@ -176,7 +180,7 @@ set(CPACK_DEBIAN_COMPLETE_PACKAGE_MAINTAINER "gilles <gilles@joag.fr>")
 set(CPACK_DEBIAN_COMPLETE_DESCRIPTION
     "Observatoire Sans Tête - all-in-one\n Backend + web UI + nginx, ready to use after a single install")
 set(CPACK_DEBIAN_COMPLETE_PACKAGE_SHLIBDEPS ON)
-set(CPACK_DEBIAN_COMPLETE_PACKAGE_DEPENDS "libqt6sql6-sqlite, gsc, nginx")
+set(CPACK_DEBIAN_COMPLETE_PACKAGE_DEPENDS "libqt6sql6-sqlite, gsc, nginx, avahi-daemon")
 set(CPACK_DEBIAN_COMPLETE_PACKAGE_CONFLICTS "ostserver")
 set(CPACK_DEBIAN_COMPLETE_PACKAGE_REPLACES  "ostserver")
 set(CPACK_DEBIAN_COMPLETE_PACKAGE_CONTROL_EXTRA

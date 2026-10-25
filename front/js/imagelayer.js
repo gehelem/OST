@@ -430,18 +430,32 @@ export function buildImageAlternatesPanel(client, moduleName, propName, elName) 
  * all 4 comparable at a glance, which matters for correlating e.g. a
  * hotspot in the HFR map with the shape map at the same field position.
  *
- * `items`: `[{propName, elName, label}, ...]` — `label` is a fallback,
- * the server's own property label (once the dump arrives) always wins.
+ * `items`: `[{propName, elName, label, requires}, ...]` — `label` is a
+ * fallback, the server's own property label (once the dump arrives)
+ * always wins. `requires`, if set, names a boolean element of this same
+ * module's "analysis" property (e.g. "inspector"/"collimator") that
+ * gates the tile - hidden whenever that toggle is off, since the image
+ * underneath is stale/meaningless while its own analysis pass isn't even
+ * running (Gilles, 2026-10-24: inspector's collimation map shouldn't
+ * show when "Collimator analysis" is unchecked, same for HFR/Shape/
+ * Corners and "Inspector analysis").
  */
 export function buildImageGridPanel(client, moduleName, items) {
   const wrap = el("div", { class: "img-grid" });
-  const tiles = items.map((item) => {
+  const analysisEnabled = {};
+  const entries = items.map((item) => {
     const label = el("div", { class: "img-grid-label", text: item.label || item.propName });
     const img = el("img", { class: "img-grid-thumb", alt: "" });
     let src = null;
     img.addEventListener("click", () => { if (src) openImageViewer(src); });
     const tile = el("div", { class: "img-grid-tile" }, [img, label]);
-    const unsub = client.subscribe(client.topics.property(moduleName, item.propName), (prop) => {
+    wrap.appendChild(tile);
+    const entry = { item, tile };
+    entry.applyGate = () => {
+      tile.classList.toggle("hidden", !!item.requires && !analysisEnabled[item.requires]);
+    };
+    entry.applyGate();
+    entry.unsub = client.subscribe(client.topics.property(moduleName, item.propName), (prop) => {
       if (prop && prop.label) label.textContent = prop.label;
       const v = elValue(prop, item.elName);
       const path = v.urljpeg || v.urlthumbnail;
@@ -450,10 +464,19 @@ export function buildImageGridPanel(client, moduleName, items) {
       tile.classList.toggle("img-grid-tile-empty", !src);
       if (src) refreshImageViewer(src);
     });
-    wrap.appendChild(tile);
-    return unsub;
+    return entry;
   });
-  wrap._dispose = () => { for (const unsub of tiles) unsub(); };
+  const unsubAnalysis = items.some((item) => item.requires)
+    ? client.subscribe(client.topics.property(moduleName, "analysis"), (prop) => {
+        analysisEnabled.inspector = !!(prop && prop.elements.inspector && prop.elements.inspector.value);
+        analysisEnabled.collimator = !!(prop && prop.elements.collimator && prop.elements.collimator.value);
+        for (const entry of entries) entry.applyGate();
+      })
+    : null;
+  wrap._dispose = () => {
+    for (const entry of entries) entry.unsub();
+    if (unsubAnalysis) unsubAnalysis();
+  };
   return wrap;
 }
 

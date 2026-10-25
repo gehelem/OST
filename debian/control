@@ -35,7 +35,7 @@ Rules-Requires-Root: no
 Package: ostserver
 Architecture: any
 Section: science
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqt6sql6-sqlite, gsc
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt6sql6-sqlite, gsc, avahi-daemon
 Description: Observatoire Sans Tête
  Light and headless astrophotography automation tool
 
@@ -44,7 +44,7 @@ Architecture: any
 Section: science
 Conflicts: ostserver
 Replaces: ostserver
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqt6sql6-sqlite, gsc, nginx
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt6sql6-sqlite, gsc, nginx, avahi-daemon
 Description: Observatoire Sans Tête - all-in-one
  Backend + web UI + nginx, ready to use after a single install.
  .

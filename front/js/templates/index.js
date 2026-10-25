@@ -20,6 +20,7 @@ import * as parkmanager from "./parkmanager.js";
 import * as monitor from "./monitor.js";
 import * as planner from "./planner.js";
 import * as allsky from "./allsky.js";
+import * as indipanel from "./indipanel.js";
 
 export const templates = {
   guider,
@@ -32,4 +33,5 @@ export const templates = {
   monitor,
   planner,
   allsky,
+  indipanel,
 };

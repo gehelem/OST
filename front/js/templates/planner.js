@@ -50,3 +50,19 @@ export const mount = buildScaffoldTemplate([
     return (e && e.sequencemodule && e.sequencemodule.value) || null;
   },
 });
+
+// Per-template reorganize layout (panels.js's own reorganizePanels()),
+// same scheme as sequencer.js's own (the two modules mirror each other's
+// shape - "planning"/"liveplanning" here are "sequence"/"livesequence"
+// there): actions and planning stacked in the left column at a quarter
+// of the display wide each, natural content height; liveplanning alone
+// in the right column at half width, left edge pinned to the display's
+// horizontal center (xFrac) rather than the column's own default
+// right-edge anchor, which would overflow a half-width panel.
+// image-stats stays hidden.
+export const PANEL_LAYOUT = {
+  actions: { col: 0, order: 0, wFrac: 1 / 4 },
+  planning: { col: 0, order: 1, wFrac: 1 / 4 },
+  liveplanning: { col: 1, order: 0, wFrac: 1 / 2, xFrac: 1 / 2 },
+  "image-stats": { hidden: true },
+};

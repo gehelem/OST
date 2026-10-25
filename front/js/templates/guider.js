@@ -604,6 +604,25 @@ function buildValuesPanel(client, moduleName) {
   return wrap;
 }
 
+// Per-template reorganize layout (panels.js's own reorganizePanels(),
+// read by app.js off whichever bespoke template is active) - spells out
+// the exact arrangement instead of the generic "fill left then right"
+// fallback: actions and drift stacked in the left column (a quarter and
+// an eighth of the display wide, respectively), guiding alone in the
+// right column at half width, its left edge pinned to the display's
+// horizontal center via xFrac rather than the column's own default
+// right-edge anchor (which would push a half-width panel off-screen).
+// None of the three set hFrac, so each keeps its natural content height
+// instead of being forced/scroll-capped to a fraction of the display.
+// "image-stats" and "analyse" stay hidden - both used to show by default.
+export const PANEL_LAYOUT = {
+  actions: { col: 0, order: 0, wFrac: 1 / 4 },
+  drift: { col: 0, order: 1, wFrac: 1 / 8 },
+  "image-stats": { hidden: true },
+  guiding: { col: 1, order: 0, wFrac: 1 / 2, xFrac: 1 / 2 },
+  analyse: { hidden: true },
+};
+
 export function mount(client, moduleName) {
   Panels.setScope(moduleName);
   Panels.clear();
