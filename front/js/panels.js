@@ -748,8 +748,6 @@ export function reorganizePanels(layout) {
     place(panel, col, width, hint.hFrac != null ? hint.hFrac * lr.width : null, x);
   }
 
-  let col = 0;
-  for (let c = 1; c < columns; c++) if (colY[c] < colY[col]) col = c;
   for (const panel of unhinted) {
     const id = panel.dataset.panel;
     if (!id) continue;
@@ -759,10 +757,16 @@ export function reorganizePanels(layout) {
     panel.classList.remove("collapsed");
     panel.style.width = (defaultColWidth / z) + "px";
     const h = panel.getBoundingClientRect().height;
-    // Fills the current column solidly before moving on to the next -
-    // never backtracks to an earlier one, same rule as the original
-    // 2-column version, just generalized to any column count.
-    while (col < columns - 1 && colY[col] > top && colY[col] + h > bottomLimit) col++;
+    // Picked fresh for every panel, left to right, instead of a pointer
+    // that only ever moves right and stays there - that used to let one
+    // tall panel exile every later, smaller panel to the next column too.
+    // A still-empty column always qualifies regardless of overflow
+    // (colY[c] === top) - better one tall panel overflowing its own
+    // column than leaving it empty for an equally-tall next one.
+    let col = columns - 1;
+    for (let c = 0; c < columns; c++) {
+      if (colY[c] === top || colY[c] + h <= bottomLimit) { col = c; break; }
+    }
     place(panel, col, defaultColWidth, null);
   }
 }
