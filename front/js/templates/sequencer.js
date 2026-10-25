@@ -63,3 +63,17 @@ export const mount = buildScaffoldTemplate(
   // which this drops too.
   { imageQuickPanel: false, otherPanel: false },
 );
+
+// Per-template reorganize layout (panels.js's own reorganizePanels()),
+// same scheme as guider.js/focus.js: actions and sequence stacked in the
+// left column at a quarter of the display wide each, natural content
+// height; livesequence alone in the right column at half width, left
+// edge pinned to the display's horizontal center (xFrac) rather than the
+// column's own default right-edge anchor, which would overflow a
+// half-width panel. image-stats stays hidden.
+export const PANEL_LAYOUT = {
+  actions: { col: 0, order: 0, wFrac: 1 / 4 },
+  sequence: { col: 0, order: 1, wFrac: 1 / 4 },
+  livesequence: { col: 1, order: 0, wFrac: 1 / 2, xFrac: 1 / 2 },
+  "image-stats": { hidden: true },
+};
