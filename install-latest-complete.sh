@@ -11,9 +11,13 @@
 # this one script, no manual repo wrangling.
 #
 # Targets Ubuntu 26.04 (build-job-2604 in .gitlab-ci.yml, the only
-# mandatory/always-built job). Adjust the filename below if you need
-# the 24.04 build instead (ostserver-complete_latest_2404_amd64.deb).
+# mandatory/always-built job). Adjust the amd64 filename below if you
+# need the 24.04 build instead (ostserver-complete_latest_2404_amd64.deb).
 #
+# On arm64, no pre-built .deb is published to the GitLab registry yet,
+# so this falls back to the ppa:gehelem/ostserver PPA instead, which
+# builds ostserver-complete from source on Launchpad's own builders for
+# both amd64 and arm64 (confirmed 2026-10, resolute series).
 set -e
 
 # Passed through to the package's postinst (cmake/cpack/complete/postinst)
@@ -25,11 +29,7 @@ set -e
 # variable through explicitly regardless of how this script got invoked.
 export OST_INSTALL_USER="$(id -un)"
 
-DEB_FILE="ostserver-complete_latest_2604_amd64.deb"
-URL="https://gitlab.ostserver.fr/api/v4/projects/1/packages/generic/latest/latest/${DEB_FILE}"
-
-echo "Downloading ${DEB_FILE}..."
-curl --fail --location --output "${DEB_FILE}" "${URL}"
+ARCH="$(dpkg --print-architecture)"
 
 echo "Adding the INDI library PPA (libindi1 is not in the standard Ubuntu archives)..."
 sudo add-apt-repository -y ppa:mutlaqja/ppa
@@ -37,10 +37,25 @@ sudo add-apt-repository -y ppa:mutlaqja/ppa
 # astrometry.net itself - not guaranteed enabled on a minimal/cloud
 # image (confirmed missing on a fresh VM, 2026-10).
 sudo add-apt-repository -y universe
-sudo apt update
 
-echo "Installing ${DEB_FILE}..."
-sudo --preserve-env=OST_INSTALL_USER apt install -y "./${DEB_FILE}"
+if [ "${ARCH}" = "arm64" ]; then
+    echo "arm64 detected: no GitLab-built package for this architecture yet, using the Launchpad PPA instead..."
+    sudo add-apt-repository -y ppa:gehelem/ostserver
+    sudo apt update
+    echo "Installing ostserver-complete..."
+    sudo --preserve-env=OST_INSTALL_USER apt install -y ostserver-complete
+else
+    DEB_FILE="ostserver-complete_latest_2604_amd64.deb"
+    URL="https://gitlab.ostserver.fr/api/v4/projects/1/packages/generic/latest/latest/${DEB_FILE}"
+
+    echo "Downloading ${DEB_FILE}..."
+    curl --fail --location --output "${DEB_FILE}" "${URL}"
+
+    sudo apt update
+
+    echo "Installing ${DEB_FILE}..."
+    sudo --preserve-env=OST_INSTALL_USER apt install -y "./${DEB_FILE}"
+fi
 # ostserver.parms is created by the package's own postinst
 # (cmake/cpack/complete/postinst, cp'd from the shared
 # share/ostserver/ostserver.parms.skel) if missing - no need to
@@ -75,7 +90,9 @@ sudo apt install -y astrometry.net whiptail
 # block - downloaded unconditionally, no prompt. ~152 MB total.
 echo "Downloading default astrometry.net indexes (wide field >5°, ~152 MB)..."
 for idx in 4208 4209 4210 4211 4212 4213 4214; do
-    sudo wget -q -P /usr/share/astrometry "http://data.astrometry.net/4200/index-${idx}.fits"
+    # -nc: skip a file already present (re-running this script shouldn't
+    # re-download ~150 MB of unchanged index files every time).
+    sudo wget -nc -q -P /usr/share/astrometry "http://data.astrometry.net/4200/index-${idx}.fits"
 done
 
 # Narrow-field indexes (4200-4207, long focal length / small sensor) are
@@ -109,7 +126,7 @@ if [ -n "${CHOICES}" ]; then
         esac
         echo "Downloading index-${idx} (tiles 00-${last})..."
         for i in $(seq -w 0 "${last}"); do
-            sudo wget -q -P /usr/share/astrometry "http://data.astrometry.net/4200/index-${idx}-${i}.fits"
+            sudo wget -nc -q -P /usr/share/astrometry "http://data.astrometry.net/4200/index-${idx}-${i}.fits"
         done
     done
 else
