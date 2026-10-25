@@ -1,3 +1,39 @@
+## 0.0.24 (2026-10-25)
+
+### changed (7 changes)
+
+- [Update install docs for the unified ostserver-complete package](https://gitlab.ostserver.fr/ost/ostserver/-/commit/44379b93f7f164c44f6de6a79f822693ac32a3b6) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [front: per-template reorganize layouts, starting with guider](https://gitlab.ostserver.fr/ost/ostserver/-/commit/0accaeb3c9414f9cb82298cca50603b6579a24de) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [front: split hide/show and reorganize into two separate buttons](https://gitlab.ostserver.fr/ost/ostserver/-/commit/3055b147e46469baa7f879e0babbad1b32af6dfe) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [front: reorganize panels into two quarter-width side columns](https://gitlab.ostserver.fr/ost/ostserver/-/commit/bee13867926c12850c51b0dbc8f747fa4c3d11a6) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [front: turn the hide-all-panels button into a hide/reorganize toggle](https://gitlab.ostserver.fr/ost/ostserver/-/commit/28e3bc4e7cc8189c30844dd7daac615e61b5aaf6) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [front: hide inspector analysis maps for disabled toggles](https://gitlab.ostserver.fr/ost/ostserver/-/commit/ccf51161527f8240a6f13cb85f479504cee55996) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [front: simplify Controller screen panel layout](https://gitlab.ostserver.fr/ost/ostserver/-/commit/7f74932528bb85623fcbcd2f653c2e459ffddadc) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/278))
+
+### fixed (9 changes)
+
+- [Support arm64 in the all-in-one install script via the Launchpad PPA](https://gitlab.ostserver.fr/ost/ostserver/-/commit/8cacccaca6b352512f9730b053805874f35669f9) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [Fix generic reorganize fallback getting stuck on the right column](https://gitlab.ostserver.fr/ost/ostserver/-/commit/a524b684a11ef8ae68ff3737c1dedd7d199c135b) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [front: right-align a right-column reorganize panel by its own width](https://gitlab.ostserver.fr/ost/ostserver/-/commit/c789ba3505d1971553ffd33d28617a876a9d004d) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [front: drop every Parameters-box property from indipanel's main view](https://gitlab.ostserver.fr/ost/ostserver/-/commit/dd88f51c5bdc7a9399bc4675919aa2635bace1f2) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [front: content-based guider panel sizes, show-all restores customized layout](https://gitlab.ostserver.fr/ost/ostserver/-/commit/6d7417eacf5595ea691c69bab9740b4ea7d246e3) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [front: fix top forbidden zone breaking at non-1x UI zoom](https://gitlab.ostserver.fr/ost/ostserver/-/commit/eb045dbea457bfc82be070daf552e9ba2476f956) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [packaging: add avahi-daemon as a runtime dependency](https://gitlab.ostserver.fr/ost/ostserver/-/commit/f60173174586e43d2616df796af52d23974d7447) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [front: fix repeat zeroconf discovery staying empty](https://gitlab.ostserver.fr/ost/ostserver/-/commit/695abf22106ce59db9a3c7d36e367bb16c9865ea) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [cmake: fall back to debian/changelog for front gitdata.json too](https://gitlab.ostserver.fr/ost/ostserver/-/commit/6b459e962b4d351ffd23b5b68e0f7fcfcdecc867) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/278))
+
+### added (9 changes)
+
+- [front: planner/sequencer reorganize layout, same scheme as guider/focus](https://gitlab.ostserver.fr/ost/ostserver/-/commit/afd813f4eba59372453eb475df5a6530efe9efa2) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [front: add a "lock on mount" toggle to navigator](https://gitlab.ostserver.fr/ost/ostserver/-/commit/2716da048a10ab9110c83bdd25389f321e5dc75a) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [front: navigator reorganize layout, same scheme as guider/focus](https://gitlab.ostserver.fr/ost/ostserver/-/commit/84a88fadd68937b38bb54cc8f0f5941d671287a8) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [front: auto-reorganize a module's panels on its first-ever open](https://gitlab.ostserver.fr/ost/ostserver/-/commit/e04f911982325097053c35ce789bde3a018ea6bf) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [front: focus reorganize layout, same scheme as guider](https://gitlab.ostserver.fr/ost/ostserver/-/commit/1bb63290a4f127f4faeb79cf923ccca35bc388d6) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [front: surface serveractions/devicesactions in the Parameters box](https://gitlab.ostserver.fr/ost/ostserver/-/commit/6681a76ebdd0fac4df80c4b66372a497a32ad822) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [front: dedicated docked single-view template for indipanel](https://gitlab.ostserver.fr/ost/ostserver/-/commit/42d6d05f2a86bf6262960c99b7e5053a831d35d0) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [front: support a 4-column reorganize layout for indipanel](https://gitlab.ostserver.fr/ost/ostserver/-/commit/776437c4e13d6abd15b39e08f1a0217d8c395dad) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+- [front: add a quicknav button to hide all open panels](https://gitlab.ostserver.fr/ost/ostserver/-/commit/a8dd720e9890dc160132844a8c5b7dd07cce2a96) ([merge request](https://gitlab.ostserver.fr/ost/ostserver/-/merge_requests/279))
+
 ## 0.0.23 (2026-10-24)
 
 No changes.
