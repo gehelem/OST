@@ -1289,6 +1289,7 @@ bool IndiModule::defineMeAsNavigator()
     giveMeATarget();
     giveMeAnActions();
     giveMeALocation();
+    giveMeASolver();
 
     OST::PropertyMulti* pm  = getProperty("actions");
     pm->setRule(OST::SwitchsRule::AtMostOne);
@@ -1326,6 +1327,17 @@ bool IndiModule::defineMeAsNavigator()
     s->setAutoUpdate(true);
     s->setGlobalLov("profiles-Sequencer", OST::LovScope::Controller);
     pmtarget->addElt(s);
+
+    OST::PropertyMulti* solver  = getProperty("solver");
+    b = new  OST::ElementBool("stellarsolver", "Stellarsolver", "solver10", "");
+    b->setValue(true, false);
+    b->setDirectEdit(true);
+    solver->addElt(b);
+    b = new  OST::ElementBool("tetra", "Tetra", "solver20", "");
+    b->setValue(false, false);
+    b->setDirectEdit(true);
+    solver->addElt(b);
+
 
     mIsNavigator = true;
     return true;
@@ -1557,6 +1569,18 @@ bool IndiModule::giveMeATarget()
         OST::PropertyMulti* pm = new OST::PropertyMulti("target", "Target", OST::ReadWrite, "Target", "", "0500",
                 false,
                 false);
+        createProperty(pm);
+    }
+    return true;
+}
+bool IndiModule::giveMeASolver()
+{
+    if (!getStore().contains("solver"))
+    {
+        OST::PropertyMulti* pm = new OST::PropertyMulti("solver", "Solver", OST::ReadWrite, "Solver", "", "0700",
+                false,
+                false);
+        pm->setRule(OST::SwitchsRule::OneOfMany);
         createProperty(pm);
     }
     return true;

@@ -122,6 +122,7 @@ class IndiModule : public Basemodule, public INDI::BaseClient
         bool giveMeALocation();
         bool giveMeAnActions();
         bool giveMeATarget();
+        bool giveMeASolver();
         bool setFocalLengthAndDiameter();
         bool setFocalLengthAndDiameter(QString device, double fl, double diam);
 

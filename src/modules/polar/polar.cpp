@@ -29,8 +29,18 @@ Polar::Polar(QString name, QString label, QString profile, QVariantMap available
     giveMeADevice("gps", "GPS", INDI::BaseDevice::GPS_INTERFACE);
     giveMeAParms();
     defineMeAsImager();
+    giveMeASolver();
 
-    auto* b = new OST::ElementBool("start", "Start", "0", "");
+    auto* b = new OST::ElementBool("stellarsolver", "Stellarsolver", "solver10", "");
+    b->setValue(true, false);
+    b->setDirectEdit(true);
+    getProperty("solver")->addElt(b);
+    b = new OST::ElementBool("tetra", "Tetra", "solver20", "");
+    b->setValue(false, false);
+    b->setDirectEdit(true);
+    getProperty("solver")->addElt(b);
+
+    b = new OST::ElementBool("start", "Start", "0", "");
     b->setDirectEdit(true);
     getProperty("actions")->addElt( b);
     b = new OST::ElementBool("abort", "Abort", "2", "");
