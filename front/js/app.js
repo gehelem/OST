@@ -194,6 +194,12 @@ let contentDispose = null; // disposes whatever subscriptions the current conten
 // handler further down since it has no other way to reach "whichever
 // template is on screen right now".
 let activeReorganizeLayout = null;
+// indipanel has no bespoke template of its own (dom.js's
+// TEMPLATE_ICON_MAP comment - it renders on the generic fallback), but
+// Gilles still wants it reorganized across 4 columns instead of the
+// generic default of 2 - set alongside activeReorganizeLayout above,
+// same reasoning, for the same reason there's no PANEL_LAYOUT to carry it.
+let activeReorganizeColumns = 2;
 let loginShown = false;
 // Declared up here, not just above renderModbarNow() itself: client.onStatus()
 // below fires its callback synchronously on registration (like subscribe()),
@@ -442,7 +448,7 @@ hideAllToggleEl.addEventListener("click", () => {
   updateHideAllToggle();
 });
 reorganizeToggleEl.addEventListener("click", () => {
-  Panels.reorganizePanels(activeReorganizeLayout);
+  Panels.reorganizePanels(activeReorganizeLayout, activeReorganizeColumns);
   updateHideAllToggle();
 });
 
@@ -611,6 +617,7 @@ function renderContentNow() {
     const mod = client.get(client.topics.module(activeView));
     const bespoke = !getDisableTemplates(activeView) && mod && templates[mod.infos.template];
     activeReorganizeLayout = (bespoke && bespoke.PANEL_LAYOUT) || null;
+    activeReorganizeColumns = (mod && mod.infos && mod.infos.template === "indipanel") ? 4 : 2;
     const result = bespoke ? bespoke.mount(client, activeView) : renderModuleView(client, activeView);
     // Keeps the gear button's "unsaved changes" dot live while this same
     // module stays active (updateParamsToggle() already ran once above,
@@ -623,6 +630,7 @@ function renderContentNow() {
   }
 
   activeReorganizeLayout = null;
+  activeReorganizeColumns = 2;
   let result;
   if (activeView === "__home") result = renderHome(client, selectView);
   else result = renderController(client, settingsBoxEl);
