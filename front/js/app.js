@@ -194,12 +194,6 @@ let contentDispose = null; // disposes whatever subscriptions the current conten
 // handler further down since it has no other way to reach "whichever
 // template is on screen right now".
 let activeReorganizeLayout = null;
-// indipanel has no bespoke template of its own (dom.js's
-// TEMPLATE_ICON_MAP comment - it renders on the generic fallback), but
-// Gilles still wants it reorganized across 4 columns instead of the
-// generic default of 2 - set alongside activeReorganizeLayout above,
-// same reasoning, for the same reason there's no PANEL_LAYOUT to carry it.
-let activeReorganizeColumns = 2;
 let loginShown = false;
 // Declared up here, not just above renderModbarNow() itself: client.onStatus()
 // below fires its callback synchronously on registration (like subscribe()),
@@ -448,7 +442,7 @@ hideAllToggleEl.addEventListener("click", () => {
   updateHideAllToggle();
 });
 reorganizeToggleEl.addEventListener("click", () => {
-  Panels.reorganizePanels(activeReorganizeLayout, activeReorganizeColumns);
+  Panels.reorganizePanels(activeReorganizeLayout);
   updateHideAllToggle();
 });
 
@@ -586,6 +580,23 @@ function renderContentNow() {
   // panel-layer/quicknav mechanism as a module), alongside its docked
   // settings box - so it needs the quicknav bar on, unlike Home.
   const isController = activeView === "__controller";
+
+  // A bespoke template (templates/index.js) wins over the generic,
+  // level1-grouped renderer when infos.template names one we have — see
+  // templates/index.js's header for the fallback-safety note.
+  // getDisableTemplates(activeView) (the Parameters box's own per-module
+  // dev-mode checkbox, render.js) forces the generic one for THIS module
+  // regardless, Gilles: "je suis certain de pouvoir toucher toutes les
+  // proprietes lorsque le template n'est pas encore bien determine".
+  const mod = isModule && client.get(client.topics.module(activeView));
+  const bespoke = isModule && !getDisableTemplates(activeView) && mod && templates[mod.infos.template];
+  // A bespoke template can opt out of the floating #panel-layer entirely
+  // (its own `DOCKED` export - indipanel.js is the one case so far, see
+  // its own header) in favor of #docked-view instead, same container
+  // Home/Controller already use - needed here, ahead of the dockedViewEl
+  // toggle just below, which decides between the two containers.
+  const docked = !!(bespoke && bespoke.DOCKED);
+
   // #panel-layer stays visible regardless of isModule now (Gilles,
   // 2026-10-06: "sur la home, on doit pouvoir ouvrir les logs (sans
   // selection du module) ==> la il ne se passe rien") - the persistent
@@ -598,27 +609,21 @@ function renderContentNow() {
   // so it doesn't block anything over empty space, and Panels.clear()
   // (above) already wipes every non-persistent (per-module) panel on
   // every call to this function, docked view or not.
-  dockedViewEl.classList.toggle("hidden", isModule);
+  dockedViewEl.classList.toggle("hidden", isModule && !docked);
   // #quicknav's own visibility follows the module/controller view
   // directly, not whether it has nav entries to show — the actions zone
   // (params) is still relevant for a module with zero level1 groups.
   quicknavEl.classList.toggle("hidden", !isModule && !isController);
+  // Hide/show-all and reorganize only mean anything against the floating
+  // #panel-layer - a docked template has no panels for either to act on.
+  hideAllToggleEl.classList.toggle("hidden", docked);
+  reorganizeToggleEl.classList.toggle("hidden", docked);
   updateParamsToggle();
 
   if (isModule) {
-    // A bespoke template (templates/index.js) wins over the generic,
-    // level1-grouped renderer when infos.template names one we have —
-    // see templates/index.js's header for the fallback-safety note.
-    // getDisableTemplates(activeView) (the Parameters box's own per-module
-    // dev-mode checkbox, render.js) forces the generic one for THIS
-    // module regardless, Gilles: "je suis certain de pouvoir toucher
-    // toutes les proprietes lorsque le template n'est pas encore bien
-    // determine".
-    const mod = client.get(client.topics.module(activeView));
-    const bespoke = !getDisableTemplates(activeView) && mod && templates[mod.infos.template];
     activeReorganizeLayout = (bespoke && bespoke.PANEL_LAYOUT) || null;
-    activeReorganizeColumns = (mod && mod.infos && mod.infos.template === "indipanel") ? 4 : 2;
     const result = bespoke ? bespoke.mount(client, activeView) : renderModuleView(client, activeView);
+    if (docked) dockedViewEl.appendChild(result.node);
     // Keeps the gear button's "unsaved changes" dot live while this same
     // module stays active (updateParamsToggle() already ran once above,
     // this covers every subsequent profile.changed flip without switching
@@ -630,7 +635,6 @@ function renderContentNow() {
   }
 
   activeReorganizeLayout = null;
-  activeReorganizeColumns = 2;
   let result;
   if (activeView === "__home") result = renderHome(client, selectView);
   else result = renderController(client, settingsBoxEl);

@@ -1044,7 +1044,7 @@ export function renderProperty(client, moduleName, propName, opts) {
 
 // ---- module layout: tabs by level1, groups by level2, ordered -----------
 
-function buildLayout(properties) {
+export function buildLayout(properties) {
   const noLevel1 = [];
   const tabsMap = new Map();
   for (const [name, p] of Object.entries(properties)) {
@@ -1083,7 +1083,7 @@ function buildLayout(properties) {
  * show (nothing to tab between), same rule buildParamsPanel's own level1
  * tabs already follow.
  */
-function fillLevel1Panel(container, client, moduleName, track, tab) {
+export function fillLevel1Panel(container, client, moduleName, track, tab) {
   const groups = tab.direct.length ? [{ name: "", items: tab.direct }, ...tab.groups] : tab.groups;
   if (groups.length <= 1) {
     for (const { name } of (groups[0] ? groups[0].items : [])) container.appendChild(track(renderProperty(client, moduleName, name)));

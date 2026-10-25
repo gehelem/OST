@@ -632,19 +632,9 @@ export function showAllPanels() {
  * are already that), exactly like startDrag()/startResize() above, and
  * only converted to local (pre-zoom) space with `/ z` right before each
  * style/state write - same reasoning as uiZoom()'s own doc comment.
- *
- * `columns` defaults to 2 (the two-column, edge-hugging, center-free
- * layout above). A caller can ask for more - indipanel is the one
- * module that actually needs it, with no bespoke template of its own to
- * carry a PANEL_LAYOUT (it's infos.template-gated straight onto the
- * generic renderer, see dom.js's TEMPLATE_ICON_MAP comment) - app.js
- * special-cases it directly rather than inventing a bespoke template
- * file just to host this one number. With more than 2 columns there's
- * no room left to also hug the outer edges and keep a free center, so
- * they're spaced evenly across the full width instead.
  */
-export function reorganizePanels(layout, columns) {
-  columns = columns || 2;
+export function reorganizePanels(layout) {
+  const columns = 2;
   const z = uiZoom();
   const lr = layerRect();
   const bottomLimit = bottomSafeLimit();
@@ -658,22 +648,14 @@ export function reorganizePanels(layout, columns) {
   // comment) - otherwise a zoom above 1x still let a reorganized panel's
   // top land above #modbar's real (zoom-scaled) bottom edge.
   const top = Math.max(SAFE_TOP * z, lr.top + margin);
-  let defaultColWidth, colX;
-  if (columns > 2) {
-    defaultColWidth = (lr.width - margin * 2 - gap * (columns - 1)) / columns;
-    colX = [];
-    for (let i = 0; i < columns; i++) colX.push(lr.left + margin + i * (defaultColWidth + gap));
-  } else {
-    // Capped at a quarter of the display, not half (Gilles, 2026-10-24:
-    // "on voulait faire de la place au centre") - each column hugs its
-    // own edge, leaving the middle free for the background/sky view
-    // instead of the two columns meeting in the center. The
-    // half-minus-margins figure stays as a fallback floor for a narrow
-    // viewport where a quarter alone would be under panel-float's own
-    // 200px min-width.
-    defaultColWidth = Math.min(lr.width / 4, (lr.width - margin * 3) / 2);
-    colX = [lr.left + margin, lr.left + lr.width - margin - defaultColWidth];
-  }
+  // Capped at a quarter of the display, not half - each column hugs its
+  // own edge, leaving the middle free for the background/sky view
+  // instead of the two columns meeting in the center. The
+  // half-minus-margins figure stays as a fallback floor for a narrow
+  // viewport where a quarter alone would be under panel-float's own
+  // 200px min-width.
+  const defaultColWidth = Math.min(lr.width / 4, (lr.width - margin * 3) / 2);
+  const colX = [lr.left + margin, lr.left + lr.width - margin - defaultColWidth];
   const colY = new Array(columns).fill(top);
 
   function place(panel, col, width, height, x) {
