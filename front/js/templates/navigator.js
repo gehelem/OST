@@ -1245,3 +1245,23 @@ export function mount(client, moduleName) {
 
   return moduleLifecycle(client, moduleName, build, dispose);
 }
+
+// Per-template reorganize layout (panels.js's own reorganizePanels()),
+// same scheme as guider.js/focus.js: actions and search stacked in the
+// left column at a quarter of the display wide each. actions sets hFrac
+// too (a fixed square instead of natural content height) since its own
+// content varies a lot depending on what's selected/connected; search
+// keeps its natural content height. settings alone in the right column,
+// narrower at a sixth since it has no wide content to need more - fits
+// the column's own default right-edge anchor without an xFrac override,
+// unlike guider/focus's half-width right-column panel.
+// location/mountposition/mosaicDefinition stay hidden, same idea as
+// guider's "analyse"/focus's "image-stats".
+export const PANEL_LAYOUT = {
+  actions: { col: 0, order: 0, wFrac: 1 / 4, hFrac: 1 / 4 },
+  search: { col: 0, order: 1, wFrac: 1 / 4 },
+  settings: { col: 1, order: 0, wFrac: 1 / 6 },
+  location: { hidden: true },
+  mountposition: { hidden: true },
+  mosaicDefinition: { hidden: true },
+};
