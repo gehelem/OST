@@ -622,8 +622,19 @@ function renderContentNow() {
 
   if (isModule) {
     activeReorganizeLayout = (bespoke && bespoke.PANEL_LAYOUT) || null;
+    // Checked before mount()/build() ever runs - a fresh panel's own
+    // make() only sets its hardcoded default x/y/w, it doesn't persist
+    // anything until the user actually drags/resizes/toggles it, so this
+    // still reads as "nothing saved yet" afterwards too, but asking first
+    // reads clearly as "this module's own first-ever open" rather than
+    // relying on that incidental timing.
+    const isFreshScope = !docked && !Panels.hasSavedLayout(activeView);
     const result = bespoke ? bespoke.mount(client, activeView) : renderModuleView(client, activeView);
     if (docked) dockedViewEl.appendChild(result.node);
+    // A cleared cache or a module opened for the very first time starts
+    // already organized instead of at each panel's own hardcoded default
+    // position - same reorganizePanels() the button itself calls.
+    if (isFreshScope) Panels.reorganizePanels(activeReorganizeLayout);
     // Keeps the gear button's "unsaved changes" dot live while this same
     // module stays active (updateParamsToggle() already ran once above,
     // this covers every subsequent profile.changed flip without switching

@@ -105,6 +105,25 @@ function saveState(sc, id, st) {
   try { localStorage.setItem(keyFor(sc, id), JSON.stringify(st)); } catch (e) { /* ignore */ }
 }
 
+/** True if this scope has never had anything saved - a cleared cache, or
+ * the very first time this module is ever opened (app.js's own
+ * renderContentNow(), right after mount()/build() first lays out its
+ * panels at their hardcoded default positions): calls reorganizePanels()
+ * once right away in that case instead, so a fresh module starts already
+ * organized rather than at those defaults. Scans every key rather than
+ * checking one panel id, since which ids a module even has isn't known
+ * from here. */
+export function hasSavedLayout(sc) {
+  const prefix = keyFor(sc, "");
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith(prefix)) return true;
+    }
+  } catch (e) { /* ignore */ }
+  return false;
+}
+
 export function setLayer(el) { layer = el; }
 export function setScope(s) { scope = s || ""; }
 
