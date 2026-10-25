@@ -241,6 +241,8 @@ add_library(ostbasemodule SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/utils/elementupdate.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/tetra3solver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/tetra3solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/imagequality.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/imagequality.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.cpp
@@ -263,6 +265,7 @@ set(BASE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/dbmanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/basemodule.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/solver.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/tetra3solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/imagequality.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/fileio.h
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/phd2guidelog.h
@@ -661,6 +664,19 @@ install(
 )
 install(
     FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cpack/ostserver.parms.skel"
+    DESTINATION "share/ostserver"
+    COMPONENT Complete
+)
+
+# tetra3_solve.py: see libs/tetra3solver/README.md for the runtime
+# dependencies it needs and the one-time catalog generation step.
+install(
+    PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/libs/tetra3solver/tetra3_solve.py"
+    DESTINATION "share/ostserver"
+    COMPONENT Runtime
+)
+install(
+    PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/libs/tetra3solver/tetra3_solve.py"
     DESTINATION "share/ostserver"
     COMPONENT Complete
 )
