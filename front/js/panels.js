@@ -735,13 +735,17 @@ export function reorganizePanels(layout) {
       continue;
     }
     const col = hint.col || 0;
+    const width = hint.wFrac != null ? hint.wFrac * lr.width : defaultColWidth;
     // xFrac lets a hint override the column's default edge-anchored x -
-    // needed when wFrac makes the panel wider than defaultColWidth
-    // (e.g. a half-width right-column panel), where anchoring to the
-    // column's own edge would push part of it past the display edge.
-    const x = hint.xFrac != null ? lr.left + hint.xFrac * lr.width : null;
-    place(panel, col, hint.wFrac != null ? hint.wFrac * lr.width : defaultColWidth,
-      hint.hFrac != null ? hint.hFrac * lr.width : null, x);
+    // needed for a half-width right-column panel (anchoring it to
+    // colX[1]'s own fixed slot, built for defaultColWidth, would push
+    // part of it past the display edge). With no xFrac, a right-column
+    // panel still right-aligns using its OWN width instead of that fixed
+    // slot - otherwise a narrower one (e.g. a sixth-width panel) landed
+    // at colX[1]'s left edge, flush with neither margin.
+    let x = hint.xFrac != null ? lr.left + hint.xFrac * lr.width : null;
+    if (x == null && col === 1) x = lr.left + lr.width - margin - width;
+    place(panel, col, width, hint.hFrac != null ? hint.hFrac * lr.width : null, x);
   }
 
   let col = 0;
