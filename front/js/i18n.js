@@ -253,6 +253,8 @@ const STRINGS = {
   "navigator.displaySettings": { en: "Display settings", fr: "Réglages d'affichage", de: "Anzeigeeinstellungen", it: "Impostazioni di visualizzazione", es: "Ajustes de visualización" },
   "navigator.settingsQuicknav": { en: "Settings", fr: "Réglages", de: "Einstellungen", it: "Impostazioni", es: "Ajustes" },
   "navigator.centerOnMount": { en: "Center on mount", fr: "Centrer sur la monture", de: "Auf Montierung zentrieren", it: "Centra sulla montatura", es: "Centrar en la montura" },
+  "navigator.lockOnMount": { en: "Lock on mount", fr: "Verrouiller sur la monture", de: "Auf Montierung verriegeln", it: "Blocca sulla montatura", es: "Bloquear en la montura" },
+  "navigator.unlockMount": { en: "Unlock", fr: "Déverrouiller", de: "Entriegeln", it: "Sblocca", es: "Desbloquear" },
   "navigator.search": { en: "Search", fr: "Recherche", de: "Suche", it: "Ricerca", es: "Búsqueda" },
   "navigator.searchPlaceholder": { en: "Object name...", fr: "Nom de l'objet...", de: "Objektname...", it: "Nome dell'oggetto...", es: "Nombre del objeto..." },
   "navigator.searchLaunch": { en: "Search", fr: "Rechercher", de: "Suchen", it: "Cerca", es: "Buscar" },

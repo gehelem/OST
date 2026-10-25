@@ -899,7 +899,7 @@ function readUiZoom() {
   return raw > 0 ? raw : 1;
 }
 
-function buildSkyDome(client, moduleName, onSelect, getTime) {
+function buildSkyDome(client, moduleName, onSelect, getTime, onMountUpdate) {
   const bgLayer = document.getElementById("bg-layer");
   if (!bgLayer) return { dispose: () => {}, engine: null };
   bgLayer.classList.add("sky-active");
@@ -1012,13 +1012,17 @@ function buildSkyDome(client, moduleName, onSelect, getTime) {
       engine.mountRaDeg = ra * 15;
       engine.mountDecDeg = dec;
       engine.render();
+      if (onMountUpdate) onMountUpdate();
     }
-    // Keep the "center on mount" quicknav button's enabled state current
-    // even though this doesn't trigger a module rebuild (see that entry's
-    // own doc comment in mount()'s build()) - a no-op before that button
-    // exists yet (first dump, build() hasn't reached updateQuickNav() yet).
+    // Keep the "center on mount"/"lock on mount" quicknav buttons' enabled
+    // state current even though this doesn't trigger a module rebuild (see
+    // those entries' own doc comment in mount()'s build()) - a no-op
+    // before they exist yet (first dump, build() hasn't reached
+    // updateQuickNav() yet).
     const btn = getQuickNavButton("centerOnMount");
     if (btn) btn.disabled = engine.mountRaDeg === null;
+    const lockBtn = getQuickNavButton("lockOnMount");
+    if (lockBtn) lockBtn.disabled = engine.mountRaDeg === null;
   });
 
   // Sensor field of view (Gilles, 2026-10-03: "le champ du capteur (cadre
@@ -1096,6 +1100,16 @@ export function mount(client, moduleName) {
   // that, not reset to "now" on the next server dump.
   let simulatedTime = null;
 
+  // "Lock on mount" (Gilles, 2026-10-25) - like repeatedly clicking "center
+  // on mount", but on every mountposition tick instead of once. Lives here
+  // too, same reasoning as simulatedTime above. suppressUnlockMount guards
+  // the recenter this feature itself triggers: centerOn()/centerOnMount()
+  // (sky-engine.js) fires onRotationChange() same as a real drag gesture
+  // does, so without it the very recenter the lock causes would itself be
+  // read as "the user just moved the view" and immediately unlock again.
+  let mountLocked = false;
+  let suppressUnlockMount = false;
+
   function build(mod) {
     dispose();
     Panels.clear();
@@ -1111,8 +1125,30 @@ export function mount(client, moduleName) {
     // here by value (not wrapped the same way) is already safe regardless
     // of where it's textually defined below.
     const selection = buildSelectionPanel(client, moduleName, () => sky.engine, () => simulatedTime, setSimTime);
-    const sky = buildSkyDome(client, moduleName, selection.onSelect, () => simulatedTime || new Date());
+    const sky = buildSkyDome(client, moduleName, selection.onSelect, () => simulatedTime || new Date(), () => { if (mountLocked) recenterOnMount(); });
     disposers.push(sky.dispose);
+
+    // See mount()'s own suppressUnlockMount doc comment - centerOnMount()
+    // fires onRotationChange() same as a real drag, so this recenter
+    // itself must not be read as the user manually moving the view.
+    function recenterOnMount() {
+      suppressUnlockMount = true;
+      sky.engine.centerOnMount();
+      suppressUnlockMount = false;
+    }
+    function unlockMount() {
+      if (suppressUnlockMount || !mountLocked) return;
+      mountLocked = false;
+      updateLockButton();
+    }
+    function updateLockButton() {
+      const btn = getQuickNavButton("lockOnMount");
+      if (!btn) return;
+      const iconEl = btn.querySelector(".material-icons");
+      if (iconEl) iconEl.textContent = mountLocked ? "lock" : "lock_open";
+      btn.title = t(mountLocked ? "navigator.unlockMount" : "navigator.lockOnMount");
+      btn.classList.toggle("active", mountLocked);
+    }
 
     // Single entry point for every time change (selection.node's own
     // drag/Now controls) - redraws the dome at the new instant and keeps
@@ -1173,6 +1209,14 @@ export function mount(client, moduleName) {
     if (sky.engine) {
       const settingsPanel = Panels.make({ id: "settings", title: t("navigator.displaySettings"), x: 660, y: 92, w: 260 });
       settingsPanel.appendChild(track(buildSettingsPanel(sky.engine, sky.hips)));
+      // Chained on top of buildSettingsPanel()'s own onZoomChange/
+      // onRotationChange (persisting zoom/rotation) rather than replacing
+      // them - both fields only ever hold one callback each, see
+      // sky-engine.js's own doc comments on them.
+      const prevOnZoomChange = sky.engine.onZoomChange;
+      sky.engine.onZoomChange = () => { unlockMount(); if (prevOnZoomChange) prevOnZoomChange(); };
+      const prevOnRotationChange = sky.engine.onRotationChange;
+      sky.engine.onRotationChange = () => { unlockMount(); if (prevOnRotationChange) prevOnRotationChange(); };
       // Icon-only (Gilles, 2026-10-03: "boutons 'settings' et 'time' :
       // juste les icones aussi (qui y sont deja), plus de libelle" - same
       // icon/iconOnly fields as the Stats/Guiding graph/Drift buttons just
@@ -1205,6 +1249,26 @@ export function mount(client, moduleName) {
         id: "centerOnMount", label: t("navigator.centerOnMount"), icon: "align_flex_center", iconOnly: true,
         disabled: sky.engine.mountRaDeg === null,
         onClick: () => sky.engine.centerOnMount(),
+      });
+
+      // "Lock on mount" (Gilles, 2026-10-25): like clicking "center on
+      // mount" on every single mountposition tick instead of once, until
+      // toggled off again - either by clicking this same button again, or
+      // by the user manually zooming/dragging the view (unlockMount(),
+      // chained onto onZoomChange/onRotationChange above). onClick, same
+      // reasoning as centerOnMount - no panel to toggle, so no `.active`
+      // reflecting panel visibility to rely on (renderQuickNav()'s own
+      // doc comment); updateLockButton() keeps the icon/title/`.active`
+      // class in sync by hand instead, same idea as indipanel.js's own
+      // active-tab buttons.
+      quickNavEntries.push({
+        id: "lockOnMount", label: t("navigator.lockOnMount"), icon: mountLocked ? "lock" : "lock_open", iconOnly: true,
+        disabled: sky.engine.mountRaDeg === null,
+        onClick: () => {
+          mountLocked = !mountLocked;
+          if (mountLocked) recenterOnMount();
+          updateLockButton();
+        },
       });
     }
 
@@ -1241,6 +1305,12 @@ export function mount(client, moduleName) {
     // connection block, image/optic/parms... — worth a dedicated panel
     // later if any of those turn out to matter day-to-day).
     updateQuickNav(quickNavEntries);
+    // Sets the button's `.active` class/title to match a `mountLocked`
+    // that's already true across this rebuild - the icon field above
+    // already gets this right at creation, but renderQuickNav() never
+    // sets `.active` for an onClick entry (there's no panel visibility
+    // for it to reflect).
+    updateLockButton();
   }
 
   return moduleLifecycle(client, moduleName, build, dispose);
