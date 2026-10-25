@@ -305,3 +305,18 @@ export function mount(client, moduleName) {
 
   return moduleLifecycle(client, moduleName, build, dispose);
 }
+
+// Per-template reorganize layout (panels.js's own reorganizePanels()) -
+// same scheme as guider.js's own: actions and tilt stacked in the left
+// column at a quarter of the display wide each, natural content height;
+// values alone in the right column at half width with its left edge
+// pinned to the display's horizontal center (xFrac) rather than the
+// column's own default right-edge anchor, which would overflow a
+// half-width panel; none of the three set hFrac, so each keeps its
+// natural content height. image-stats stays hidden, same as guider's.
+export const PANEL_LAYOUT = {
+  actions: { col: 0, order: 0, wFrac: 1 / 4 },
+  tilt: { col: 0, order: 1, wFrac: 1 / 4 },
+  values: { col: 1, order: 0, wFrac: 1 / 2, xFrac: 1 / 2 },
+  "image-stats": { hidden: true },
+};
